@@ -71,41 +71,26 @@
     </section>
 
     <!-- Quick Access Cards -->
-    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4 lg:py-8">
-        <div class="grid grid-cols-4 lg:grid-cols-4 gap-2 lg:gap-4">
-            <a href="{{ route('opac.catalog') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-blue-500/30">
-                    <i class="fas fa-search text-white text-sm lg:text-lg"></i>
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4 lg:py-6">
+        <div class="grid grid-cols-3 gap-2 lg:gap-4">
+            <a href="{{ route('opac.catalog') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
+                    <i class="fas fa-search text-white text-sm lg:text-base"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Katalog</h3>
+                <span class="font-semibold text-gray-900 text-xs lg:text-sm">Katalog</span>
             </a>
-            <a href="{{ route('opac.ebooks') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-orange-500/30">
-                    <i class="fas fa-file-pdf text-white text-sm lg:text-lg"></i>
+            <a href="{{ route('opac.ebooks') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30">
+                    <i class="fas fa-file-pdf text-white text-sm lg:text-base"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">E-Book</h3>
+                <span class="font-semibold text-gray-900 text-xs lg:text-sm">E-Book</span>
             </a>
-            <a href="{{ route('opac.etheses') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-pink-500/30">
-                    <i class="fas fa-graduation-cap text-white text-sm lg:text-lg"></i>
+            <a href="{{ route('opac.etheses') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-pink-500/30">
+                    <i class="fas fa-graduation-cap text-white text-sm lg:text-base"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">E-Thesis</h3>
+                <span class="font-semibold text-gray-900 text-xs lg:text-sm">E-Thesis</span>
             </a>
-            @auth('member')
-            <a href="{{ route('opac.member.dashboard') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-emerald-500/30">
-                    <i class="fas fa-user text-white text-sm lg:text-lg"></i>
-                </div>
-                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Akun</h3>
-            </a>
-            @else
-            <a href="{{ route('opac.login') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-emerald-500/30">
-                    <i class="fas fa-sign-in-alt text-white text-sm lg:text-lg"></i>
-                </div>
-                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Masuk</h3>
-            </a>
-            @endauth
         </div>
     </section>
 
