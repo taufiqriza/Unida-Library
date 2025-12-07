@@ -39,7 +39,7 @@ class OpacController extends Controller
 
         $popularBooks = Book::withoutGlobalScopes()
             ->with('authors')
-            ->withCount('loans')
+            ->withCount(['items as loans_count' => fn($q) => $q->withoutGlobalScopes()->whereHas('loans')])
             ->orderByDesc('loans_count')
             ->take(8)
             ->get()
@@ -93,7 +93,7 @@ class OpacController extends Controller
         $sort = $request->sort ?? 'latest';
         match ($sort) {
             'title' => $query->orderBy('title'),
-            'popular' => $query->withCount('loans')->orderByDesc('loans_count'),
+            'popular' => $query->withCount(['items as loans_count' => fn($q) => $q->withoutGlobalScopes()->whereHas('loans')])->orderByDesc('loans_count'),
             default => $query->latest(),
         };
 
