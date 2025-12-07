@@ -1,25 +1,17 @@
 <x-opac.layout title="Beranda">
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-12 lg:py-20 relative overflow-hidden">
+    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-8 lg:py-16 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
         
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm mb-6">
-                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                Perpustakaan Online
-            </div>
-            <h1 class="text-3xl lg:text-5xl font-bold mb-4">Perpustakaan UNIDA Gontor</h1>
-            <p class="text-blue-200 text-base lg:text-lg mb-2">Universitas Darussalam Gontor</p>
-            <p class="text-white/60 text-xs lg:text-sm max-w-lg mx-auto mb-8">
-                Akses ribuan koleksi buku, e-book, dan karya ilmiah untuk mendukung kegiatan akademik Anda.
-            </p>
+            <h1 class="text-2xl lg:text-4xl font-bold mb-2">Perpustakaan UNIDA Gontor</h1>
+            <p class="text-blue-200 text-sm lg:text-base mb-4">Universitas Darussalam Gontor</p>
             
             <!-- Search Box -->
             <form action="{{ route('opac.catalog') }}" method="GET" class="max-w-2xl mx-auto">
                 <div class="flex bg-white rounded-xl shadow-xl shadow-blue-900/20 overflow-hidden">
-                    <input type="text" name="q" placeholder="Cari judul, pengarang, atau ISBN..." class="flex-1 px-6 py-4 text-gray-700 focus:outline-none">
-                    <button type="submit" class="px-6 py-4 bg-blue-600 hover:bg-blue-700 transition">
+                    <input type="text" name="q" placeholder="Cari judul, pengarang, ISBN..." class="flex-1 px-4 py-3 text-gray-700 text-sm focus:outline-none">
+                    <button type="submit" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 transition">
                         <i class="fas fa-search text-white"></i>
                     </button>
                 </div>
@@ -28,85 +20,80 @@
     </section>
 
     <!-- Stats -->
-    <section class="max-w-7xl mx-auto px-4 -mt-8">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 lg:gap-4">
-            <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 text-center">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-book text-blue-600"></i>
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-5 lg:-mt-6">
+        <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-4">
+            <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center">
+                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
+                    <i class="fas fa-book text-blue-600 text-xs lg:text-base"></i>
                 </div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
-                <div class="text-xs text-gray-500">Judul Buku</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Judul</div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 text-center">
-                <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-copy text-emerald-600"></i>
+            <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center">
+                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-emerald-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
+                    <i class="fas fa-copy text-emerald-600 text-xs lg:text-base"></i>
                 </div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
-                <div class="text-xs text-gray-500">Eksemplar</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 text-center">
-                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-users text-purple-600"></i>
+            <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center">
+                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
+                    <i class="fas fa-users text-purple-600 text-xs lg:text-base"></i>
                 </div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($stats['members']) }}</div>
-                <div class="text-xs text-gray-500">Anggota</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['members']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Anggota</div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 text-center">
-                <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-file-pdf text-orange-600"></i>
+            <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center hidden md:block">
+                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
+                    <i class="fas fa-file-pdf text-orange-600 text-xs lg:text-base"></i>
                 </div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
-                <div class="text-xs text-gray-500">E-Book</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
             </div>
-            <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 text-center col-span-2 md:col-span-1">
-                <div class="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <i class="fas fa-graduation-cap text-pink-600"></i>
+            <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center hidden md:block">
+                <div class="w-8 h-8 lg:w-10 lg:h-10 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
+                    <i class="fas fa-graduation-cap text-pink-600 text-xs lg:text-base"></i>
                 </div>
-                <div class="text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
-                <div class="text-xs text-gray-500">E-Thesis</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
             </div>
         </div>
     </section>
 
     <!-- Quick Access Cards -->
-    <section class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            <a href="{{ route('opac.catalog') }}" class="bg-white rounded-xl p-4 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-blue-500/30">
-                    <i class="fas fa-search text-white text-lg"></i>
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4 lg:py-8">
+        <div class="grid grid-cols-4 lg:grid-cols-4 gap-2 lg:gap-4">
+            <a href="{{ route('opac.catalog') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-blue-500/30">
+                    <i class="fas fa-search text-white text-sm lg:text-lg"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-sm lg:text-base">Katalog</h3>
-                <p class="text-xs text-gray-500 mt-1 hidden lg:block">Cari koleksi buku perpustakaan</p>
+                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Katalog</h3>
             </a>
-            <a href="{{ route('opac.ebooks') }}" class="bg-white rounded-xl p-4 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-orange-500/30">
-                    <i class="fas fa-file-pdf text-white text-lg"></i>
+            <a href="{{ route('opac.ebooks') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-orange-500/30">
+                    <i class="fas fa-file-pdf text-white text-sm lg:text-lg"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-sm lg:text-base">E-Book</h3>
-                <p class="text-xs text-gray-500 mt-1 hidden lg:block">Akses koleksi buku digital</p>
+                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">E-Book</h3>
             </a>
-            <a href="{{ route('opac.etheses') }}" class="bg-white rounded-xl p-4 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-pink-500/30">
-                    <i class="fas fa-graduation-cap text-white text-lg"></i>
+            <a href="{{ route('opac.etheses') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-pink-500/30">
+                    <i class="fas fa-graduation-cap text-white text-sm lg:text-lg"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-sm lg:text-base">E-Thesis</h3>
-                <p class="text-xs text-gray-500 mt-1 hidden lg:block">Repositori karya ilmiah</p>
+                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">E-Thesis</h3>
             </a>
             @auth('member')
-            <a href="{{ route('opac.member.dashboard') }}" class="bg-white rounded-xl p-4 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/30">
-                    <i class="fas fa-user text-white text-lg"></i>
+            <a href="{{ route('opac.member.dashboard') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-emerald-500/30">
+                    <i class="fas fa-user text-white text-sm lg:text-lg"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-sm lg:text-base">Akun Saya</h3>
-                <p class="text-xs text-gray-500 mt-1 hidden lg:block">Lihat peminjaman & riwayat</p>
+                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Akun</h3>
             </a>
             @else
-            <a href="{{ route('opac.login') }}" class="bg-white rounded-xl p-4 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all group">
-                <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/30">
-                    <i class="fas fa-sign-in-alt text-white text-lg"></i>
+            <a href="{{ route('opac.login') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-6 shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition-all text-center lg:text-left">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center mx-auto lg:mx-0 mb-2 lg:mb-3 shadow-lg shadow-emerald-500/30">
+                    <i class="fas fa-sign-in-alt text-white text-sm lg:text-lg"></i>
                 </div>
-                <h3 class="font-bold text-gray-900 text-sm lg:text-base">Masuk</h3>
-                <p class="text-xs text-gray-500 mt-1 hidden lg:block">Login akun anggota</p>
+                <h3 class="font-bold text-gray-900 text-[10px] lg:text-base">Masuk</h3>
             </a>
             @endauth
         </div>
