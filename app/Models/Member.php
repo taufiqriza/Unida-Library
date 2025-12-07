@@ -3,25 +3,29 @@
 namespace App\Models;
 
 use App\Traits\BelongsToBranch;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Member extends Model
+class Member extends Authenticatable
 {
-    use BelongsToBranch;
+    use BelongsToBranch, HasApiTokens;
 
     protected $fillable = [
         'branch_id', 'member_id', 'name', 'gender', 'birth_date', 'identity_number',
-        'address', 'city', 'phone', 'email', 'member_type_id', 'register_date',
+        'address', 'city', 'phone', 'email', 'password', 'member_type_id', 'register_date',
         'expire_date', 'photo', 'is_active', 'notes'
     ];
+
+    protected $hidden = ['password'];
 
     protected $casts = [
         'birth_date' => 'date',
         'register_date' => 'date',
         'expire_date' => 'date',
         'is_active' => 'boolean',
+        'password' => 'hashed',
     ];
 
     public function memberType(): BelongsTo { return $this->belongsTo(MemberType::class); }

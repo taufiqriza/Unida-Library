@@ -49,4 +49,14 @@ class Book extends Model
     {
         return $this->authors->pluck('name')->implode('; ');
     }
+
+    public function loans()
+    {
+        return $this->hasManyThrough(Loan::class, Item::class);
+    }
+
+    public function collectionType(): BelongsTo
+    {
+        return $this->belongsTo(CollectionType::class);
+    }
 }
