@@ -1,9 +1,16 @@
-<div class="flex items-center gap-2">
-    <x-filament::dropdown>
+<div class="flex items-center">
+    <style>
+        @media (min-width: 768px) {
+            .branch-text { display: inline !important; }
+        }
+    </style>
+    
+    <x-filament::dropdown placement="bottom-end">
         <x-slot name="trigger">
-            <x-filament::button color="gray" size="sm" icon="heroicon-o-building-library">
-                {{ $currentBranch?->name ?? 'Semua Cabang' }}
-            </x-filament::button>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition">
+                <x-heroicon-o-building-library class="w-4 h-4" />
+                <span style="display: none;" class="branch-text">{{ $currentBranch?->name ?? 'Semua Cabang' }}</span>
+            </button>
         </x-slot>
 
         <x-filament::dropdown.list>

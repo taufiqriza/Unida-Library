@@ -13,6 +13,21 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasFactory, Notifiable;
 
+    const ROLE_SUPER_ADMIN = 'super_admin';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_LIBRARIAN = 'librarian';
+    const ROLE_STAFF = 'staff';
+
+    public static function getRoles(): array
+    {
+        return [
+            self::ROLE_SUPER_ADMIN => 'Super Admin',
+            self::ROLE_ADMIN => 'Admin Cabang',
+            self::ROLE_LIBRARIAN => 'Pustakawan',
+            self::ROLE_STAFF => 'Staff',
+        ];
+    }
+
     protected $fillable = ['name', 'email', 'password', 'branch_id', 'role', 'is_active'];
 
     protected $hidden = ['password', 'remember_token'];
@@ -38,20 +53,45 @@ class User extends Authenticatable implements FilamentUser
 
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'super_admin';
+        return $this->role === self::ROLE_SUPER_ADMIN;
     }
 
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['super_admin', 'admin']);
+        return in_array($this->role, [self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN]);
+    }
+
+    public function isLibrarian(): bool
+    {
+        return in_array($this->role, [self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_LIBRARIAN]);
+    }
+
+    public function canManageBranch(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->isAdmin();
+    }
+
+    public function canAccessReports(): bool
+    {
+        return $this->isLibrarian();
     }
 
     // Get current working branch (for super admin who can switch)
     public function getCurrentBranchId(): ?int
     {
         if ($this->isSuperAdmin()) {
-            return session('current_branch_id', $this->branch_id);
+            return session('current_branch_id');
         }
         return $this->branch_id;
+    }
+
+    public function getRoleLabel(): string
+    {
+        return self::getRoles()[$this->role] ?? $this->role;
     }
 }

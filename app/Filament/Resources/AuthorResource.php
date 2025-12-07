@@ -89,4 +89,9 @@ class AuthorResource extends Resource
             'index' => Pages\ManageAuthors::route('/'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
+    }
 }

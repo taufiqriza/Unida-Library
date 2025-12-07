@@ -85,4 +85,9 @@ class SubjectResource extends Resource
             'index' => Pages\ManageSubjects::route('/'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
+    }
 }

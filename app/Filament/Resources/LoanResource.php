@@ -117,4 +117,14 @@ class LoanResource extends Resource
             'index' => Pages\ListLoans::route('/'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('is_returned', false)->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
 }

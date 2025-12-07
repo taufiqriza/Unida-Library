@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Fine extends Model
 {
+    use BelongsToBranch;
+
     protected $fillable = [
-        'loan_id', 'member_id', 'amount', 'paid_amount', 'description', 'is_paid'
+        'loan_id', 'member_id', 'branch_id', 'amount', 'paid_amount', 'description', 'is_paid'
     ];
 
     protected $casts = [

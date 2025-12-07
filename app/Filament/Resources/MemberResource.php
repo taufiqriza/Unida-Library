@@ -21,6 +21,19 @@ class MemberResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'name';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'member_id', 'email', 'phone'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'ID' => $record->member_id ?? '-',
+            'Email' => $record->email ?? '-',
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -245,5 +258,10 @@ class MemberResource extends Resource
             'view' => Pages\ViewMember::route('/{record}'),
             'edit' => Pages\EditMember::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
     }
 }

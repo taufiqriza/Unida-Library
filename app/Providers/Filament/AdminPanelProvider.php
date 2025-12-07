@@ -2,12 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -31,27 +31,31 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->navigationGroups([
                 NavigationGroup::make('Katalog'),
+                NavigationGroup::make('E-Library'),
+                NavigationGroup::make('CMS'),
                 NavigationGroup::make('Sirkulasi'),
                 NavigationGroup::make('Keanggotaan'),
+                NavigationGroup::make('Laporan'),
                 NavigationGroup::make('Master Data')->collapsed(),
                 NavigationGroup::make('Perpustakaan'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                \App\Filament\Widgets\CurrentBranchInfo::class,
-                \App\Filament\Widgets\StatsOverview::class,
-                \App\Filament\Widgets\LoanChart::class,
-            ])
+            ->widgets([])
             ->renderHook(
                 'panels::user-menu.before',
-                fn () => auth()->user()?->isSuperAdmin() ? view('livewire.branch-switcher-hook') : ''
+                fn () => view('livewire.quick-actions-hook') . (auth()->user()?->isSuperAdmin() ? view('livewire.branch-switcher-hook') : '')
+            )
+            ->renderHook(
+                'panels::global-search.before',
+                fn () => view('filament.hooks.global-search-style')
             )
             ->middleware([
                 EncryptCookies::class,

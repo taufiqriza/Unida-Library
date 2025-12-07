@@ -20,6 +20,19 @@ class BookResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'isbn', 'call_number'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'ISBN' => $record->isbn ?? '-',
+            'Call Number' => $record->call_number ?? '-',
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -346,5 +359,10 @@ class BookResource extends Resource
             'create' => Pages\CreateBook::route('/create'),
             'edit' => Pages\EditBook::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
     }
 }

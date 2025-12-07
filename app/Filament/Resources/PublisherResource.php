@@ -68,4 +68,9 @@ class PublisherResource extends Resource
             'index' => Pages\ManagePublishers::route('/'),
         ];
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
+    }
 }

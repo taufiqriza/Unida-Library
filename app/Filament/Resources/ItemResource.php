@@ -18,6 +18,20 @@ class ItemResource extends Resource
     protected static ?string $modelLabel = 'Eksemplar';
     protected static ?string $pluralModelLabel = 'Eksemplar';
     protected static ?int $navigationSort = 2;
+    protected static ?string $recordTitleAttribute = 'barcode';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['barcode', 'inventory_code', 'book.title'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Judul' => $record->book?->title ?? '-',
+            'Status' => $record->status ?? '-',
+        ];
+    }
 
     public static function form(Form $form): Form
     {
@@ -188,5 +202,10 @@ class ItemResource extends Resource
             'create' => Pages\CreateItem::route('/create'),
             'edit' => Pages\EditItem::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
     }
 }

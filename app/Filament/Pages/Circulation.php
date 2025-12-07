@@ -87,10 +87,21 @@ class Circulation extends Page implements HasForms
             return;
         }
 
-        $item = Item::with('book')->where('barcode', $this->itemBarcode)->first();
+        $item = Item::withoutGlobalScopes()->with('book')->where('barcode', $this->itemBarcode)->first();
 
         if (!$item) {
             Notification::make()->title('Item tidak ditemukan')->danger()->send();
+            return;
+        }
+
+        // Branch validation
+        $currentBranchId = auth()->user()->getCurrentBranchId();
+        if ($currentBranchId && $item->branch_id !== $currentBranchId) {
+            Notification::make()
+                ->title('Item milik cabang lain')
+                ->body('Item ini terdaftar di cabang lain. Tidak dapat dipinjam dari cabang ini.')
+                ->danger()
+                ->send();
             return;
         }
 
@@ -122,7 +133,7 @@ class Circulation extends Page implements HasForms
         $loanPeriod = $this->activeMember->memberType->loan_period ?? 7;
 
         Loan::create([
-            'branch_id' => auth()->user()->getCurrentBranchId() ?? $item->branch_id,
+            'branch_id' => $item->branch_id,
             'member_id' => $this->activeMember->id,
             'item_id' => $item->id,
             'loan_date' => now(),

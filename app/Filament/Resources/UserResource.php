@@ -54,13 +54,9 @@ class UserResource extends Resource
                         ->helperText('Kosongkan untuk Super Admin'),
                     Forms\Components\Select::make('role')
                         ->label('Role')
-                        ->options([
-                            'super_admin' => 'Super Admin',
-                            'admin' => 'Admin Cabang',
-                            'librarian' => 'Pustakawan',
-                        ])
+                        ->options(User::getRoles())
                         ->required()
-                        ->default('librarian')
+                        ->default('staff')
                         ->visible(fn () => auth()->user()?->isSuperAdmin()),
                     Forms\Components\Toggle::make('is_active')
                         ->label('Aktif')
@@ -78,9 +74,11 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('branch.name')->label('Cabang')->placeholder('Semua Cabang'),
                 Tables\Columns\TextColumn::make('role')->label('Role')
                     ->badge()
+                    ->formatStateUsing(fn (string $state) => User::getRoles()[$state] ?? $state)
                     ->color(fn (string $state) => match ($state) {
                         'super_admin' => 'danger',
                         'admin' => 'warning',
+                        'librarian' => 'success',
                         default => 'gray',
                     }),
                 Tables\Columns\IconColumn::make('is_active')->label('Aktif')->boolean(),
@@ -102,5 +100,10 @@ class UserResource extends Resource
         return [
             'index' => Pages\ManageUsers::route('/'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count() ?: null;
     }
 }
