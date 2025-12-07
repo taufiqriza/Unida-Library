@@ -179,6 +179,28 @@
     </section>
     @endif
 
+    <!-- Branches -->
+    @if(count($branches) > 0)
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4"><i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>Lokasi Perpustakaan</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            @foreach($branches as $branch)
+            <div class="bg-white rounded-lg p-3 shadow-lg shadow-gray-200/50 flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-building text-blue-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm">{{ $branch['name'] }}</h3>
+                    @if($branch['address'])
+                    <p class="text-xs text-gray-500">{{ $branch['address'] }}</p>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
     <!-- Contact Section -->
     <section class="bg-white py-8 lg:py-12 lg:hidden">
         <div class="max-w-7xl mx-auto px-4">

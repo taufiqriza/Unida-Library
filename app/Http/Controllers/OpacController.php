@@ -86,6 +86,10 @@ class OpacController extends Controller
             $query->whereHas('subjects', fn($s) => $s->where('subjects.id', $subject));
         }
 
+        if ($branch = $request->branch) {
+            $query->whereHas('items', fn($i) => $i->withoutGlobalScopes()->where('branch_id', $branch));
+        }
+
         $sort = $request->sort ?? 'latest';
         match ($sort) {
             'title' => $query->orderBy('title'),
@@ -95,8 +99,9 @@ class OpacController extends Controller
 
         $books = $query->paginate(12)->withQueryString();
         $subjects = Subject::orderBy('name')->get();
+        $branches = Branch::orderBy('name')->get();
 
-        return view('opac.catalog', compact('books', 'subjects'));
+        return view('opac.catalog', compact('books', 'subjects', 'branches'));
     }
 
     public function catalogShow($id)
