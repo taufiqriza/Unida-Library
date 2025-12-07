@@ -1,0 +1,1 @@
+@livewire('branch-switcher')
