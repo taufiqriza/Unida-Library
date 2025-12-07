@@ -20,7 +20,7 @@
     </section>
 
     <!-- Stats -->
-    <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-5 lg:-mt-6">
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-10 lg:-mt-12 relative z-10">
         <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-4">
             <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-4 shadow-lg shadow-gray-200/50 text-center">
                 <div class="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-1 lg:mb-2">
