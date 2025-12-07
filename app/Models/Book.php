@@ -47,7 +47,23 @@ class Book extends Model
 
     public function getAuthorNamesAttribute(): string
     {
-        return $this->authors->pluck('name')->implode('; ');
+        return $this->authors()->get()->pluck('name')->implode('; ');
+    }
+
+    public function getCoverUrlAttribute(): ?string
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
+    public function getFileUrlAttribute(): ?string
+    {
+        $attachment = $this->attachments()->first();
+        return $attachment ? asset('storage/' . $attachment->file_path) : null;
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function loans()

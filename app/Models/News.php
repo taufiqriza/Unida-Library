@@ -33,4 +33,14 @@ class News extends Model
     public function scopePublished($query) { return $query->where('status', 'published')->where('published_at', '<=', now()); }
     public function scopeFeatured($query) { return $query->where('is_featured', true); }
     public function scopePinned($query) { return $query->where('is_pinned', true); }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->featured_image ? asset('storage/' . $this->featured_image) : null;
+    }
+
+    public function getIsPublishedAttribute(): bool
+    {
+        return $this->status === 'published' && $this->published_at <= now();
+    }
 }

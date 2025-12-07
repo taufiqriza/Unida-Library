@@ -1,13 +1,24 @@
 <?php
 
+use App\Http\Controllers\OpacController;
 use App\Http\Controllers\PrintController;
 use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// OPAC Routes
+Route::get('/', [OpacController::class, 'home'])->name('opac.home');
+Route::get('/catalog', [OpacController::class, 'catalog'])->name('opac.catalog');
+Route::get('/catalog/{id}', [OpacController::class, 'catalogShow'])->name('opac.catalog.show');
+Route::get('/ebooks', [OpacController::class, 'ebooks'])->name('opac.ebooks');
+Route::get('/etheses', [OpacController::class, 'etheses'])->name('opac.etheses');
+Route::get('/news', [OpacController::class, 'news'])->name('opac.news');
+Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
+
+// Placeholder routes for auth (will implement later)
+Route::view('/login', 'opac.login')->name('opac.login');
+Route::view('/register', 'opac.register')->name('opac.register');
+Route::view('/member', 'opac.member-dashboard')->name('opac.member.dashboard');
 
 // Print routes
 Route::middleware('auth')->group(function () {
