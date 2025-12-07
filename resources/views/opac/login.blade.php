@@ -9,11 +9,17 @@
                 <p class="text-sm text-gray-500 mt-1">Masuk ke akun anggota perpustakaan</p>
             </div>
 
+            @if($errors->any())
+            <div class="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4">
+                {{ $errors->first() }}
+            </div>
+            @endif
+
             <form action="{{ route('opac.login') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">No. Anggota / Email</label>
-                    <input type="text" name="identifier" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
+                    <input type="text" name="identifier" value="{{ old('identifier') }}" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
