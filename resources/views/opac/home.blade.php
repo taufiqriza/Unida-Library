@@ -21,43 +21,41 @@
 
     <!-- Stats -->
     <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-6 lg:-mt-10 relative z-10">
-        <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50">
-            <div class="grid grid-cols-3 md:grid-cols-5 gap-3 lg:gap-6">
-                <div class="text-center">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                        <i class="fas fa-book text-blue-600 text-sm lg:text-lg"></i>
-                    </div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Judul</div>
+        <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-3">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+                    <i class="fas fa-book text-blue-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                        <i class="fas fa-copy text-emerald-600 text-sm lg:text-lg"></i>
-                    </div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Judul</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+                    <i class="fas fa-copy text-emerald-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                        <i class="fas fa-users text-purple-600 text-sm lg:text-lg"></i>
-                    </div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['members']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Anggota</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+                    <i class="fas fa-users text-purple-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center hidden md:block">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                        <i class="fas fa-file-pdf text-orange-600 text-sm lg:text-lg"></i>
-                    </div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['members']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">Anggota</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center hidden md:block">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+                    <i class="fas fa-file-pdf text-orange-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center hidden md:block">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                        <i class="fas fa-graduation-cap text-pink-600 text-sm lg:text-lg"></i>
-                    </div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center hidden md:block">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+                    <i class="fas fa-graduation-cap text-pink-600 text-sm lg:text-lg"></i>
                 </div>
+                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
+                <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
             </div>
         </div>
     </section>
