@@ -19,49 +19,49 @@
 </head>
 <body class="pattern-bg min-h-screen">
     <!-- Header -->
-    <header class="bg-white border-b border-blue-100 sticky top-0 z-50 shadow-sm">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-700 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-14">
                 <a href="{{ route('opac.home') }}" class="flex items-center gap-3">
-                    <div class="w-10 h-10 gradient-blue rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                    <div class="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
                         <i class="fas fa-book-open text-white"></i>
                     </div>
                     <div class="hidden sm:block">
-                        <span class="font-bold text-gray-900">Perpustakaan</span>
-                        <span class="text-xs text-blue-600 block -mt-1">UNIDA Gontor</span>
+                        <span class="font-bold text-white">Perpustakaan</span>
+                        <span class="text-xs text-blue-200 block -mt-1">UNIDA Gontor</span>
                     </div>
                 </a>
                 
                 <!-- Desktop Nav -->
-                <nav class="hidden lg:flex items-center gap-6">
-                    <a href="{{ route('opac.home') }}" class="flex items-center gap-2 text-sm font-medium {{ request()->routeIs('opac.home') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                <nav class="hidden lg:flex items-center gap-1">
+                    <a href="{{ route('opac.home') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('opac.home') ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-home"></i> Beranda
                     </a>
-                    <a href="{{ route('opac.catalog') }}" class="flex items-center gap-2 text-sm font-medium {{ request()->routeIs('opac.catalog*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                    <a href="{{ route('opac.catalog') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('opac.catalog*') ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-search"></i> Katalog
                     </a>
-                    <a href="{{ route('opac.ebooks') }}" class="flex items-center gap-2 text-sm font-medium {{ request()->routeIs('opac.ebooks*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                    <a href="{{ route('opac.ebooks') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('opac.ebooks*') ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-file-pdf"></i> E-Book
                     </a>
-                    <a href="{{ route('opac.etheses') }}" class="flex items-center gap-2 text-sm font-medium {{ request()->routeIs('opac.etheses*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                    <a href="{{ route('opac.etheses') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('opac.etheses*') ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-graduation-cap"></i> E-Thesis
                     </a>
-                    <a href="{{ route('opac.news') }}" class="flex items-center gap-2 text-sm font-medium {{ request()->routeIs('opac.news*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                    <a href="{{ route('opac.news') }}" class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg {{ request()->routeIs('opac.news*') ? 'bg-white/20 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
                         <i class="fas fa-newspaper"></i> Berita
                     </a>
                 </nav>
 
                 <div class="flex items-center gap-2">
-                    <a href="https://wa.me/6285183053934" target="_blank" class="w-9 h-9 bg-green-50 hover:bg-green-100 rounded-lg flex items-center justify-center text-green-600 transition">
+                    <a href="https://wa.me/6285183053934" target="_blank" class="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center text-white transition">
                         <i class="fab fa-whatsapp text-lg"></i>
                     </a>
                     @auth('member')
-                        <a href="{{ route('opac.member.dashboard') }}" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg">
+                        <a href="{{ route('opac.member.dashboard') }}" class="hidden sm:flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg">
                             <i class="fas fa-user-circle"></i> {{ auth('member')->user()->name }}
                         </a>
                     @else
-                        <a href="{{ route('opac.login') }}" class="hidden sm:block px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700">Masuk</a>
-                        <a href="{{ route('opac.register') }}" class="hidden sm:block px-4 py-2 text-sm font-medium text-white gradient-blue rounded-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition">Daftar</a>
+                        <a href="{{ route('opac.login') }}" class="hidden sm:block px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg">Masuk</a>
+                        <a href="{{ route('opac.register') }}" class="hidden sm:block px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-lg hover:bg-blue-50 transition">Daftar</a>
                     @endauth
                 </div>
             </div>
@@ -73,74 +73,73 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-100 mt-12 hidden lg:block">
+    <footer class="bg-gradient-to-r from-blue-600 to-indigo-700 mt-12 hidden lg:block">
         <div class="max-w-7xl mx-auto px-4 py-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 gradient-blue rounded-lg flex items-center justify-center">
+                        <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                             <i class="fas fa-book-open text-white text-sm"></i>
                         </div>
-                        <span class="font-bold text-gray-900">Perpustakaan</span>
+                        <span class="font-bold text-white">Perpustakaan</span>
                     </div>
-                    <p class="text-sm text-gray-500">Perpustakaan Universitas Darussalam Gontor melayani civitas akademika dalam akses koleksi dan layanan informasi.</p>
+                    <p class="text-sm text-blue-200">Perpustakaan Universitas Darussalam Gontor melayani civitas akademika dalam akses koleksi dan layanan informasi.</p>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-3">Layanan</h4>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li><a href="{{ route('opac.catalog') }}" class="hover:text-blue-600"><i class="fas fa-search mr-2 text-blue-500"></i>Katalog Online</a></li>
-                        <li><a href="{{ route('opac.ebooks') }}" class="hover:text-blue-600"><i class="fas fa-file-pdf mr-2 text-orange-500"></i>E-Book</a></li>
-                        <li><a href="{{ route('opac.etheses') }}" class="hover:text-blue-600"><i class="fas fa-graduation-cap mr-2 text-pink-500"></i>E-Thesis</a></li>
+                    <h4 class="font-semibold text-white mb-3">Layanan</h4>
+                    <ul class="space-y-2 text-sm text-blue-200">
+                        <li><a href="{{ route('opac.catalog') }}" class="hover:text-white"><i class="fas fa-search mr-2"></i>Katalog Online</a></li>
+                        <li><a href="{{ route('opac.ebooks') }}" class="hover:text-white"><i class="fas fa-file-pdf mr-2"></i>E-Book</a></li>
+                        <li><a href="{{ route('opac.etheses') }}" class="hover:text-white"><i class="fas fa-graduation-cap mr-2"></i>E-Thesis</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-3">Informasi</h4>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li><i class="fas fa-clock mr-2 text-blue-500"></i>Sen-Jum: 08.00 - 16.00</li>
-                        <li><i class="fas fa-clock mr-2 text-blue-500"></i>Sabtu: 08.00 - 12.00</li>
-                        <li><a href="{{ route('opac.news') }}" class="hover:text-blue-600"><i class="fas fa-newspaper mr-2 text-emerald-500"></i>Berita & Pengumuman</a></li>
+                    <h4 class="font-semibold text-white mb-3">Jam Layanan</h4>
+                    <ul class="space-y-2 text-sm text-blue-200">
+                        <li><i class="fas fa-clock mr-2"></i>Sen-Jum: 08.00 - 16.00</li>
+                        <li><i class="fas fa-clock mr-2"></i>Sabtu: 08.00 - 12.00</li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-900 mb-3">Kontak</h4>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li><a href="mailto:library@unida.gontor.ac.id" class="hover:text-blue-600"><i class="fas fa-envelope mr-2 text-blue-500"></i>library@unida.gontor.ac.id</a></li>
-                        <li><a href="https://wa.me/6285183053934" target="_blank" class="hover:text-blue-600"><i class="fab fa-whatsapp mr-2 text-green-500"></i>0851-8305-3934</a></li>
-                        <li><a href="https://library.unida.gontor.ac.id" target="_blank" class="hover:text-blue-600"><i class="fas fa-globe mr-2 text-blue-500"></i>library.unida.gontor.ac.id</a></li>
+                    <h4 class="font-semibold text-white mb-3">Kontak</h4>
+                    <ul class="space-y-2 text-sm text-blue-200">
+                        <li><a href="mailto:library@unida.gontor.ac.id" class="hover:text-white"><i class="fas fa-envelope mr-2"></i>library@unida.gontor.ac.id</a></li>
+                        <li><a href="https://wa.me/6285183053934" target="_blank" class="hover:text-white"><i class="fab fa-whatsapp mr-2"></i>0851-8305-3934</a></li>
+                        <li><a href="https://library.unida.gontor.ac.id" target="_blank" class="hover:text-white"><i class="fas fa-globe mr-2"></i>library.unida.gontor.ac.id</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-100 mt-8 pt-6 text-center text-sm text-gray-400">
+            <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-blue-200">
                 &copy; {{ date('Y') }} Perpustakaan Universitas Darussalam Gontor. All rights reserved.
             </div>
         </div>
     </footer>
 
     <!-- Mobile Bottom Nav -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-blue-100 p-2 lg:hidden z-50">
+    <div class="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-indigo-700 p-2 lg:hidden z-50">
         <div class="flex items-center justify-around">
-            <a href="{{ route('opac.home') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.home') ? 'text-blue-600' : 'text-gray-400' }}">
+            <a href="{{ route('opac.home') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.home') ? 'text-white' : 'text-blue-200' }}">
                 <i class="fas fa-home text-lg"></i>
                 <span class="text-[10px] mt-1 font-medium">Beranda</span>
             </a>
-            <a href="{{ route('opac.catalog') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.catalog*') ? 'text-blue-600' : 'text-gray-400' }}">
+            <a href="{{ route('opac.catalog') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.catalog*') ? 'text-white' : 'text-blue-200' }}">
                 <i class="fas fa-search text-lg"></i>
                 <span class="text-[10px] mt-1 font-medium">Katalog</span>
             </a>
-            <a href="{{ route('opac.ebooks') }}" class="flex items-center justify-center w-12 h-12 -mt-5 gradient-blue text-white rounded-full shadow-lg shadow-blue-500/30">
+            <a href="{{ route('opac.ebooks') }}" class="flex items-center justify-center w-12 h-12 -mt-5 bg-white text-blue-600 rounded-full shadow-lg">
                 <i class="fas fa-book-reader text-lg"></i>
             </a>
-            <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.etheses*') ? 'text-blue-600' : 'text-gray-400' }}">
+            <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.etheses*') ? 'text-white' : 'text-blue-200' }}">
                 <i class="fas fa-graduation-cap text-lg"></i>
                 <span class="text-[10px] mt-1 font-medium">E-Thesis</span>
             </a>
             @auth('member')
-            <a href="{{ route('opac.member.dashboard') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.member*') ? 'text-blue-600' : 'text-gray-400' }}">
+            <a href="{{ route('opac.member.dashboard') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.member*') ? 'text-white' : 'text-blue-200' }}">
                 <i class="fas fa-user text-lg"></i>
                 <span class="text-[10px] mt-1 font-medium">Akun</span>
             </a>
             @else
-            <a href="{{ route('opac.login') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.login') ? 'text-blue-600' : 'text-gray-400' }}">
+            <a href="{{ route('opac.login') }}" class="flex flex-col items-center py-2 px-3 {{ request()->routeIs('opac.login') ? 'text-white' : 'text-blue-200' }}">
                 <i class="fas fa-sign-in-alt text-lg"></i>
                 <span class="text-[10px] mt-1 font-medium">Masuk</span>
             </a>
