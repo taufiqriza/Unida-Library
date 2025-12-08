@@ -153,6 +153,21 @@ class OpacController extends Controller
         return view('opac.etheses', compact('theses'));
     }
 
+    public function ethesisShow($id)
+    {
+        $thesis = Ethesis::where('is_public', true)->with('department')->findOrFail($id);
+        $thesis->increment('views');
+
+        $relatedTheses = Ethesis::where('is_public', true)
+            ->where('id', '!=', $thesis->id)
+            ->where('department_id', $thesis->department_id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('opac.ethesis-detail', compact('thesis', 'relatedTheses'));
+    }
+
     public function news()
     {
         $news = News::published()->latest('published_at')->paginate(12);

@@ -3,6 +3,7 @@
 use App\Http\Controllers\MemberAuthController;
 use App\Http\Controllers\OpacController;
 use App\Http\Controllers\PrintController;
+use App\Http\Controllers\ThesisFileController;
 use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,21 @@ Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])->name('opac.login');
 Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])->name('opac.register');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');
-Route::get('/member', [MemberAuthController::class, 'dashboard'])->middleware('auth:member')->name('opac.member.dashboard');
+
+// Member Area (Protected)
+Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(function () {
+    Route::get('/', [MemberAuthController::class, 'dashboard'])->name('dashboard');
+    Route::get('/submissions', fn() => view('opac.member.submissions'))->name('submissions');
+    Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
+    Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
+});
+
+// E-Thesis detail
+Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');
+
+// Thesis file access (with access control)
+Route::get('/thesis-file/{submission}/{type}', [ThesisFileController::class, 'show'])->name('thesis.file');
+Route::get('/thesis-file/{submission}/{type}/download', [ThesisFileController::class, 'download'])->name('thesis.file.download');
 
 // Print routes
 Route::middleware('auth')->group(function () {
