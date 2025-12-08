@@ -86,32 +86,45 @@
                 <label class="block text-sm font-medium text-gray-700 mb-3">
                     Jenis Tugas Akhir <span class="text-red-500">*</span>
                 </label>
-                <div class="inline-flex rounded-xl border border-gray-200 p-1 bg-gray-50/50">
-                    @foreach($this->thesisTypes as $thesisType)
-                        <label class="cursor-pointer">
-                            <input 
-                                type="radio" 
-                                wire:model.live="type" 
-                                name="thesis_type" 
-                                value="{{ $thesisType->value }}" 
-                                class="sr-only peer"
-                            >
-                            <div @class([
-                                'px-5 py-2.5 rounded-lg text-sm font-semibold transition-all relative',
-                                'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' => $type === $thesisType->value,
-                                'text-gray-500 hover:text-gray-700 hover:bg-white/50' => $type !== $thesisType->value,
-                            ])>
-                                <span class="flex items-center gap-2">
-                                    <i class="fas {{ $thesisType->icon() }} text-xs"></i>
-                                    {{ $thesisType->degree() }}
-                                </span>
-                            </div>
-                        </label>
-                    @endforeach
+                <div class="inline-flex rounded-xl border border-gray-200 p-1 bg-gray-50/50 gap-1">
+                    <button 
+                        type="button"
+                        wire:click="$set('type', 'skripsi')"
+                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'skripsi' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
+                    >
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-graduation-cap text-xs"></i>
+                            S1
+                        </span>
+                    </button>
+                    <button 
+                        type="button"
+                        wire:click="$set('type', 'tesis')"
+                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'tesis' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
+                    >
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-user-graduate text-xs"></i>
+                            S2
+                        </span>
+                    </button>
+                    <button 
+                        type="button"
+                        wire:click="$set('type', 'disertasi')"
+                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'disertasi' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
+                    >
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-award text-xs"></i>
+                            S3
+                        </span>
+                    </button>
                 </div>
                 <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5">
                     <i class="fas fa-info-circle text-primary-400"></i>
-                    {{ $this->selectedType?->fullLabel() ?? 'Pilih jenis tugas akhir' }}
+                    @if($type === 'skripsi') Skripsi (S1)
+                    @elseif($type === 'tesis') Tesis (S2)
+                    @elseif($type === 'disertasi') Disertasi (S3)
+                    @else Pilih jenis tugas akhir
+                    @endif
                 </p>
                 @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
