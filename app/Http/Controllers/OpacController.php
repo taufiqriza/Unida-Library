@@ -170,4 +170,125 @@ class OpacController extends Controller
 
         return view('opac.news-detail', compact('news', 'recentNews'));
     }
+
+    public function page($slug)
+    {
+        // Pages with dedicated views
+        $dedicatedViews = [
+            // HOME
+            'visi-misi', 'sejarah', 'struktur-organisasi', 'mou',
+            'tata-tertib', 'jam-layanan', 'fasilitas', 'karir',
+            // E-RESOURCES
+            'digilib-apps', 'journal-subscription',
+            // DISCOVER
+            'event-library', 'virtual-tour', 'e-learning',
+            'prosa-kreatif', 'survey', 'research-tools',
+            // GUIDE
+            'panduan-opac', 'unggah-tugas-akhir', 'panduan-ospek',
+            'panduan-akademik', 'materi-perpustakaan', 'download-eddc',
+        ];
+
+        if (in_array($slug, $dedicatedViews)) {
+            return view('opac.pages.' . $slug);
+        }
+
+        // Generic pages
+        $pages = [
+            // E-RESOURCES
+            'digilib-apps' => [
+                'title' => 'Digilib Apps',
+                'subtitle' => 'Aplikasi Perpustakaan Digital',
+                'icon' => 'fas fa-mobile-alt',
+                'content' => null,
+            ],
+            'journal-subscription' => [
+                'title' => 'Journal Subscription',
+                'subtitle' => 'Langganan Jurnal Internasional',
+                'icon' => 'fas fa-bookmark',
+                'content' => null,
+            ],
+            // DISCOVER
+            'event-library' => [
+                'title' => 'Event Library',
+                'subtitle' => 'Kegiatan dan Acara Perpustakaan',
+                'icon' => 'fas fa-calendar-star',
+                'content' => null,
+            ],
+            'virtual-tour' => [
+                'title' => 'Virtual Tour',
+                'subtitle' => 'Tur Virtual 360° Perpustakaan',
+                'icon' => 'fas fa-vr-cardboard',
+                'content' => null,
+            ],
+            'e-learning' => [
+                'title' => 'E-Learning',
+                'subtitle' => 'Pembelajaran Online',
+                'icon' => 'fas fa-laptop',
+                'content' => null,
+            ],
+            'prosa-kreatif' => [
+                'title' => 'Prosa Kreatif',
+                'subtitle' => 'Komunitas Menulis Kreatif',
+                'icon' => 'fas fa-pen-fancy',
+                'content' => null,
+            ],
+            'survey' => [
+                'title' => 'Experience Survey',
+                'subtitle' => 'Survei Kepuasan Pengguna',
+                'icon' => 'fas fa-poll',
+                'content' => null,
+            ],
+            'research-tools' => [
+                'title' => 'Research Tools',
+                'subtitle' => 'Alat Bantu Penelitian',
+                'icon' => 'fas fa-microscope',
+                'content' => null,
+            ],
+            // GUIDE
+            'panduan-opac' => [
+                'title' => 'Panduan OPAC',
+                'subtitle' => 'Cara Menggunakan Katalog Online',
+                'icon' => 'fas fa-search',
+                'content' => null,
+            ],
+            'unggah-tugas-akhir' => [
+                'title' => 'Unggah Tugas Akhir',
+                'subtitle' => 'Panduan Upload Skripsi/Tesis',
+                'icon' => 'fas fa-upload',
+                'content' => null,
+            ],
+            'panduan-ospek' => [
+                'title' => 'Panduan Ospek',
+                'subtitle' => 'Orientasi Perpustakaan Mahasiswa Baru',
+                'icon' => 'fas fa-user-graduate',
+                'content' => null,
+            ],
+            'panduan-akademik' => [
+                'title' => 'Panduan Akademik',
+                'subtitle' => 'Informasi Akademik Perpustakaan',
+                'icon' => 'fas fa-book-reader',
+                'content' => null,
+            ],
+            'materi-perpustakaan' => [
+                'title' => 'Materi Perpustakaan',
+                'subtitle' => 'Bahan Ajar dan Presentasi',
+                'icon' => 'fas fa-chalkboard-teacher',
+                'content' => null,
+            ],
+            'download-eddc' => [
+                'title' => 'Download E-DDC 23',
+                'subtitle' => 'Dewey Decimal Classification',
+                'icon' => 'fas fa-download',
+                'content' => null,
+            ],
+        ];
+
+        if (!isset($pages[$slug])) {
+            abort(404);
+        }
+
+        $page = $pages[$slug];
+
+        return view('opac.page', compact('page'));
+    }
 }
