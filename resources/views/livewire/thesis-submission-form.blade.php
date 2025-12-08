@@ -81,51 +81,19 @@
             <p class="text-xs lg:text-sm text-gray-500 mt-1">Lengkapi informasi dasar tugas akhir Anda</p>
         </div>
         <div class="p-4 lg:p-6 space-y-5">
-            {{-- Jenis Tugas Akhir - Compact Toggle --}}
+            {{-- Jenis Tugas Akhir - Select Dropdown --}}
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                     Jenis Tugas Akhir <span class="text-red-500">*</span>
                 </label>
-                <div class="inline-flex rounded-xl border border-gray-200 p-1 bg-gray-50/50 gap-1">
-                    <button 
-                        type="button"
-                        wire:click="$set('type', 'skripsi')"
-                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'skripsi' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
-                    >
-                        <span class="flex items-center gap-2">
-                            <i class="fas fa-graduation-cap text-xs"></i>
-                            S1
-                        </span>
-                    </button>
-                    <button 
-                        type="button"
-                        wire:click="$set('type', 'tesis')"
-                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'tesis' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
-                    >
-                        <span class="flex items-center gap-2">
-                            <i class="fas fa-user-graduate text-xs"></i>
-                            S2
-                        </span>
-                    </button>
-                    <button 
-                        type="button"
-                        wire:click="$set('type', 'disertasi')"
-                        class="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all {{ $type === 'disertasi' ? 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' : 'text-gray-500 hover:text-gray-700 hover:bg-white/50' }}"
-                    >
-                        <span class="flex items-center gap-2">
-                            <i class="fas fa-award text-xs"></i>
-                            S3
-                        </span>
-                    </button>
-                </div>
-                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5">
-                    <i class="fas fa-info-circle text-primary-400"></i>
-                    @if($type === 'skripsi') Skripsi (S1)
-                    @elseif($type === 'tesis') Tesis (S2)
-                    @elseif($type === 'disertasi') Disertasi (S3)
-                    @else Pilih jenis tugas akhir
-                    @endif
-                </p>
+                <select 
+                    wire:model.live="type" 
+                    class="w-full md:w-auto px-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition bg-white font-medium"
+                >
+                    <option value="skripsi">📚 Skripsi (S1)</option>
+                    <option value="tesis">🎓 Tesis (S2)</option>
+                    <option value="disertasi">🏆 Disertasi (S3)</option>
+                </select>
                 @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
