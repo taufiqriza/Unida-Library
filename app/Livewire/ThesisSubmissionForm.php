@@ -247,6 +247,23 @@ class ThesisSubmissionForm extends Component
 
     public function saveDraft(): void
     {
+        // Minimal validation for draft - only require title
+        $this->validate([
+            'title' => 'required|min:3',
+        ], [
+            'title.required' => 'Judul wajib diisi untuk menyimpan draft',
+            'title.min' => 'Judul minimal 3 karakter',
+        ]);
+
+        // Check if department_id is set, if not set a default or skip
+        if (!$this->department_id) {
+            // Get first department as fallback for draft
+            $firstDept = Department::first();
+            if ($firstDept) {
+                $this->department_id = $firstDept->id;
+            }
+        }
+
         $this->saveSubmission('draft');
         session()->flash('success', 'Draft berhasil disimpan');
     }
