@@ -88,20 +88,25 @@
                 </label>
                 <div class="inline-flex rounded-xl border border-gray-200 p-1 bg-gray-50/50">
                     @foreach($this->thesisTypes as $thesisType)
-                        <button 
-                            type="button"
-                            wire:click="selectType('{{ $thesisType->value }}')"
-                            @class([
+                        <label class="cursor-pointer">
+                            <input 
+                                type="radio" 
+                                wire:model.live="type" 
+                                name="thesis_type" 
+                                value="{{ $thesisType->value }}" 
+                                class="sr-only peer"
+                            >
+                            <div @class([
                                 'px-5 py-2.5 rounded-lg text-sm font-semibold transition-all relative',
                                 'bg-white shadow-sm text-primary-700 ring-1 ring-primary-200' => $type === $thesisType->value,
                                 'text-gray-500 hover:text-gray-700 hover:bg-white/50' => $type !== $thesisType->value,
-                            ])
-                        >
-                            <span class="flex items-center gap-2">
-                                <i class="fas {{ $thesisType->icon() }} text-xs"></i>
-                                {{ $thesisType->degree() }}
-                            </span>
-                        </button>
+                            ])>
+                                <span class="flex items-center gap-2">
+                                    <i class="fas {{ $thesisType->icon() }} text-xs"></i>
+                                    {{ $thesisType->degree() }}
+                                </span>
+                            </div>
+                        </label>
                     @endforeach
                 </div>
                 <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5">
