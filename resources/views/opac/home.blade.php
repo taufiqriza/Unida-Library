@@ -1,19 +1,50 @@
 <x-opac.layout title="Beranda">
     <!-- Hero Section -->
     <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-8 lg:py-16 relative overflow-hidden">
+        <!-- Decorative elements -->
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
         
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
             <h1 class="text-2xl lg:text-4xl font-bold mb-2">Perpustakaan UNIDA Gontor</h1>
-            <p class="text-blue-200 text-sm lg:text-base mb-4">Universitas Darussalam Gontor</p>
+            <p class="text-blue-200 text-sm lg:text-base mb-6">Universitas Darussalam Gontor</p>
             
-            <!-- Search Box -->
+            <!-- Search Box - Powerful Rounded Full Design -->
             <form action="{{ route('opac.catalog') }}" method="GET" class="max-w-2xl mx-auto">
-                <div class="flex bg-white rounded-xl shadow-xl shadow-blue-900/20 overflow-hidden">
-                    <input type="text" name="q" placeholder="Cari judul, pengarang, ISBN..." class="flex-1 px-4 py-3 text-gray-700 text-sm focus:outline-none">
-                    <button type="submit" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 transition">
-                        <i class="fas fa-search text-white"></i>
-                    </button>
+                <div class="relative group">
+                    <!-- Glow effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
+                    
+                    <!-- Search input container -->
+                    <div class="relative flex items-center bg-white rounded-full shadow-2xl shadow-blue-900/30 overflow-hidden">
+                        <!-- Search icon -->
+                        <div class="pl-5 pr-2">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        
+                        <!-- Input -->
+                        <input 
+                            type="text" 
+                            name="q" 
+                            placeholder="Cari judul, pengarang, ISBN, atau kata kunci..." 
+                            class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
+                        >
+                        
+                        <!-- Submit button -->
+                        <button type="submit" class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2">
+                            <span class="hidden sm:inline">Cari</span>
+                            <i class="fas fa-arrow-right text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick search tags -->
+                <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <span class="text-blue-200 text-xs">Populer:</span>
+                    <a href="{{ route('opac.catalog') }}?q=islam" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
+                    <a href="{{ route('opac.catalog') }}?q=ekonomi" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
+                    <a href="{{ route('opac.catalog') }}?q=pendidikan" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
+                    <a href="{{ route('opac.catalog') }}?q=hukum" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
                 </div>
             </form>
         </div>

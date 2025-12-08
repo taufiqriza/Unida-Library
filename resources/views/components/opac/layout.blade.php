@@ -663,45 +663,72 @@
 
     <!-- Search Modal - Works on both mobile and desktop -->
     <div x-show="searchOpen" x-cloak class="fixed inset-0 z-[70]" @keydown.escape.window="searchOpen = false">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="searchOpen = false"></div>
-        <div class="absolute inset-x-4 top-20 lg:inset-x-auto lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-xl" 
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-900/90 to-indigo-900/90 backdrop-blur-md" @click="searchOpen = false"></div>
+        <div class="absolute inset-x-4 top-16 lg:top-24 lg:inset-x-auto lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl" 
              x-show="searchOpen"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-95">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div class="bg-gradient-to-r from-primary-600 to-primary-800 p-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-white font-semibold flex items-center gap-2">
-                            <i class="fas fa-search"></i> Cari Koleksi
-                        </h3>
-                        <button @click="searchOpen = false" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition">
-                            <i class="fas fa-times"></i>
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4">
+            
+            <!-- Close button floating -->
+            <button @click="searchOpen = false" class="absolute -top-2 -right-2 lg:top-0 lg:-right-12 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition z-10">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Search container -->
+            <div class="text-center mb-6">
+                <h3 class="text-white text-xl lg:text-2xl font-bold mb-2">Cari Koleksi Perpustakaan</h3>
+                <p class="text-primary-200 text-sm">Temukan buku, jurnal, e-book, dan tugas akhir</p>
+            </div>
+
+            <form action="{{ route('opac.catalog') }}" method="GET">
+                <!-- Search input - Rounded Full Style -->
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-primary-400 via-white to-primary-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
+                    <div class="relative flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
+                        <div class="pl-5 pr-2">
+                            <i class="fas fa-search text-gray-400 text-lg"></i>
+                        </div>
+                        <input type="text" name="q" placeholder="Ketik judul, pengarang, ISBN, atau kata kunci..." 
+                               class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
+                               x-ref="searchInput"
+                               @keydown.enter="$el.form.submit()">
+                        <button type="submit" class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg flex items-center gap-2">
+                            <span class="hidden sm:inline">Cari</span>
+                            <i class="fas fa-arrow-right text-sm"></i>
                         </button>
                     </div>
                 </div>
-                <form action="{{ route('opac.catalog') }}" method="GET" class="p-4 lg:p-6">
-                    <div class="relative">
-                        <input type="text" name="q" placeholder="Ketik judul, pengarang, atau ISBN..." 
-                               class="w-full px-4 py-3 lg:py-4 pr-12 bg-gray-100 rounded-xl text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
-                               x-ref="searchInput"
-                               @keydown.enter="$el.form.submit()">
-                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 lg:w-10 lg:h-10 bg-primary-600 text-white rounded-lg flex items-center justify-center hover:bg-primary-700 transition">
-                            <i class="fas fa-search text-sm"></i>
-                        </button>
-                    </div>
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="text-xs text-gray-400">Cari di:</span>
-                        <a href="{{ route('opac.catalog') }}" class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium hover:bg-primary-200 transition">Katalog</a>
-                        <a href="{{ route('opac.ebooks') }}" class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium hover:bg-orange-200 transition">E-Book</a>
-                        <a href="{{ route('opac.etheses') }}" class="px-3 py-1.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium hover:bg-pink-200 transition">E-Thesis</a>
-                    </div>
-                    <p class="mt-4 text-xs text-gray-400 text-center">Tekan <kbd class="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">Esc</kbd> untuk menutup</p>
-                </form>
-            </div>
+
+                <!-- Quick search categories -->
+                <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+                    <span class="text-primary-200 text-xs">Cari di:</span>
+                    <a href="{{ route('opac.catalog') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-search text-[10px]"></i> Katalog
+                    </a>
+                    <a href="{{ route('opac.ebooks') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-file-pdf text-[10px]"></i> E-Book
+                    </a>
+                    <a href="{{ route('opac.etheses') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-graduation-cap text-[10px]"></i> E-Thesis
+                    </a>
+                </div>
+
+                <!-- Popular searches -->
+                <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <span class="text-primary-300 text-xs">Populer:</span>
+                    <a href="{{ route('opac.catalog') }}?q=islam" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Islam</a>
+                    <a href="{{ route('opac.catalog') }}?q=ekonomi" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Ekonomi</a>
+                    <a href="{{ route('opac.catalog') }}?q=pendidikan" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Pendidikan</a>
+                </div>
+
+                <p class="mt-6 text-xs text-primary-300 text-center">
+                    Tekan <kbd class="px-2 py-1 bg-white/10 rounded text-white">Esc</kbd> atau klik di luar untuk menutup
+                </p>
+            </form>
         </div>
     </div>
 
