@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 // OPAC Routes
 Route::get('/', [OpacController::class, 'home'])->name('opac.home');
+Route::get('/search', fn() => view('opac.search'))->name('opac.search');
 Route::get('/catalog', [OpacController::class, 'catalog'])->name('opac.catalog');
 Route::get('/catalog/{id}', [OpacController::class, 'catalogShow'])->name('opac.catalog.show');
 Route::get('/ebooks', [OpacController::class, 'ebooks'])->name('opac.ebooks');

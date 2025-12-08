@@ -1,0 +1,492 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Book;
+use App\Models\Branch;
+use App\Models\CollectionType;
+use App\Models\Department;
+use App\Models\Ebook;
+use App\Models\Ethesis;
+use App\Models\Faculty;
+use App\Models\News;
+use App\Models\Subject;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Illuminate\Support\Collection;
+
+class GlobalSearch extends Component
+{
+    use WithPagination;
+
+    // Search
+    public string $query = '';
+    
+    // Primary Filters
+    public string $resourceType = 'all';
+    public ?int $branchId = null;
+    
+    // Advanced Filters
+    public array $selectedSubjects = [];
+    public ?int $collectionTypeId = null;
+    public ?int $facultyId = null;
+    public ?int $departmentId = null;
+    public ?string $language = null;
+    public ?int $yearFrom = null;
+    public ?int $yearTo = null;
+    public string $thesisType = '';
+    
+    // Sort & View
+    public string $sortBy = 'relevance';
+    public string $viewMode = 'grid';
+    
+    // UI State
+    public bool $showMobileFilters = false;
+    public bool $showAdvancedFilters = false;
+
+    protected $queryString = [
+        'query' => ['as' => 'q', 'except' => ''],
+        'resourceType' => ['as' => 'type', 'except' => 'all'],
+        'branchId' => ['as' => 'branch', 'except' => null],
+        'collectionTypeId' => ['as' => 'collection', 'except' => null],
+        'facultyId' => ['as' => 'faculty', 'except' => null],
+        'departmentId' => ['as' => 'dept', 'except' => null],
+        'language' => ['as' => 'lang', 'except' => null],
+        'yearFrom' => ['as' => 'from', 'except' => null],
+        'yearTo' => ['as' => 'to', 'except' => null],
+        'thesisType' => ['as' => 'thesis', 'except' => ''],
+        'sortBy' => ['as' => 'sort', 'except' => 'relevance'],
+    ];
+
+    protected $listeners = ['search' => 'performSearch'];
+
+    public function mount()
+    {
+        $this->query = request('q', '');
+    }
+
+    public function updatingQuery()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedResourceType()
+    {
+        $this->resetPage();
+        // Reset type-specific filters
+        if ($this->resourceType !== 'ethesis') {
+            $this->facultyId = null;
+            $this->departmentId = null;
+            $this->thesisType = '';
+        }
+    }
+
+    public function updatedFacultyId()
+    {
+        $this->departmentId = null;
+        $this->resetPage();
+    }
+
+    public function setResourceType(string $type)
+    {
+        $this->resourceType = $type;
+        $this->resetPage();
+    }
+
+    public function clearAllFilters()
+    {
+        $this->reset([
+            'branchId', 'selectedSubjects', 'collectionTypeId', 
+            'facultyId', 'departmentId', 'language', 
+            'yearFrom', 'yearTo', 'thesisType', 'sortBy'
+        ]);
+        $this->resetPage();
+    }
+
+    public function toggleSubject(int $subjectId)
+    {
+        if (in_array($subjectId, $this->selectedSubjects)) {
+            $this->selectedSubjects = array_diff($this->selectedSubjects, [$subjectId]);
+        } else {
+            $this->selectedSubjects[] = $subjectId;
+        }
+        $this->resetPage();
+    }
+
+    public function removeSubject(int $subjectId)
+    {
+        $this->selectedSubjects = array_diff($this->selectedSubjects, [$subjectId]);
+        $this->resetPage();
+    }
+
+    // Computed: Results
+    public function getResultsProperty(): Collection
+    {
+        $results = collect();
+
+        if ($this->resourceType === 'all' || $this->resourceType === 'book') {
+            $results = $results->merge($this->searchBooks());
+        }
+
+        if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
+            $results = $results->merge($this->searchEbooks());
+        }
+
+        if ($this->resourceType === 'all' || $this->resourceType === 'ethesis') {
+            $results = $results->merge($this->searchEtheses());
+        }
+
+        if ($this->resourceType === 'all' || $this->resourceType === 'news') {
+            $results = $results->merge($this->searchNews());
+        }
+
+        // Apply sorting
+        return $this->applySorting($results);
+    }
+
+    protected function searchBooks(): Collection
+    {
+        $query = Book::query()
+            ->withoutGlobalScopes()
+            ->with(['authors', 'publisher', 'subjects'])
+            ->withCount('items')
+            ->where(function($q) {
+                $q->where('is_opac_visible', true)
+                  ->orWhereNull('is_opac_visible');
+            });
+
+        if ($this->query) {
+            $searchTerm = $this->query;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('isbn', 'like', "%{$searchTerm}%")
+                  ->orWhere('call_number', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"))
+                  ->orWhereHas('publisher', fn($p) => $p->where('name', 'like', "%{$searchTerm}%"));
+            });
+        }
+
+        // Branch filter - filter by items location
+        if ($this->branchId) {
+            $query->whereHas('items', fn($i) => $i->withoutGlobalScopes()->where('branch_id', $this->branchId));
+        }
+
+        // Subject filter
+        if (!empty($this->selectedSubjects)) {
+            $query->whereHas('subjects', fn($s) => $s->whereIn('subjects.id', $this->selectedSubjects));
+        }
+
+        // Collection type filter
+        if ($this->collectionTypeId) {
+            $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
+        }
+
+        // Language filter
+        if ($this->language) {
+            $query->where('language', $this->language);
+        }
+
+        // Year filter
+        if ($this->yearFrom) {
+            $query->where('publish_year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('publish_year', '<=', $this->yearTo);
+        }
+
+        return $query->limit(50)->get()->map(fn($book) => [
+            'type' => 'book',
+            'id' => $book->id,
+            'title' => $book->title,
+            'author' => $book->author_names ?: '-',
+            'cover' => $book->cover_url,
+            'year' => $book->publish_year,
+            'publisher' => $book->publisher?->name,
+            'badge' => $book->items_count . ' eksemplar',
+            'badgeColor' => 'blue',
+            'icon' => 'fa-book',
+            'url' => route('opac.catalog.show', $book->id),
+            'description' => $book->abstract ? \Str::limit(strip_tags($book->abstract), 120) : null,
+            'meta' => [
+                'isbn' => $book->isbn,
+                'call_number' => $book->call_number,
+            ],
+        ]);
+    }
+
+    protected function searchEbooks(): Collection
+    {
+        $query = Ebook::query()->where('is_active', true)->with('authors');
+
+        if ($this->query) {
+            $searchTerm = $this->query;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('abstract', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"));
+            });
+        }
+
+        if ($this->yearFrom) {
+            $query->where('publish_year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('publish_year', '<=', $this->yearTo);
+        }
+
+        if ($this->language) {
+            $query->where('language', $this->language);
+        }
+
+        return $query->limit(50)->get()->map(fn($ebook) => [
+            'type' => 'ebook',
+            'id' => $ebook->id,
+            'title' => $ebook->title,
+            'author' => $ebook->author_names ?: '-',
+            'cover' => $ebook->cover_url,
+            'year' => $ebook->publish_year,
+            'badge' => strtoupper($ebook->file_format ?? 'PDF'),
+            'badgeColor' => 'orange',
+            'icon' => 'fa-file-pdf',
+            'url' => route('opac.ebooks') . '?view=' . $ebook->id,
+            'description' => $ebook->abstract ? \Str::limit(strip_tags($ebook->abstract), 120) : null,
+            'meta' => [
+                'format' => $ebook->file_format,
+                'access' => $ebook->access_type,
+            ],
+        ]);
+    }
+
+    protected function searchEtheses(): Collection
+    {
+        $query = Ethesis::query()
+            ->where('is_public', true)
+            ->with('department.faculty');
+
+        if ($this->query) {
+            $searchTerm = $this->query;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('title_en', 'like', "%{$searchTerm}%")
+                  ->orWhere('author', 'like', "%{$searchTerm}%")
+                  ->orWhere('nim', 'like', "%{$searchTerm}%")
+                  ->orWhere('abstract', 'like', "%{$searchTerm}%")
+                  ->orWhere('keywords', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($this->facultyId) {
+            $query->whereHas('department', fn($d) => $d->where('faculty_id', $this->facultyId));
+        }
+
+        if ($this->departmentId) {
+            $query->where('department_id', $this->departmentId);
+        }
+
+        if ($this->thesisType) {
+            $query->where('type', $this->thesisType);
+        }
+
+        if ($this->yearFrom) {
+            $query->where('year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('year', '<=', $this->yearTo);
+        }
+
+        return $query->limit(50)->get()->map(fn($thesis) => [
+            'type' => 'ethesis',
+            'id' => $thesis->id,
+            'title' => $thesis->title,
+            'author' => $thesis->author,
+            'cover' => $thesis->cover_path ? asset('storage/' . $thesis->cover_path) : null,
+            'year' => $thesis->year,
+            'badge' => $thesis->getTypeLabel(),
+            'badgeColor' => 'purple',
+            'icon' => 'fa-graduation-cap',
+            'url' => route('opac.ethesis.show', $thesis->id),
+            'description' => $thesis->abstract ? \Str::limit(strip_tags($thesis->abstract), 120) : null,
+            'meta' => [
+                'department' => $thesis->department?->name,
+                'faculty' => $thesis->department?->faculty?->name,
+                'nim' => $thesis->nim,
+            ],
+        ]);
+    }
+
+    protected function searchNews(): Collection
+    {
+        $query = News::query()
+            ->published()
+            ->with('category');
+
+        if ($this->query) {
+            $searchTerm = $this->query;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('excerpt', 'like', "%{$searchTerm}%")
+                  ->orWhere('content', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($this->yearFrom) {
+            $query->whereYear('published_at', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->whereYear('published_at', '<=', $this->yearTo);
+        }
+
+        return $query->limit(20)->get()->map(fn($news) => [
+            'type' => 'news',
+            'id' => $news->id,
+            'title' => $news->title,
+            'author' => $news->author?->name ?? 'Admin',
+            'cover' => $news->image_url,
+            'year' => $news->published_at?->format('d M Y'),
+            'badge' => $news->category?->name ?? 'Berita',
+            'badgeColor' => 'green',
+            'icon' => 'fa-newspaper',
+            'url' => route('opac.news.show', $news->slug),
+            'description' => $news->excerpt ? \Str::limit(strip_tags($news->excerpt), 120) : null,
+            'meta' => [
+                'views' => $news->views,
+            ],
+        ]);
+    }
+
+    protected function applySorting(Collection $results): Collection
+    {
+        return match($this->sortBy) {
+            'title_asc' => $results->sortBy('title'),
+            'title_desc' => $results->sortByDesc('title'),
+            'newest' => $results->sortByDesc('year'),
+            'oldest' => $results->sortBy('year'),
+            default => $results,
+        };
+    }
+
+    // Computed: Counts
+    public function getCountsProperty(): array
+    {
+        $baseQuery = $this->query;
+        
+        return [
+            'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
+                     $this->getEthesisCount($baseQuery) + $this->getNewsCount($baseQuery),
+            'book' => $this->getBookCount($baseQuery),
+            'ebook' => $this->getEbookCount($baseQuery),
+            'ethesis' => $this->getEthesisCount($baseQuery),
+            'news' => $this->getNewsCount($baseQuery),
+        ];
+    }
+
+    protected function getBookCount(?string $search): int
+    {
+        $query = Book::withoutGlobalScopes();
+        if ($search) {
+            $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
+                ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$search}%")));
+        }
+        return $query->count();
+    }
+
+    protected function getEbookCount(?string $search): int
+    {
+        $query = Ebook::where('is_active', true);
+        if ($search) {
+            $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
+                ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$search}%")));
+        }
+        return $query->count();
+    }
+
+    protected function getEthesisCount(?string $search): int
+    {
+        $query = Ethesis::where('is_public', true);
+        if ($search) {
+            $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
+                ->orWhere('author', 'like', "%{$search}%"));
+        }
+        return $query->count();
+    }
+
+    protected function getNewsCount(?string $search): int
+    {
+        $query = News::published();
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%");
+        }
+        return $query->count();
+    }
+
+    // Computed: Filter Options
+    public function getBranchesProperty()
+    {
+        return Branch::where('is_active', true)->orderBy('name')->get();
+    }
+
+    public function getSubjectsProperty()
+    {
+        return Subject::orderBy('name')->limit(100)->get();
+    }
+
+    public function getPopularSubjectsProperty()
+    {
+        return Subject::withCount('books')
+            ->orderByDesc('books_count')
+            ->limit(10)
+            ->get();
+    }
+
+    public function getCollectionTypesProperty()
+    {
+        return CollectionType::orderBy('name')->get();
+    }
+
+    public function getFacultiesProperty()
+    {
+        return Faculty::orderBy('name')->get();
+    }
+
+    public function getDepartmentsProperty()
+    {
+        if ($this->facultyId) {
+            return Department::where('faculty_id', $this->facultyId)->orderBy('name')->get();
+        }
+        return Department::orderBy('name')->get();
+    }
+
+    public function getLanguagesProperty(): array
+    {
+        return [
+            'id' => 'Indonesia',
+            'en' => 'English',
+            'ar' => 'Arabic',
+            'zh' => 'Chinese',
+            'ja' => 'Japanese',
+        ];
+    }
+
+    public function getActiveFiltersCountProperty(): int
+    {
+        $count = 0;
+        if ($this->branchId) $count++;
+        if (!empty($this->selectedSubjects)) $count += count($this->selectedSubjects);
+        if ($this->collectionTypeId) $count++;
+        if ($this->facultyId) $count++;
+        if ($this->departmentId) $count++;
+        if ($this->language) $count++;
+        if ($this->yearFrom) $count++;
+        if ($this->yearTo) $count++;
+        if ($this->thesisType) $count++;
+        return $count;
+    }
+
+    public function render()
+    {
+        return view('livewire.global-search', [
+            'results' => $this->results,
+            'counts' => $this->counts,
+        ]);
+    }
+}

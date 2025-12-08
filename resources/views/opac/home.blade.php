@@ -10,7 +10,7 @@
             <p class="text-blue-200 text-sm lg:text-base mb-6">Universitas Darussalam Gontor</p>
             
             <!-- Search Box - Powerful Rounded Full Design -->
-            <form action="{{ route('opac.catalog') }}" method="GET" class="max-w-2xl mx-auto">
+            <form action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto">
                 <div class="relative group">
                     <!-- Glow effect -->
                     <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
@@ -26,7 +26,7 @@
                         <input 
                             type="text" 
                             name="q" 
-                            placeholder="Cari judul, pengarang, ISBN, atau kata kunci..." 
+                            placeholder="Cari buku, e-book, tugas akhir, berita..." 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                         >
                         
@@ -41,10 +41,10 @@
                 <!-- Quick search tags -->
                 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
                     <span class="text-blue-200 text-xs">Populer:</span>
-                    <a href="{{ route('opac.catalog') }}?q=islam" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
-                    <a href="{{ route('opac.catalog') }}?q=ekonomi" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
-                    <a href="{{ route('opac.catalog') }}?q=pendidikan" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
-                    <a href="{{ route('opac.catalog') }}?q=hukum" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
+                    <a href="{{ route('opac.search') }}?q=islam" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
+                    <a href="{{ route('opac.search') }}?q=ekonomi" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
+                    <a href="{{ route('opac.search') }}?q=pendidikan" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
+                    <a href="{{ route('opac.search') }}?q=hukum" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
                 </div>
             </form>
         </div>

@@ -440,9 +440,9 @@
 
             <!-- Search -->
             <div class="p-4 border-b">
-                <form action="{{ route('opac.catalog') }}" method="GET">
+                <form action="{{ route('opac.search') }}" method="GET">
                     <div class="flex bg-gray-100 rounded-xl overflow-hidden border-2 border-transparent focus-within:border-primary-300 focus-within:bg-white transition">
-                        <input type="text" name="q" placeholder="Cari buku, jurnal, skripsi..." class="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none">
+                        <input type="text" name="q" placeholder="Cari buku, e-book, tugas akhir..." class="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none">
                         <button class="px-4 text-primary-600 hover:text-primary-700"><i class="fas fa-search"></i></button>
                     </div>
                 </form>
@@ -680,11 +680,11 @@
 
             <!-- Search container -->
             <div class="text-center mb-6">
-                <h3 class="text-white text-xl lg:text-2xl font-bold mb-2">Cari Koleksi Perpustakaan</h3>
-                <p class="text-primary-200 text-sm">Temukan buku, jurnal, e-book, dan tugas akhir</p>
+                <h3 class="text-white text-xl lg:text-2xl font-bold mb-2">Pencarian Global</h3>
+                <p class="text-primary-200 text-sm">Temukan buku, e-book, tugas akhir, dan berita</p>
             </div>
 
-            <form action="{{ route('opac.catalog') }}" method="GET">
+            <form action="{{ route('opac.search') }}" method="GET">
                 <!-- Search input - Rounded Full Style -->
                 <div class="relative group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-primary-400 via-white to-primary-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
@@ -705,24 +705,27 @@
 
                 <!-- Quick search categories -->
                 <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
-                    <span class="text-primary-200 text-xs">Cari di:</span>
-                    <a href="{{ route('opac.catalog') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
-                        <i class="fas fa-search text-[10px]"></i> Katalog
+                    <span class="text-primary-200 text-xs">Filter:</span>
+                    <a href="{{ route('opac.search') }}?type=book" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-book text-[10px]"></i> Buku
                     </a>
-                    <a href="{{ route('opac.ebooks') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                    <a href="{{ route('opac.search') }}?type=ebook" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-file-pdf text-[10px]"></i> E-Book
                     </a>
-                    <a href="{{ route('opac.etheses') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                    <a href="{{ route('opac.search') }}?type=ethesis" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-graduation-cap text-[10px]"></i> E-Thesis
+                    </a>
+                    <a href="{{ route('opac.search') }}?type=news" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-newspaper text-[10px]"></i> Berita
                     </a>
                 </div>
 
                 <!-- Popular searches -->
                 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
                     <span class="text-primary-300 text-xs">Populer:</span>
-                    <a href="{{ route('opac.catalog') }}?q=islam" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Islam</a>
-                    <a href="{{ route('opac.catalog') }}?q=ekonomi" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Ekonomi</a>
-                    <a href="{{ route('opac.catalog') }}?q=pendidikan" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Pendidikan</a>
+                    <a href="{{ route('opac.search') }}?q=islam" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Islam</a>
+                    <a href="{{ route('opac.search') }}?q=ekonomi" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Ekonomi</a>
+                    <a href="{{ route('opac.search') }}?q=pendidikan" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Pendidikan</a>
                 </div>
 
                 <p class="mt-6 text-xs text-primary-300 text-center">
