@@ -365,10 +365,14 @@
 
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
-                    <!-- Academic Search Button -->
-                    <a href="{{ route('opac.catalog') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 bg-accent-400 hover:bg-accent-500 text-gray-900 rounded-lg text-sm font-medium transition shadow-lg shadow-accent-400/30">
-                        <i class="fas fa-search"></i> Academic Search
-                    </a>
+                    <!-- Academic Search Button - Icon with hover expand -->
+                    <button 
+                        @click="searchOpen = true" 
+                        class="hidden lg:flex items-center gap-2 px-3 py-2 text-white hover:bg-white/10 rounded-lg text-sm font-medium transition group"
+                    >
+                        <i class="fas fa-search"></i>
+                        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[100px] transition-all duration-300 ease-in-out">Search</span>
+                    </button>
                     
                     <!-- Auth Buttons Desktop -->
                     @auth('member')
@@ -657,10 +661,10 @@
         </div>
     </footer>
 
-    <!-- Search Modal -->
-    <div x-show="searchOpen" x-cloak class="fixed inset-0 z-[70] lg:hidden" @keydown.escape.window="searchOpen = false">
+    <!-- Search Modal - Works on both mobile and desktop -->
+    <div x-show="searchOpen" x-cloak class="fixed inset-0 z-[70]" @keydown.escape.window="searchOpen = false">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="searchOpen = false"></div>
-        <div class="absolute inset-x-4 top-20" 
+        <div class="absolute inset-x-4 top-20 lg:inset-x-auto lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-xl" 
              x-show="searchOpen"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
@@ -671,28 +675,31 @@
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
                 <div class="bg-gradient-to-r from-primary-600 to-primary-800 p-4">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-white font-semibold">Cari Koleksi</h3>
+                        <h3 class="text-white font-semibold flex items-center gap-2">
+                            <i class="fas fa-search"></i> Cari Koleksi
+                        </h3>
                         <button @click="searchOpen = false" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
-                <form action="{{ route('opac.catalog') }}" method="GET" class="p-4">
+                <form action="{{ route('opac.catalog') }}" method="GET" class="p-4 lg:p-6">
                     <div class="relative">
                         <input type="text" name="q" placeholder="Ketik judul, pengarang, atau ISBN..." 
-                               class="w-full px-4 py-3 pr-12 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
+                               class="w-full px-4 py-3 lg:py-4 pr-12 bg-gray-100 rounded-xl text-sm lg:text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition"
                                x-ref="searchInput"
                                @keydown.enter="$el.form.submit()">
-                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary-600 text-white rounded-lg flex items-center justify-center hover:bg-primary-700 transition">
+                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 lg:w-10 lg:h-10 bg-primary-600 text-white rounded-lg flex items-center justify-center hover:bg-primary-700 transition">
                             <i class="fas fa-search text-sm"></i>
                         </button>
                     </div>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <span class="text-xs text-gray-400">Cari di:</span>
-                        <a href="{{ route('opac.catalog') }}" class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium hover:bg-primary-200 transition">Katalog</a>
-                        <a href="{{ route('opac.ebooks') }}" class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium hover:bg-orange-200 transition">E-Book</a>
-                        <a href="{{ route('opac.etheses') }}" class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium hover:bg-pink-200 transition">E-Thesis</a>
+                        <a href="{{ route('opac.catalog') }}" class="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium hover:bg-primary-200 transition">Katalog</a>
+                        <a href="{{ route('opac.ebooks') }}" class="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium hover:bg-orange-200 transition">E-Book</a>
+                        <a href="{{ route('opac.etheses') }}" class="px-3 py-1.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium hover:bg-pink-200 transition">E-Thesis</a>
                     </div>
+                    <p class="mt-4 text-xs text-gray-400 text-center">Tekan <kbd class="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600">Esc</kbd> untuk menutup</p>
                 </form>
             </div>
         </div>
