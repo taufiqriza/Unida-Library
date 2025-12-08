@@ -81,19 +81,46 @@
             <p class="text-xs lg:text-sm text-gray-500 mt-1">Lengkapi informasi dasar tugas akhir Anda</p>
         </div>
         <div class="p-4 lg:p-6 space-y-5">
-            {{-- Jenis Tugas Akhir - Select Dropdown --}}
+            {{-- Jenis Tugas Akhir - Card Style --}}
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
                     Jenis Tugas Akhir <span class="text-red-500">*</span>
                 </label>
-                <select 
-                    wire:model.live="type" 
-                    class="w-full md:w-auto px-4 py-3 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition bg-white font-medium"
-                >
-                    <option value="skripsi">📚 Skripsi (S1)</option>
-                    <option value="tesis">🎓 Tesis (S2)</option>
-                    <option value="disertasi">🏆 Disertasi (S3)</option>
-                </select>
+                <div class="grid grid-cols-3 gap-3">
+                    {{-- Skripsi --}}
+                    <label class="cursor-pointer">
+                        <input type="radio" wire:model.live="type" value="skripsi" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 border-gray-200 hover:border-gray-300">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-blue-600 text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900">S1</p>
+                            <p class="text-xs text-gray-500">Skripsi</p>
+                        </div>
+                    </label>
+                    {{-- Tesis --}}
+                    <label class="cursor-pointer">
+                        <input type="radio" wire:model.live="type" value="tesis" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 border-gray-200 hover:border-gray-300">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-user-graduate text-purple-600 text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900">S2</p>
+                            <p class="text-xs text-gray-500">Tesis</p>
+                        </div>
+                    </label>
+                    {{-- Disertasi --}}
+                    <label class="cursor-pointer">
+                        <input type="radio" wire:model.live="type" value="disertasi" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50 border-gray-200 hover:border-gray-300">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-amber-100 flex items-center justify-center">
+                                <i class="fas fa-award text-amber-600 text-xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-900">S3</p>
+                            <p class="text-xs text-gray-500">Disertasi</p>
+                        </div>
+                    </label>
+                </div>
                 @error('type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 

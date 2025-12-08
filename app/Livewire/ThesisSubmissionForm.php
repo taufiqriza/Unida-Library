@@ -168,9 +168,11 @@ class ThesisSubmissionForm extends Component
 
     public function nextStep(): void
     {
-        $this->validateStep();
-        if ($this->step < $this->totalSteps) {
-            $this->step++;
+        // Validate current step before proceeding
+        if ($this->validateCurrentStep()) {
+            if ($this->step < $this->totalSteps) {
+                $this->step++;
+            }
         }
     }
 
@@ -189,35 +191,52 @@ class ThesisSubmissionForm extends Component
         }
     }
 
-    protected function validateStep(): void
-    {
-        match($this->step) {
-            1 => $this->validate([
-                'type' => 'required|in:skripsi,tesis,disertasi',
-                'title' => 'required|min:10|max:500',
-                'abstract' => 'required|min:100',
-                'year' => 'required|numeric|min:2000|max:' . (date('Y') + 1),
-            ]),
-            2 => $this->validate([
-                'author' => 'required|max:255',
-                'nim' => 'required|max:50',
-                'department_id' => 'required|exists:departments,id',
-            ]),
-            3 => $this->validate([
-                'advisor1' => 'required|max:255',
-            ]),
-            4 => $this->validateFiles(),
-            5 => $this->validate([
-                'agreement' => 'accepted',
-            ]),
-            default => null,
-        };
-    }
-
-    protected function validateFiles(): void
+    protected function validateCurrentStep(): bool
     {
         $rules = [];
-        
+        $messages = $this->messages();
+
+        switch ($this->step) {
+            case 1:
+                $rules = [
+                    'type' => 'required|in:skripsi,tesis,disertasi',
+                    'title' => 'required|min:10|max:500',
+                    'abstract' => 'required|min:100',
+                    'year' => 'required|numeric|min:2000|max:' . (date('Y') + 1),
+                ];
+                break;
+            case 2:
+                $rules = [
+                    'author' => 'required|max:255',
+                    'nim' => 'required|max:50',
+                    'department_id' => 'required|exists:departments,id',
+                ];
+                break;
+            case 3:
+                $rules = [
+                    'advisor1' => 'required|max:255',
+                ];
+                break;
+            case 4:
+                return $this->validateFilesStep();
+            case 5:
+                $rules = [
+                    'agreement' => 'accepted',
+                ];
+                break;
+        }
+
+        if (!empty($rules)) {
+            $this->validate($rules, $messages);
+        }
+
+        return true;
+    }
+
+    protected function validateFilesStep(): bool
+    {
+        $rules = [];
+
         // Cover - required if new or not exists
         if (!$this->isEdit || !$this->submission?->cover_file) {
             $rules['cover_file'] = 'required|image|max:2048';
@@ -242,7 +261,15 @@ class ThesisSubmissionForm extends Component
         // Fulltext - always optional
         $rules['fulltext_file'] = 'nullable|mimes:pdf|max:51200';
 
-        $this->validate($rules);
+        $this->validate($rules, $this->messages());
+
+        return true;
+    }
+
+    // Keep old method for backward compatibility
+    protected function validateStep(): void
+    {
+        $this->validateCurrentStep();
     }
 
     public function saveDraft(): void
