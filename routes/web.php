@@ -11,11 +11,9 @@ use Illuminate\Support\Facades\Route;
 // OPAC Routes
 Route::get('/', [OpacController::class, 'home'])->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');
-Route::get('/catalog', [OpacController::class, 'catalog'])->name('opac.catalog');
 Route::get('/catalog/{id}', [OpacController::class, 'catalogShow'])->name('opac.catalog.show');
-Route::get('/ebooks', [OpacController::class, 'ebooks'])->name('opac.ebooks');
-Route::get('/etheses', [OpacController::class, 'etheses'])->name('opac.etheses');
-Route::get('/news', [OpacController::class, 'news'])->name('opac.news');
+Route::get('/ebook/{id}', [OpacController::class, 'ebookShow'])->name('opac.ebook.show');
+Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');
 Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
 Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 

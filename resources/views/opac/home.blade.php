@@ -17,20 +17,16 @@
                     
                     <!-- Search input container -->
                     <div class="relative flex items-center bg-white rounded-full shadow-2xl shadow-blue-900/30 overflow-hidden">
-                        <!-- Search icon -->
                         <div class="pl-5 pr-2">
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
-                        
-                        <!-- Input -->
                         <input 
-                            type="text" 
+                            type="search" 
                             name="q" 
                             placeholder="Cari buku, e-book, tugas akhir, berita..." 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
+                            autocomplete="off"
                         >
-                        
-                        <!-- Submit button -->
                         <button type="submit" class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2">
                             <span class="hidden sm:inline">Cari</span>
                             <i class="fas fa-arrow-right text-sm"></i>
@@ -53,65 +49,51 @@
     <!-- Stats -->
     <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-6 lg:-mt-10 relative z-10">
         <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-3">
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-book text-blue-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
-                <div class="text-[10px] lg:text-xs text-gray-500">Judul</div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Judul</div>
+                </div>
             </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-copy text-emerald-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
-                <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
-            </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-1">
-                    <i class="fas fa-users text-purple-600 text-sm lg:text-lg"></i>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
                 </div>
-                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['members']) }}</div>
-                <div class="text-[10px] lg:text-xs text-gray-500">Anggota</div>
             </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center hidden md:block">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-building text-purple-600 text-sm lg:text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['branches']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Cabang</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-file-pdf text-orange-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
-                <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+                </div>
             </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg text-center hidden md:block">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-1">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-graduation-cap text-pink-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
-                <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
+                </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Quick Access Cards -->
-    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4 lg:py-6">
-        <div class="grid grid-cols-3 gap-2 lg:gap-4">
-            <a href="{{ route('opac.catalog') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
-                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
-                    <i class="fas fa-search text-white text-sm lg:text-base"></i>
-                </div>
-                <span class="font-semibold text-gray-900 text-xs lg:text-sm">Katalog</span>
-            </a>
-            <a href="{{ route('opac.ebooks') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
-                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-orange-500/30">
-                    <i class="fas fa-file-pdf text-white text-sm lg:text-base"></i>
-                </div>
-                <span class="font-semibold text-gray-900 text-xs lg:text-sm">E-Book</span>
-            </a>
-            <a href="{{ route('opac.etheses') }}" class="bg-white rounded-lg lg:rounded-xl p-3 lg:p-4 shadow-lg shadow-gray-200/50 hover:shadow-xl transition flex items-center gap-2 lg:gap-3">
-                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg shadow-pink-500/30">
-                    <i class="fas fa-graduation-cap text-white text-sm lg:text-base"></i>
-                </div>
-                <span class="font-semibold text-gray-900 text-xs lg:text-sm">E-Thesis</span>
-            </a>
         </div>
     </section>
 
@@ -120,7 +102,7 @@
     <section class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-sparkles text-blue-500 mr-2"></i>Koleksi Terbaru</h2>
-            <a href="{{ route('opac.catalog') }}?sort=latest" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+            <a href="{{ route('opac.search') . '?type=book' }}?sort=latest" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
             @foreach($newBooks as $book)
@@ -149,7 +131,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-fire text-orange-500 mr-2"></i>Paling Diminati</h2>
-                <a href="{{ route('opac.catalog') }}?sort=popular" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+                <a href="{{ route('opac.search') . '?type=book' }}?sort=popular" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                 @foreach($popularBooks as $book)
@@ -178,7 +160,7 @@
     <section class="max-w-7xl mx-auto px-4 py-8">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-newspaper text-emerald-500 mr-2"></i>Berita & Pengumuman</h2>
-            <a href="{{ route('opac.news') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+            <a href="{{ route('opac.search') . '?type=news' }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             @foreach($news as $item)

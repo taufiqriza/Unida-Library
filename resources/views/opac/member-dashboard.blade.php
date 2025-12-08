@@ -119,19 +119,19 @@
         <div class="lg:hidden mb-3">
             <div class="bg-white rounded-2xl p-3 shadow-sm border border-gray-100/50">
                 <div class="grid grid-cols-5 gap-1">
-                    <a href="{{ route('opac.catalog') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
+                    <a href="{{ route('opac.search') . '?type=book' }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
                         <div class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
                             <i class="fas fa-search text-white text-sm"></i>
                         </div>
                         <span class="text-[9px] font-medium text-gray-600">Katalog</span>
                     </a>
-                    <a href="{{ route('opac.ebooks') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
+                    <a href="{{ route('opac.search') . '?type=ebook' }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
                         <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/20">
                             <i class="fas fa-book text-white text-sm"></i>
                         </div>
                         <span class="text-[9px] font-medium text-gray-600">E-Book</span>
                     </a>
-                    <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
+                    <a href="{{ route('opac.search') . '?type=ethesis' }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
                         <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-pink-500/20">
                             <i class="fas fa-graduation-cap text-white text-sm"></i>
                         </div>
@@ -143,7 +143,7 @@
                         </div>
                         <span class="text-[9px] font-medium text-gray-600">Unggah</span>
                     </a>
-                    <a href="{{ route('opac.news') }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
+                    <a href="{{ route('opac.search') . '?type=news' }}" class="flex flex-col items-center gap-1.5 p-2 rounded-xl active:bg-gray-50 transition-colors">
                         <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
                             <i class="fas fa-newspaper text-white text-sm"></i>
                         </div>
@@ -216,7 +216,7 @@
                             </div>
                             <p class="text-gray-500 text-sm font-medium">Tidak ada peminjaman aktif</p>
                             <p class="text-gray-400 text-xs mt-1">Yuk pinjam buku di perpustakaan!</p>
-                            <a href="{{ route('opac.catalog') }}" class="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 active:scale-95 transition-all shadow-lg shadow-primary-500/30">
+                            <a href="{{ route('opac.search') . '?type=book' }}" class="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 active:scale-95 transition-all shadow-lg shadow-primary-500/30">
                                 <i class="fas fa-search"></i> Cari Buku
                             </a>
                         </div>
@@ -352,25 +352,25 @@
                     </div>
                     <div class="p-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <a href="{{ route('opac.catalog') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-primary-50 rounded-xl transition group">
+                            <a href="{{ route('opac.search') . '?type=book' }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-primary-50 rounded-xl transition group">
                                 <div class="w-10 h-10 bg-primary-100 group-hover:bg-primary-200 rounded-xl flex items-center justify-center transition">
                                     <i class="fas fa-search text-primary-600"></i>
                                 </div>
                                 <span class="text-xs text-gray-700 group-hover:text-primary-700 font-medium">Katalog</span>
                             </a>
-                            <a href="{{ route('opac.ebooks') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-orange-50 rounded-xl transition group">
+                            <a href="{{ route('opac.search') . '?type=ebook' }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-orange-50 rounded-xl transition group">
                                 <div class="w-10 h-10 bg-orange-100 group-hover:bg-orange-200 rounded-xl flex items-center justify-center transition">
                                     <i class="fas fa-file-pdf text-orange-600"></i>
                                 </div>
                                 <span class="text-xs text-gray-700 group-hover:text-orange-700 font-medium">E-Book</span>
                             </a>
-                            <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-pink-50 rounded-xl transition group">
+                            <a href="{{ route('opac.search') . '?type=ethesis' }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-pink-50 rounded-xl transition group">
                                 <div class="w-10 h-10 bg-pink-100 group-hover:bg-pink-200 rounded-xl flex items-center justify-center transition">
                                     <i class="fas fa-graduation-cap text-pink-600"></i>
                                 </div>
                                 <span class="text-xs text-gray-700 group-hover:text-pink-700 font-medium">E-Thesis</span>
                             </a>
-                            <a href="{{ route('opac.news') }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-emerald-50 rounded-xl transition group">
+                            <a href="{{ route('opac.search') . '?type=news' }}" class="flex flex-col items-center gap-2 p-4 bg-gray-50 hover:bg-emerald-50 rounded-xl transition group">
                                 <div class="w-10 h-10 bg-emerald-100 group-hover:bg-emerald-200 rounded-xl flex items-center justify-center transition">
                                     <i class="fas fa-newspaper text-emerald-600"></i>
                                 </div>

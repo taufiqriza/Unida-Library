@@ -69,7 +69,7 @@
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-5 text-white text-center">
             <h4 class="font-bold mb-2">Mulai Pencarian Sekarang</h4>
             <p class="text-blue-100 text-sm mb-4">Temukan buku yang Anda butuhkan</p>
-            <a href="{{ route('opac.catalog') }}" class="inline-flex items-center gap-2 px-5 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition">
+            <a href="{{ route('opac.search') . '?type=book' }}" class="inline-flex items-center gap-2 px-5 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition">
                 <i class="fas fa-search"></i> Buka Katalog
             </a>
         </div>

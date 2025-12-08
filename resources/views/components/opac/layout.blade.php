@@ -63,6 +63,23 @@
         .dropdown-item:hover .dropdown-menu { display: block; }
         .sidebar-overlay { background: rgba(0,0,0,0.5); }
         [x-cloak] { display: none !important; }
+        /* Fix input autofill background */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            box-shadow: 0 0 0 30px white inset !important;
+            -webkit-text-fill-color: #374151 !important;
+        }
+        /* Remove default input styling */
+        input[type="text"],
+        input[type="search"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            box-shadow: none !important;
+        }
     </style>
     @livewireStyles
 </head>
@@ -98,7 +115,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <a href="{{ route('opac.home') }}" class="flex items-center lg:flex-none flex-1 lg:flex-initial justify-center lg:justify-start">
-                    <img src="{{ asset('storage/logo.png') }}" alt="UNIDA Library" class="h-10 w-auto">
+                    <img src="{{ url('storage/logo.png') }}" alt="UNIDA Library" class="h-10 w-auto">
                 </a>
 
                 <!-- Desktop Navigation -->
@@ -179,15 +196,15 @@
                                     <div>
                                         <h3 class="font-bold text-gray-900 mb-3 text-sm">Koleksi Internal</h3>
                                         <div class="space-y-2">
-                                            <a href="{{ route('opac.catalog') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
-                                                <div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center"><i class="fas fa-search text-primary-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">OPAC</p><p class="text-xs text-gray-500">Katalog Online</p></div>
+                                            <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
+                                                <div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center"><i class="fas fa-book text-primary-600"></i></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Buku</p><p class="text-xs text-gray-500">Katalog Online</p></div>
                                             </a>
-                                            <a href="{{ route('opac.ebooks') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
+                                            <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-file-pdf text-orange-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">E-Book</p><p class="text-xs text-gray-500">Koleksi Digital</p></div>
                                             </a>
-                                            <a href="{{ route('opac.etheses') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
+                                            <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-pink-100 rounded-lg flex items-center justify-center"><i class="fas fa-graduation-cap text-pink-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">E-Thesis</p><p class="text-xs text-gray-500">Tugas Akhir</p></div>
                                             </a>
@@ -285,7 +302,7 @@
                                 <!-- Book Recommendation -->
                                 <div>
                                     <h3 class="font-bold text-gray-900 mb-3 text-sm">Rekomendasi Buku</h3>
-                                    <a href="{{ route('opac.catalog') }}?sort=latest" class="block bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 hover:shadow-lg transition">
+                                    <a href="{{ route('opac.search') . '?type=book' }}?sort=latest" class="block bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 hover:shadow-lg transition">
                                         <div class="flex gap-3">
                                             <div class="w-16 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
                                                 <i class="fas fa-book text-white text-xl"></i>
@@ -358,29 +375,33 @@
                     </div>
 
                     <!-- NEWS Link -->
-                    <a href="{{ route('opac.news') }}" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
+                    <a href="{{ route('opac.search') . '?type=news' }}" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
                         <i class="fas fa-newspaper text-xs"></i> NEWS
                     </a>
                 </nav>
 
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
-                    <!-- Academic Search Button - Icon with hover expand -->
+                    <!-- Search Button with Card Style -->
                     <button 
                         @click="searchOpen = true" 
-                        class="hidden lg:flex items-center gap-2 px-3 py-2 text-white hover:bg-white/10 rounded-lg text-sm font-medium transition group"
+                        class="hidden lg:flex items-center gap-2 px-4 py-2 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm"
                     >
                         <i class="fas fa-search"></i>
-                        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[100px] transition-all duration-300 ease-in-out">Search</span>
+                        <span>Cari</span>
                     </button>
                     
                     <!-- Auth Buttons Desktop -->
                     @auth('member')
-                        <a href="{{ route('opac.member.dashboard') }}" class="hidden lg:flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg">
-                            <i class="fas fa-user-circle"></i> {{ auth('member')->user()->name }}
+                        <a href="{{ route('opac.member.dashboard') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl shadow-sm transition">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ auth('member')->user()->name }}</span>
                         </a>
                     @else
-                        <a href="{{ route('opac.login') }}" class="hidden lg:block px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg">Masuk</a>
+                        <a href="{{ route('opac.login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-700 bg-white hover:bg-gray-50 rounded-xl shadow-sm transition">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Masuk</span>
+                        </a>
                     @endauth
 
                 </div>
@@ -403,7 +424,7 @@
             <!-- Sidebar Header with Logo -->
             <div class="bg-gradient-to-r from-primary-700 to-primary-900 p-4">
                 <div class="flex items-center justify-between">
-                    <img src="{{ asset('storage/logo.png') }}" alt="UNIDA Library" class="h-9 w-auto">
+                    <img src="{{ url('storage/logo.png') }}" alt="UNIDA Library" class="h-9 w-auto">
                     <button @click="sidebarOpen = false" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition">
                         <i class="fas fa-times"></i>
                     </button>
@@ -491,9 +512,9 @@
                     <div x-show="openMenu === 'eresources'" x-collapse class="px-3 pb-3">
                         <div class="pl-12 space-y-1 border-l-2 border-indigo-200 ml-1.5">
                             <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider px-3 py-1.5">Koleksi Internal</p>
-                            <a href="{{ route('opac.catalog') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-search text-xs text-gray-400"></i> OPAC</a>
-                            <a href="{{ route('opac.ebooks') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-file-pdf text-xs text-gray-400"></i> E-Book</a>
-                            <a href="{{ route('opac.etheses') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> E-Thesis</a>
+                            <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-book text-xs text-gray-400"></i> Buku</a>
+                            <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-file-pdf text-xs text-gray-400"></i> E-Book</a>
+                            <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> E-Thesis</a>
                             <a href="{{ route('opac.page', 'digilib-apps') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-mobile-alt text-xs text-gray-400"></i> Digilib Apps</a>
                             <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider px-3 py-1.5 mt-2">Sumber External</p>
                             <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-database text-xs text-gray-400"></i> Repository <i class="fas fa-external-link-alt text-[10px] text-gray-300 ml-auto"></i></a>
@@ -557,7 +578,7 @@
                 </div>
 
                 <!-- NEWS -->
-                <a href="{{ route('opac.news') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-pink-50 transition group">
+                <a href="{{ route('opac.search') . '?type=news' }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-pink-50 transition group">
                     <span class="w-9 h-9 bg-pink-100 group-hover:bg-pink-600 rounded-lg flex items-center justify-center text-pink-600 group-hover:text-white transition">
                         <i class="fas fa-newspaper"></i>
                     </span>
@@ -569,15 +590,15 @@
             <div class="p-4 border-t">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Akses Cepat</p>
                 <div class="grid grid-cols-3 gap-2">
-                    <a href="{{ route('opac.catalog') }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-primary-50 rounded-xl transition group">
+                    <a href="{{ route('opac.search') . '?type=book' }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-primary-50 rounded-xl transition group">
                         <i class="fas fa-search text-gray-400 group-hover:text-primary-600"></i>
                         <span class="text-[10px] text-gray-600 group-hover:text-primary-600">Katalog</span>
                     </a>
-                    <a href="{{ route('opac.ebooks') }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition group">
+                    <a href="{{ route('opac.search') . '?type=ebook' }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition group">
                         <i class="fas fa-book text-gray-400 group-hover:text-orange-600"></i>
                         <span class="text-[10px] text-gray-600 group-hover:text-orange-600">E-Book</span>
                     </a>
-                    <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-pink-50 rounded-xl transition group">
+                    <a href="{{ route('opac.search') . '?type=ethesis' }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-pink-50 rounded-xl transition group">
                         <i class="fas fa-graduation-cap text-gray-400 group-hover:text-pink-600"></i>
                         <span class="text-[10px] text-gray-600 group-hover:text-pink-600">E-Thesis</span>
                     </a>
@@ -621,7 +642,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     <div class="flex items-center gap-3 mb-4">
-                        <img src="{{ asset('storage/logo.png') }}" alt="UNIDA Library" class="h-12 w-auto brightness-0 invert">
+                        <img src="{{ url('storage/logo.png') }}" alt="UNIDA Library" class="h-12 w-auto brightness-0 invert">
                     </div>
                     <p class="text-sm text-primary-200">Perpustakaan Universitas Darussalam Gontor melayani civitas akademika dalam akses koleksi dan layanan informasi.</p>
                     <div class="flex gap-3 mt-4">
@@ -633,9 +654,9 @@
                 <div>
                     <h4 class="font-semibold text-white mb-4">E-Resources</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
-                        <li><a href="{{ route('opac.catalog') }}" class="hover:text-white transition"><i class="fas fa-search mr-2"></i>OPAC</a></li>
-                        <li><a href="{{ route('opac.ebooks') }}" class="hover:text-white transition"><i class="fas fa-file-pdf mr-2"></i>E-Book</a></li>
-                        <li><a href="{{ route('opac.etheses') }}" class="hover:text-white transition"><i class="fas fa-graduation-cap mr-2"></i>E-Thesis</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=book' }}" class="hover:text-white transition"><i class="fas fa-search mr-2"></i>OPAC</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=ebook' }}" class="hover:text-white transition"><i class="fas fa-file-pdf mr-2"></i>E-Book</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=ethesis' }}" class="hover:text-white transition"><i class="fas fa-graduation-cap mr-2"></i>E-Thesis</a></li>
                         <li><a href="https://repo.unida.gontor.ac.id" target="_blank" class="hover:text-white transition"><i class="fas fa-database mr-2"></i>Repository</a></li>
                     </ul>
                 </div>
@@ -744,8 +765,8 @@
                 </span>
                 <span class="text-[10px] mt-0.5 font-medium">Beranda</span>
             </a>
-            <a href="{{ route('opac.ebooks') }}" class="flex flex-col items-center py-1.5 px-3 {{ request()->routeIs('opac.ebooks*') ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
-                <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request()->routeIs('opac.ebooks*') ? 'bg-white/20' : '' }}">
+            <a href="{{ route('opac.search') }}?type=ebook" class="flex flex-col items-center py-1.5 px-3 {{ request('type') == 'ebook' ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
+                <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request('type') == 'ebook' ? 'bg-white/20' : '' }}">
                     <i class="fas fa-book text-lg"></i>
                 </span>
                 <span class="text-[10px] mt-0.5 font-medium">E-Book</span>
@@ -756,8 +777,8 @@
                 </span>
                 <span class="text-[10px] mt-1 font-medium text-white">Cari</span>
             </button>
-            <a href="{{ route('opac.etheses') }}" class="flex flex-col items-center py-1.5 px-3 {{ request()->routeIs('opac.etheses*') ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
-                <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request()->routeIs('opac.etheses*') ? 'bg-white/20' : '' }}">
+            <a href="{{ route('opac.search') }}?type=ethesis" class="flex flex-col items-center py-1.5 px-3 {{ request('type') == 'ethesis' ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
+                <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request('type') == 'ethesis' ? 'bg-white/20' : '' }}">
                     <i class="fas fa-graduation-cap text-lg"></i>
                 </span>
                 <span class="text-[10px] mt-0.5 font-medium">E-Thesis</span>

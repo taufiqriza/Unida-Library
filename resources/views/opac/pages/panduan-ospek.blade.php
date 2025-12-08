@@ -82,7 +82,7 @@
             <h4 class="font-bold mb-2">Siap Menjelajahi Perpustakaan?</h4>
             <p class="text-orange-100 text-sm mb-4">Kunjungi kami atau mulai dengan katalog online</p>
             <div class="flex flex-wrap justify-center gap-3">
-                <a href="{{ route('opac.catalog') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-50 transition">
+                <a href="{{ route('opac.search') . '?type=book' }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-orange-600 rounded-lg text-sm font-medium hover:bg-orange-50 transition">
                     <i class="fas fa-search"></i> Cari Buku
                 </a>
                 <a href="{{ route('opac.page', 'virtual-tour') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition">

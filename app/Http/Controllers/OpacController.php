@@ -19,7 +19,7 @@ class OpacController extends Controller
         $stats = [
             'books' => Book::withoutGlobalScopes()->count(),
             'items' => Item::withoutGlobalScopes()->count(),
-            'members' => Member::withoutGlobalScopes()->count(),
+            'branches' => Branch::where('is_active', true)->count(),
             'ebooks' => Ebook::count(),
             'etheses' => Ethesis::count(),
         ];
@@ -168,6 +168,19 @@ class OpacController extends Controller
         return view('opac.ethesis-detail', compact('thesis', 'relatedTheses'));
     }
 
+    public function ebookShow($id)
+    {
+        $ebook = Ebook::where('is_active', true)->with('authors')->findOrFail($id);
+        
+        $relatedEbooks = Ebook::where('is_active', true)
+            ->where('id', '!=', $ebook->id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('opac.ebook-detail', compact('ebook', 'relatedEbooks'));
+    }
+
     public function news()
     {
         $news = News::published()->latest('published_at')->paginate(12);
@@ -177,13 +190,15 @@ class OpacController extends Controller
     public function newsShow($slug)
     {
         $news = News::where('slug', $slug)->published()->firstOrFail();
-        $recentNews = News::published()
+        $news->increment('views');
+        
+        $relatedNews = News::published()
             ->where('id', '!=', $news->id)
             ->latest('published_at')
             ->take(4)
             ->get();
 
-        return view('opac.news-detail', compact('news', 'recentNews'));
+        return view('opac.news-detail', compact('news', 'relatedNews'));
     }
 
     public function page($slug)
