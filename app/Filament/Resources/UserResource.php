@@ -21,7 +21,7 @@ class UserResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->isAdmin() ?? false;
+        return auth('web')->user()?->isAdmin() ?? false;
     }
 
     public static function form(Form $form): Form
@@ -50,14 +50,14 @@ class UserResource extends Resource
                         ->relationship('branch', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(fn () => !auth()->user()?->isSuperAdmin())
+                        ->required(fn () => !auth('web')->user()?->isSuperAdmin())
                         ->helperText('Kosongkan untuk Super Admin'),
                     Forms\Components\Select::make('role')
                         ->label('Role')
                         ->options(User::getRoles())
                         ->required()
                         ->default('staff')
-                        ->visible(fn () => auth()->user()?->isSuperAdmin()),
+                        ->visible(fn () => auth('web')->user()?->isSuperAdmin()),
                     Forms\Components\Toggle::make('is_active')
                         ->label('Aktif')
                         ->default(true),

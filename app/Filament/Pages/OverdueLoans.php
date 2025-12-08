@@ -27,8 +27,8 @@ class OverdueLoans extends Page implements HasTable
                     ->with(['member.memberType', 'item.book'])
                     ->where('is_returned', false)
                     ->where('due_date', '<', now())
-                    ->when(!auth()->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth()->user()->branch_id))
-                    ->when(auth()->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
+                    ->when(!auth('web')->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth('web')->user()->branch_id))
+                    ->when(auth('web')->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
             )
             ->columns([
                 Tables\Columns\TextColumn::make('member.name')
@@ -99,8 +99,8 @@ class OverdueLoans extends Page implements HasTable
     {
         $query = Loan::where('is_returned', false)->where('due_date', '<', now());
         
-        if (!auth()->user()?->isSuperAdmin()) {
-            $query->where('branch_id', auth()->user()->branch_id);
+        if (!auth('web')->user()?->isSuperAdmin()) {
+            $query->where('branch_id', auth('web')->user()->branch_id);
         } elseif (session('current_branch_id')) {
             $query->where('branch_id', session('current_branch_id'));
         }

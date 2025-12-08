@@ -41,8 +41,8 @@ class FineResource extends Resource
             ->query(
                 Fine::query()
                     ->with(['member', 'loan.item.book'])
-                    ->when(!auth()->user()->isSuperAdmin(), fn ($q) => 
-                        $q->whereHas('loan', fn ($q2) => $q2->where('branch_id', auth()->user()->branch_id))
+                    ->when(!auth('web')->user()?->isSuperAdmin(), fn ($q) => 
+                        $q->whereHas('loan', fn ($q2) => $q2->where('branch_id', auth('web')->user()?->branch_id))
                     )
             )
             ->columns([

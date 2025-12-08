@@ -23,22 +23,22 @@ class BranchResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->isAdmin() ?? false;
+        return auth('web')->user()?->isAdmin() ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->isSuperAdmin() ?? false;
+        return auth('web')->user()?->isSuperAdmin() ?? false;
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->isSuperAdmin() ?? false;
+        return auth('web')->user()?->isSuperAdmin() ?? false;
     }
 
     public static function canDelete($record): bool
     {
-        return auth()->user()?->isSuperAdmin() ?? false;
+        return auth('web')->user()?->isSuperAdmin() ?? false;
     }
 
     public static function form(Form $form): Form
@@ -120,12 +120,12 @@ class BranchResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
-                    ->visible(fn () => auth()->user()?->isSuperAdmin()),
+                    ->visible(fn () => auth('web')->user()?->isSuperAdmin()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->visible(fn () => auth()->user()?->isSuperAdmin()),
+                        ->visible(fn () => auth('web')->user()?->isSuperAdmin()),
                 ]),
             ]);
     }

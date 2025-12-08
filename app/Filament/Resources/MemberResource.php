@@ -143,7 +143,7 @@ class MemberResource extends Resource
                     ->label('Cabang')
                     ->badge()
                     ->color('gray')
-                    ->visible(fn () => auth()->user()?->isSuperAdmin() && !session('current_branch_id')),
+                    ->visible(fn () => auth('web')->user()?->isSuperAdmin() && !session('current_branch_id')),
                 Tables\Columns\TextColumn::make('member_id')
                     ->label('No. Anggota')
                     ->searchable()
@@ -187,7 +187,7 @@ class MemberResource extends Resource
                 Tables\Filters\SelectFilter::make('branch_id')
                     ->label('Cabang')
                     ->relationship('branch', 'name')
-                    ->visible(fn () => auth()->user()?->isSuperAdmin() && !session('current_branch_id')),
+                    ->visible(fn () => auth('web')->user()?->isSuperAdmin() && !session('current_branch_id')),
                 Tables\Filters\SelectFilter::make('member_type_id')
                     ->label('Tipe Anggota')
                     ->relationship('memberType', 'name'),

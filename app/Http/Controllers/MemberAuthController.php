@@ -71,7 +71,7 @@ class MemberAuthController extends Controller
         $member = Auth::guard('member')->user();
         $loans = $member->loans()->with('item.book')->where('is_returned', false)->get();
         $history = $member->loans()->with('item.book')->where('is_returned', true)->latest()->take(10)->get();
-        $fines = $member->fines()->where('status', 'unpaid')->get();
+        $fines = $member->fines()->where('is_paid', false)->get();
 
         return view('opac.member-dashboard', compact('member', 'loans', 'history', 'fines'));
     }

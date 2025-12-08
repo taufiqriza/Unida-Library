@@ -25,14 +25,14 @@ class PrintMemberCards extends Page implements HasTable
             ->query(
                 Member::query()
                     ->where('is_active', true)
-                    ->when(!auth()->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth()->user()->branch_id))
-                    ->when(auth()->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
+                    ->when(!auth('web')->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth('web')->user()->branch_id))
+                    ->when(auth('web')->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
             )
             ->columns([
                 Tables\Columns\TextColumn::make('branch.name')
                     ->label('Cabang')
                     ->badge()
-                    ->visible(fn () => auth()->user()?->isSuperAdmin() && !session('current_branch_id')),
+                    ->visible(fn () => auth('web')->user()?->isSuperAdmin() && !session('current_branch_id')),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Foto')
                     ->circular()
