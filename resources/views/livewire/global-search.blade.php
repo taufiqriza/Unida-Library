@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white" x-data="{ showSubjectModal: false }">
+<div class="min-h-screen" x-data="{ showSubjectModal: false }">
     {{-- Search Header with Gradient --}}
     <div class="relative bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800 overflow-hidden">
         {{-- Background Pattern --}}
