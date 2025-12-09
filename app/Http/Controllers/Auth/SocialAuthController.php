@@ -62,6 +62,7 @@ class SocialAuthController extends Controller
 
         // Create new member with incomplete profile
         $member = Member::create([
+            'member_id' => $this->generateUniqueMemberId(),
             'name' => $googleUser->getName(),
             'email' => $googleUser->getEmail(),
             'is_active' => true,
@@ -113,5 +114,14 @@ class SocialAuthController extends Controller
             return redirect()->route('member.complete-profile');
         }
         return redirect()->route('member.dashboard');
+    }
+
+    protected function generateUniqueMemberId(): string
+    {
+        do {
+            $id = 'M' . date('Ymd') . strtoupper(\Illuminate\Support\Str::random(4));
+        } while (Member::where('member_id', $id)->exists());
+        
+        return $id;
     }
 }
