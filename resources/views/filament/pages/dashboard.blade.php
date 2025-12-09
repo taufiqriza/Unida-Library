@@ -209,23 +209,79 @@
         <div class="p-2 sm:p-4" style="height: 200px;"><canvas id="loanChart"></canvas></div>
     </div>
 
-    {{-- Recent Loans --}}
-    <div class="section-card">
-        <div class="section-header gradient-green"><x-heroicon-o-clock /><span>Peminjaman Terbaru</span></div>
-        <div class="p-2 sm:p-3 flex flex-wrap gap-2">
-            @forelse($recentLoans as $loan)
-            <div class="loan-card flex items-center gap-2 p-2 rounded-lg flex-1 min-w-[140px] max-w-[200px]">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    {{ substr($loan['member']['name'] ?? 'N', 0, 1) }}
+    {{-- Recent Loans + My Tasks --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+        <div class="section-card">
+            <div class="section-header gradient-green"><x-heroicon-o-clock /><span>Peminjaman Terbaru</span></div>
+            <div class="p-2 sm:p-3 flex flex-wrap gap-2">
+                @forelse($recentLoans as $loan)
+                <div class="loan-card flex items-center gap-2 p-2 rounded-lg flex-1 min-w-[140px] max-w-[200px]">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        {{ substr($loan['member']['name'] ?? 'N', 0, 1) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-xs font-semibold text-gray-800 dark:text-gray-100 truncate">{{ Str::limit($loan['item']['book']['title'] ?? '-', 18) }}</div>
+                        <div class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ Str::limit($loan['member']['name'] ?? '-', 12) }}</div>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                    <div class="text-xs font-semibold text-gray-800 dark:text-gray-100 truncate">{{ Str::limit($loan['item']['book']['title'] ?? '-', 18) }}</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ Str::limit($loan['member']['name'] ?? '-', 12) }}</div>
-                </div>
+                @empty
+                <div class="w-full text-center py-6 text-gray-400 text-sm">Belum ada peminjaman</div>
+                @endforelse
             </div>
-            @empty
-            <div class="w-full text-center py-6 text-gray-400 text-sm">Belum ada peminjaman</div>
-            @endforelse
+        </div>
+
+        {{-- My Tasks --}}
+        @php
+            $myTasks = \App\Models\Task::where('assigned_to', auth()->id())
+                ->whereHas('status', fn($q) => $q->where('is_done', false))
+                ->with(['status', 'project'])
+                ->orderBy('due_date')
+                ->limit(5)
+                ->get();
+            $overdueCount = \App\Models\Task::overdue()->where('assigned_to', auth()->id())->count();
+        @endphp
+        <div class="section-card">
+            <div class="section-header" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
+                <x-heroicon-o-clipboard-document-list /><span>Task Saya</span>
+                @if($overdueCount > 0)
+                    <span class="ml-auto bg-white/20 px-2 py-0.5 rounded-full text-xs">{{ $overdueCount }} overdue</span>
+                @endif
+            </div>
+            <div>
+                @forelse($myTasks as $task)
+                <a href="{{ route('filament.admin.resources.tasks.view', $task) }}" class="alert-row">
+                    <div class="alert-icon" style="background: {{ $task->status?->color ?? '#6b7280' }}20;">
+                        @switch($task->type)
+                            @case('bug') <span>🐛</span> @break
+                            @case('feature') <span>✨</span> @break
+                            @case('improvement') <span>📈</span> @break
+                            @default <span>📋</span>
+                        @endswitch
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm text-gray-700 dark:text-gray-200 truncate">{{ $task->title }}</div>
+                        <div class="text-xs text-gray-500">{{ $task->project?->name }}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs px-2 py-0.5 rounded-full" style="background: {{ $task->status?->color ?? '#6b7280' }}20; color: {{ $task->status?->color ?? '#6b7280' }};">
+                            {{ $task->status?->name }}
+                        </span>
+                        @if($task->due_date)
+                            <div class="text-xs mt-1 {{ $task->isOverdue() ? 'text-red-600' : 'text-gray-500' }}">
+                                {{ $task->due_date->format('d M') }}
+                            </div>
+                        @endif
+                    </div>
+                </a>
+                @empty
+                <div class="text-center py-6 text-gray-400 text-sm">Tidak ada task</div>
+                @endforelse
+                @if($myTasks->count() > 0)
+                <a href="{{ route('filament.admin.resources.tasks.index') }}?tableFilters[assigned_to][value]={{ auth()->id() }}" class="block text-center py-2 text-sm text-primary-600 hover:text-primary-700 border-t border-gray-100 dark:border-gray-700">
+                    Lihat Semua Task →
+                </a>
+                @endif
+            </div>
         </div>
     </div>
 
