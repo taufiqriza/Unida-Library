@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\DdcController;
 use App\Http\Controllers\MemberAuthController;
 use App\Http\Controllers\OpacController;
 use App\Http\Controllers\PrintController;
@@ -50,6 +51,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/print/member-cards', [PrintController::class, 'memberCards'])->name('member.cards');
     
     // Stock Opname Scan
+    // DDC API for admin panel
+    Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.search');
+    Route::get('/api/ddc/main-classes', [DdcController::class, 'mainClasses'])->name('api.ddc.main-classes');
+    
     Route::post('/stock-opname/{stockOpname}/scan', function (Request $request, $stockOpname) {
         $so = StockOpname::withoutGlobalScopes()->findOrFail($stockOpname);
         $barcode = $request->input('barcode');

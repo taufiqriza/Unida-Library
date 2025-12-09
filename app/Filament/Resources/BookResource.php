@@ -186,14 +186,68 @@ class BookResource extends Resource
                     Forms\Components\Tabs\Tab::make('Klasifikasi')
                         ->icon('heroicon-o-tag')
                         ->schema([
-                            Forms\Components\TextInput::make('classification')
-                                ->label('No. Klasifikasi')
-                                ->helperText('Nomor DDC/UDC')
-                                ->maxLength(40),
-                            Forms\Components\TextInput::make('call_number')
-                                ->label('No. Panggil')
-                                ->helperText('Call number untuk penempatan di rak')
-                                ->maxLength(50),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('classification')
+                                        ->label('No. Klasifikasi')
+                                        ->helperText('Nomor DDC/UDC')
+                                        ->maxLength(40)
+                                        ->suffixAction(
+                                            Forms\Components\Actions\Action::make('searchDdc')
+                                                ->icon('heroicon-o-magnifying-glass')
+                                                ->tooltip('Cari DDC')
+                                                ->modalHeading('Pencarian DDC (Dewey Decimal Classification)')
+                                                ->modalDescription('Cari dan pilih nomor klasifikasi DDC yang sesuai')
+                                                ->modalWidth('2xl')
+                                                ->modalSubmitAction(false)
+                                                ->modalCancelActionLabel('Tutup')
+                                                ->form([
+                                                    Forms\Components\TextInput::make('ddc_search')
+                                                        ->label('Cari DDC')
+                                                        ->placeholder('Ketik nomor atau kata kunci...')
+                                                        ->live(debounce: 300)
+                                                        ->autofocus()
+                                                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                                            if (strlen($state) >= 2) {
+                                                                $results = \App\Models\DdcClassification::where('code', 'like', "%{$state}%")
+                                                                    ->orWhere('description', 'like', "%{$state}%")
+                                                                    ->orderBy('code')
+                                                                    ->limit(20)
+                                                                    ->get()
+                                                                    ->mapWithKeys(fn ($item) => [$item->code => "{$item->code} - " . \Str::limit($item->description, 100)])
+                                                                    ->toArray();
+                                                                $set('ddc_results', $results);
+                                                            } else {
+                                                                $set('ddc_results', []);
+                                                            }
+                                                        }),
+                                                    Forms\Components\Radio::make('ddc_results')
+                                                        ->label('Hasil Pencarian')
+                                                        ->options(fn (Forms\Get $get) => $get('ddc_results') ?? [])
+                                                        ->visible(fn (Forms\Get $get) => !empty($get('ddc_results')))
+                                                        ->live()
+                                                        ->afterStateUpdated(function ($state, Forms\Set $set, $livewire) {
+                                                            if ($state) {
+                                                                $set('../../classification', $state);
+                                                                $livewire->dispatch('close-modal', id: 'searchDdc');
+                                                            }
+                                                        }),
+                                                    Forms\Components\Placeholder::make('ddc_help')
+                                                        ->content(new \Illuminate\Support\HtmlString('
+                                                            <div class="text-sm text-gray-500 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                                                                <strong>Kelas Utama DDC:</strong><br>
+                                                                000 Karya Umum • 100 Filsafat • 200 Agama • 300 Ilmu Sosial • 400 Bahasa<br>
+                                                                500 Sains • 600 Teknologi • 700 Seni • 800 Sastra • 900 Sejarah
+                                                            </div>
+                                                        '))
+                                                        ->visible(fn (Forms\Get $get) => empty($get('ddc_results')) && strlen($get('ddc_search') ?? '') < 2),
+                                                ])
+                                        ),
+                                    Forms\Components\TextInput::make('call_number')
+                                        ->label('No. Panggil')
+                                        ->helperText('Call number untuk penempatan di rak')
+                                        ->maxLength(50),
+                                ]),
                             Forms\Components\TextInput::make('series_title')
                                 ->label('Judul Seri')
                                 ->maxLength(200),
