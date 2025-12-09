@@ -12,7 +12,7 @@
         }
         this.loading = true;
         try {
-            const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=25');
+            const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=50');
             this.results = await res.json();
         } catch (e) {
             this.results = [];
@@ -32,7 +32,6 @@
     
     apply() {
         if (!this.selectedCode) return;
-        
         document.querySelectorAll('input').forEach(input => {
             const key = input.closest('[wire\\:key]')?.getAttribute('wire:key') || '';
             if (key.includes('classification') || input.id?.includes('classification')) {
@@ -41,121 +40,135 @@
                 input.dispatchEvent(new Event('change', { bubbles: true }));
             }
         });
-        
         document.querySelector('.fi-modal-close-btn')?.click();
     }
 }">
-    {{-- Main Classes Grid --}}
+    {{-- Search Box --}}
+    <div style="margin-bottom: 1rem;">
+        <div style="position: relative;">
+            <div style="position: absolute; left: 0.875rem; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                <template x-if="loading">
+                    <svg class="ddc-search-icon ddc-spin" fill="none" viewBox="0 0 24 24">
+                        <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                </template>
+                <template x-if="!loading">
+                    <svg class="ddc-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </template>
+            </div>
+            <input 
+                type="text" 
+                x-model="search"
+                @input.debounce.300ms="doSearch()"
+                placeholder="Cari nomor klasifikasi atau deskripsi..."
+                class="ddc-search-input"
+                autofocus
+            >
+            <button 
+                x-show="search.length > 0"
+                @click="search = ''; results = [];"
+                type="button"
+                class="ddc-search-clear"
+            >
+                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    {{-- Main Classes Grid - Original Style --}}
     <template x-if="search.length < 2 && results.length === 0">
         <div>
-            <div class="grid grid-cols-2 gap-2 mb-4">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 0.5rem;">
                 <template x-for="cls in [
-                    {code: '000', label: 'Karya Umum & Komputer', bg: 'bg-pink-100 dark:bg-pink-950/60', color: 'text-pink-700 dark:text-pink-300', icon: '💻'},
-                    {code: '100', label: 'Filsafat & Psikologi', bg: 'bg-orange-100 dark:bg-orange-950/60', color: 'text-orange-700 dark:text-orange-300', icon: '🧠'},
-                    {code: '200', label: 'Agama', bg: 'bg-emerald-100 dark:bg-emerald-950/60', color: 'text-emerald-700 dark:text-emerald-300', icon: '🕌'},
-                    {code: '2X0', label: 'Islam (Umum)', bg: 'bg-teal-100 dark:bg-teal-950/60', color: 'text-teal-700 dark:text-teal-300', icon: '☪️'},
-                    {code: '300', label: 'Ilmu Sosial', bg: 'bg-amber-100 dark:bg-amber-950/60', color: 'text-amber-700 dark:text-amber-300', icon: '👥'},
-                    {code: '400', label: 'Bahasa', bg: 'bg-lime-100 dark:bg-lime-950/60', color: 'text-lime-700 dark:text-lime-300', icon: '🗣️'},
-                    {code: '500', label: 'Sains & Matematika', bg: 'bg-cyan-100 dark:bg-cyan-950/60', color: 'text-cyan-700 dark:text-cyan-300', icon: '🔬'},
-                    {code: '600', label: 'Teknologi', bg: 'bg-blue-100 dark:bg-blue-950/60', color: 'text-blue-700 dark:text-blue-300', icon: '⚙️'},
-                    {code: '700', label: 'Seni & Olahraga', bg: 'bg-violet-100 dark:bg-violet-950/60', color: 'text-violet-700 dark:text-violet-300', icon: '🎨'},
-                    {code: '800', label: 'Sastra', bg: 'bg-fuchsia-100 dark:bg-fuchsia-950/60', color: 'text-fuchsia-700 dark:text-fuchsia-300', icon: '📚'},
-                    {code: '900', label: 'Sejarah & Geografi', bg: 'bg-slate-100 dark:bg-slate-800/80', color: 'text-slate-700 dark:text-slate-300', icon: '🌍'},
+                    {code: '000', label: 'Karya Umum & Komputer', gradient: 'linear-gradient(135deg, #fce7f3 0%, #f9a8d4 100%)', color: '#9d174d', icon: '💻'},
+                    {code: '100', label: 'Filsafat & Psikologi', gradient: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 100%)', color: '#9a3412', icon: '🧠'},
+                    {code: '200', label: 'Agama', gradient: 'linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%)', color: '#065f46', icon: '🕌'},
+                    {code: '300', label: 'Ilmu Sosial', gradient: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', color: '#92400e', icon: '👥'},
+                    {code: '400', label: 'Bahasa', gradient: 'linear-gradient(135deg, #ecfccb 0%, #bef264 100%)', color: '#3f6212', icon: '🗣️'},
+                    {code: '500', label: 'Sains & Matematika', gradient: 'linear-gradient(135deg, #cffafe 0%, #67e8f9 100%)', color: '#155e75', icon: '🔬'},
+                    {code: '600', label: 'Teknologi', gradient: 'linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)', color: '#1e40af', icon: '⚙️'},
+                    {code: '700', label: 'Seni & Olahraga', gradient: 'linear-gradient(135deg, #ede9fe 0%, #c4b5fd 100%)', color: '#5b21b6', icon: '🎨'},
+                    {code: '800', label: 'Sastra', gradient: 'linear-gradient(135deg, #fae8ff 0%, #e879f9 100%)', color: '#86198f', icon: '📚'},
+                    {code: '900', label: 'Sejarah & Geografi', gradient: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)', color: '#334155', icon: '🌍'},
                 ]" :key="cls.code">
                     <button 
                         type="button"
                         @click="selectClass(cls.code)"
-                        :class="cls.bg"
-                        class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer text-left transition-all duration-150 hover:scale-[1.02] hover:shadow-md"
+                        :style="{ background: cls.gradient }"
+                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; border: none; cursor: pointer; text-align: left; transition: transform 0.15s, box-shadow 0.15s;"
+                        @mouseenter="$el.style.transform = 'scale(1.02)'; $el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'"
+                        @mouseleave="$el.style.transform = 'scale(1)'; $el.style.boxShadow = 'none'"
                     >
-                        <span class="text-xl flex-shrink-0" x-text="cls.icon"></span>
-                        <div class="flex-1 min-w-0">
-                            <div :class="cls.color" class="text-lg font-extrabold leading-none" x-text="cls.code"></div>
-                            <div :class="cls.color" class="text-[11px] opacity-80 truncate mt-0.5" x-text="cls.label"></div>
+                        <span style="font-size: 1.5rem;" x-text="cls.icon"></span>
+                        <div style="flex: 1; min-width: 0;">
+                            <div :style="{ color: cls.color }" style="font-size: 1.25rem; font-weight: 800; line-height: 1;" x-text="cls.code"></div>
+                            <div :style="{ color: cls.color }" style="font-size: 0.7rem; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="cls.label"></div>
                         </div>
-                        <svg :class="cls.color" class="w-4 h-4 opacity-50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg :style="{ color: cls.color }" style="width: 1rem; height: 1rem; opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </button>
                 </template>
             </div>
-            <p class="text-center text-xs text-gray-400 dark:text-gray-500">Klik kelas utama untuk melihat sub-klasifikasi, atau ketik di kotak pencarian</p>
-        </div>
-    </template>
-
-    {{-- Search Box --}}
-    <div class="mb-4">
-        <div class="relative">
-            <input 
-                type="text" 
-                x-model="search"
-                @input.debounce.300ms="doSearch()"
-                placeholder="Ketik nomor atau kata kunci (min. 2 karakter)..."
-                class="w-full h-12 pl-11 pr-11 text-base border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-                autofocus
-            >
-            <div class="absolute left-0 top-0 h-12 w-11 flex items-center justify-center pointer-events-none">
-                <template x-if="loading">
-                    <svg class="w-5 h-5 text-primary-500 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                </template>
-                <template x-if="!loading">
-                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </template>
-            </div>
-            <div class="absolute right-0 top-0 h-12 w-11 flex items-center justify-center">
+            {{-- 2X Islam - Centered --}}
+            <div style="display: flex; justify-content: center; margin-bottom: 0.75rem;">
                 <button 
-                    x-show="search.length > 0"
-                    @click="search = ''; results = [];"
                     type="button"
-                    class="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    @click="selectClass('2X')"
+                    style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 2rem; border-radius: 0.75rem; border: none; cursor: pointer; text-align: left; transition: transform 0.15s, box-shadow 0.15s; background: linear-gradient(135deg, #ccfbf1 0%, #5eead4 100%);"
+                    @mouseenter="$el.style.transform = 'scale(1.02)'; $el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'"
+                    @mouseleave="$el.style.transform = 'scale(1)'; $el.style.boxShadow = 'none'"
                 >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <span style="font-size: 1.5rem;">☪️</span>
+                    <div>
+                        <div style="font-size: 1.25rem; font-weight: 800; line-height: 1; color: #115e59;">2X</div>
+                        <div style="font-size: 0.7rem; opacity: 0.8; color: #115e59;">Islam</div>
+                    </div>
+                    <svg style="width: 1rem; height: 1rem; opacity: 0.5; color: #115e59;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
                 </button>
             </div>
+            <p style="text-align: center; font-size: 0.75rem; color: #9ca3af;">Klik kelas utama atau ketik di kotak pencarian</p>
         </div>
-    </div>
+    </template>
 
-    {{-- Results --}}
+    {{-- Results List - Fixed Height with Scroll --}}
     <template x-if="results.length > 0">
         <div>
-            <div class="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-primary-50 dark:bg-primary-900/30">
-                <span class="text-sm text-primary-700 dark:text-primary-300">
-                    <strong x-text="results.length"></strong> hasil ditemukan
+            {{-- Results Header --}}
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.625rem 0.875rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.625rem; color: white;">
+                <span style="font-size: 0.875rem; font-weight: 600;">
+                    <span x-text="results.length"></span> hasil ditemukan
                 </span>
                 <button 
                     @click="search = ''; results = [];"
                     type="button"
-                    class="text-xs text-primary-600 dark:text-primary-400 hover:underline"
-                >Kembali ke kelas utama</button>
+                    style="font-size: 0.75rem; color: rgba(255,255,255,0.9); background: rgba(255,255,255,0.2); border: none; padding: 0.25rem 0.625rem; border-radius: 0.375rem; cursor: pointer;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.3)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.2)'"
+                >← Kembali</button>
             </div>
-            <div class="max-h-72 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800/50">
+            
+            {{-- Scrollable Results --}}
+            <div style="max-height: 280px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0.75rem; background: #fafafa;" class="ddc-results-scroll">
                 <template x-for="ddc in results" :key="ddc.code">
                     <button 
                         type="button"
-                        @click="select(ddc.code, ddc.description.substring(0, 60))"
-                        :class="selectedCode === ddc.code ? 'bg-primary-50 dark:bg-primary-900/40 border-l-4 border-l-primary-500' : 'border-l-4 border-l-transparent hover:bg-gray-50 dark:hover:bg-gray-700/50'"
-                        class="w-full flex items-start gap-3 p-3 text-left border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 transition"
+                        @click="select(ddc.code, ddc.description.substring(0, 80))"
+                        :class="selectedCode === ddc.code ? 'ddc-item-selected' : 'ddc-item'"
+                        class="ddc-result-item"
                     >
-                        <span 
-                            :class="selectedCode === ddc.code ? 'bg-primary-500 text-white' : 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300'"
-                            class="flex-shrink-0 px-2.5 py-1 font-mono font-bold text-sm rounded-lg transition"
-                            x-text="ddc.code"
-                        ></span>
-                        <span class="flex-1 text-sm leading-relaxed text-gray-700 dark:text-gray-300" x-text="ddc.description.substring(0, 120) + (ddc.description.length > 120 ? '...' : '')"></span>
-                        <template x-if="selectedCode === ddc.code">
-                            <span class="flex-shrink-0 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </span>
-                        </template>
+                        <span :class="selectedCode === ddc.code ? 'ddc-code-selected' : 'ddc-code'" x-text="ddc.code"></span>
+                        <span class="ddc-desc" x-text="ddc.description.substring(0, 100) + (ddc.description.length > 100 ? '...' : '')"></span>
+                        <svg x-show="selectedCode === ddc.code" class="ddc-check" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
                     </button>
                 </template>
             </div>
@@ -164,41 +177,211 @@
 
     {{-- No Results --}}
     <template x-if="search.length >= 2 && results.length === 0 && !loading">
-        <div class="py-8 text-center">
-            <div class="w-14 h-14 mx-auto mb-3 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                <svg class="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style="padding: 2.5rem 1rem; text-align: center;">
+            <div style="width: 3.5rem; height: 3.5rem; margin: 0 auto 0.75rem; background: #f3f4f6; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 1.75rem; height: 1.75rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <p class="text-gray-600 dark:text-gray-400 text-sm">Tidak ada hasil untuk "<strong x-text="search"></strong>"</p>
-            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Coba kata kunci lain</p>
+            <p style="font-size: 0.875rem; color: #6b7280; font-weight: 500;">Tidak ada hasil untuk "<span x-text="search"></span>"</p>
+            <button 
+                @click="search = ''; results = [];"
+                type="button"
+                style="margin-top: 0.75rem; font-size: 0.8125rem; color: #667eea; background: none; border: none; cursor: pointer;"
+                onmouseover="this.style.textDecoration='underline'"
+                onmouseout="this.style.textDecoration='none'"
+            >Kembali ke kelas utama</button>
         </div>
     </template>
 
-    {{-- Footer with Selection --}}
-    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
-        <div class="flex-1 min-w-0">
+    {{-- Footer --}}
+    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; align-items: center; gap: 0.75rem;">
+        <div style="flex: 1; min-width: 0;">
             <template x-if="selectedCode">
-                <div class="flex items-center gap-2 px-3 py-2.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-lg">
-                    <span class="px-2 py-0.5 bg-primary-500 text-white font-mono font-bold text-sm rounded" x-text="selectedCode"></span>
-                    <span class="text-sm text-primary-700 dark:text-primary-300 truncate" x-text="selectedDesc"></span>
+                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.875rem; background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%); border: 1px solid rgba(102,126,234,0.3); border-radius: 0.625rem;">
+                    <span style="padding: 0.25rem 0.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: monospace; font-weight: 700; font-size: 0.875rem; border-radius: 0.375rem; box-shadow: 0 2px 6px rgba(102,126,234,0.3);" x-text="selectedCode"></span>
+                    <span style="font-size: 0.875rem; color: #4b5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" x-text="selectedDesc"></span>
                 </div>
             </template>
             <template x-if="!selectedCode">
-                <span class="text-sm text-gray-400 dark:text-gray-500">Pilih klasifikasi dari daftar</span>
+                <span style="font-size: 0.875rem; color: #9ca3af; font-style: italic;">Pilih klasifikasi dari daftar</span>
             </template>
         </div>
         <button 
             type="button"
             @click="apply()"
-            :disabled="!selectedCode"
-            :class="selectedCode ? 'bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-500/30' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'"
-            class="px-5 py-2.5 text-white font-semibold text-sm rounded-lg flex items-center gap-2 transition"
+            x-bind:disabled="!selectedCode"
+            x-bind:class="selectedCode ? 'ddc-btn-active' : 'ddc-btn-disabled'"
+            class="ddc-btn-gunakan"
         >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
             </svg>
-            Gunakan
+            <span>Gunakan</span>
         </button>
     </div>
+
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .ddc-spin { animation: spin 1s linear infinite; }
+        
+        /* Search Input */
+        .ddc-search-input {
+            width: 100%;
+            height: 3rem;
+            padding-left: 2.75rem;
+            padding-right: 2.75rem;
+            font-size: 0.9375rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            background: white;
+            color: #111827;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .ddc-search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .ddc-search-input::placeholder { color: #9ca3af; }
+        .ddc-search-icon { width: 1.25rem; height: 1.25rem; color: #9ca3af; }
+        .ddc-search-clear {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 0.25rem;
+            color: #9ca3af;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .ddc-search-clear:hover { color: #6b7280; }
+        
+        .dark .ddc-search-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        .dark .ddc-search-input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(129,140,248,0.15);
+        }
+        .dark .ddc-search-input::placeholder { color: #9ca3af; }
+        .dark .ddc-search-icon { color: #9ca3af; }
+        .dark .ddc-search-clear { color: #9ca3af; }
+        .dark .ddc-search-clear:hover { color: #d1d5db; }
+        
+        /* Results scroll */
+        .ddc-results-scroll::-webkit-scrollbar { width: 6px; }
+        .ddc-results-scroll::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 3px; }
+        .ddc-results-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+        .ddc-results-scroll::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        
+        .ddc-result-item {
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            text-align: left;
+            border: none;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ddc-item { background: white; border-left: 4px solid transparent; }
+        .ddc-item:hover { background: #f9fafb; }
+        .ddc-item-selected { 
+            background: linear-gradient(135deg, rgba(102,126,234,0.08) 0%, rgba(118,75,162,0.08) 100%); 
+            border-left: 4px solid #667eea; 
+        }
+        
+        .ddc-code {
+            flex-shrink: 0;
+            min-width: 70px;
+            padding: 0.375rem 0.75rem;
+            background: #f3f4f6;
+            color: #667eea;
+            font-family: ui-monospace, monospace;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .ddc-code-selected {
+            flex-shrink: 0;
+            min-width: 70px;
+            padding: 0.375rem 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: ui-monospace, monospace;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+        }
+        
+        .ddc-desc {
+            flex: 1;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #374151;
+            padding-top: 0.125rem;
+        }
+        
+        .ddc-check {
+            flex-shrink: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #667eea;
+            margin-top: 0.125rem;
+        }
+        
+        .ddc-btn-gunakan {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: none;
+            border-radius: 0.625rem;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .ddc-btn-gunakan svg {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+        }
+        .ddc-btn-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(102,126,234,0.4);
+            cursor: pointer;
+        }
+        .ddc-btn-active:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+        }
+        .ddc-btn-disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        /* Dark mode */
+        .dark .ddc-results-scroll { background: #1f2937 !important; border-color: #374151 !important; }
+        .dark .ddc-result-item { border-color: #374151 !important; }
+        .dark .ddc-item { background: #1f2937 !important; }
+        .dark .ddc-item:hover { background: #374151 !important; }
+        .dark .ddc-item-selected { background: rgba(102,126,234,0.15) !important; }
+        .dark .ddc-code { background: #374151 !important; color: #a5b4fc !important; }
+        .dark .ddc-desc { color: #d1d5db !important; }
+        .dark .ddc-btn-disabled { background: #374151; color: #6b7280; }
+    </style>
 </div>

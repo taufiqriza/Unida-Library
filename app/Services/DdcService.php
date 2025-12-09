@@ -13,7 +13,7 @@ class DdcService
 
     public function __construct()
     {
-        $this->jsonPath = storage_path('app/ddc.json');
+        $this->jsonPath = database_path('data/ddc.json');
     }
 
     /**
