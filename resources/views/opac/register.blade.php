@@ -40,6 +40,15 @@
                                     <p class="text-primary-200 text-sm">Pengingat jatuh tempo</p>
                                 </div>
                             </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-upload text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Unggah Tugas Akhir</p>
+                                    <p class="text-primary-200 text-sm">Submit skripsi/tesis mandiri</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
