@@ -21,7 +21,7 @@ Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 // Member Auth - with rate limiting
 Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])
     ->middleware('throttle:login')
-    ->name('login')->name('member.login');
+    ->name('login');
 Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])
     ->middleware('throttle:login')
     ->name('opac.register');

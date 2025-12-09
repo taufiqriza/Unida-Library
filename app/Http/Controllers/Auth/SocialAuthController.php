@@ -14,7 +14,7 @@ class SocialAuthController extends Controller
     public function redirect()
     {
         if (!Setting::get('google_oauth_enabled')) {
-            return redirect()->route('member.login')->with('error', 'Google login tidak aktif.');
+            return redirect()->route('login')->with('error', 'Google login tidak aktif.');
         }
         return Socialite::driver('google')->redirect();
     }
@@ -22,13 +22,13 @@ class SocialAuthController extends Controller
     public function callback()
     {
         if (!Setting::get('google_oauth_enabled')) {
-            return redirect()->route('member.login')->with('error', 'Google login tidak aktif.');
+            return redirect()->route('login')->with('error', 'Google login tidak aktif.');
         }
 
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (\Exception $e) {
-            return redirect()->route('member.login')->with('error', 'Gagal login dengan Google.');
+            return redirect()->route('login')->with('error', 'Gagal login dengan Google.');
         }
 
         // Check domain whitelist
@@ -37,8 +37,7 @@ class SocialAuthController extends Controller
             $domains = array_filter(array_map('trim', explode("\n", $allowedDomains)));
             $emailDomain = substr(strrchr($googleUser->getEmail(), '@'), 1);
             if (!empty($domains) && !in_array($emailDomain, $domains)) {
-                return redirect()->route('member.login')
-                    ->with('error', 'Domain email tidak diizinkan.');
+                return redirect()->route('login')->with('error', 'Domain email tidak diizinkan.');
             }
         }
 
@@ -56,7 +55,6 @@ class SocialAuthController extends Controller
         $member = Member::where('email', $googleUser->getEmail())->first();
 
         if ($member) {
-            // Link social account to existing member
             $member->socialAccounts()->create([
                 'provider' => 'google',
                 'provider_id' => $googleUser->getId(),
