@@ -19,9 +19,19 @@ Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news
 Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 
 // Member Auth - 'login' name is required for Laravel's default auth redirect
-Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])->name('login');
+Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])->name('login')->name('member.login');
 Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])->name('opac.register');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');
+
+// Google OAuth
+Route::get('/auth/google', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'callback']);
+
+// Complete Profile (for OAuth users)
+Route::middleware('auth:member')->group(function () {
+    Route::get('/member/complete-profile', [App\Http\Controllers\Auth\CompleteProfileController::class, 'show'])->name('member.complete-profile');
+    Route::post('/member/complete-profile', [App\Http\Controllers\Auth\CompleteProfileController::class, 'update']);
+});
 
 // Member Area (Protected)
 Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(function () {
@@ -30,6 +40,9 @@ Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(
     Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
     Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
 });
+
+// Alias for member.dashboard
+Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->middleware('auth:member')->name('member.dashboard');
 
 // E-Thesis detail
 Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');

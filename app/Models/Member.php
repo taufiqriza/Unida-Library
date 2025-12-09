@@ -15,7 +15,7 @@ class Member extends Authenticatable
     protected $fillable = [
         'branch_id', 'member_id', 'name', 'gender', 'birth_date', 'identity_number',
         'address', 'city', 'phone', 'email', 'password', 'member_type_id', 'register_date',
-        'expire_date', 'photo', 'is_active', 'notes'
+        'expire_date', 'photo', 'is_active', 'profile_completed', 'notes'
     ];
 
     protected $hidden = ['password'];
@@ -25,6 +25,7 @@ class Member extends Authenticatable
         'register_date' => 'date',
         'expire_date' => 'date',
         'is_active' => 'boolean',
+        'profile_completed' => 'boolean',
         'password' => 'hashed',
     ];
 
@@ -78,5 +79,10 @@ class Member extends Authenticatable
     public function getTotalUnpaidFinesAttribute(): float
     {
         return $this->fines()->where('is_paid', false)->sum('amount');
+    }
+
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
     }
 }

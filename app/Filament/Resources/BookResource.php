@@ -64,20 +64,17 @@ class BookResource extends Resource
                                 ->relationship('contentType', 'name')
                                 ->searchable()
                                 ->helperText('RDA Content Type'),
-                            Forms\Components\Select::make('carrier_type_id')
-                                ->label('Carrier Type')
-                                ->relationship('carrierType', 'name')
-                                ->searchable()
-                                ->helperText('RDA Carrier Type'),
+                            Forms\Components\TextInput::make('item_qty')
+                                ->label('Jml Eksemplar')
+                                ->numeric()
+                                ->default(1)
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->visible(fn ($livewire) => $livewire instanceof \App\Filament\Resources\BookResource\Pages\CreateBook),
                             Forms\Components\TextInput::make('title')
                                 ->label('Judul')
                                 ->required()
                                 ->maxLength(500)
-                                ->columnSpanFull(),
-                            Forms\Components\TextInput::make('sor')
-                                ->label('Pernyataan Tanggung Jawab')
-                                ->helperText('Statement of Responsibility - pengarang seperti tertulis di buku')
-                                ->maxLength(200)
                                 ->columnSpanFull(),
                             Forms\Components\TextInput::make('edition')
                                 ->label('Edisi'),
@@ -208,27 +205,28 @@ class BookResource extends Resource
                                         ),
                                     Forms\Components\TextInput::make('call_number')
                                         ->label('No. Panggil')
-                                        ->hint('Format: Kode Klasifikasi Penulis Judul')
+                                        ->hint('Format: S Klasifikasi Penulis Judul')
                                         ->hintIcon('heroicon-o-information-circle')
                                         ->maxLength(50)
-                                        ->placeholder('Contoh: S 2X9.12 TIR m')
-                                        ->helperText('Klik tombol Generate untuk membuat otomatis')
+                                        ->placeholder('Klik Generate →')
+                                        ->disabled()
+                                        ->dehydrated()
                                         ->suffixAction(
                                             Forms\Components\Actions\Action::make('generateCallNumber')
                                                 ->label('Generate')
-                                                ->icon('heroicon-o-sparkles')
-                                                ->color('success')
+                                                ->icon('heroicon-o-cog-6-tooth')
+                                                ->color('primary')
                                                 ->action(function (Forms\Get $get, Forms\Set $set) {
                                                     $classification = $get('classification');
                                                     $title = $get('title');
                                                     $sor = $get('sor');
                                                     
-                                                    // Get author from SOR or first word
                                                     $authorCode = \App\Services\CallNumberService::getAuthorCode($sor);
                                                     $titleCode = \App\Services\CallNumberService::getTitleCode($title);
                                                     
-                                                    // Build call number (without collection code - that's per item)
-                                                    $callNumber = trim("{$classification}\n{$authorCode}\n{$titleCode}");
+                                                    // Build call number: S + Classification + Author + Title
+                                                    $parts = array_filter(['S', $classification, $authorCode, $titleCode]);
+                                                    $callNumber = implode(' ', $parts);
                                                     $set('call_number', $callNumber);
                                                 })
                                         ),
@@ -239,7 +237,7 @@ class BookResource extends Resource
                             Forms\Components\Select::make('frequency_id')
                                 ->label('Frekuensi')
                                 ->relationship('frequency', 'name')
-                                ->helperText('Untuk terbitan berseri'),
+                                ->hint('Untuk terbitan berseri'),
                         ])->columns(2),
 
                     // Tab 5: Abstrak & Catatan
@@ -322,7 +320,7 @@ class BookResource extends Resource
                     ->label('Subjek')
                     ->badge()
                     ->color('warning')
-                    ->limitList(2)
+                    ->limitList(1)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('isbn')
                     ->label('ISBN')
@@ -372,12 +370,6 @@ class BookResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('print_label')
-                    ->label('Label')
-                    ->icon('heroicon-o-printer')
-                    ->url(fn ($record) => route('print.labels', ['ids' => $record->items->pluck('id')->toArray()]))
-                    ->openUrlInNewTab()
-                    ->visible(fn ($record) => $record->items->count() > 0),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -183,14 +183,31 @@ class ItemResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('print_barcode')
-                    ->label('Cetak')
-                    ->icon('heroicon-o-printer')
+                    ->label('Barcode')
+                    ->icon('heroicon-o-qr-code')
                     ->url(fn ($record) => route('print.barcode', $record))
+                    ->openUrlInNewTab(),
+                Tables\Actions\Action::make('print_label')
+                    ->label('Label')
+                    ->icon('heroicon-o-tag')
+                    ->url(fn ($record) => route('print.label', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('print_barcodes')
+                        ->label('Cetak Barcode')
+                        ->icon('heroicon-o-qr-code')
+                        ->action(fn ($records) => redirect()->away(route('print.barcodes', ['ids' => $records->pluck('id')->implode(',')])))
+                        ->openUrlInNewTab()
+                        ->deselectRecordsAfterCompletion(),
+                    Tables\Actions\BulkAction::make('print_labels')
+                        ->label('Cetak Label')
+                        ->icon('heroicon-o-tag')
+                        ->action(fn ($records) => redirect()->away(route('print.labels', ['ids' => $records->pluck('id')->implode(',')])))
+                        ->openUrlInNewTab()
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

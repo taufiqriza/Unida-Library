@@ -86,10 +86,10 @@ class CallNumberService
             }
         }
         
-        // Ambil huruf pertama
+        // Ambil huruf pertama, uppercase
         $firstChar = substr(preg_replace('/[^a-zA-Z0-9]/', '', $title), 0, 1);
         
-        return strtolower($firstChar);
+        return strtoupper($firstChar);
     }
 
     /**

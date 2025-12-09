@@ -16,7 +16,7 @@ class PrintController extends Controller
 
     public function barcodes(Request $request)
     {
-        $ids = explode(',', $request->get('ids', ''));
+        $ids = $this->parseIds($request->get('ids'));
         $items = Item::with(['book.authors', 'collectionType'])->whereIn('id', $ids)->get();
         return view('print.barcode', ['items' => $items]);
     }
@@ -29,7 +29,7 @@ class PrintController extends Controller
 
     public function labels(Request $request)
     {
-        $ids = explode(',', $request->get('ids', ''));
+        $ids = $this->parseIds($request->get('ids'));
         $items = Item::with(['book.authors', 'collectionType'])->whereIn('id', $ids)->get();
         return view('print.label', ['items' => $items]);
     }
@@ -41,8 +41,22 @@ class PrintController extends Controller
 
     public function memberCards(Request $request)
     {
-        $ids = explode(',', $request->get('ids', ''));
+        $ids = $this->parseIds($request->get('ids'));
         $members = Member::with('memberType')->whereIn('id', $ids)->get();
         return view('print.member-card', ['members' => $members]);
+    }
+
+    /**
+     * Parse IDs from request (handles both array and comma-separated string)
+     */
+    private function parseIds($ids): array
+    {
+        if (is_array($ids)) {
+            return $ids;
+        }
+        if (is_string($ids) && !empty($ids)) {
+            return explode(',', $ids);
+        }
+        return [];
     }
 }
