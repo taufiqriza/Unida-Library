@@ -18,6 +18,13 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/branches', [HomeController::class, 'branches']);
 
+    // Departments (for complete profile form)
+    Route::get('/departments', function (\Illuminate\Http\Request $request) {
+        return \App\Models\Department::where('faculty_id', $request->faculty_id)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    });
+
     // Catalog
     Route::get('/catalog', [CatalogController::class, 'index']);
     Route::get('/catalog/filters', [CatalogController::class, 'filters']);
