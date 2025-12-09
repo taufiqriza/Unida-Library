@@ -57,7 +57,7 @@ class ThesisSubmissionForm extends Component
 
     protected $listeners = ['refreshComponent' => '$refresh'];
     
-    public ?int $memberId = null;
+    protected ?int $memberId = null;
 
     // Validation rules per step
     protected function rules(): array

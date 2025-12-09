@@ -9,31 +9,33 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Public API Routes
+| Public API Routes (Rate Limited: 60 req/min)
 |--------------------------------------------------------------------------
 */
 
-// Home / Landing
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/branches', [HomeController::class, 'branches']);
+Route::middleware('throttle:api')->group(function () {
+    // Home / Landing
+    Route::get('/', [HomeController::class, 'index']);
+    Route::get('/branches', [HomeController::class, 'branches']);
 
-// Catalog
-Route::get('/catalog', [CatalogController::class, 'index']);
-Route::get('/catalog/filters', [CatalogController::class, 'filters']);
-Route::get('/catalog/{id}', [CatalogController::class, 'show']);
+    // Catalog
+    Route::get('/catalog', [CatalogController::class, 'index']);
+    Route::get('/catalog/filters', [CatalogController::class, 'filters']);
+    Route::get('/catalog/{id}', [CatalogController::class, 'show']);
 
-// E-Library
-Route::get('/ebooks', [ElibraryController::class, 'ebooks']);
-Route::get('/ebooks/{id}', [ElibraryController::class, 'ebookShow']);
-Route::get('/etheses', [ElibraryController::class, 'etheses']);
-Route::get('/etheses/{id}', [ElibraryController::class, 'ethesisShow']);
+    // E-Library
+    Route::get('/ebooks', [ElibraryController::class, 'ebooks']);
+    Route::get('/ebooks/{id}', [ElibraryController::class, 'ebookShow']);
+    Route::get('/etheses', [ElibraryController::class, 'etheses']);
+    Route::get('/etheses/{id}', [ElibraryController::class, 'ethesisShow']);
 
-// News
-Route::get('/news', [ElibraryController::class, 'news']);
-Route::get('/news/{slug}', [ElibraryController::class, 'newsShow']);
+    // News
+    Route::get('/news', [ElibraryController::class, 'news']);
+    Route::get('/news/{slug}', [ElibraryController::class, 'newsShow']);
 
-// Auth
-Route::post('/login', [AuthController::class, 'login']);
+    // Auth (with stricter rate limit for login)
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +43,7 @@ Route::post('/login', [AuthController::class, 'login']);
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
