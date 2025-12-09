@@ -193,6 +193,7 @@ class BookResource extends Resource
                                         ->maxLength(40)
                                         ->hint('Nomor DDC/UDC')
                                         ->hintIcon('heroicon-o-information-circle')
+                                        ->live(onBlur: true)
                                         ->suffixAction(
                                             Forms\Components\Actions\Action::make('searchDdc')
                                                 ->label('Cari DDC')
@@ -206,9 +207,30 @@ class BookResource extends Resource
                                         ),
                                     Forms\Components\TextInput::make('call_number')
                                         ->label('No. Panggil')
-                                        ->hint('Call number untuk rak')
+                                        ->hint('Format: Kode Klasifikasi Penulis Judul')
                                         ->hintIcon('heroicon-o-information-circle')
-                                        ->maxLength(50),
+                                        ->maxLength(50)
+                                        ->placeholder('Contoh: S 2X9.12 TIR m')
+                                        ->helperText('Klik tombol Generate untuk membuat otomatis')
+                                        ->suffixAction(
+                                            Forms\Components\Actions\Action::make('generateCallNumber')
+                                                ->label('Generate')
+                                                ->icon('heroicon-o-sparkles')
+                                                ->color('success')
+                                                ->action(function (Forms\Get $get, Forms\Set $set) {
+                                                    $classification = $get('classification');
+                                                    $title = $get('title');
+                                                    $sor = $get('sor');
+                                                    
+                                                    // Get author from SOR or first word
+                                                    $authorCode = \App\Services\CallNumberService::getAuthorCode($sor);
+                                                    $titleCode = \App\Services\CallNumberService::getTitleCode($title);
+                                                    
+                                                    // Build call number (without collection code - that's per item)
+                                                    $callNumber = trim("{$classification}\n{$authorCode}\n{$titleCode}");
+                                                    $set('call_number', $callNumber);
+                                                })
+                                        ),
                                 ]),
                             Forms\Components\TextInput::make('series_title')
                                 ->label('Judul Seri')

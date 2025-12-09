@@ -3,25 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DdcClassification;
+use App\Services\DdcService;
 use Illuminate\Http\Request;
 
 class DdcController extends Controller
 {
-    public function search(Request $request)
+    public function search(Request $request, DdcService $ddcService)
     {
         $query = $request->get('q', '');
-        $limit = min($request->get('limit', 20), 50);
+        $limit = min($request->get('limit', 25), 50);
 
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $results = DdcClassification::where('code', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->orderBy('code')
-            ->limit($limit)
-            ->get(['id', 'code', 'description']);
+        $results = $ddcService->search($query, $limit);
 
         return response()->json($results);
     }

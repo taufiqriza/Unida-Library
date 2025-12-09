@@ -1,60 +1,80 @@
-# DDC (Dewey Decimal Classification) Implementation
+# DDC & Call Number Implementation
 
 ## Overview
-Fitur DDC Lookup memungkinkan pustakawan mencari dan memilih nomor klasifikasi DDC saat input bibliografi. Nomor klasifikasi akan otomatis terisi ke field classification.
+Sistem klasifikasi DDC dan auto-generate call number untuk perpustakaan.
 
-## Database Setup
+## DDC Lookup
 
-### Import Data DDC
-```bash
-# Via Laravel migration dan seeder (recommended)
-php artisan migrate
-php artisan db:seed --class=DdcSeeder
+### Storage
+Data DDC disimpan dalam file JSON (`storage/app/ddc.json`) dengan caching untuk performa optimal.
+- 4715+ klasifikasi DDC Edition 23
+- Cached selama 24 jam
+- Search tanpa query database
+
+### Penggunaan di Form Bibliografi
+1. Buka form Create/Edit Bibliografi
+2. Tab "Klasifikasi" → klik tombol "Cari DDC"
+3. Ketik kata kunci atau klik kelas utama
+4. Pilih klasifikasi → otomatis terisi
+
+### Export DDC ke JSON
+```php
+// Via tinker atau artisan command
+(new \App\Services\DdcService)->exportToJson();
 ```
 
-Data DDC berisi 4715+ klasifikasi dari e-DDC Edition 23.
+## Call Number
 
-### Struktur Tabel
-- `ddc_classifications` - Tabel utama untuk nomor klasifikasi DDC
-  - `id` - Primary key
-  - `code` - Nomor klasifikasi (e.g., "004", "297.1")
-  - `description` - Deskripsi klasifikasi dalam Bahasa Indonesia
+### Format Pattern (SLiMS Style)
+```
+S        = Kode Koleksi (dari Collection Type)
+2X9.12   = Nomor Klasifikasi DDC
+TIR      = 3 huruf pertama nama pengarang
+m        = Huruf pertama judul (lowercase)
+```
 
-## Penggunaan
+### Auto-Generate
+1. Isi field Classification
+2. Klik tombol "Generate" di field No. Panggil
+3. Call number akan dibuat otomatis dari:
+   - Classification number
+   - Author code (dari SOR/Statement of Responsibility)
+   - Title code (huruf pertama judul, skip artikel)
 
-### Di Form Bibliografi (Admin Panel)
-1. Buka form Create/Edit Bibliografi
-2. Pergi ke tab "Klasifikasi"
-3. Klik icon 🔍 di samping field "No. Klasifikasi"
-4. Ketik kata kunci (min. 2 karakter) untuk mencari
-5. Pilih hasil pencarian - nomor klasifikasi akan otomatis terisi
+### Services
 
-### Contoh Pencarian
-- Ketik "004" → hasil: semua klasifikasi komputer
-- Ketik "islam" → hasil: klasifikasi terkait Islam
-- Ketik "ekonomi" → hasil: klasifikasi ekonomi
+**DdcService** (`app/Services/DdcService.php`)
+- `search($query, $limit)` - Cari DDC
+- `find($code)` - Get DDC by code
+- `exportToJson()` - Export database ke JSON
 
-### API Endpoints
-- `GET /api/ddc/search?q=keyword` - Search DDC
-- `GET /api/ddc/main-classes` - Get 10 main classes
+**CallNumberService** (`app/Services/CallNumberService.php`)
+- `generate($collectionCode, $classification, $author, $title)` - Generate call number
+- `getAuthorCode($name)` - Get 3 huruf kode pengarang
+- `getTitleCode($title)` - Get huruf pertama judul
+- `parse($callNumber)` - Parse call number ke parts
 
-## Kelas Utama DDC
-| Kode | Subjek |
-|------|--------|
-| 000 | Karya Umum, Komputer |
-| 100 | Filsafat & Psikologi |
-| 200 | Agama |
-| 300 | Ilmu Sosial |
-| 400 | Bahasa |
-| 500 | Sains & Matematika |
-| 600 | Teknologi |
-| 700 | Seni & Olahraga |
-| 800 | Sastra |
-| 900 | Sejarah & Geografi |
+## Print Label
+
+### Barcode Label
+Layout: Barcode di kiri, Call Number di kanan
+- Judul buku (italic)
+- Barcode dengan font Code 39
+- Nama perpustakaan
+- Call number (4 baris)
+
+### Spine Label
+Label punggung buku dengan call number 4 baris.
+
+### Routes
+- `/print/barcode/{item}` - Single barcode
+- `/print/barcodes?ids=1,2,3` - Multiple barcodes
+- `/print/label/{item}` - Single label
+- `/print/labels?ids=1,2,3` - Multiple labels
 
 ## File Terkait
-- `docs/ddc_db.sql` - Data DDC original dari e-DDC
-- `app/Models/DdcClassification.php` - Model Eloquent
-- `database/migrations/2025_12_09_120000_create_ddc_classifications_table.php` - Migration
-- `database/seeders/DdcSeeder.php` - Seeder untuk import data
-- `app/Http/Controllers/Api/DdcController.php` - API Controller
+- `storage/app/ddc.json` - Data DDC (JSON)
+- `app/Services/DdcService.php` - DDC Service
+- `app/Services/CallNumberService.php` - Call Number Service
+- `resources/views/print/barcode.blade.php` - Print barcode
+- `resources/views/print/label.blade.php` - Print label

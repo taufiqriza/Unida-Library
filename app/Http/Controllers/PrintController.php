@@ -10,25 +10,27 @@ class PrintController extends Controller
 {
     public function barcode(Item $item)
     {
+        $item->load(['book.authors', 'collectionType']);
         return view('print.barcode', ['items' => collect([$item])]);
     }
 
     public function barcodes(Request $request)
     {
         $ids = explode(',', $request->get('ids', ''));
-        $items = Item::with('book')->whereIn('id', $ids)->get();
+        $items = Item::with(['book.authors', 'collectionType'])->whereIn('id', $ids)->get();
         return view('print.barcode', ['items' => $items]);
     }
 
     public function label(Item $item)
     {
+        $item->load(['book.authors', 'collectionType']);
         return view('print.label', ['items' => collect([$item])]);
     }
 
     public function labels(Request $request)
     {
         $ids = explode(',', $request->get('ids', ''));
-        $items = Item::with('book')->whereIn('id', $ids)->get();
+        $items = Item::with(['book.authors', 'collectionType'])->whereIn('id', $ids)->get();
         return view('print.label', ['items' => $items]);
     }
 
