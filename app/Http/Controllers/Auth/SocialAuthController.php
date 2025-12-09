@@ -13,7 +13,7 @@ class SocialAuthController extends Controller
 {
     public function redirect()
     {
-        if (!Setting::get('google_oauth_enabled')) {
+        if (!Setting::get('google_enabled')) {
             return redirect()->route('login')->with('error', 'Google login tidak aktif.');
         }
         return Socialite::driver('google')->redirect();
@@ -21,7 +21,7 @@ class SocialAuthController extends Controller
 
     public function callback()
     {
-        if (!Setting::get('google_oauth_enabled')) {
+        if (!Setting::get('google_enabled')) {
             return redirect()->route('login')->with('error', 'Google login tidak aktif.');
         }
 
