@@ -41,4 +41,42 @@ class Member extends Authenticatable
     {
         return $this->loans()->where('is_returned', false)->count();
     }
+
+    public function thesisSubmissions(): HasMany
+    {
+        return $this->hasMany(ThesisSubmission::class);
+    }
+
+    public function hasOutstandingLoans(): bool
+    {
+        return $this->loans()->where('is_returned', false)->exists();
+    }
+
+    public function hasOverdueLoans(): bool
+    {
+        return $this->loans()
+            ->where('is_returned', false)
+            ->where('due_date', '<', now())
+            ->exists();
+    }
+
+    public function hasUnpaidFines(): bool
+    {
+        return $this->fines()->where('is_paid', false)->exists();
+    }
+
+    public function canRequestClearanceLetter(): bool
+    {
+        return !$this->hasOutstandingLoans() && !$this->hasUnpaidFines();
+    }
+
+    public function getOutstandingLoansCountAttribute(): int
+    {
+        return $this->loans()->where('is_returned', false)->count();
+    }
+
+    public function getTotalUnpaidFinesAttribute(): float
+    {
+        return $this->fines()->where('is_paid', false)->sum('amount');
+    }
 }

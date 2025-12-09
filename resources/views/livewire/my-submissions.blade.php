@@ -10,11 +10,23 @@
         </a>
     </div>
 
-    {{-- Flash Message --}}
+    {{-- Flash Messages --}}
     @if(session('success'))
         <div class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl flex items-center gap-3">
             <i class="fas fa-check-circle text-emerald-500"></i>
             <span>{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
+    @if(session('info'))
+        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl flex items-center gap-3">
+            <i class="fas fa-info-circle text-blue-500"></i>
+            <span>{{ session('info') }}</span>
         </div>
     @endif
 
@@ -147,6 +159,12 @@
                                     </a>
                                 @endif
 
+                                @if(in_array($submission->status, ['approved', 'published']))
+                                    <button wire:click="openClearanceModal({{ $submission->id }})" class="px-3 py-1.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-200 transition inline-flex items-center gap-1.5">
+                                        <i class="fas fa-file-certificate"></i> Surat Bebas Pustaka
+                                    </button>
+                                @endif
+
                                 <span class="text-xs text-gray-400 ml-auto">
                                     {{ $submission->created_at->diffForHumans() }}
                                 </span>
@@ -261,5 +279,118 @@
         <div class="mt-6">
             {{ $submissions->links() }}
         </div>
+    @endif
+
+    {{-- Clearance Letters Section --}}
+    @if($this->clearanceLetters->count() > 0)
+    <div class="mt-8">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-file-certificate text-purple-500"></i>
+            Surat Bebas Pustaka
+        </h2>
+        <div class="space-y-3">
+            @foreach($this->clearanceLetters as $letter)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center
+                            @if($letter->status === 'approved') bg-green-100
+                            @elseif($letter->status === 'pending') bg-yellow-100
+                            @else bg-red-100 @endif">
+                            <i class="fas 
+                                @if($letter->status === 'approved') fa-check-circle text-green-600
+                                @elseif($letter->status === 'pending') fa-clock text-yellow-600
+                                @else fa-times-circle text-red-600 @endif"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 text-sm">{{ $letter->letter_number }}</p>
+                            <p class="text-xs text-gray-500">{{ $letter->thesisSubmission?->title ?? 'Tugas Akhir' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 text-xs font-medium rounded-full
+                            @if($letter->status === 'approved') bg-green-100 text-green-700
+                            @elseif($letter->status === 'pending') bg-yellow-100 text-yellow-700
+                            @else bg-red-100 text-red-700 @endif">
+                            {{ $letter->status_label }}
+                        </span>
+                        @if($letter->isApproved() && $letter->file_path)
+                            <a href="{{ Storage::url($letter->file_path) }}" target="_blank" class="px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition">
+                                <i class="fas fa-download mr-1"></i> Unduh
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- Clearance Letter Modal --}}
+    @if($showClearanceModal)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" wire:click="closeClearanceModal"></div>
+            
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto overflow-hidden transform transition-all">
+                <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-white">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-file-certificate text-purple-500"></i>
+                            Surat Bebas Pustaka
+                        </h3>
+                        <button wire:click="closeClearanceModal" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-5">
+                    @if($clearanceError)
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-xl mb-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-red-800 text-sm">Tidak Dapat Mengajukan</p>
+                                    <p class="text-sm text-red-700 mt-1">{{ $clearanceError }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">
+                            Silakan selesaikan tunggakan Anda terlebih dahulu sebelum mengajukan surat bebas pustaka.
+                        </p>
+                    @else
+                        <div class="p-4 bg-green-50 border border-green-200 rounded-xl mb-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-green-800 text-sm">Anda Memenuhi Syarat</p>
+                                    <p class="text-sm text-green-700 mt-1">Tidak ada tunggakan peminjaman atau denda yang belum dibayar.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">
+                            Surat bebas pustaka akan diproses oleh petugas perpustakaan. Anda akan mendapat notifikasi setelah surat disetujui.
+                        </p>
+                    @endif
+                </div>
+                
+                <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                    <button wire:click="closeClearanceModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium">
+                        Batal
+                    </button>
+                    @if(!$clearanceError)
+                        <button wire:click="requestClearanceLetter" class="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium flex items-center gap-2">
+                            <i class="fas fa-paper-plane"></i>
+                            Ajukan Surat
+                        </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
 </div>

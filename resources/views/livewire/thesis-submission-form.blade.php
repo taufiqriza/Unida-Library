@@ -22,7 +22,15 @@
     <div class="sticky top-16 z-40 -mx-1 px-1 py-4 mb-4 lg:mb-6">
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-4">
             {{-- Step Indicators --}}
-            <div class="flex items-center">
+            <div class="relative flex items-start justify-between px-2">
+                {{-- Background Line - positioned at center of circles --}}
+                <div class="absolute top-5 lg:top-[22px] left-7 right-7 lg:left-8 lg:right-8 h-0.5 bg-gray-200"></div>
+                {{-- Progress Line - animated based on step --}}
+                <div 
+                    class="absolute top-5 lg:top-[22px] left-7 lg:left-8 h-0.5 bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500 ease-out"
+                    style="width: {{ $step === 1 ? '0%' : (($step - 1) * 25) . '%' }}; max-width: calc(100% - 3.5rem);"
+                ></div>
+                
                 @foreach([
                     ['step' => 1, 'label' => 'Informasi', 'icon' => 'fa-file-alt'],
                     ['step' => 2, 'label' => 'Penulis', 'icon' => 'fa-user'],
@@ -30,15 +38,10 @@
                     ['step' => 4, 'label' => 'Dokumen', 'icon' => 'fa-cloud-upload-alt'],
                     ['step' => 5, 'label' => 'Kirim', 'icon' => 'fa-paper-plane'],
                 ] as $index => $s)
-                    @if($index > 0)
-                        {{-- Connector Line --}}
-                        <div class="flex-1 h-1 rounded-full {{ $step > $index ? 'bg-gradient-to-r from-primary-500 to-primary-600' : 'bg-gray-200' }} transition-all duration-500"></div>
-                    @endif
-                    
                     <button 
                         wire:click="goToStep({{ $s['step'] }})"
                         type="button"
-                        class="flex flex-col items-center {{ $step > $s['step'] ? 'cursor-pointer' : 'cursor-default' }}"
+                        class="relative z-10 flex flex-col items-center flex-shrink-0 {{ $step > $s['step'] ? 'cursor-pointer' : 'cursor-default' }}"
                         @if($step < $s['step']) disabled @endif
                     >
                         <div class="relative">
@@ -93,10 +96,10 @@
                 </label>
                 <div class="grid grid-cols-3 gap-3">
                     {{-- Skripsi --}}
-                    <label class="cursor-pointer">
-                        <input type="radio" wire:model.live="type" value="skripsi" class="sr-only peer">
-                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 border-gray-200 hover:border-gray-300">
-                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-blue-100 flex items-center justify-center">
+                    <label class="cursor-pointer block">
+                        <input type="radio" wire:model.live="type" name="thesis_type" value="skripsi" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 {{ $type === 'skripsi' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300' }}">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full {{ $type === 'skripsi' ? 'bg-blue-200' : 'bg-blue-100' }} flex items-center justify-center">
                                 <i class="fas fa-graduation-cap text-blue-600 text-xl"></i>
                             </div>
                             <p class="font-semibold text-gray-900">S1</p>
@@ -104,10 +107,10 @@
                         </div>
                     </label>
                     {{-- Tesis --}}
-                    <label class="cursor-pointer">
-                        <input type="radio" wire:model.live="type" value="tesis" class="sr-only peer">
-                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 border-gray-200 hover:border-gray-300">
-                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-purple-100 flex items-center justify-center">
+                    <label class="cursor-pointer block">
+                        <input type="radio" wire:model.live="type" name="thesis_type" value="tesis" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-purple-500 peer-checked:bg-purple-50 {{ $type === 'tesis' ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-gray-300' }}">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full {{ $type === 'tesis' ? 'bg-purple-200' : 'bg-purple-100' }} flex items-center justify-center">
                                 <i class="fas fa-user-graduate text-purple-600 text-xl"></i>
                             </div>
                             <p class="font-semibold text-gray-900">S2</p>
@@ -115,10 +118,10 @@
                         </div>
                     </label>
                     {{-- Disertasi --}}
-                    <label class="cursor-pointer">
-                        <input type="radio" wire:model.live="type" value="disertasi" class="sr-only peer">
-                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50 border-gray-200 hover:border-gray-300">
-                            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-amber-100 flex items-center justify-center">
+                    <label class="cursor-pointer block">
+                        <input type="radio" wire:model.live="type" name="thesis_type" value="disertasi" class="sr-only peer">
+                        <div class="p-4 border-2 rounded-xl text-center transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50 {{ $type === 'disertasi' ? 'border-amber-500 bg-amber-50' : 'border-gray-200 hover:border-gray-300' }}">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-full {{ $type === 'disertasi' ? 'bg-amber-200' : 'bg-amber-100' }} flex items-center justify-center">
                                 <i class="fas fa-award text-amber-600 text-xl"></i>
                             </div>
                             <p class="font-semibold text-gray-900">S3</p>

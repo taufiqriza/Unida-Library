@@ -114,7 +114,7 @@ return [
     |
     */
 
-    'inject_assets' => false,
+    'inject_assets' => true,
 
     /*
     |---------------------------------------------------------------------------
@@ -183,4 +183,15 @@ return [
     */
 
     'release_token' => 'a',
+
+    /*
+    |---------------------------------------------------------------------------
+    | Livewire Update Endpoint
+    |---------------------------------------------------------------------------
+    |
+    | The endpoint for Livewire to handle component updates.
+    |
+    */
+
+    'update_endpoint' => '/livewire/update',
 ];

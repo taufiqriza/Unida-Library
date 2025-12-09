@@ -63,21 +63,84 @@
         </div>
 
         {{-- Content Cards --}}
-        <div class="px-4 lg:px-0 -mt-4 relative z-20 space-y-4 pb-8">
+        <div class="px-4 lg:px-0 mt-6 relative z-20 space-y-4 pb-8">
             
-            {{-- Action Buttons --}}
-            @if($thesis->file_path)
-            <div class="bg-white rounded-2xl p-4 shadow-lg flex gap-3">
-                <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/30 flex items-center justify-center gap-2">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>Baca PDF</span>
-                </a>
-                <button class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
-                    <i class="fas fa-share-alt"></i>
-                    <span>Bagikan</span>
-                </button>
+            {{-- Files Section - Clear & Detailed --}}
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-folder-open text-purple-500"></i>
+                        Dokumen Tersedia
+                    </h3>
+                </div>
+                <div class="p-4 space-y-3">
+                    {{-- Preview/BAB 1-3 --}}
+                    @if($thesis->file_path)
+                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">BAB 1-3 (Preview)</p>
+                                <p class="text-xs text-green-600 flex items-center gap-1">
+                                    <i class="fas fa-unlock"></i> Dapat diakses publik
+                                </p>
+                            </div>
+                        </div>
+                        <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-eye"></i>
+                            <span class="hidden sm:inline">Baca</span>
+                        </a>
+                    </div>
+                    @endif
+
+                    {{-- Full Text --}}
+                    <div class="flex items-center justify-between p-4 {{ $thesis->is_fulltext_public ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200' }} border rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 {{ $thesis->is_fulltext_public ? 'bg-blue-100' : 'bg-gray-100' }} rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book {{ $thesis->is_fulltext_public ? 'text-blue-600' : 'text-gray-400' }} text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">Full Text (Lengkap)</p>
+                                @if($thesis->is_fulltext_public)
+                                    <p class="text-xs text-blue-600 flex items-center gap-1">
+                                        <i class="fas fa-unlock"></i> Dapat diakses publik
+                                    </p>
+                                @else
+                                    <p class="text-xs text-gray-500 flex items-center gap-1">
+                                        <i class="fas fa-lock"></i> Hanya untuk anggota perpustakaan
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                        @if($thesis->is_fulltext_public && $thesis->file_path)
+                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                                <i class="fas fa-download"></i>
+                                <span class="hidden sm:inline">Unduh</span>
+                            </a>
+                        @elseif(auth('member')->check())
+                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                                <i class="fas fa-download"></i>
+                                <span class="hidden sm:inline">Unduh</span>
+                            </a>
+                        @else
+                            <a href="{{ route('opac.login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span class="hidden sm:inline">Login</span>
+                            </a>
+                        @endif
+                    </div>
+
+                    {{-- Info Box --}}
+                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                        <p class="text-xs text-amber-700 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>Untuk mengakses full text, silakan login sebagai anggota perpustakaan. Jika belum terdaftar, kunjungi perpustakaan untuk mendaftar.</span>
+                        </p>
+                    </div>
+                </div>
             </div>
-            @endif
 
             {{-- Detail Info --}}
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
@@ -112,6 +175,18 @@
                         <span class="w-28 text-sm text-gray-500 flex-shrink-0">Prodi</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $thesis->department?->name ?? '-' }}</span>
                     </div>
+                    @if($thesis->advisor1)
+                    <div class="flex items-center px-4 py-3">
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Pembimbing 1</span>
+                        <span class="text-sm text-gray-900 font-medium">{{ $thesis->advisor1 }}</span>
+                    </div>
+                    @endif
+                    @if($thesis->advisor2)
+                    <div class="flex items-center px-4 py-3">
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Pembimbing 2</span>
+                        <span class="text-sm text-gray-900 font-medium">{{ $thesis->advisor2 }}</span>
+                    </div>
+                    @endif
                     @if($thesis->keywords)
                     <div class="flex items-start px-4 py-3">
                         <span class="w-28 text-sm text-gray-500 flex-shrink-0 pt-0.5">Kata Kunci</span>
@@ -135,10 +210,24 @@
                     </h3>
                 </div>
                 <div class="p-4">
-                    <p class="text-sm text-gray-600 leading-relaxed">{{ $thesis->abstract }}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ $thesis->abstract }}</p>
                 </div>
             </div>
             @endif
+
+            {{-- Share Button --}}
+            <div class="bg-white rounded-2xl p-4 shadow-lg">
+                <div class="flex gap-3">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ $thesis->title }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link disalin!'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Bagikan</span>
+                    </button>
+                    <button onclick="window.print()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+                        <i class="fas fa-print"></i>
+                        <span>Cetak</span>
+                    </button>
+                </div>
+            </div>
 
             {{-- Related --}}
             @if($relatedTheses->count() > 0)
