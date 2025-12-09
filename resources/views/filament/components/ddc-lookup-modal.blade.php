@@ -4,6 +4,7 @@
     selectedCode: null,
     selectedDesc: '',
     loading: false,
+    isDark: document.documentElement.classList.contains('dark'),
     
     async doSearch() {
         if (this.search.length < 2) {
@@ -44,7 +45,7 @@
         
         document.querySelector('.fi-modal-close-btn')?.click();
     }
-}">
+}" x-init="isDark = document.documentElement.classList.contains('dark')">
     {{-- Main Classes Grid --}}
     <template x-if="search.length < 2 && results.length === 0">
         <div>
@@ -80,7 +81,7 @@
                     </button>
                 </template>
             </div>
-            <p style="text-align: center; font-size: 0.75rem; color: #9ca3af;">Klik kelas utama untuk melihat sub-klasifikasi, atau ketik di kotak pencarian</p>
+            <p class="text-center text-xs text-gray-400 dark:text-gray-500">Klik kelas utama untuk melihat sub-klasifikasi, atau ketik di kotak pencarian</p>
         </div>
     </template>
 
@@ -89,13 +90,13 @@
         <div style="position: relative;">
             <div style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none;">
                 <template x-if="loading">
-                    <svg style="width: 1.25rem; height: 1.25rem; color: #6366f1; animation: spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
-                        <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    <svg class="w-5 h-5 text-primary-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                     </svg>
                 </template>
                 <template x-if="!loading">
-                    <svg style="width: 1.25rem; height: 1.25rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                 </template>
@@ -105,20 +106,15 @@
                 x-model="search"
                 @input.debounce.300ms="doSearch()"
                 placeholder="Ketik nomor atau kata kunci (min. 2 karakter)..."
-                style="width: 100%; padding: 0.875rem 2.5rem 0.875rem 2.5rem; border: 2px solid #e5e7eb; border-radius: 0.75rem; font-size: 0.9375rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;"
-                class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                @focus="$el.style.borderColor = '#6366f1'; $el.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.1)'"
-                @blur="$el.style.borderColor = '#e5e7eb'; $el.style.boxShadow = 'none'"
+                class="w-full py-3.5 pl-10 pr-10 text-base border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
                 autofocus
             >
             <button 
                 x-show="search.length > 0"
                 @click="search = ''; results = [];"
-                style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9ca3af; padding: 0.25rem;"
-                @mouseenter="$el.style.color = '#6b7280'"
-                @mouseleave="$el.style.color = '#9ca3af'"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             >
-                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
@@ -128,38 +124,32 @@
     {{-- Results --}}
     <template x-if="results.length > 0">
         <div>
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.75rem; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 0.5rem; margin-bottom: 0.75rem;">
-                <span style="font-size: 0.8125rem; color: #0369a1;">
+            <div class="flex items-center justify-between px-3 py-2 mb-3 rounded-lg bg-primary-50 dark:bg-primary-900/30">
+                <span class="text-sm text-primary-700 dark:text-primary-300">
                     <strong x-text="results.length"></strong> hasil ditemukan
                 </span>
                 <button 
                     @click="search = ''; results = [];"
-                    style="font-size: 0.75rem; color: #0284c7; background: none; border: none; cursor: pointer; text-decoration: underline;"
+                    class="text-xs text-primary-600 dark:text-primary-400 hover:underline"
                 >Kembali ke kelas utama</button>
             </div>
-            <div style="max-height: 280px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0.75rem;" class="dark:border-gray-600">
+            <div class="max-h-72 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-xl">
                 <template x-for="ddc in results" :key="ddc.code">
                     <button 
                         type="button"
                         @click="select(ddc.code, ddc.description.substring(0, 60))"
-                        :style="{ 
-                            background: selectedCode === ddc.code ? 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)' : 'transparent',
-                            borderLeft: selectedCode === ddc.code ? '4px solid #6366f1' : '4px solid transparent'
-                        }"
-                        style="width: 100%; display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; text-align: left; border: none; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.15s;"
-                        class="dark:border-gray-700"
-                        @mouseenter="if (selectedCode !== ddc.code) $el.style.background = '#f9fafb'"
-                        @mouseleave="if (selectedCode !== ddc.code) $el.style.background = 'transparent'"
+                        :class="selectedCode === ddc.code ? 'bg-primary-50 dark:bg-primary-900/40 border-l-4 border-l-primary-500' : 'border-l-4 border-l-transparent hover:bg-gray-50 dark:hover:bg-gray-700/50'"
+                        class="w-full flex items-start gap-3 p-3 text-left border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition"
                     >
                         <span 
-                            :style="{ background: selectedCode === ddc.code ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)', color: selectedCode === ddc.code ? 'white' : '#4338ca' }"
-                            style="flex-shrink: 0; padding: 0.375rem 0.625rem; font-family: monospace; font-weight: 700; font-size: 0.875rem; border-radius: 0.5rem; transition: all 0.15s;"
+                            :class="selectedCode === ddc.code ? 'bg-primary-500 text-white' : 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300'"
+                            class="flex-shrink-0 px-2.5 py-1 font-mono font-bold text-sm rounded-lg transition"
                             x-text="ddc.code"
                         ></span>
-                        <span style="flex: 1; font-size: 0.8125rem; line-height: 1.4;" class="text-gray-700 dark:text-gray-300" x-text="ddc.description.substring(0, 120) + (ddc.description.length > 120 ? '...' : '')"></span>
+                        <span class="flex-1 text-sm leading-relaxed text-gray-700 dark:text-gray-200" x-text="ddc.description.substring(0, 120) + (ddc.description.length > 120 ? '...' : '')"></span>
                         <template x-if="selectedCode === ddc.code">
-                            <span style="flex-shrink: 0; width: 1.25rem; height: 1.25rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
-                                <svg style="width: 0.75rem; height: 0.75rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span class="flex-shrink-0 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
+                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </span>
@@ -172,54 +162,41 @@
 
     {{-- No Results --}}
     <template x-if="search.length >= 2 && results.length === 0 && !loading">
-        <div style="padding: 2rem; text-align: center;">
-            <div style="width: 3.5rem; height: 3.5rem; margin: 0 auto 0.75rem; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); border-radius: 9999px; display: flex; align-items: center; justify-content: center;">
-                <svg style="width: 1.75rem; height: 1.75rem; color: #9ca3af;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="py-8 text-center">
+            <div class="w-14 h-14 mx-auto mb-3 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <p style="color: #6b7280; font-size: 0.875rem;">Tidak ada hasil untuk "<strong x-text="search"></strong>"</p>
-            <p style="color: #9ca3af; font-size: 0.75rem; margin-top: 0.25rem;">Coba kata kunci lain</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm">Tidak ada hasil untuk "<strong x-text="search"></strong>"</p>
+            <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Coba kata kunci lain</p>
         </div>
     </template>
 
     {{-- Footer with Selection --}}
-    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; gap: 1rem;" class="dark:border-gray-600">
-        <div style="flex: 1; min-width: 0;">
+    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between gap-4">
+        <div class="flex-1 min-w-0">
             <template x-if="selectedCode">
-                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.75rem; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-radius: 0.5rem; border: 1px solid #c7d2fe;">
-                    <span style="padding: 0.25rem 0.5rem; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; font-family: monospace; font-weight: 700; font-size: 0.875rem; border-radius: 0.375rem;" x-text="selectedCode"></span>
-                    <span style="font-size: 0.8125rem; color: #4338ca; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="selectedDesc"></span>
+                <div class="flex items-center gap-2 px-3 py-2.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-lg">
+                    <span class="px-2 py-0.5 bg-primary-500 text-white font-mono font-bold text-sm rounded" x-text="selectedCode"></span>
+                    <span class="text-sm text-primary-700 dark:text-primary-300 truncate" x-text="selectedDesc"></span>
                 </div>
             </template>
             <template x-if="!selectedCode">
-                <span style="font-size: 0.8125rem; color: #9ca3af;">Pilih klasifikasi dari daftar</span>
+                <span class="text-sm text-gray-400 dark:text-gray-500">Pilih klasifikasi dari daftar</span>
             </template>
         </div>
         <button 
             type="button"
             @click="apply()"
             :disabled="!selectedCode"
-            :style="{ 
-                background: selectedCode ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : '#d1d5db',
-                cursor: selectedCode ? 'pointer' : 'not-allowed',
-                boxShadow: selectedCode ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none'
-            }"
-            style="padding: 0.625rem 1.25rem; color: white; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 0.5rem; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;"
-            @mouseenter="if (selectedCode) { $el.style.transform = 'translateY(-1px)'; $el.style.boxShadow = '0 6px 16px rgba(99, 102, 241, 0.4)' }"
-            @mouseleave="if (selectedCode) { $el.style.transform = 'translateY(0)'; $el.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)' }"
+            :class="selectedCode ? 'bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-500/30' : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'"
+            class="px-5 py-2.5 text-white font-semibold text-sm rounded-lg flex items-center gap-2 transition"
         >
-            <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
             Gunakan
         </button>
     </div>
 </div>
-
-<style>
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-</style>
