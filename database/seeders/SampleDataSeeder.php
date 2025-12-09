@@ -11,53 +11,38 @@ class SampleDataSeeder extends Seeder
     public function run(): void
     {
         // Publishers
-        $publishers = [
-            ['name' => 'Gramedia Pustaka Utama', 'city' => 'Jakarta'],
-            ['name' => 'Erlangga', 'city' => 'Jakarta'],
-            ['name' => 'Mizan', 'city' => 'Bandung'],
-            ['name' => 'Kompas', 'city' => 'Jakarta'],
-            ['name' => 'Bentang Pustaka', 'city' => 'Yogyakarta'],
-        ];
-        foreach ($publishers as $p) {
-            DB::table('publishers')->insert(array_merge($p, ['created_at' => now(), 'updated_at' => now()]));
-        }
-
-        // Places
-        $places = ['Jakarta', 'Bandung', 'Yogyakarta', 'Surabaya', 'Semarang'];
-        foreach ($places as $p) {
-            DB::table('places')->insert(['name' => $p, 'created_at' => now(), 'updated_at' => now()]);
-        }
+        DB::table('publishers')->upsert([
+            ['name' => 'Gramedia Pustaka Utama', 'city' => 'Jakarta', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Erlangga', 'city' => 'Jakarta', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Mizan', 'city' => 'Bandung', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Kompas', 'city' => 'Jakarta', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Bentang Pustaka', 'city' => 'Yogyakarta', 'created_at' => now(), 'updated_at' => now()],
+        ], ['name'], ['city', 'updated_at']);
 
         // Authors
-        $authors = [
-            ['name' => 'Andrea Hirata', 'type' => 'personal'],
-            ['name' => 'Pramoedya Ananta Toer', 'type' => 'personal'],
-            ['name' => 'Tere Liye', 'type' => 'personal'],
-            ['name' => 'Dee Lestari', 'type' => 'personal'],
-            ['name' => 'Habiburrahman El Shirazy', 'type' => 'personal'],
-            ['name' => 'Ahmad Fuadi', 'type' => 'personal'],
-            ['name' => 'Leila S. Chudori', 'type' => 'personal'],
-            ['name' => 'Eka Kurniawan', 'type' => 'personal'],
-        ];
-        foreach ($authors as $a) {
-            DB::table('authors')->insert(array_merge($a, ['created_at' => now(), 'updated_at' => now()]));
-        }
+        DB::table('authors')->upsert([
+            ['name' => 'Andrea Hirata', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Pramoedya Ananta Toer', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Tere Liye', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Dee Lestari', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Habiburrahman El Shirazy', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Ahmad Fuadi', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Leila S. Chudori', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Eka Kurniawan', 'type' => 'personal', 'created_at' => now(), 'updated_at' => now()],
+        ], ['name'], ['type', 'updated_at']);
 
         // Subjects
-        $subjects = [
-            ['name' => 'Fiksi Indonesia', 'classification' => '899.221'],
-            ['name' => 'Novel', 'classification' => '808.3'],
-            ['name' => 'Pendidikan', 'classification' => '370'],
-            ['name' => 'Sejarah Indonesia', 'classification' => '959.8'],
-            ['name' => 'Agama Islam', 'classification' => '297'],
-            ['name' => 'Komputer', 'classification' => '004'],
-        ];
-        foreach ($subjects as $s) {
-            DB::table('subjects')->insert(array_merge($s, ['created_at' => now(), 'updated_at' => now()]));
-        }
+        DB::table('subjects')->upsert([
+            ['name' => 'Fiksi Indonesia', 'classification' => '899.221', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Novel', 'classification' => '808.3', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Pendidikan', 'classification' => '370', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Sejarah Indonesia', 'classification' => '959.8', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Agama Islam', 'classification' => '297', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Komputer', 'classification' => '004', 'created_at' => now(), 'updated_at' => now()],
+        ], ['name'], ['classification', 'updated_at']);
 
         // Books
-        $books = [
+        DB::table('books')->upsert([
             [
                 'title' => 'Laskar Pelangi',
                 'sor' => 'Andrea Hirata',
@@ -72,6 +57,9 @@ class SampleDataSeeder extends Seeder
                 'language' => 'id',
                 'media_type_id' => 1,
                 'branch_id' => 1,
+                'is_opac_visible' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'title' => 'Bumi Manusia',
@@ -87,6 +75,9 @@ class SampleDataSeeder extends Seeder
                 'language' => 'id',
                 'media_type_id' => 1,
                 'branch_id' => 1,
+                'is_opac_visible' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'title' => 'Negeri 5 Menara',
@@ -102,6 +93,9 @@ class SampleDataSeeder extends Seeder
                 'language' => 'id',
                 'media_type_id' => 1,
                 'branch_id' => 1,
+                'is_opac_visible' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'title' => 'Ayat-Ayat Cinta',
@@ -117,6 +111,9 @@ class SampleDataSeeder extends Seeder
                 'language' => 'id',
                 'media_type_id' => 1,
                 'branch_id' => 1,
+                'is_opac_visible' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'title' => 'Supernova: Ksatria, Puteri, dan Bintang Jatuh',
@@ -132,19 +129,14 @@ class SampleDataSeeder extends Seeder
                 'language' => 'id',
                 'media_type_id' => 1,
                 'branch_id' => 1,
-            ],
-        ];
-
-        foreach ($books as $book) {
-            DB::table('books')->insert(array_merge($book, [
                 'is_opac_visible' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]));
-        }
+            ],
+        ], ['isbn'], ['title', 'sor', 'updated_at']);
 
         // Book-Author pivot
-        DB::table('book_author')->insert([
+        DB::table('book_author')->insertOrIgnore([
             ['book_id' => 1, 'author_id' => 1],
             ['book_id' => 2, 'author_id' => 2],
             ['book_id' => 3, 'author_id' => 6],
@@ -153,7 +145,7 @@ class SampleDataSeeder extends Seeder
         ]);
 
         // Book-Subject pivot
-        DB::table('book_subject')->insert([
+        DB::table('book_subject')->insertOrIgnore([
             ['book_id' => 1, 'subject_id' => 1],
             ['book_id' => 1, 'subject_id' => 2],
             ['book_id' => 1, 'subject_id' => 3],
@@ -168,73 +160,27 @@ class SampleDataSeeder extends Seeder
         ]);
 
         // Items (Eksemplar)
-        $items = [
-            ['book_id' => 1, 'barcode' => 'B0001-001', 'call_number' => '899.221 AND l c.1', 'inventory_code' => 'INV-2024-001'],
-            ['book_id' => 1, 'barcode' => 'B0001-002', 'call_number' => '899.221 AND l c.2', 'inventory_code' => 'INV-2024-002'],
-            ['book_id' => 2, 'barcode' => 'B0002-001', 'call_number' => '899.221 PRA b c.1', 'inventory_code' => 'INV-2024-003'],
-            ['book_id' => 2, 'barcode' => 'B0002-002', 'call_number' => '899.221 PRA b c.2', 'inventory_code' => 'INV-2024-004'],
-            ['book_id' => 3, 'barcode' => 'B0003-001', 'call_number' => '899.221 FUA n c.1', 'inventory_code' => 'INV-2024-005'],
-            ['book_id' => 4, 'barcode' => 'B0004-001', 'call_number' => '899.221 HAB a c.1', 'inventory_code' => 'INV-2024-006'],
-            ['book_id' => 5, 'barcode' => 'B0005-001', 'call_number' => '899.221 DEE s c.1', 'inventory_code' => 'INV-2024-007'],
-            ['book_id' => 5, 'barcode' => 'B0005-002', 'call_number' => '899.221 DEE s c.2', 'inventory_code' => 'INV-2024-008'],
-        ];
-
-        foreach ($items as $item) {
-            DB::table('items')->insert(array_merge($item, [
-                'branch_id' => 1,
-                'collection_type_id' => 1,
-                'location_id' => 1,
-                'item_status_id' => 1,
-                'received_date' => now()->subMonths(rand(1, 12)),
-                'source' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
-        }
+        DB::table('items')->upsert([
+            ['book_id' => 1, 'barcode' => 'B0001-001', 'call_number' => '899.221 AND l c.1', 'inventory_code' => 'INV-2024-001', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(6), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 1, 'barcode' => 'B0001-002', 'call_number' => '899.221 AND l c.2', 'inventory_code' => 'INV-2024-002', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(5), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 2, 'barcode' => 'B0002-001', 'call_number' => '899.221 PRA b c.1', 'inventory_code' => 'INV-2024-003', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(4), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 2, 'barcode' => 'B0002-002', 'call_number' => '899.221 PRA b c.2', 'inventory_code' => 'INV-2024-004', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(3), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 3, 'barcode' => 'B0003-001', 'call_number' => '899.221 FUA n c.1', 'inventory_code' => 'INV-2024-005', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(2), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 4, 'barcode' => 'B0004-001', 'call_number' => '899.221 HAB a c.1', 'inventory_code' => 'INV-2024-006', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(1), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 5, 'barcode' => 'B0005-001', 'call_number' => '899.221 DEE s c.1', 'inventory_code' => 'INV-2024-007', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(1), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['book_id' => 5, 'barcode' => 'B0005-002', 'call_number' => '899.221 DEE s c.2', 'inventory_code' => 'INV-2024-008', 'branch_id' => 1, 'collection_type_id' => 1, 'location_id' => 1, 'item_status_id' => 1, 'received_date' => now()->subMonths(1), 'source' => 1, 'created_at' => now(), 'updated_at' => now()],
+        ], ['barcode'], ['call_number', 'updated_at']);
 
         // Members
-        $members = [
-            ['member_id' => 'M2024001', 'name' => 'Budi Santoso', 'email' => 'budi@example.com', 'gender' => 'M', 'member_type_id' => 1],
-            ['member_id' => 'M2024002', 'name' => 'Siti Rahayu', 'email' => 'siti@example.com', 'gender' => 'F', 'member_type_id' => 1],
-            ['member_id' => 'M2024003', 'name' => 'Dr. Ahmad Wijaya', 'email' => 'ahmad@example.com', 'gender' => 'M', 'member_type_id' => 2],
-            ['member_id' => 'M2024004', 'name' => 'Dewi Lestari', 'email' => 'dewi@example.com', 'gender' => 'F', 'member_type_id' => 3],
-        ];
-
-        foreach ($members as $m) {
-            DB::table('members')->insert(array_merge($m, [
-                'branch_id' => 1,
-                'register_date' => now()->subMonths(rand(1, 6)),
-                'expire_date' => now()->addYear(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]));
-        }
-
-        // Sample Loans (for chart testing)
-        $items = DB::table('items')->pluck('id')->toArray();
-        $memberIds = DB::table('members')->pluck('id')->toArray();
-        
-        foreach (range(0, 6) as $daysAgo) {
-            $loansCount = rand(1, 3);
-            for ($i = 0; $i < $loansCount; $i++) {
-                if (empty($items)) break;
-                $itemId = $items[array_rand($items)];
-                DB::table('loans')->insert([
-                    'branch_id' => 1,
-                    'member_id' => $memberIds[array_rand($memberIds)],
-                    'item_id' => $itemId,
-                    'loan_date' => now()->subDays($daysAgo),
-                    'due_date' => now()->subDays($daysAgo)->addDays(7),
-                    'is_returned' => $daysAgo > 3,
-                    'return_date' => $daysAgo > 3 ? now()->subDays($daysAgo - 2) : null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
+        DB::table('members')->upsert([
+            ['member_id' => 'M2024001', 'name' => 'Budi Santoso', 'email' => 'budi@example.com', 'password' => bcrypt('password'), 'gender' => 'M', 'member_type_id' => 1, 'branch_id' => 1, 'register_date' => now()->subMonths(3), 'expire_date' => now()->addYear(), 'created_at' => now(), 'updated_at' => now()],
+            ['member_id' => 'M2024002', 'name' => 'Siti Rahayu', 'email' => 'siti@example.com', 'password' => bcrypt('password'), 'gender' => 'F', 'member_type_id' => 1, 'branch_id' => 1, 'register_date' => now()->subMonths(2), 'expire_date' => now()->addYear(), 'created_at' => now(), 'updated_at' => now()],
+            ['member_id' => 'M2024003', 'name' => 'Dr. Ahmad Wijaya', 'email' => 'ahmad@example.com', 'password' => bcrypt('password'), 'gender' => 'M', 'member_type_id' => 2, 'branch_id' => 1, 'register_date' => now()->subMonths(1), 'expire_date' => now()->addYear(), 'created_at' => now(), 'updated_at' => now()],
+            ['member_id' => 'M2024004', 'name' => 'Dewi Lestari', 'email' => 'dewi@example.com', 'password' => bcrypt('password'), 'gender' => 'F', 'member_type_id' => 3, 'branch_id' => 1, 'register_date' => now()->subMonths(1), 'expire_date' => now()->addYear(), 'created_at' => now(), 'updated_at' => now()],
+        ], ['member_id'], ['name', 'email', 'password', 'updated_at']);
 
         // Users with different roles
-        DB::table('users')->insert([
+        DB::table('users')->upsert([
             [
                 'name' => 'Super Admin',
                 'email' => 'superadmin@perpustakaan.id',
@@ -265,6 +211,6 @@ class SampleDataSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ], ['email'], ['name', 'role', 'updated_at']);
     }
 }

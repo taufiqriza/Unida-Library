@@ -97,6 +97,38 @@
         </div>
     </section>
 
+    <!-- Quick Actions: Unggah & Plagiasi -->
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+            <!-- Unggah Tugas Akhir -->
+            <a href="{{ route('opac.page', 'unggah-tugas-akhir') }}" class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-4 text-white hover:shadow-lg hover:shadow-purple-200 transition group flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-cloud-upload-alt text-xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-sm lg:text-base">Unggah Tugas Akhir</h3>
+                    <p class="text-purple-200 text-[10px] lg:text-xs">Upload skripsi, tesis & disertasi</p>
+                </div>
+                <i class="fas fa-chevron-right text-purple-200 group-hover:translate-x-1 transition"></i>
+            </a>
+            
+            <!-- Cek Plagiasi -->
+            <div class="bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl p-4 flex items-center gap-4 relative">
+                <div class="absolute top-2 right-2">
+                    <span class="px-1.5 py-0.5 bg-amber-400 text-amber-900 text-[8px] font-bold rounded">SOON</span>
+                </div>
+                <div class="w-12 h-12 bg-gray-300 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-search-plus text-gray-500 text-xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-gray-500 text-sm lg:text-base">Cek Plagiasi</h3>
+                    <p class="text-gray-400 text-[10px] lg:text-xs">Dalam pengembangan</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-300"></i>
+            </div>
+        </div>
+    </section>
+
     <!-- New Books -->
     @if($newBooks->count() > 0)
     <section class="max-w-7xl mx-auto px-4 py-6">

@@ -292,7 +292,8 @@ class ThesisSubmissionForm extends Component
         }
 
         $this->saveSubmission('draft');
-        session()->flash('success', 'Draft berhasil disimpan');
+        session()->flash('success', 'Draft berhasil disimpan!');
+        $this->redirect(route('opac.member.submissions'));
     }
 
     public function submit(): void

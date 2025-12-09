@@ -18,55 +18,60 @@
         </div>
     @endif
 
-    {{-- Progress Header --}}
-    <div class="mb-6 lg:mb-8">
-        {{-- Completion Bar --}}
-        <div class="mb-4 bg-gray-100 rounded-full h-2 overflow-hidden">
-            <div class="bg-gradient-to-r from-primary-500 to-primary-600 h-full transition-all duration-500" style="width: {{ $this->completionPercentage }}%"></div>
-        </div>
-        
-        {{-- Step Indicators --}}
-        <div class="flex items-center justify-between relative">
-            <div class="absolute top-4 lg:top-5 left-0 right-0 h-0.5 bg-gray-200 mx-8 lg:mx-12"></div>
-            <div class="absolute top-4 lg:top-5 left-0 h-0.5 bg-primary-600 mx-8 lg:mx-12 transition-all duration-300" style="width: {{ ($step - 1) * 25 }}%"></div>
+    {{-- Progress Header - Sticky & Premium --}}
+    <div class="sticky top-16 z-40 -mx-1 px-1 py-4 mb-4 lg:mb-6">
+        <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-4">
+            {{-- Step Indicators --}}
+            <div class="flex items-center">
+                @foreach([
+                    ['step' => 1, 'label' => 'Informasi', 'icon' => 'fa-file-alt'],
+                    ['step' => 2, 'label' => 'Penulis', 'icon' => 'fa-user'],
+                    ['step' => 3, 'label' => 'Dosen', 'icon' => 'fa-chalkboard-teacher'],
+                    ['step' => 4, 'label' => 'Dokumen', 'icon' => 'fa-cloud-upload-alt'],
+                    ['step' => 5, 'label' => 'Kirim', 'icon' => 'fa-paper-plane'],
+                ] as $index => $s)
+                    @if($index > 0)
+                        {{-- Connector Line --}}
+                        <div class="flex-1 h-1 rounded-full {{ $step > $index ? 'bg-gradient-to-r from-primary-500 to-primary-600' : 'bg-gray-200' }} transition-all duration-500"></div>
+                    @endif
+                    
+                    <button 
+                        wire:click="goToStep({{ $s['step'] }})"
+                        type="button"
+                        class="flex flex-col items-center {{ $step > $s['step'] ? 'cursor-pointer' : 'cursor-default' }}"
+                        @if($step < $s['step']) disabled @endif
+                    >
+                        <div class="relative">
+                            @if($step === $s['step'])
+                                <div class="absolute -inset-1 bg-primary-400 rounded-full blur-md opacity-40 animate-pulse"></div>
+                            @endif
+                            <div @class([
+                                'relative w-10 h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center transition-all duration-300',
+                                'bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-300' => $step === $s['step'],
+                                'bg-gradient-to-br from-primary-500 to-primary-600 text-white' => $step > $s['step'],
+                                'bg-gray-100 text-gray-400 border-2 border-gray-200' => $step < $s['step'],
+                            ])>
+                                @if($step > $s['step'])
+                                    <i class="fas fa-check text-sm"></i>
+                                @else
+                                    <i class="fas {{ $s['icon'] }} text-sm"></i>
+                                @endif
+                            </div>
+                        </div>
+                        <span @class([
+                            'text-[10px] lg:text-xs mt-2 font-semibold transition-colors whitespace-nowrap',
+                            'text-primary-600' => $step >= $s['step'],
+                            'text-gray-400' => $step < $s['step'],
+                        ])>{{ $s['label'] }}</span>
+                    </button>
+                @endforeach
+            </div>
             
-            @foreach([
-                ['step' => 1, 'label' => 'Informasi', 'icon' => 'fa-file-alt'],
-                ['step' => 2, 'label' => 'Penulis', 'icon' => 'fa-user'],
-                ['step' => 3, 'label' => 'Dosen', 'icon' => 'fa-chalkboard-teacher'],
-                ['step' => 4, 'label' => 'Dokumen', 'icon' => 'fa-cloud-upload-alt'],
-                ['step' => 5, 'label' => 'Kirim', 'icon' => 'fa-paper-plane'],
-            ] as $s)
-                <button 
-                    wire:click="goToStep({{ $s['step'] }})"
-                    type="button"
-                    @class([
-                        'flex flex-col items-center z-10 group',
-                        'cursor-pointer' => $step > $s['step'],
-                        'cursor-default' => $step <= $s['step'],
-                    ])
-                    @if($step < $s['step']) disabled @endif
-                >
-                    <div @class([
-                        'w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-all border-2',
-                        'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200' => $step === $s['step'],
-                        'bg-primary-600 border-primary-600 text-white' => $step > $s['step'],
-                        'bg-white border-gray-300 text-gray-400' => $step < $s['step'],
-                        'group-hover:scale-110' => $step > $s['step'],
-                    ])>
-                        @if($step > $s['step'])
-                            <i class="fas fa-check text-xs lg:text-sm"></i>
-                        @else
-                            <i class="fas {{ $s['icon'] }} text-xs lg:text-sm"></i>
-                        @endif
-                    </div>
-                    <span @class([
-                        'text-[9px] lg:text-xs mt-1.5 font-medium transition-colors',
-                        'text-primary-600' => $step >= $s['step'],
-                        'text-gray-400' => $step < $s['step'],
-                    ])>{{ $s['label'] }}</span>
-                </button>
-            @endforeach
+            {{-- Progress Text --}}
+            <div class="mt-3 flex items-center justify-between text-xs">
+                <span class="text-gray-500">Langkah {{ $step }} dari 5</span>
+                <span class="font-semibold text-primary-600">{{ $this->completionPercentage }}% selesai</span>
+            </div>
         </div>
     </div>
 
@@ -564,7 +569,7 @@
             {{-- Agreement --}}
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <label class="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" wire:model="agreement" class="w-5 h-5 text-primary-600 rounded mt-0.5 flex-shrink-0">
+                    <input type="checkbox" wire:model.live="agreement" class="w-5 h-5 text-primary-600 rounded mt-0.5 flex-shrink-0">
                     <div>
                         <p class="text-sm font-semibold text-gray-900">Pernyataan Keaslian Karya</p>
                         <p class="text-xs text-gray-600 mt-1 leading-relaxed">
@@ -615,7 +620,12 @@
                         <button wire:click="saveDraft" type="button" class="px-4 py-2.5 text-gray-600 hover:text-gray-900 text-sm font-medium rounded-xl hover:bg-gray-100 transition flex items-center gap-2">
                             <i class="fas fa-save"></i> Simpan Draft
                         </button>
-                        <button wire:click="submit" type="button" class="px-6 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm flex items-center gap-2" {{ !$agreement ? 'disabled' : '' }}>
+                        <button 
+                            wire:click="submit" 
+                            type="button" 
+                            class="px-6 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            @disabled(!$agreement)
+                        >
                             <i class="fas fa-paper-plane"></i> Submit Pengajuan
                         </button>
                     @endif
