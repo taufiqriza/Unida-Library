@@ -152,7 +152,8 @@ class MemberResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn ($record) => $record->socialAccounts()->where('provider', 'google')->exists() ? '🔗 Google' : null),
                 Tables\Columns\TextColumn::make('memberType.name')
                     ->label('Tipe')
                     ->badge()
