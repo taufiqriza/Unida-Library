@@ -4,16 +4,30 @@ namespace App\Livewire;
 
 use App\Models\DdcClassification;
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class DdcLookup extends Component
 {
     public string $search = '';
     public array $results = [];
-    public string $targetField = 'classification';
+    public bool $isOpen = false;
+    public ?string $selectedCode = null;
+    public ?string $selectedDescription = null;
 
-    public function mount(string $targetField = 'classification')
+    protected $listeners = ['openDdcModal' => 'openModal'];
+
+    public function openModal()
     {
-        $this->targetField = $targetField;
+        $this->isOpen = true;
+        $this->search = '';
+        $this->results = [];
+        $this->selectedCode = null;
+        $this->selectedDescription = null;
+    }
+
+    public function closeModal()
+    {
+        $this->isOpen = false;
     }
 
     public function updatedSearch()
@@ -30,9 +44,30 @@ class DdcLookup extends Component
         }
     }
 
-    public function selectDdc($code)
+    public function searchByClass($code)
     {
-        $this->dispatch('ddc-selected', code: $code, field: $this->targetField);
+        $this->search = $code;
+        $this->updatedSearch();
+    }
+
+    public function selectDdc($code, $description)
+    {
+        $this->selectedCode = $code;
+        $this->selectedDescription = $description;
+    }
+
+    public function confirmSelection()
+    {
+        if ($this->selectedCode) {
+            $this->dispatch('ddc-selected', code: $this->selectedCode);
+            $this->closeModal();
+        }
+    }
+
+    public function quickSelect($code)
+    {
+        $this->dispatch('ddc-selected', code: $code);
+        $this->closeModal();
     }
 
     public function render()

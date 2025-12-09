@@ -38,6 +38,10 @@ Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.
 Route::get('/thesis-file/{submission}/{type}', [ThesisFileController::class, 'show'])->name('thesis.file');
 Route::get('/thesis-file/{submission}/{type}/download', [ThesisFileController::class, 'download'])->name('thesis.file.download');
 
+// DDC API (for admin panel DDC lookup)
+Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.search');
+Route::get('/api/ddc/main-classes', [DdcController::class, 'mainClasses'])->name('api.ddc.main-classes');
+
 // Print routes
 Route::middleware('auth')->group(function () {
     // Item barcode & label
@@ -51,10 +55,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/print/member-cards', [PrintController::class, 'memberCards'])->name('member.cards');
     
     // Stock Opname Scan
-    // DDC API for admin panel
-    Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.search');
-    Route::get('/api/ddc/main-classes', [DdcController::class, 'mainClasses'])->name('api.ddc.main-classes');
-    
     Route::post('/stock-opname/{stockOpname}/scan', function (Request $request, $stockOpname) {
         $so = StockOpname::withoutGlobalScopes()->findOrFail($stockOpname);
         $barcode = $request->input('barcode');
