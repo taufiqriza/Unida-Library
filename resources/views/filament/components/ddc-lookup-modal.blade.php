@@ -4,7 +4,6 @@
     selectedCode: null,
     selectedDesc: '',
     loading: false,
-    isDark: document.documentElement.classList.contains('dark'),
     
     async doSearch() {
         if (this.search.length < 2) {
@@ -45,37 +44,36 @@
         
         document.querySelector('.fi-modal-close-btn')?.click();
     }
-}" x-init="isDark = document.documentElement.classList.contains('dark')">
+}">
     {{-- Main Classes Grid --}}
     <template x-if="search.length < 2 && results.length === 0">
         <div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+            <div class="grid grid-cols-2 gap-2 mb-4">
                 <template x-for="cls in [
-                    {code: '000', label: 'Karya Umum & Komputer', gradient: 'linear-gradient(135deg, #fce7f3 0%, #f9a8d4 100%)', color: '#9d174d', icon: '💻'},
-                    {code: '100', label: 'Filsafat & Psikologi', gradient: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 100%)', color: '#9a3412', icon: '🧠'},
-                    {code: '200', label: 'Agama', gradient: 'linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%)', color: '#065f46', icon: '🕌'},
-                    {code: '300', label: 'Ilmu Sosial', gradient: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)', color: '#92400e', icon: '👥'},
-                    {code: '400', label: 'Bahasa', gradient: 'linear-gradient(135deg, #ecfccb 0%, #bef264 100%)', color: '#3f6212', icon: '🗣️'},
-                    {code: '500', label: 'Sains & Matematika', gradient: 'linear-gradient(135deg, #cffafe 0%, #67e8f9 100%)', color: '#155e75', icon: '🔬'},
-                    {code: '600', label: 'Teknologi', gradient: 'linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%)', color: '#1e40af', icon: '⚙️'},
-                    {code: '700', label: 'Seni & Olahraga', gradient: 'linear-gradient(135deg, #ede9fe 0%, #c4b5fd 100%)', color: '#5b21b6', icon: '🎨'},
-                    {code: '800', label: 'Sastra', gradient: 'linear-gradient(135deg, #fae8ff 0%, #e879f9 100%)', color: '#86198f', icon: '📚'},
-                    {code: '900', label: 'Sejarah & Geografi', gradient: 'linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%)', color: '#334155', icon: '🌍'},
+                    {code: '000', label: 'Karya Umum & Komputer', bg: 'bg-pink-100 dark:bg-pink-950/60', color: 'text-pink-700 dark:text-pink-300', icon: '💻'},
+                    {code: '100', label: 'Filsafat & Psikologi', bg: 'bg-orange-100 dark:bg-orange-950/60', color: 'text-orange-700 dark:text-orange-300', icon: '🧠'},
+                    {code: '200', label: 'Agama', bg: 'bg-emerald-100 dark:bg-emerald-950/60', color: 'text-emerald-700 dark:text-emerald-300', icon: '🕌'},
+                    {code: '2X0', label: 'Islam (Umum)', bg: 'bg-teal-100 dark:bg-teal-950/60', color: 'text-teal-700 dark:text-teal-300', icon: '☪️'},
+                    {code: '300', label: 'Ilmu Sosial', bg: 'bg-amber-100 dark:bg-amber-950/60', color: 'text-amber-700 dark:text-amber-300', icon: '👥'},
+                    {code: '400', label: 'Bahasa', bg: 'bg-lime-100 dark:bg-lime-950/60', color: 'text-lime-700 dark:text-lime-300', icon: '🗣️'},
+                    {code: '500', label: 'Sains & Matematika', bg: 'bg-cyan-100 dark:bg-cyan-950/60', color: 'text-cyan-700 dark:text-cyan-300', icon: '🔬'},
+                    {code: '600', label: 'Teknologi', bg: 'bg-blue-100 dark:bg-blue-950/60', color: 'text-blue-700 dark:text-blue-300', icon: '⚙️'},
+                    {code: '700', label: 'Seni & Olahraga', bg: 'bg-violet-100 dark:bg-violet-950/60', color: 'text-violet-700 dark:text-violet-300', icon: '🎨'},
+                    {code: '800', label: 'Sastra', bg: 'bg-fuchsia-100 dark:bg-fuchsia-950/60', color: 'text-fuchsia-700 dark:text-fuchsia-300', icon: '📚'},
+                    {code: '900', label: 'Sejarah & Geografi', bg: 'bg-slate-100 dark:bg-slate-800/80', color: 'text-slate-700 dark:text-slate-300', icon: '🌍'},
                 ]" :key="cls.code">
                     <button 
                         type="button"
                         @click="selectClass(cls.code)"
-                        :style="{ background: cls.gradient }"
-                        style="display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem; border-radius: 0.75rem; border: none; cursor: pointer; text-align: left; transition: transform 0.15s, box-shadow 0.15s;"
-                        @mouseenter="$el.style.transform = 'scale(1.02)'; $el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'"
-                        @mouseleave="$el.style.transform = 'scale(1)'; $el.style.boxShadow = 'none'"
+                        :class="cls.bg"
+                        class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer text-left transition-all duration-150 hover:scale-[1.02] hover:shadow-md"
                     >
-                        <span style="font-size: 1.5rem;" x-text="cls.icon"></span>
-                        <div style="flex: 1; min-width: 0;">
-                            <div :style="{ color: cls.color }" style="font-size: 1.25rem; font-weight: 800; line-height: 1;" x-text="cls.code"></div>
-                            <div :style="{ color: cls.color }" style="font-size: 0.7rem; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="cls.label"></div>
+                        <span class="text-xl flex-shrink-0" x-text="cls.icon"></span>
+                        <div class="flex-1 min-w-0">
+                            <div :class="cls.color" class="text-lg font-extrabold leading-none" x-text="cls.code"></div>
+                            <div :class="cls.color" class="text-[11px] opacity-80 truncate mt-0.5" x-text="cls.label"></div>
                         </div>
-                        <svg :style="{ color: cls.color }" style="width: 1rem; height: 1rem; opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg :class="cls.color" class="w-4 h-4 opacity-50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </button>
@@ -86,9 +84,17 @@
     </template>
 
     {{-- Search Box --}}
-    <div style="margin-bottom: 1rem;">
-        <div style="position: relative;">
-            <div style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none;">
+    <div class="mb-4">
+        <div class="relative">
+            <input 
+                type="text" 
+                x-model="search"
+                @input.debounce.300ms="doSearch()"
+                placeholder="Ketik nomor atau kata kunci (min. 2 karakter)..."
+                class="w-full h-12 pl-11 pr-11 text-base border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
+                autofocus
+            >
+            <div class="absolute left-0 top-0 h-12 w-11 flex items-center justify-center pointer-events-none">
                 <template x-if="loading">
                     <svg class="w-5 h-5 text-primary-500 animate-spin" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -101,23 +107,18 @@
                     </svg>
                 </template>
             </div>
-            <input 
-                type="text" 
-                x-model="search"
-                @input.debounce.300ms="doSearch()"
-                placeholder="Ketik nomor atau kata kunci (min. 2 karakter)..."
-                class="w-full py-3.5 pl-10 pr-10 text-base border-2 border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition"
-                autofocus
-            >
-            <button 
-                x-show="search.length > 0"
-                @click="search = ''; results = [];"
-                class="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
+            <div class="absolute right-0 top-0 h-12 w-11 flex items-center justify-center">
+                <button 
+                    x-show="search.length > 0"
+                    @click="search = ''; results = [];"
+                    type="button"
+                    class="w-7 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -130,23 +131,24 @@
                 </span>
                 <button 
                     @click="search = ''; results = [];"
+                    type="button"
                     class="text-xs text-primary-600 dark:text-primary-400 hover:underline"
                 >Kembali ke kelas utama</button>
             </div>
-            <div class="max-h-72 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-xl">
+            <div class="max-h-72 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800/50">
                 <template x-for="ddc in results" :key="ddc.code">
                     <button 
                         type="button"
                         @click="select(ddc.code, ddc.description.substring(0, 60))"
                         :class="selectedCode === ddc.code ? 'bg-primary-50 dark:bg-primary-900/40 border-l-4 border-l-primary-500' : 'border-l-4 border-l-transparent hover:bg-gray-50 dark:hover:bg-gray-700/50'"
-                        class="w-full flex items-start gap-3 p-3 text-left border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition"
+                        class="w-full flex items-start gap-3 p-3 text-left border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 transition"
                     >
                         <span 
                             :class="selectedCode === ddc.code ? 'bg-primary-500 text-white' : 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300'"
                             class="flex-shrink-0 px-2.5 py-1 font-mono font-bold text-sm rounded-lg transition"
                             x-text="ddc.code"
                         ></span>
-                        <span class="flex-1 text-sm leading-relaxed text-gray-700 dark:text-gray-200" x-text="ddc.description.substring(0, 120) + (ddc.description.length > 120 ? '...' : '')"></span>
+                        <span class="flex-1 text-sm leading-relaxed text-gray-700 dark:text-gray-300" x-text="ddc.description.substring(0, 120) + (ddc.description.length > 120 ? '...' : '')"></span>
                         <template x-if="selectedCode === ddc.code">
                             <span class="flex-shrink-0 w-5 h-5 bg-primary-500 rounded-full flex items-center justify-center">
                                 <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,21 +165,21 @@
     {{-- No Results --}}
     <template x-if="search.length >= 2 && results.length === 0 && !loading">
         <div class="py-8 text-center">
-            <div class="w-14 h-14 mx-auto mb-3 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-14 h-14 mx-auto mb-3 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-sm">Tidak ada hasil untuk "<strong x-text="search"></strong>"</p>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">Tidak ada hasil untuk "<strong x-text="search"></strong>"</p>
             <p class="text-gray-400 dark:text-gray-500 text-xs mt-1">Coba kata kunci lain</p>
         </div>
     </template>
 
     {{-- Footer with Selection --}}
-    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between gap-4">
+    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4">
         <div class="flex-1 min-w-0">
             <template x-if="selectedCode">
-                <div class="flex items-center gap-2 px-3 py-2.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-700 rounded-lg">
+                <div class="flex items-center gap-2 px-3 py-2.5 bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-lg">
                     <span class="px-2 py-0.5 bg-primary-500 text-white font-mono font-bold text-sm rounded" x-text="selectedCode"></span>
                     <span class="text-sm text-primary-700 dark:text-primary-300 truncate" x-text="selectedDesc"></span>
                 </div>
@@ -190,7 +192,7 @@
             type="button"
             @click="apply()"
             :disabled="!selectedCode"
-            :class="selectedCode ? 'bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-500/30' : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'"
+            :class="selectedCode ? 'bg-primary-600 hover:bg-primary-700 shadow-lg shadow-primary-500/30' : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed'"
             class="px-5 py-2.5 text-white font-semibold text-sm rounded-lg flex items-center gap-2 transition"
         >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
