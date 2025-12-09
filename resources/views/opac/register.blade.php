@@ -98,7 +98,7 @@
                     <div class="mt-6 pt-6 border-t border-gray-100 text-center">
                         <p class="text-sm text-gray-500">
                             Sudah punya akun? 
-                            <a href="{{ route('opac.login') }}" class="text-primary-600 font-semibold hover:text-primary-700">Masuk</a>
+                            <a href="{{ route('login') }}" class="text-primary-600 font-semibold hover:text-primary-700">Masuk</a>
                         </p>
                     </div>
                 </div>

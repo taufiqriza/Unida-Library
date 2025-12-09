@@ -109,7 +109,7 @@ class ThesisSubmissionForm extends Component
         $this->memberId = $member?->id;
         
         if (!$this->memberId) {
-            $this->redirect(route('opac.login'));
+            $this->redirect(route('login'));
             return;
         }
         
@@ -299,7 +299,7 @@ class ThesisSubmissionForm extends Component
     public function submit(): void
     {
         if (!$this->memberId) {
-            $this->redirect(route('opac.login'));
+            $this->redirect(route('login'));
             return;
         }
         

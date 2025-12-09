@@ -398,7 +398,7 @@
                             <span>{{ auth('member')->user()->name }}</span>
                         </a>
                     @else
-                        <a href="{{ route('opac.login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-700 bg-white hover:bg-gray-50 rounded-xl shadow-sm transition">
+                        <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-700 bg-white hover:bg-gray-50 rounded-xl shadow-sm transition">
                             <i class="fas fa-sign-in-alt"></i>
                             <span>Masuk</span>
                         </a>
@@ -453,7 +453,7 @@
             <div class="p-4 bg-gradient-to-r from-gray-50 to-slate-50 border-b">
                 <p class="text-xs text-gray-500 mb-3 text-center">Masuk untuk akses penuh</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('opac.login') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-primary-600 bg-white border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition">Masuk</a>
+                    <a href="{{ route('login') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-primary-600 bg-white border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition">Masuk</a>
                     <a href="{{ route('opac.register') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">Daftar</a>
                 </div>
             </div>

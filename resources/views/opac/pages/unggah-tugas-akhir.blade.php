@@ -224,7 +224,7 @@
                 <p class="text-primary-100 text-xs">Ajukan tugas akhir Anda sekarang</p>
             </a>
             @else
-            <a href="{{ route('opac.login') }}" class="bg-gradient-to-r from-primary-600 to-indigo-600 rounded-xl p-5 text-white text-center hover:shadow-lg hover:shadow-primary-200 transition group">
+            <a href="{{ route('login') }}" class="bg-gradient-to-r from-primary-600 to-indigo-600 rounded-xl p-5 text-white text-center hover:shadow-lg hover:shadow-primary-200 transition group">
                 <i class="fas fa-sign-in-alt text-2xl mb-2 group-hover:scale-110 transition"></i>
                 <h4 class="font-bold">Login Dulu</h4>
                 <p class="text-primary-100 text-xs">Masuk untuk mulai mengunggah</p>

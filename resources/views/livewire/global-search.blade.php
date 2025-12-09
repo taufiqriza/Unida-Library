@@ -1,4 +1,6 @@
-<div class="min-h-screen" x-data="{ showSubjectModal: false }">
+<div class="min-h-screen bg-gray-50" x-data="{ showSubjectModal: false }">
+    {{-- Background Pattern --}}
+    <div class="fixed inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
     {{-- Search Header with Gradient --}}
     <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
         {{-- Decorative elements --}}
@@ -8,34 +10,34 @@
         <div class="relative max-w-7xl mx-auto px-4 py-8 lg:py-12 z-10">
             {{-- Title --}}
             <div class="text-center mb-6">
-                <h1 class="text-2xl lg:text-3xl font-bold text-white mb-2">Pencarian Koleksi Perpustakaan</h1>
-                <p class="text-blue-200 text-sm lg:text-base">Perpustakaan UNIDA Gontor - Temukan buku, e-book, tugas akhir, dan berita</p>
+                <h1 class="text-2xl lg:text-4xl font-bold text-white mb-2">Perpustakaan UNIDA Gontor</h1>
+                <p class="text-blue-200 text-sm lg:text-base">Universitas Darussalam Gontor</p>
             </div>
 
-            {{-- Search Box - Rounded Full Design --}}
-            <div class="max-w-2xl mx-auto">
+            {{-- Search Box - Full Rounded Design like Homepage --}}
+            <div class="max-w-3xl mx-auto">
                 <div class="relative group">
                     {{-- Glow effect --}}
                     <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
                     
                     {{-- Search input container --}}
-                    <div class="relative flex items-center bg-white rounded-full shadow-2xl shadow-blue-900/30 overflow-hidden">
+                    <div class="relative flex items-center bg-white rounded-full shadow-2xl shadow-primary-900/30 overflow-hidden">
                         <div class="pl-5 pr-2">
                             <i class="fas fa-search text-gray-400"></i>
                         </div>
                         <input 
                             type="text" 
                             wire:model.live.debounce.400ms="query"
-                            placeholder="Cari judul, pengarang, ISBN, atau kata kunci..." 
+                            placeholder="Ketik judul, pengarang, ISBN, atau kata kunci..." 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                             autofocus
                         >
                         @if($query)
                             <button wire:click="$set('query', '')" class="px-3 text-gray-400 hover:text-gray-600 transition">
-                                <i class="fas fa-times-circle"></i>
+                                <i class="fas fa-times-circle text-lg"></i>
                             </button>
                         @endif
-                        <button class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2">
+                        <button class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-600/50 flex items-center gap-2">
                             <span class="hidden sm:inline">Cari</span>
                             <i class="fas fa-arrow-right text-sm"></i>
                         </button>
@@ -115,7 +117,7 @@
                         </div>
 
                         <div class="p-4 space-y-5">
-                            {{-- Branch/Location Filter (Primary) --}}
+                            {{-- Branch/Location Filter (Dropdown) --}}
                             <div class="filter-section">
                                 <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
                                     <span class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">

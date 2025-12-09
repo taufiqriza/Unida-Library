@@ -28,7 +28,7 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('opac.login') }}" method="POST" class="space-y-5">
+                    <form action="{{ route('login') }}" method="POST" class="space-y-5">
                         @csrf
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">No. Anggota / Email</label>

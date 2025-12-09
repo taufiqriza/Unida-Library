@@ -72,7 +72,16 @@ class MemberAuthController extends Controller
         $loans = $member->loans()->with('item.book')->where('is_returned', false)->get();
         $history = $member->loans()->with('item.book')->where('is_returned', true)->latest()->take(10)->get();
         $fines = $member->fines()->where('is_paid', false)->get();
+        
+        // Thesis submissions
+        $submissions = $member->thesisSubmissions()->with('department')->latest()->get();
+        
+        // Clearance letters (sent by admin)
+        $clearanceLetters = \App\Models\ClearanceLetter::where('member_id', $member->id)
+            ->with('thesisSubmission')
+            ->latest()
+            ->get();
 
-        return view('opac.member-dashboard', compact('member', 'loans', 'history', 'fines'));
+        return view('opac.member-dashboard', compact('member', 'loans', 'history', 'fines', 'submissions', 'clearanceLetters'));
     }
 }

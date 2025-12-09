@@ -17,8 +17,8 @@ Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.
 Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
 Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 
-// Member Auth
-Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])->name('opac.login');
+// Member Auth - 'login' name is required for Laravel's default auth redirect
+Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])->name('login');
 Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])->name('opac.register');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');
 
