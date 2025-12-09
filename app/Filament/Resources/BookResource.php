@@ -190,21 +190,24 @@ class BookResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('classification')
                                         ->label('No. Klasifikasi')
-                                        ->helperText('Nomor DDC/UDC')
                                         ->maxLength(40)
+                                        ->hint('Nomor DDC/UDC')
+                                        ->hintIcon('heroicon-o-information-circle')
                                         ->suffixAction(
                                             Forms\Components\Actions\Action::make('searchDdc')
-                                                ->icon('heroicon-o-magnifying-glass')
-                                                ->tooltip('Cari DDC')
-                                                ->modalHeading('DDC Lookup - Dewey Decimal Classification')
-                                                ->modalWidth('3xl')
+                                                ->label('Cari DDC')
+                                                ->icon('heroicon-o-book-open')
+                                                ->color('primary')
+                                                ->modalHeading('')
+                                                ->modalWidth('4xl')
                                                 ->modalSubmitAction(false)
                                                 ->modalCancelAction(false)
                                                 ->modalContent(fn () => view('filament.components.ddc-lookup-modal'))
                                         ),
                                     Forms\Components\TextInput::make('call_number')
                                         ->label('No. Panggil')
-                                        ->helperText('Call number untuk penempatan di rak')
+                                        ->hint('Call number untuk rak')
+                                        ->hintIcon('heroicon-o-information-circle')
                                         ->maxLength(50),
                                 ]),
                             Forms\Components\TextInput::make('series_title')
