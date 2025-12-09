@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
-use App\Models\Department;
 use App\Models\Faculty;
-use App\Models\Member;
 use App\Models\MemberType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -39,23 +37,28 @@ class CompleteProfileController extends Controller
             'department_id' => 'required|exists:departments,id',
             'phone' => 'required|string|max:20',
             'gender' => 'required|in:M,F',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ], [
             'nim.required' => 'NIM wajib diisi',
             'nim.unique' => 'NIM sudah terdaftar',
-            'branch_id.required' => 'Kampus wajib dipilih',
-            'member_type_id.required' => 'Tipe anggota wajib dipilih',
-            'faculty_id.required' => 'Fakultas wajib dipilih',
-            'department_id.required' => 'Program Studi wajib dipilih',
+            'photo.image' => 'File harus berupa gambar',
+            'photo.max' => 'Ukuran foto maksimal 2MB',
         ]);
 
-        $member->update([
+        $data = [
             'member_id' => $validated['nim'],
             'branch_id' => $validated['branch_id'],
             'member_type_id' => $validated['member_type_id'],
             'phone' => $validated['phone'],
             'gender' => $validated['gender'],
             'profile_completed' => true,
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('members', 'public');
+        }
+
+        $member->update($data);
 
         return redirect()->route('member.dashboard')
             ->with('success', 'Profil berhasil dilengkapi.');

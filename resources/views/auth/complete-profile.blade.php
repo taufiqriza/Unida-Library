@@ -29,8 +29,20 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('member.complete-profile') }}" method="POST" class="space-y-4" x-data="profileForm()">
+                    <form action="{{ route('member.complete-profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="profileForm()">
                         @csrf
+                        
+                        <!-- Photo Upload -->
+                        <div class="flex justify-center">
+                            <label class="cursor-pointer group">
+                                <div class="w-24 h-24 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center group-hover:border-primary-500 transition overflow-hidden" x-ref="preview">
+                                    <i class="fas fa-camera text-gray-400 text-xl group-hover:text-primary-500"></i>
+                                    <span class="text-xs text-gray-400 mt-1">Upload Foto</span>
+                                </div>
+                                <input type="file" name="photo" accept="image/*" class="hidden" @change="previewImage($event)">
+                            </label>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
                             <input type="text" name="nim" value="{{ old('nim') }}" required placeholder="Contoh: 402019611021"
@@ -111,6 +123,16 @@
                 }
                 const res = await fetch(`/api/departments?faculty_id=${this.facultyId}`);
                 this.departments = await res.json();
+            },
+            previewImage(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.$refs.preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
             },
             init() {
                 if (this.facultyId) this.loadDepartments();
