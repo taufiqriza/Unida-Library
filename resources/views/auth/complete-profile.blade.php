@@ -2,12 +2,14 @@
     <div class="min-h-[70vh] flex items-center justify-center py-8 px-4">
         <div class="w-full max-w-md">
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
-                <div class="bg-gradient-to-r from-primary-600 to-primary-800 p-6 text-center">
-                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-user-edit text-3xl text-white"></i>
+                <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user-edit text-2xl text-white"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-white">Lengkapi Profil</h1>
-                    <p class="text-primary-200 text-sm mt-1">Lengkapi data untuk melanjutkan</p>
+                    <div>
+                        <h1 class="text-lg font-bold text-white">Lengkapi Profil</h1>
+                        <p class="text-primary-200 text-sm">Lengkapi data untuk melanjutkan</p>
+                    </div>
                 </div>
 
                 <div class="p-6">
