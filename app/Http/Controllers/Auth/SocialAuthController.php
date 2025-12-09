@@ -65,9 +65,11 @@ class SocialAuthController extends Controller
             'member_id' => $this->generateUniqueMemberId(),
             'name' => $googleUser->getName(),
             'email' => $googleUser->getEmail(),
+            'member_type_id' => 1, // Default: Mahasiswa
             'is_active' => true,
             'profile_completed' => false,
             'register_date' => now(),
+            'expire_date' => now()->addYear(),
         ]);
 
         $member->socialAccounts()->create([

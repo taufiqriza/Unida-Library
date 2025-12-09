@@ -27,7 +27,12 @@
                     <form action="{{ route('member.complete-profile') }}" method="POST" class="space-y-4">
                         @csrf
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">No. Identitas (KTP/NIM)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">NIM / No. Anggota</label>
+                            <input type="text" name="nim" value="{{ old('nim') }}" required placeholder="Contoh: 2021001234"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">No. KTP</label>
                             <input type="text" name="identity_number" value="{{ old('identity_number') }}" required 
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                         </div>
