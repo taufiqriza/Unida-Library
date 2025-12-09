@@ -32,13 +32,8 @@ class SocialAuthController extends Controller
         }
 
         // Check domain whitelist
-        $allowedDomains = Setting::get('google_allowed_domains');
-        if ($allowedDomains) {
-            $domains = array_filter(array_map('trim', explode("\n", $allowedDomains)));
-            $emailDomain = substr(strrchr($googleUser->getEmail(), '@'), 1);
-            if (!empty($domains) && !in_array($emailDomain, $domains)) {
-                return redirect()->route('login')->with('error', 'Domain email tidak diizinkan.');
-            }
+        if (!$this->isAllowedDomain($googleUser->getEmail())) {
+            return redirect()->route('login')->with('error', 'Domain email tidak diizinkan.');
         }
 
         // Find or create social account
@@ -83,6 +78,33 @@ class SocialAuthController extends Controller
 
         Auth::guard('member')->login($member);
         return redirect()->route('member.complete-profile');
+    }
+
+    protected function isAllowedDomain(string $email): bool
+    {
+        $allowedDomains = Setting::get('google_allowed_domains');
+        
+        if (empty($allowedDomains)) {
+            return true; // No whitelist = allow all
+        }
+
+        $domains = array_filter(array_map('trim', explode("\n", $allowedDomains)));
+        
+        if (empty($domains)) {
+            return true;
+        }
+
+        $emailDomain = substr(strrchr($email, '@'), 1); // e.g., "gontor.ac.id"
+
+        foreach ($domains as $domain) {
+            // Remove @ prefix if present
+            $domain = ltrim($domain, '@');
+            if ($emailDomain === $domain) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function redirectAfterLogin(Member $member)
