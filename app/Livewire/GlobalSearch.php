@@ -62,12 +62,31 @@ class GlobalSearch extends Component
 
     public function mount()
     {
-        $this->query = request('q', '');
+        $this->query = $this->sanitizeInput(request('q', ''));
     }
 
-    public function updatingQuery()
+    public function updatingQuery($value)
     {
+        $this->query = $this->sanitizeInput($value);
         $this->resetPage();
+    }
+
+    /**
+     * Sanitize search input to prevent SQL wildcard injection
+     */
+    protected function sanitizeInput(string $value): string
+    {
+        $value = strip_tags($value);
+        // Escape SQL LIKE wildcards to prevent ReDoS-like attacks
+        return str_replace(['%', '_'], ['\\%', '\\_'], $value);
+    }
+
+    /**
+     * Get sanitized search term for LIKE queries
+     */
+    protected function getSearchTerm(): string
+    {
+        return $this->query;
     }
 
     public function updatedResourceType()

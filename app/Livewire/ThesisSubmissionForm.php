@@ -335,20 +335,20 @@ class ThesisSubmissionForm extends Component
             'status' => $status,
         ];
 
-        // Handle file uploads - store in public disk (can change to local for more security)
-        $storageDisk = 'public';
+        // Handle file uploads - store in private thesis disk for security
+        $storageDisk = 'thesis';
         
         if ($this->cover_file) {
-            $data['cover_file'] = $this->cover_file->store('thesis-submissions/covers', $storageDisk);
+            $data['cover_file'] = $this->cover_file->store('covers', $storageDisk);
         }
         if ($this->approval_file) {
-            $data['approval_file'] = $this->approval_file->store('thesis-submissions/approvals', $storageDisk);
+            $data['approval_file'] = $this->approval_file->store('approvals', $storageDisk);
         }
         if ($this->preview_file) {
-            $data['preview_file'] = $this->preview_file->store('thesis-submissions/previews', $storageDisk);
+            $data['preview_file'] = $this->preview_file->store('previews', $storageDisk);
         }
         if ($this->fulltext_file) {
-            $data['fulltext_file'] = $this->fulltext_file->store('thesis-submissions/fulltext', $storageDisk);
+            $data['fulltext_file'] = $this->fulltext_file->store('fulltext', $storageDisk);
         }
 
         if ($this->isEdit && $this->submission) {

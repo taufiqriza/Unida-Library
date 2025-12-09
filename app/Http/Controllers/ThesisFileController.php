@@ -10,64 +10,48 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ThesisFileController extends Controller
 {
-    /**
-     * Serve thesis file with access control
-     */
+    protected string $disk = 'thesis';
+
     public function show(Request $request, ThesisSubmission $submission, string $type): StreamedResponse
     {
-        // Validate file type
-        if (!in_array($type, ['cover', 'approval', 'preview', 'fulltext'])) {
-            abort(404, 'File type not found');
-        }
+        $filePath = $this->getValidatedFilePath($submission, $type);
+        $this->checkAccess($submission, $type);
 
-        // Get file path
-        $filePath = match($type) {
-            'cover' => $submission->cover_file,
-            'approval' => $submission->approval_file,
-            'preview' => $submission->preview_file,
-            'fulltext' => $submission->fulltext_file,
-            default => null,
-        };
-
-        if (!$filePath) {
+        if (!Storage::disk($this->disk)->exists($filePath)) {
             abort(404, 'File not found');
         }
 
-        // Check access permission
-        $member = Auth::guard('member')->user();
-        $user = Auth::guard('web')->user();
+        $mimeType = Storage::disk($this->disk)->mimeType($filePath);
 
-        if (!$submission->canAccessFile($type, $member, $user)) {
-            abort(403, 'Access denied');
-        }
-
-        // Check if file exists
-        if (!Storage::disk('public')->exists($filePath)) {
-            abort(404, 'File not found');
-        }
-
-        // Determine content type
-        $mimeType = Storage::disk('public')->mimeType($filePath);
-        $fileName = basename($filePath);
-
-        // Stream the file
-        return Storage::disk('public')->response($filePath, $fileName, [
+        return Storage::disk($this->disk)->response($filePath, basename($filePath), [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => $type === 'cover' ? 'inline' : 'inline; filename="' . $fileName . '"',
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline';",
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 
-    /**
-     * Download thesis file
-     */
     public function download(Request $request, ThesisSubmission $submission, string $type): StreamedResponse
     {
-        // Validate file type
+        $filePath = $this->getValidatedFilePath($submission, $type);
+        $this->checkAccess($submission, $type);
+
+        if (!Storage::disk($this->disk)->exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $downloadName = str($submission->nim . '_' . $submission->author . '_' . $type)->slug() . '.' . $extension;
+
+        return Storage::disk($this->disk)->download($filePath, $downloadName);
+    }
+
+    protected function getValidatedFilePath(ThesisSubmission $submission, string $type): string
+    {
         if (!in_array($type, ['cover', 'approval', 'preview', 'fulltext'])) {
             abort(404, 'File type not found');
         }
 
-        // Get file path
         $filePath = match($type) {
             'cover' => $submission->cover_file,
             'approval' => $submission->approval_file,
@@ -80,23 +64,16 @@ class ThesisFileController extends Controller
             abort(404, 'File not found');
         }
 
-        // Check access permission
+        return $filePath;
+    }
+
+    protected function checkAccess(ThesisSubmission $submission, string $type): void
+    {
         $member = Auth::guard('member')->user();
         $user = Auth::guard('web')->user();
 
         if (!$submission->canAccessFile($type, $member, $user)) {
             abort(403, 'Access denied');
         }
-
-        // Check if file exists
-        if (!Storage::disk('public')->exists($filePath)) {
-            abort(404, 'File not found');
-        }
-
-        // Generate download filename
-        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
-        $downloadName = str($submission->nim . '_' . $submission->author . '_' . $type)->slug() . '.' . $extension;
-
-        return Storage::disk('public')->download($filePath, $downloadName);
     }
 }
