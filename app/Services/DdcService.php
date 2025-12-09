@@ -45,7 +45,6 @@ class DdcService
             }
         }
         
-        // Sort by code
         usort($results, fn($a, $b) => strcmp($a['code'], $b['code']));
         
         return $results;
@@ -70,21 +69,5 @@ class DdcService
     public function clearCache(): void
     {
         Cache::forget($this->cacheKey);
-    }
-
-    /**
-     * Export database to JSON file
-     */
-    public function exportToJson(): int
-    {
-        $data = \App\Models\DdcClassification::select('code', 'description')
-            ->orderBy('code')
-            ->get()
-            ->toArray();
-        
-        File::put($this->jsonPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        $this->clearCache();
-        
-        return count($data);
     }
 }

@@ -1,80 +1,70 @@
-# DDC & Call Number Implementation
+# DDC (Dewey Decimal Classification) Implementation
 
 ## Overview
-Sistem klasifikasi DDC dan auto-generate call number untuk perpustakaan.
+Sistem klasifikasi DDC untuk katalogisasi buku perpustakaan.
 
-## DDC Lookup
+## Struktur File
 
-### Storage
-Data DDC disimpan dalam file JSON (`storage/app/ddc.json`) dengan caching untuk performa optimal.
-- 4715+ klasifikasi DDC Edition 23
-- Cached selama 24 jam
-- Search tanpa query database
+```
+database/data/ddc.json      # Data DDC (4715 klasifikasi)
+app/Services/DdcService.php # Service untuk search DDC
+app/Http/Controllers/Api/DdcController.php # API endpoint
+app/Livewire/DdcLookup.php  # Livewire component
+resources/views/filament/components/ddc-lookup-modal.blade.php # Modal UI
+resources/views/livewire/ddc-lookup.blade.php # Livewire view
+```
 
-### Penggunaan di Form Bibliografi
-1. Buka form Create/Edit Bibliografi
-2. Tab "Klasifikasi" → klik tombol "Cari DDC"
-3. Ketik kata kunci atau klik kelas utama
-4. Pilih klasifikasi → otomatis terisi
+## Cara Kerja
 
-### Export DDC ke JSON
+1. Data DDC disimpan dalam file JSON (`database/data/ddc.json`)
+2. `DdcService` membaca JSON dan cache selama 24 jam
+3. API endpoint `/api/ddc/search` untuk pencarian
+4. Modal lookup di Filament admin untuk input klasifikasi buku
+
+## API Endpoints
+
+### Search DDC
+```
+GET /api/ddc/search?q={query}&limit={limit}
+```
+- `q` - Kata kunci pencarian (min 2 karakter)
+- `limit` - Maksimal hasil (default 25, max 50)
+
+### Main Classes
+```
+GET /api/ddc/main-classes
+```
+Mengembalikan 10 kelas utama DDC (000-900)
+
+## Kelas Utama DDC
+
+| Kode | Deskripsi |
+|------|-----------|
+| 000 | Karya Umum & Komputer |
+| 100 | Filsafat & Psikologi |
+| 200 | Agama |
+| 2X | Islam |
+| 300 | Ilmu Sosial |
+| 400 | Bahasa |
+| 500 | Sains & Matematika |
+| 600 | Teknologi |
+| 700 | Seni & Olahraga |
+| 800 | Sastra |
+| 900 | Sejarah & Geografi |
+
+## Deployment
+
+Tidak perlu setup tambahan. File JSON sudah termasuk dalam repository dan akan otomatis tersedia saat deploy.
+
+## Clear Cache
+
+Jika perlu clear cache DDC:
 ```php
-// Via tinker atau artisan command
-(new \App\Services\DdcService)->exportToJson();
+app(DdcService::class)->clearCache();
 ```
 
-## Call Number
-
-### Format Pattern (SLiMS Style)
+Atau via tinker:
+```bash
+php artisan tinker
+>>> app(\App\Services\DdcService::class)->clearCache();
 ```
-S        = Kode Koleksi (dari Collection Type)
-2X9.12   = Nomor Klasifikasi DDC
-TIR      = 3 huruf pertama nama pengarang
-m        = Huruf pertama judul (lowercase)
-```
-
-### Auto-Generate
-1. Isi field Classification
-2. Klik tombol "Generate" di field No. Panggil
-3. Call number akan dibuat otomatis dari:
-   - Classification number
-   - Author code (dari SOR/Statement of Responsibility)
-   - Title code (huruf pertama judul, skip artikel)
-
-### Services
-
-**DdcService** (`app/Services/DdcService.php`)
-- `search($query, $limit)` - Cari DDC
-- `find($code)` - Get DDC by code
-- `exportToJson()` - Export database ke JSON
-
-**CallNumberService** (`app/Services/CallNumberService.php`)
-- `generate($collectionCode, $classification, $author, $title)` - Generate call number
-- `getAuthorCode($name)` - Get 3 huruf kode pengarang
-- `getTitleCode($title)` - Get huruf pertama judul
-- `parse($callNumber)` - Parse call number ke parts
-
-## Print Label
-
-### Barcode Label
-Layout: Barcode di kiri, Call Number di kanan
-- Judul buku (italic)
-- Barcode dengan font Code 39
-- Nama perpustakaan
-- Call number (4 baris)
-
-### Spine Label
-Label punggung buku dengan call number 4 baris.
-
-### Routes
-- `/print/barcode/{item}` - Single barcode
-- `/print/barcodes?ids=1,2,3` - Multiple barcodes
-- `/print/label/{item}` - Single label
-- `/print/labels?ids=1,2,3` - Multiple labels
-
-## File Terkait
-- `storage/app/ddc.json` - Data DDC (JSON)
-- `app/Services/DdcService.php` - DDC Service
-- `app/Services/CallNumberService.php` - Call Number Service
-- `resources/views/print/barcode.blade.php` - Print barcode
-- `resources/views/print/label.blade.php` - Print label
