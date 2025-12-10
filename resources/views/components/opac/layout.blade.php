@@ -792,6 +792,9 @@
         </div>
     </div>
 
+    {{-- Floating Widgets: WhatsApp & Scroll to Top --}}
+    @include('partials.floating-widgets')
+
     <script src="{{ url('livewire/livewire.js') }}" data-csrf="{{ csrf_token() }}" data-update-uri="{{ url('livewire/update') }}"></script>
 </body>
 </html>

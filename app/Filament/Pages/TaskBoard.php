@@ -12,8 +12,26 @@ class TaskBoard extends Page
     protected static ?string $navigationIcon = 'heroicon-o-view-columns';
     protected static ?string $navigationGroup = 'Task Management';
     protected static ?string $navigationLabel = 'Kanban Board';
+    protected static ?string $title = 'Task Board';
     protected static ?int $navigationSort = 5;
     protected static string $view = 'filament.pages.task-board';
+
+    public function getHeading(): string
+    {
+        return '📋 Task Board';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola dan pantau progress task dengan drag & drop';
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $overdueCount = Task::overdue()->count();
+        return $overdueCount > 0 ? 'danger' : 'primary';
+    }
+
 
     public ?int $projectId = null;
     public array $statuses = [];
@@ -36,10 +54,14 @@ class TaskBoard extends Page
         $this->tasks = Task::query()
             ->when($this->projectId, fn ($q) => $q->where('project_id', $this->projectId))
             ->with(['assignee', 'status', 'project'])
+            ->orderByRaw("FIELD(priority, 'urgent', 'high', 'medium', 'low')")
+            ->orderBy('due_date')
+            ->orderByDesc('created_at')
             ->get()
             ->groupBy('status_id')
             ->toArray();
     }
+
 
     public function updatedProjectId(): void
     {
