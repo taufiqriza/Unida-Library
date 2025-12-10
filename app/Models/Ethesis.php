@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Ethesis extends Model
 {
@@ -24,6 +25,11 @@ class Ethesis extends Model
     public function department() { return $this->belongsTo(Department::class); }
     public function subjects() { return $this->belongsToMany(Subject::class, 'ethesis_subject'); }
     public function user() { return $this->belongsTo(User::class); }
+    
+    public function fingerprint(): MorphOne
+    {
+        return $this->morphOne(DocumentFingerprint::class, 'documentable');
+    }
 
     public function getTypeLabel(): string
     {

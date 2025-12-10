@@ -48,6 +48,11 @@ class Member extends Authenticatable
         return $this->hasMany(ThesisSubmission::class);
     }
 
+    public function plagiarismChecks(): HasMany
+    {
+        return $this->hasMany(PlagiarismCheck::class);
+    }
+
     public function hasOutstandingLoans(): bool
     {
         return $this->loans()->where('is_returned', false)->exists();

@@ -335,9 +335,13 @@
                                                 <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-search text-blue-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Panduan OPAC</p><p class="text-xs text-gray-500">Cara menggunakan katalog</p></div>
                                             </a>
-                                            <a href="{{ route('opac.page', 'unggah-tugas-akhir') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
+                                            <a href="{{ route('opac.panduan.thesis') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center"><i class="fas fa-upload text-emerald-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Unggah Tugas Akhir</p><p class="text-xs text-gray-500">Panduan upload skripsi</p></div>
+                                            </a>
+                                            <a href="{{ route('opac.panduan.plagiarism') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
+                                                <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center"><i class="fas fa-shield-alt text-teal-600"></i></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Cek Plagiasi</p><p class="text-xs text-gray-500">Panduan cek similarity</p></div>
                                             </a>
                                             <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-user-graduate text-orange-600"></i></div>
@@ -567,7 +571,8 @@
                         <div class="pl-12 space-y-1 border-l-2 border-orange-200 ml-1.5">
                             <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5">Panduan Pengguna</p>
                             <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-search text-xs text-gray-400"></i> Panduan OPAC</a>
-                            <a href="{{ route('opac.page', 'unggah-tugas-akhir') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-upload text-xs text-gray-400"></i> Unggah Tugas Akhir</a>
+                            <a href="{{ route('opac.panduan.thesis') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-upload text-xs text-gray-400"></i> Unggah Tugas Akhir</a>
+                            <a href="{{ route('opac.panduan.plagiarism') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-teal-600 hover:bg-white rounded-lg transition"><i class="fas fa-shield-alt text-xs text-gray-400"></i> Cek Plagiasi</a>
                             <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-user-graduate text-xs text-gray-400"></i> Panduan Ospek</a>
                             <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5 mt-2">Materi & Akademik</p>
                             <a href="{{ route('opac.page', 'panduan-akademik') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> Panduan Akademik</a>

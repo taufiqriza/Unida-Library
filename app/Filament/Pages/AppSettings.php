@@ -42,6 +42,19 @@ class AppSettings extends Page implements HasForms
             'google_client_id' => Setting::get('google_client_id', ''),
             'google_client_secret' => Setting::get('google_client_secret', ''),
             'google_allowed_domains' => Setting::get('google_allowed_domains', ''),
+            // Plagiarism Settings
+            'plagiarism_enabled' => (bool) Setting::get('plagiarism_enabled', true),
+            'plagiarism_provider' => Setting::get('plagiarism_provider', 'internal'),
+            'plagiarism_pass_threshold' => (float) Setting::get('plagiarism_pass_threshold', 25),
+            'plagiarism_warning_threshold' => (float) Setting::get('plagiarism_warning_threshold', 15),
+            'plagiarism_min_words' => (int) Setting::get('plagiarism_min_words', 100),
+            'plagiarism_head_librarian' => Setting::get('plagiarism_head_librarian', ''),
+            'plagiarism_max_file_size' => (int) Setting::get('plagiarism_max_file_size', 20),
+            // iThenticate/TCA API Settings
+            'ithenticate_integration_name' => Setting::get('ithenticate_integration_name', ''),
+            'ithenticate_api_key' => Setting::get('ithenticate_api_key', ''),
+            'ithenticate_api_secret' => Setting::get('ithenticate_api_secret', ''),
+            'ithenticate_base_url' => Setting::get('ithenticate_base_url', 'https://api.turnitin.com'),
         ]);
     }
 
@@ -145,6 +158,87 @@ class AppSettings extends Page implements HasForms
                                         ->content(fn () => url('/auth/google/callback')),
                                 ]),
                         ]),
+
+                    Forms\Components\Tabs\Tab::make('Plagiarism')
+                        ->icon('heroicon-o-shield-check')
+                        ->schema([
+                            Forms\Components\Section::make('Pengaturan Cek Plagiasi')
+                                ->description('Konfigurasi layanan pengecekan plagiarisme dokumen.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('plagiarism_enabled')
+                                        ->label('Aktifkan Layanan Cek Plagiasi')
+                                        ->helperText('Tampilkan menu cek plagiasi di dashboard member'),
+                                    Forms\Components\Select::make('plagiarism_provider')
+                                        ->label('Provider')
+                                        ->options([
+                                            'internal' => 'Internal (Database E-Thesis)',
+                                            'ithenticate' => 'iThenticate',
+                                            'turnitin' => 'Turnitin',
+                                            'copyleaks' => 'Copyleaks',
+                                        ])
+                                        ->default('internal')
+                                        ->helperText('Pilih layanan pengecekan plagiasi'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Threshold Similarity')
+                                ->description('Atur batas persentase similarity untuk hasil pengecekan.')
+                                ->schema([
+                                    Forms\Components\TextInput::make('plagiarism_pass_threshold')
+                                        ->label('Batas Lolos (%)')
+                                        ->numeric()
+                                        ->default(25)
+                                        ->minValue(1)
+                                        ->maxValue(100)
+                                        ->suffix('%')
+                                        ->helperText('Dokumen dengan similarity ≤ nilai ini dinyatakan LOLOS'),
+                                    Forms\Components\TextInput::make('plagiarism_warning_threshold')
+                                        ->label('Batas Peringatan (%)')
+                                        ->numeric()
+                                        ->default(15)
+                                        ->minValue(1)
+                                        ->maxValue(100)
+                                        ->suffix('%')
+                                        ->helperText('Similarity di atas nilai ini akan diberi peringatan'),
+                                    Forms\Components\TextInput::make('plagiarism_min_words')
+                                        ->label('Minimal Kata')
+                                        ->numeric()
+                                        ->default(100)
+                                        ->helperText('Jumlah kata minimal untuk bisa dicek'),
+                                    Forms\Components\TextInput::make('plagiarism_max_file_size')
+                                        ->label('Maks. Ukuran File')
+                                        ->numeric()
+                                        ->default(20)
+                                        ->suffix('MB')
+                                        ->helperText('Ukuran maksimal file yang bisa diupload'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Sertifikat')
+                                ->schema([
+                                    Forms\Components\TextInput::make('plagiarism_head_librarian')
+                                        ->label('Nama Kepala Perpustakaan')
+                                        ->placeholder('Dr. H. Ahmad Fulan, M.A.')
+                                        ->helperText('Nama yang akan tercantum di sertifikat'),
+                                ]),
+                            Forms\Components\Section::make('iThenticate / Turnitin API')
+                                ->description('Konfigurasi API untuk integrasi dengan iThenticate/Turnitin. Kosongkan jika menggunakan provider Internal.')
+                                ->schema([
+                                    Forms\Components\TextInput::make('ithenticate_integration_name')
+                                        ->label('Integration/Scope Name')
+                                        ->placeholder('Library-Portal-API')
+                                        ->helperText('Nama scope yang dibuat di dashboard iThenticate'),
+                                    Forms\Components\TextInput::make('ithenticate_api_key')
+                                        ->label('Key Name')
+                                        ->placeholder('SYSTEM-LIBRARY')
+                                        ->helperText('Nama key dari TCA integration'),
+                                    Forms\Components\TextInput::make('ithenticate_api_secret')
+                                        ->label('Secret Key')
+                                        ->password()
+                                        ->revealable()
+                                        ->helperText('Secret key dari TCA integration (disimpan terenkripsi)'),
+                                    Forms\Components\TextInput::make('ithenticate_base_url')
+                                        ->label('Base URL')
+                                        ->default('https://unidagontor.turnitin.com')
+                                        ->helperText('URL dashboard iThenticate Anda'),
+                                ])->columns(2),
+                        ]),
                 ])->columnSpanFull(),
             ])
             ->statePath('data');
@@ -181,6 +275,21 @@ class AppSettings extends Page implements HasForms
             'google_client_secret' => $data['google_client_secret'],
             'google_allowed_domains' => $data['google_allowed_domains'],
         ], 'oauth');
+
+        Setting::setMany([
+            'plagiarism_enabled' => $data['plagiarism_enabled'],
+            'plagiarism_provider' => $data['plagiarism_provider'],
+            'plagiarism_pass_threshold' => $data['plagiarism_pass_threshold'],
+            'plagiarism_warning_threshold' => $data['plagiarism_warning_threshold'],
+            'plagiarism_min_words' => $data['plagiarism_min_words'],
+            'plagiarism_max_file_size' => $data['plagiarism_max_file_size'],
+            'plagiarism_head_librarian' => $data['plagiarism_head_librarian'],
+            // iThenticate API
+            'ithenticate_integration_name' => $data['ithenticate_integration_name'],
+            'ithenticate_api_key' => $data['ithenticate_api_key'],
+            'ithenticate_api_secret' => $data['ithenticate_api_secret'],
+            'ithenticate_base_url' => $data['ithenticate_base_url'],
+        ], 'plagiarism');
 
         Notification::make()->title('Pengaturan berhasil disimpan')->success()->send();
     }

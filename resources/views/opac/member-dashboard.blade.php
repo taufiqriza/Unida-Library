@@ -143,19 +143,101 @@
                     </div>
                     @endif
 
-                    {{-- Unggah Tugas Akhir CTA --}}
-                    <a href="{{ route('opac.member.submit-thesis') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-4 lg:p-5 text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 transition-all group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-upload text-xl"></i>
+                    {{-- CTA Buttons Grid --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {{-- Cek Plagiasi CTA (Left) --}}
+                        @if(\App\Services\Plagiarism\PlagiarismService::isEnabled())
+                        @php
+                            $plagiarismQuota = 3;
+                            $plagiarismUsed = auth('member')->user()->plagiarismChecks()->count();
+                            $plagiarismRemaining = max(0, $plagiarismQuota - $plagiarismUsed);
+                            $latestChecks = auth('member')->user()->plagiarismChecks()->latest()->take(3)->get();
+                        @endphp
+                        <a href="{{ route('opac.member.plagiarism.index') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-4 lg:p-5 text-white shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-shield-alt text-xl"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-sm lg:text-base">Cek Plagiasi</h3>
+                                    <p class="text-teal-200 text-xs">Khusus dokumen tugas akhir</p>
+                                    <p class="text-white/80 text-xs mt-0.5">
+                                        <i class="fas fa-ticket-alt mr-1"></i> Kuota: {{ $plagiarismRemaining }}/{{ $plagiarismQuota }} tersisa
+                                    </p>
+                                </div>
+                                <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
                             </div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-sm lg:text-base">Unggah Tugas Akhir</h3>
-                                <p class="text-violet-200 text-xs lg:text-sm">Submit skripsi/tesis/disertasi</p>
+                        </a>
+                        @endif
+
+                        {{-- Unggah Tugas Akhir CTA (Right) --}}
+                        <a href="{{ route('opac.member.submit-thesis') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-4 lg:p-5 text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 transition-all group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
+                                    <i class="fas fa-upload text-xl"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-sm lg:text-base">Unggah Tugas Akhir</h3>
+                                    <p class="text-violet-200 text-xs lg:text-sm">Submit skripsi/tesis/disertasi</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
                             </div>
-                            <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+
+                    {{-- Riwayat Cek Plagiasi (jika ada) --}}
+                    @if(\App\Services\Plagiarism\PlagiarismService::isEnabled() && $latestChecks->count() > 0)
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h2 class="font-bold text-gray-900 text-sm flex items-center gap-2">
+                                <div class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-shield-alt text-teal-600 text-xs"></i>
+                                </div>
+                                Riwayat Cek Plagiasi
+                            </h2>
+                            <a href="{{ route('opac.member.plagiarism.index') }}" class="text-xs text-teal-600 hover:underline">Lihat Semua</a>
                         </div>
-                    </a>
+                        <div class="divide-y divide-gray-50">
+                            @foreach($latestChecks as $check)
+                            <a href="{{ route('opac.member.plagiarism.show', $check) }}" class="block p-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0
+                                        @if($check->isCompleted())
+                                        @if($check->similarity_level === 'low') bg-emerald-100 text-emerald-600
+                                            @elseif($check->similarity_level === 'moderate') bg-amber-100 text-amber-600
+                                            @else bg-red-100 text-red-600
+                                            @endif
+                                        @elseif($check->isFailed()) bg-red-100 text-red-600
+                                        @else bg-blue-100 text-blue-600
+                                        @endif
+                                    ">
+                                        @if($check->isCompleted())
+                                            <span class="font-bold text-sm">{{ $check->similarity_score }}%</span>
+                                        @elseif($check->isFailed())
+                                            <i class="fas fa-times"></i>
+                                        @else
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-medium text-gray-900 text-sm truncate">{{ Str::limit($check->document_title, 40) }}</p>
+                                        <p class="text-xs text-gray-500">{{ $check->created_at->format('d M Y, H:i') }}</p>
+                                    </div>
+                                    @if($check->isCompleted() && $check->hasCertificate())
+                                    <a href="{{ route('opac.member.plagiarism.certificate.download', $check) }}" class="px-2 py-1 bg-teal-100 text-teal-600 rounded text-xs hover:bg-teal-200 transition" onclick="event.stopPropagation();">
+                                        <i class="fas fa-download mr-1"></i> Sertifikat
+                                    </a>
+                                    @elseif($check->isProcessing())
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs">Proses...</span>
+                                    @elseif($check->isFailed())
+                                    <span class="px-2 py-1 bg-red-100 text-red-600 rounded text-xs">Gagal</span>
+                                    @endif
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- Peminjaman Aktif --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -494,6 +576,20 @@
                                 </div>
                                 <span class="text-xs text-gray-700">Unggah Tugas Akhir</span>
                             </a>
+                            @if(\App\Services\Plagiarism\PlagiarismService::isEnabled())
+                            <a href="{{ route('opac.member.plagiarism.create') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-teal-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-shield-alt text-teal-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">Cek Plagiasi</span>
+                            </a>
+                            <a href="{{ route('opac.member.plagiarism.index') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-history text-emerald-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">Riwayat Plagiasi</span>
+                            </a>
+                            @endif
                             <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
                                 <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-question-circle text-amber-500 text-[10px]"></i>

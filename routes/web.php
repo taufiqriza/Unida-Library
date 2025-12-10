@@ -18,6 +18,11 @@ Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.
 Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
 Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 
+// Panduan Pages
+Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');
+Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');
+
+
 // Member Auth - with rate limiting
 Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])
     ->middleware('throttle:login')
@@ -43,7 +48,21 @@ Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(
     Route::get('/submissions', fn() => view('opac.member.submissions'))->name('submissions');
     Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
     Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
+    
+    // Plagiarism Check
+    Route::prefix('plagiarism')->name('plagiarism.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Opac\PlagiarismController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\Opac\PlagiarismController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\Opac\PlagiarismController::class, 'store'])->name('store');
+        Route::get('/{check}', [App\Http\Controllers\Opac\PlagiarismController::class, 'show'])->name('show');
+        Route::get('/{check}/status', [App\Http\Controllers\Opac\PlagiarismController::class, 'status'])->name('status');
+        Route::get('/{check}/certificate', [App\Http\Controllers\Opac\PlagiarismController::class, 'certificate'])->name('certificate');
+        Route::get('/{check}/certificate/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'downloadCertificate'])->name('certificate.download');
+    });
 });
+
+// Public Plagiarism Certificate Verification
+Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismController::class, 'verify'])->name('plagiarism.verify');
 
 // Alias for member.dashboard
 Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->middleware('auth:member')->name('member.dashboard');
