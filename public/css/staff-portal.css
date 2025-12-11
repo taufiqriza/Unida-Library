@@ -2,16 +2,19 @@
  * Staff Portal Styles - Desktop Mode Precision
  */
 
-[x-cloak] { display: none !important; }
+[x-cloak] {
+    display: none !important;
+}
 
 /* ============================================ */
 /* DESKTOP MODE (≥1024px) */
 /* ============================================ */
 
 @media (min-width: 1024px) {
-    /* Fix double scrolling */
+
+    /* Fix double scrolling - but allow modals to overflow */
     body {
-        overflow: hidden !important;
+        overflow-x: hidden !important;
         height: 100vh !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
@@ -25,6 +28,14 @@
         overflow-x: hidden !important;
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
+    }
+
+    /* Ensure Filament modals can display properly */
+    .fi-modal,
+    [x-teleport],
+    [x-float-reference],
+    [x-data*="modal"] {
+        overflow: visible !important;
     }
 
     /* Sidebar fixed */
@@ -72,25 +83,49 @@
     }
 
     /* Custom scrollbar - main */
-    main::-webkit-scrollbar { width: 8px; }
-    main::-webkit-scrollbar-track { background: #f1f5f9; }
-    main::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    main::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    main::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    main::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    main::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    main::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
 
     /* Custom scrollbar - sidebar */
-    aside::-webkit-scrollbar { width: 6px; }
-    aside::-webkit-scrollbar-track { background: transparent; }
-    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+    aside::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    aside::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    aside::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
+    }
 
     /* GPU acceleration */
-    aside, header.desktop-header, .main-content-wrapper {
+    aside,
+    header.desktop-header,
+    .main-content-wrapper {
         backface-visibility: hidden;
         transform: translateZ(0);
         -webkit-font-smoothing: antialiased;
     }
 
     /* Hide mobile elements */
-    .mobile-header, .mobile-nav {
+    .mobile-header,
+    .mobile-nav {
         display: none !important;
     }
 }
@@ -114,12 +149,29 @@
 /* COMPONENTS */
 /* ============================================ */
 
-.gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-.gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-.gradient-amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-.gradient-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-.gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
-.gradient-indigo { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+.gradient-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.gradient-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.gradient-amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.gradient-red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.gradient-purple {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.gradient-indigo {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
 
 .badge {
     display: inline-flex;
@@ -129,7 +181,163 @@
     font-size: 0.6875rem;
     font-weight: 600;
 }
-.badge-success { background: #dcfce7; color: #166534; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-info { background: #dbeafe; color: #1e40af; }
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ============================================ */
+/* FILAMENT FORMS - Dark Theme with Light Text */
+/* ============================================ */
+
+/* Form inputs - light text on dark bg */
+.fi-fo-text-input input,
+.fi-fo-textarea textarea,
+.fi-input,
+.fi-fo-select input {
+    color: #fff !important;
+}
+
+.fi-fo-text-input input::placeholder,
+.fi-fo-textarea textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Select trigger - light text */
+.fi-fo-select-trigger,
+.fi-fo-select button,
+.fi-fo-select [type="button"],
+.fi-select-trigger {
+    color: #fff !important;
+}
+
+/* Select text content - including selected values */
+.fi-fo-select-trigger span,
+.fi-fo-select button span,
+.fi-fo-select-trigger div,
+.fi-fo-select button div,
+.fi-fo-select .fi-input-wrp span,
+.fi-fo-select .fi-input-wrp div,
+[class*="fi-select"] span,
+[class*="fi-select"] div:not(.fi-badge),
+.fi-fo-select-trigger *,
+.fi-input-wrp span {
+    color: #fff !important;
+}
+
+/* Selected values in multi-select badges */
+.fi-badge,
+.fi-badge span {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+    color: #93c5fd !important;
+}
+
+/* Notification styling - light text on dark */
+.fi-no,
+.fi-no-notification,
+[class*="fi-notification"] {
+    color: #fff !important;
+}
+
+.fi-no-notification-title,
+.fi-no-notification-body,
+[class*="notification"] h3,
+[class*="notification"] p {
+    color: #fff !important;
+}
+
+/* Toggle/Switch styling */
+.fi-toggle-track {
+    background-color: #374151 !important;
+}
+
+.fi-toggle-track[aria-checked="true"] {
+    background-color: #2563eb !important;
+}
+
+/* Form labels - light color */
+.fi-fo-field-wrp label,
+.fi-form label {
+    color: #e5e7eb !important;
+}
+
+/* Helper text */
+.fi-fo-field-wrp-helper-text {
+    color: #9ca3af !important;
+}
+
+/* Hint text */
+.fi-fo-field-wrp-hint {
+    color: #9ca3af !important;
+}
+
+/* Select options dropdown - light text */
+.fi-fo-select-options {
+    z-index: 100 !important;
+}
+
+/* Dropdown option items - light text */
+.fi-fo-select-option,
+.fi-fo-select-options [role="option"],
+.fi-fo-select-options li,
+.fi-fo-select-options button,
+.fi-fo-select-options span {
+    color: #fff !important;
+}
+
+/* Dropdown option hover state */
+.fi-fo-select-option:hover,
+.fi-fo-select-options [role="option"]:hover {
+    background-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Selected option in dropdown */
+.fi-fo-select-option[aria-selected="true"],
+.fi-fo-select-options [aria-selected="true"] {
+    background-color: rgba(59, 130, 246, 0.5) !important;
+    color: #fff !important;
+}
+
+/* Tabs styling */
+.fi-tabs-item {
+    color: #9ca3af !important;
+}
+
+.fi-tabs-item[aria-selected="true"] {
+    color: #60a5fa !important;
+}
+
+/* ============================================ */
+/* Fix Chevron Icons Everywhere */
+/* ============================================ */
+
+.fi-fo-select-trigger svg:not(:first-of-type) {
+    display: none !important;
+}
+
+.fi-fo-select .fi-fo-select-trigger>svg~svg {
+    display: none !important;
+}
+
+/* Native HTML select fix */
+select {
+    appearance: auto !important;
+    -webkit-appearance: menulist !important;
+    background-image: none !important;
+}

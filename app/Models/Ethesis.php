@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Ethesis extends Model
 {
     protected $fillable = [
+        'source_type', 'external_id', 'external_url',
         'branch_id', 'department_id', 'title', 'title_en', 'abstract', 'abstract_en',
         'author', 'nim', 'advisor1', 'advisor2', 'examiner1', 'examiner2', 'examiner3',
         'year', 'defense_date', 'type', 'keywords', 'file_path', 'cover_path', 'url',
@@ -39,5 +40,12 @@ class Ethesis extends Model
             'disertasi' => 'Disertasi',
             default => ucfirst($this->type),
         };
+    }
+
+    public function getCoverUrlAttribute(): string
+    {
+        return $this->cover_path 
+            ? asset('storage/' . $this->cover_path) 
+            : asset('storage/thesis.png');
     }
 }

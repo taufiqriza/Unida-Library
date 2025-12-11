@@ -160,12 +160,17 @@ class OpacController extends Controller
 
         $relatedTheses = Ethesis::where('is_public', true)
             ->where('id', '!=', $thesis->id)
-            ->where('department_id', $thesis->department_id)
+            ->when($thesis->source_type === 'repo',
+                fn($q) => $q->where('source_type', 'repo'),
+                fn($q) => $q->where('department_id', $thesis->department_id)
+            )
             ->latest()
             ->take(4)
             ->get();
 
-        return view('opac.ethesis-detail', compact('thesis', 'relatedTheses'));
+        $view = $thesis->source_type === 'repo' ? 'opac.ethesis-detail-repo' : 'opac.ethesis-detail';
+        
+        return view($view, compact('thesis', 'relatedTheses'));
     }
 
     public function ebookShow($id)

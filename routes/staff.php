@@ -20,13 +20,34 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
 
         // Bibliography
         Route::prefix('biblio')->name('biblio.')->group(function () {
-            Route::get('/', [BiblioController::class, 'index'])->name('index');
-            Route::get('/create', [BiblioController::class, 'create'])->name('create');
-            Route::post('/', [BiblioController::class, 'store'])->name('store');
+            // Livewire Components for List, Create, Edit
+            Route::get('/', \App\Livewire\Staff\Biblio\BiblioList::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('create');
+            Route::get('/{book}/edit', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('edit');
+            
+            // Keep Show for read-only view if needed, or replace later
             Route::get('/{book}', [BiblioController::class, 'show'])->name('show');
-            Route::get('/{book}/edit', [BiblioController::class, 'edit'])->name('edit');
-            Route::put('/{book}', [BiblioController::class, 'update'])->name('update');
             Route::post('/{book}/items', [BiblioController::class, 'addItems'])->name('add-items');
+        });
+
+        // Circulation
+        Route::prefix('circulation')->name('circulation.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Circulation\CirculationTransaction::class)->name('index');
+        });
+
+        // Members
+        Route::prefix('member')->name('member.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Member\MemberList::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\Member\MemberForm::class)->name('create');
+            Route::get('/{member}', \App\Livewire\Staff\Member\MemberShow::class)->name('show');
+            Route::get('/{member}/edit', \App\Livewire\Staff\Member\MemberForm::class)->name('edit');
+        });
+
+        // Tasks (Kanban Board)
+        Route::prefix('task')->name('task.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Task\TaskKanban::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\Task\TaskForm::class)->name('create');
+            Route::get('/{task}/edit', \App\Livewire\Staff\Task\TaskForm::class)->name('edit');
         });
 
         // Profile

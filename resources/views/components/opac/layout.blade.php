@@ -821,6 +821,9 @@
                     <a href="{{ route('opac.search') }}?type=ethesis" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-graduation-cap text-[10px]"></i> E-Thesis
                     </a>
+                    <a href="{{ route('opac.journals.index') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                        <i class="fas fa-file-lines text-[10px]"></i> Jurnal
+                    </a>
                     <a href="{{ route('opac.search') }}?type=news" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-newspaper text-[10px]"></i> Berita
                     </a>

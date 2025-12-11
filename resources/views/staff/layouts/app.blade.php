@@ -11,7 +11,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    {{-- Alpine.js is included in @filamentScripts - do not load CDN version --}}
 
     @php
         $user = auth()->user();
@@ -19,15 +58,17 @@
         $currentDate = now()->locale('id')->isoFormat('dddd, D MMMM Y');
         $navItems = [
             ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'staff.dashboard', 'patterns' => ['staff.dashboard*']],
-            ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.dashboard', 'patterns' => ['staff.circulation*']],
+            ['label' => 'Tasks', 'icon' => 'fa-clipboard-list', 'route' => 'staff.task.index', 'patterns' => ['staff.task*']],
+            ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.circulation.index', 'patterns' => ['staff.circulation*']],
             ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.biblio.index', 'patterns' => ['staff.biblio*']],
-            ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.dashboard', 'patterns' => ['staff.members*']],
+            ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.dashboard', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
         ];
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css" rel="stylesheet">
     @stack('styles')
 
     <script>
@@ -36,6 +77,8 @@
             if (collapsed) document.documentElement.classList.add('sidebar-collapsed');
         })();
     </script>
+    @livewireStyles
+    @filamentStyles
 </head>
 <body x-data="staffPortal()" class="antialiased bg-slate-50 font-['Inter']">
 
@@ -57,7 +100,7 @@
         </div>
     </header>
 
-    <div class="lg:flex lg:min-h-screen w-full lg:pt-0 lg:h-screen lg:overflow-hidden">
+    <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
         {{-- Desktop Sidebar - FIXED --}}
         <aside class="hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white/80 shadow-xl transition-all duration-300 lg:w-56 z-40"
                :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'"
@@ -147,9 +190,9 @@
         </header>
 
         {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 lg:h-screen lg:overflow-hidden main-content-wrapper"
+        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper"
              :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
-            <main class="flex-1 w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-0 lg:pb-8 lg:h-screen lg:overflow-y-auto">
+            <main class="flex-1 w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8">
                 @yield('content')
             </main>
         </div>
@@ -179,5 +222,10 @@
         }
     </script>
     @stack('scripts')
+    @livewireScripts
+    @filamentScripts
+
+    {{-- Filament Notifications --}}
+    @livewire('notifications')
 </body>
 </html>

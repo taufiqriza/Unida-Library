@@ -4,9 +4,7 @@
         {{-- Hero Section --}}
         <div class="relative bg-gradient-to-b from-purple-600 via-purple-700 to-purple-800 lg:rounded-2xl lg:overflow-hidden">
             <div class="absolute inset-0 overflow-hidden">
-                @if($thesis->cover_path)
-                    <img src="{{ asset('storage/' . $thesis->cover_path) }}" class="w-full h-full object-cover opacity-20 blur-2xl scale-110">
-                @endif
+                <img src="{{ $thesis->cover_url }}" class="w-full h-full object-cover opacity-20 blur-2xl scale-110">
             </div>
             
             {{-- Back Button (Mobile) --}}
@@ -31,13 +29,7 @@
                 <div class="flex flex-col items-center lg:flex-row lg:items-end gap-4 lg:gap-8">
                     <div class="w-40 lg:w-52 flex-shrink-0">
                         <div class="aspect-[3/4] bg-white rounded-xl shadow-2xl overflow-hidden ring-4 ring-white/20">
-                            @if($thesis->cover_path)
-                                <img src="{{ asset('storage/' . $thesis->cover_path) }}" alt="{{ $thesis->title }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-                                    <i class="fas fa-graduation-cap text-5xl text-purple-300"></i>
-                                </div>
-                            @endif
+                            <img src="{{ $thesis->cover_url }}" alt="{{ $thesis->title }}" class="w-full h-full object-cover">
                         </div>
                     </div>
                     
@@ -584,13 +576,7 @@
                     @foreach($relatedTheses as $related)
                     <a href="{{ route('opac.ethesis.show', $related->id) }}" class="flex-shrink-0 w-32 lg:w-40 group">
                         <div class="aspect-[3/4] bg-white rounded-xl shadow-lg overflow-hidden mb-2">
-                            @if($related->cover_path)
-                                <img src="{{ asset('storage/' . $related->cover_path) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            @else
-                                <div class="w-full h-full bg-gradient-to-br from-purple-100 to-purple-50 flex items-center justify-center">
-                                    <i class="fas fa-graduation-cap text-2xl text-purple-300"></i>
-                                </div>
-                            @endif
+                            <img src="{{ $related->cover_url }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
                         <h3 class="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-purple-600 transition">{{ $related->title }}</h3>
                         <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ $related->author }}</p>

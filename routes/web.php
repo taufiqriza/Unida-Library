@@ -16,6 +16,8 @@ Route::get('/catalog/{id}', [OpacController::class, 'catalogShow'])->name('opac.
 Route::get('/ebook/{id}', [OpacController::class, 'ebookShow'])->name('opac.ebook.show');
 Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');
 Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
+Route::get('/journals', [\App\Http\Controllers\Opac\JournalController::class, 'index'])->name('opac.journals.index');
+Route::get('/journals/{article}', [\App\Http\Controllers\Opac\JournalController::class, 'show'])->name('opac.journals.show');
 Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
 
 // Panduan Pages

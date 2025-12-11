@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-gray-50" x-data="{ showSubjectModal: false }">
     {{-- Background Pattern --}}
-    <div class="fixed inset-0 opacity-[0.03] pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    <div class="fixed inset-0 opacity-[0.03] pointer-events-none z-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
     {{-- Search Header with Gradient --}}
-    <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
+    <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden z-10">
         {{-- Decorative elements --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
@@ -53,6 +53,7 @@
                         'book' => ['icon' => 'fa-book', 'label' => 'Buku'],
                         'ebook' => ['icon' => 'fa-file-pdf', 'label' => 'E-Book'],
                         'ethesis' => ['icon' => 'fa-graduation-cap', 'label' => 'E-Thesis'],
+                        'journal' => ['icon' => 'fa-file-lines', 'label' => 'Jurnal'],
                         'news' => ['icon' => 'fa-newspaper', 'label' => 'Berita'],
                     ];
                 @endphp
@@ -76,7 +77,7 @@
     </div>
 
     {{-- Main Content --}}
-    <div class="max-w-7xl mx-auto px-4 py-6 lg:py-8">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 py-6 lg:py-8">
         <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
             
             {{-- Sidebar Filters --}}
@@ -201,6 +202,24 @@
                                         </button>
                                     @endforeach
                                 </div>
+                            </div>
+                            @endif
+
+                            {{-- Journal Source Filter --}}
+                            @if($resourceType === 'all' || $resourceType === 'journal')
+                            <div class="filter-section">
+                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
+                                    <span class="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-file-lines text-indigo-500 text-xs"></i>
+                                    </span>
+                                    Sumber Jurnal
+                                </label>
+                                <select wire:model.live="journalCode" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                    <option value="">Semua Jurnal</option>
+                                    @foreach($this->journalSources as $source)
+                                        <option value="{{ $source->code }}">{{ $source->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             @endif
 
@@ -358,6 +377,12 @@
                                 </span>
                                 <span class="font-bold">{{ number_format($counts['news']) }}</span>
                             </div>
+                            <div class="flex items-center justify-between p-2 bg-white/10 rounded-lg">
+                                <span class="flex items-center gap-2 text-sm text-primary-100">
+                                    <i class="fas fa-file-lines w-4"></i> Jurnal
+                                </span>
+                                <span class="font-bold">{{ number_format($counts['journal']) }}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -476,6 +501,14 @@
                             <button wire:click="$set('yearFrom', null); $set('yearTo', null)" class="hover:text-green-900"><i class="fas fa-times"></i></button>
                         </span>
                     @endif
+
+                    @if($journalCode)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full">
+                            <i class="fas fa-file-lines"></i>
+                            {{ $this->journalSources->firstWhere('code', $journalCode)?->name }}
+                            <button wire:click="$set('journalCode', null)" class="hover:text-indigo-900"><i class="fas fa-times"></i></button>
+                        </span>
+                    @endif
                     
                     <button wire:click="clearAllFilters" class="text-xs text-gray-500 hover:text-red-600 font-medium ml-auto">
                         Hapus semua
@@ -484,7 +517,7 @@
                 @endif
 
                 {{-- Loading State --}}
-                <div wire:loading.flex wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy" class="items-center justify-center py-16">
+                <div wire:loading.flex wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy, journalCode" class="items-center justify-center py-16">
                     <div class="text-center">
                         <div class="w-12 h-12 border-3 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                         <p class="text-sm text-gray-500">Mencari koleksi...</p>
@@ -492,13 +525,13 @@
                 </div>
 
                 {{-- Results --}}
-                <div wire:loading.remove wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy">
+                <div wire:loading.remove wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy, journalCode">
                     @if(count($results) > 0)
                         @if($viewMode === 'grid')
                         {{-- Grid View --}}
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-primary-200 transition-all duration-300 hover:-translate-y-1">
+                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-primary-200 transition-all duration-300 hover:-translate-y-1">
                                     {{-- Cover --}}
                                     <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden">
                                         @if($item['cover'])
@@ -553,7 +586,7 @@
                         {{-- List View --}}
                         <div class="space-y-3">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" class="group flex gap-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg border border-gray-100 hover:border-primary-200 transition-all duration-300">
+                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group flex gap-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg border border-gray-100 hover:border-primary-200 transition-all duration-300">
                                     {{-- Cover --}}
                                     <div class="w-20 h-28 flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl overflow-hidden">
                                         @if($item['cover'])
@@ -593,7 +626,7 @@
                                             <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $item['description'] }}</p>
                                         @endif
                                         
-                                        <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                                        <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-400">
                                             @if($item['year'])
                                                 <span><i class="fas fa-calendar-alt mr-1"></i>{{ $item['year'] }}</span>
                                             @endif
@@ -602,6 +635,12 @@
                                             @endif
                                             @if(isset($item['meta']['isbn']))
                                                 <span><i class="fas fa-barcode mr-1"></i>{{ $item['meta']['isbn'] }}</span>
+                                            @endif
+                                            @if(isset($item['meta']['journal']))
+                                                <span class="text-purple-500"><i class="fas fa-book-open mr-1"></i>{{ $item['meta']['journal'] }}</span>
+                                            @endif
+                                            @if(isset($item['external']) && $item['external'])
+                                                <span class="text-blue-500"><i class="fas fa-external-link-alt mr-1"></i>Link Eksternal</span>
                                             @endif
                                         </div>
                                     </div>
@@ -612,6 +651,65 @@
                                     </div>
                                 </a>
                             @endforeach
+                        </div>
+                        @endif
+                        
+                        {{-- Pagination --}}
+                        @if($this->totalPages > 1)
+                        <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+                            <div class="text-sm text-gray-500">
+                                Halaman {{ $page }} dari {{ $this->totalPages }}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button 
+                                    wire:click="previousPage"
+                                    {{ $page <= 1 ? 'disabled' : '' }}
+                                    class="px-4 py-2 text-sm font-medium rounded-xl transition flex items-center gap-2
+                                        {{ $page <= 1 
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
+                                >
+                                    <i class="fas fa-chevron-left text-xs"></i>
+                                    <span class="hidden sm:inline">Sebelumnya</span>
+                                </button>
+                                
+                                {{-- Page Numbers --}}
+                                <div class="hidden sm:flex items-center gap-1">
+                                    @php
+                                        $start = max(1, $page - 2);
+                                        $end = min($this->totalPages, $page + 2);
+                                    @endphp
+                                    @if($start > 1)
+                                        <button wire:click="gotoPage(1)" class="w-10 h-10 text-sm rounded-xl hover:bg-gray-100">1</button>
+                                        @if($start > 2)<span class="px-1 text-gray-400">...</span>@endif
+                                    @endif
+                                    @for($i = $start; $i <= $end; $i++)
+                                        <button 
+                                            wire:click="gotoPage({{ $i }})"
+                                            class="w-10 h-10 text-sm rounded-xl transition
+                                                {{ $i === $page 
+                                                    ? 'bg-primary-600 text-white' 
+                                                    : 'hover:bg-gray-100' }}"
+                                        >{{ $i }}</button>
+                                    @endfor
+                                    @if($end < $this->totalPages)
+                                        @if($end < $this->totalPages - 1)<span class="px-1 text-gray-400">...</span>@endif
+                                        <button wire:click="gotoPage({{ $this->totalPages }})" class="w-10 h-10 text-sm rounded-xl hover:bg-gray-100">{{ $this->totalPages }}</button>
+                                    @endif
+                                </div>
+                                
+                                <button 
+                                    wire:click="nextPage"
+                                    {{ $page >= $this->totalPages ? 'disabled' : '' }}
+                                    class="px-4 py-2 text-sm font-medium rounded-xl transition flex items-center gap-2
+                                        {{ $page >= $this->totalPages 
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
+                                >
+                                    <span class="hidden sm:inline">Selanjutnya</span>
+                                    <i class="fas fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
                         </div>
                         @endif
                     @else

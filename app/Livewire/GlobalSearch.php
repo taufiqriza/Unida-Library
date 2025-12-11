@@ -11,13 +11,12 @@ use App\Models\Ethesis;
 use App\Models\Faculty;
 use App\Models\News;
 use App\Models\Subject;
+use App\Models\JournalSource;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Illuminate\Support\Collection;
 
 class GlobalSearch extends Component
 {
-    use WithPagination;
 
     // Search
     public string $query = '';
@@ -35,10 +34,15 @@ class GlobalSearch extends Component
     public ?int $yearFrom = null;
     public ?int $yearTo = null;
     public string $thesisType = '';
+    public ?string $journalCode = null;
     
     // Sort & View
     public string $sortBy = 'relevance';
     public string $viewMode = 'grid';
+    
+    // Pagination
+    public int $page = 1;
+    public int $perPage = 12;
     
     // UI State
     public bool $showMobileFilters = false;
@@ -48,6 +52,7 @@ class GlobalSearch extends Component
         'query' => ['as' => 'q', 'except' => ''],
         'resourceType' => ['as' => 'type', 'except' => 'all'],
         'branchId' => ['as' => 'branch', 'except' => null],
+        'journalCode' => ['as' => 'journal', 'except' => null],
         'collectionTypeId' => ['as' => 'collection', 'except' => null],
         'facultyId' => ['as' => 'faculty', 'except' => null],
         'departmentId' => ['as' => 'dept', 'except' => null],
@@ -56,6 +61,7 @@ class GlobalSearch extends Component
         'yearTo' => ['as' => 'to', 'except' => null],
         'thesisType' => ['as' => 'thesis', 'except' => ''],
         'sortBy' => ['as' => 'sort', 'except' => 'relevance'],
+        'page' => ['except' => 1],
     ];
 
     protected $listeners = ['search' => 'performSearch'];
@@ -68,7 +74,7 @@ class GlobalSearch extends Component
     public function updatingQuery($value)
     {
         $this->query = $this->sanitizeInput($value);
-        $this->resetPage();
+        $this->page = 1;
     }
 
     /**
@@ -103,13 +109,13 @@ class GlobalSearch extends Component
     public function updatedFacultyId()
     {
         $this->departmentId = null;
-        $this->resetPage();
+        $this->page = 1;
     }
 
     public function setResourceType(string $type)
     {
         $this->resourceType = $type;
-        $this->resetPage();
+        $this->page = 1;
     }
 
     public function clearAllFilters()
@@ -117,9 +123,9 @@ class GlobalSearch extends Component
         $this->reset([
             'branchId', 'selectedSubjects', 'collectionTypeId', 
             'facultyId', 'departmentId', 'language', 
-            'yearFrom', 'yearTo', 'thesisType', 'sortBy'
+            'yearFrom', 'yearTo', 'thesisType', 'sortBy', 'journalCode'
         ]);
-        $this->resetPage();
+        $this->page = 1;
     }
 
     public function toggleSubject(int $subjectId)
@@ -129,13 +135,32 @@ class GlobalSearch extends Component
         } else {
             $this->selectedSubjects[] = $subjectId;
         }
-        $this->resetPage();
+        $this->page = 1;
     }
 
     public function removeSubject(int $subjectId)
     {
         $this->selectedSubjects = array_diff($this->selectedSubjects, [$subjectId]);
-        $this->resetPage();
+        $this->page = 1;
+    }
+
+    public function previousPage()
+    {
+        if ($this->page > 1) {
+            $this->page--;
+        }
+    }
+
+    public function nextPage()
+    {
+        if ($this->page < $this->totalPages) {
+            $this->page++;
+        }
+    }
+
+    public function gotoPage(int $page)
+    {
+        $this->page = max(1, min($page, $this->totalPages));
     }
 
     // Computed: Results
@@ -159,8 +184,23 @@ class GlobalSearch extends Component
             $results = $results->merge($this->searchNews());
         }
 
-        // Apply sorting
-        return $this->applySorting($results);
+        if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
+            $results = $results->merge($this->searchJournals());
+        }
+
+        // Apply sorting then paginate
+        $sorted = $this->applySorting($results);
+        return $sorted->slice(($this->page - 1) * $this->perPage, $this->perPage)->values();
+    }
+
+    public function getTotalResultsProperty(): int
+    {
+        return $this->counts[$this->resourceType] ?? 0;
+    }
+
+    public function getTotalPagesProperty(): int
+    {
+        return max(1, ceil($this->totalResults / $this->perPage));
     }
 
     protected function searchBooks(): Collection
@@ -213,7 +253,7 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->limit(50)->get()->map(fn($book) => [
+        return $query->limit(100)->get()->map(fn($book) => [
             'type' => 'book',
             'id' => $book->id,
             'title' => $book->title,
@@ -257,7 +297,7 @@ class GlobalSearch extends Component
             $query->where('language', $this->language);
         }
 
-        return $query->limit(50)->get()->map(fn($ebook) => [
+        return $query->limit(100)->get()->map(fn($ebook) => [
             'type' => 'ebook',
             'id' => $ebook->id,
             'title' => $ebook->title,
@@ -313,15 +353,15 @@ class GlobalSearch extends Component
             $query->where('year', '<=', $this->yearTo);
         }
 
-        return $query->limit(50)->get()->map(fn($thesis) => [
+        return $query->limit(100)->get()->map(fn($thesis) => [
             'type' => 'ethesis',
             'id' => $thesis->id,
             'title' => $thesis->title,
             'author' => $thesis->author,
-            'cover' => $thesis->cover_path ? asset('storage/' . $thesis->cover_path) : null,
+            'cover' => $thesis->cover_url,
             'year' => $thesis->year,
-            'badge' => $thesis->getTypeLabel(),
-            'badgeColor' => 'purple',
+            'badge' => $thesis->source_type === 'repo' ? 'Repo' : $thesis->getTypeLabel(),
+            'badgeColor' => $thesis->source_type === 'repo' ? 'indigo' : 'purple',
             'icon' => 'fa-graduation-cap',
             'url' => route('opac.ethesis.show', $thesis->id),
             'description' => $thesis->abstract ? \Str::limit(strip_tags($thesis->abstract), 120) : null,
@@ -329,6 +369,7 @@ class GlobalSearch extends Component
                 'department' => $thesis->department?->name,
                 'faculty' => $thesis->department?->faculty?->name,
                 'nim' => $thesis->nim,
+                'source' => $thesis->source_type,
             ],
         ]);
     }
@@ -355,7 +396,7 @@ class GlobalSearch extends Component
             $query->whereYear('published_at', '<=', $this->yearTo);
         }
 
-        return $query->limit(20)->get()->map(fn($news) => [
+        return $query->limit(50)->get()->map(fn($news) => [
             'type' => 'news',
             'id' => $news->id,
             'title' => $news->title,
@@ -369,6 +410,51 @@ class GlobalSearch extends Component
             'description' => $news->excerpt ? \Str::limit(strip_tags($news->excerpt), 120) : null,
             'meta' => [
                 'views' => $news->views,
+            ],
+        ]);
+    }
+
+    protected function searchJournals(): Collection
+    {
+        $query = \App\Models\JournalArticle::query()->with('source');
+
+        if ($this->query) {
+            $searchTerm = $this->query;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('abstract', 'like', "%{$searchTerm}%")
+                  ->orWhereRaw("JSON_SEARCH(authors, 'one', ?) IS NOT NULL", ["%{$searchTerm}%"]);
+            });
+        }
+
+        if ($this->journalCode) {
+            $query->whereHas('source', fn($q) => $q->where('code', $this->journalCode));
+        }
+
+        if ($this->yearFrom) {
+            $query->where('publish_year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('publish_year', '<=', $this->yearTo);
+        }
+
+        return $query->orderByDesc('published_at')->limit(100)->get()->map(fn($article) => [
+            'type' => 'journal',
+            'id' => $article->id,
+            'title' => $article->title,
+            'author' => $article->authors_string ?: '-',
+            'cover' => $article->cover_url,
+            'year' => $article->publish_year,
+            'publisher' => $article->journal_name,
+            'badge' => $article->source_type === 'repo' ? 'Repo' : ($article->source?->name ?? 'Jurnal'),
+            'badgeColor' => $article->source_type === 'repo' ? 'indigo' : 'purple',
+            'icon' => 'fa-file-lines',
+            'url' => route('opac.journals.show', $article->id),
+            'description' => $article->abstract ? \Str::limit(strip_tags($article->abstract), 150) : null,
+            'meta' => [
+                'journal' => $article->journal_name,
+                'doi' => $article->doi,
+                'source' => $article->source_type,
             ],
         ]);
     }
@@ -391,11 +477,13 @@ class GlobalSearch extends Component
         
         return [
             'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
-                     $this->getEthesisCount($baseQuery) + $this->getNewsCount($baseQuery),
+                     $this->getEthesisCount($baseQuery) + $this->getNewsCount($baseQuery) +
+                     $this->getJournalCount($baseQuery),
             'book' => $this->getBookCount($baseQuery),
             'ebook' => $this->getEbookCount($baseQuery),
             'ethesis' => $this->getEthesisCount($baseQuery),
             'news' => $this->getNewsCount($baseQuery),
+            'journal' => $this->getJournalCount($baseQuery),
         ];
     }
 
@@ -434,6 +522,16 @@ class GlobalSearch extends Component
         $query = News::published();
         if ($search) {
             $query->where('title', 'like', "%{$search}%");
+        }
+        return $query->count();
+    }
+
+    protected function getJournalCount(?string $search): int
+    {
+        $query = \App\Models\JournalArticle::query();
+        if ($search) {
+            $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
+                ->orWhere('abstract', 'like', "%{$search}%"));
         }
         return $query->count();
     }
@@ -486,6 +584,11 @@ class GlobalSearch extends Component
         ];
     }
 
+    public function getJournalSourcesProperty()
+    {
+        return JournalSource::where('is_active', true)->orderBy('name')->get();
+    }
+
     public function getActiveFiltersCountProperty(): int
     {
         $count = 0;
@@ -498,6 +601,7 @@ class GlobalSearch extends Component
         if ($this->yearFrom) $count++;
         if ($this->yearTo) $count++;
         if ($this->thesisType) $count++;
+        if ($this->journalCode) $count++;
         return $count;
     }
 
