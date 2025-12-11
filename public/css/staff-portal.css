@@ -1,15 +1,15 @@
 /**
- * Staff Portal Styles
+ * Staff Portal Styles - Desktop Mode Precision
  */
 
 [x-cloak] { display: none !important; }
 
 /* ============================================ */
-/* DESKTOP MODE - PRECISE SPACING */
+/* DESKTOP MODE (≥1024px) */
 /* ============================================ */
 
 @media (min-width: 1024px) {
-    /* Fix double scrolling - hide body overflow on desktop */
+    /* Fix double scrolling */
     body {
         overflow: hidden !important;
         height: 100vh !important;
@@ -17,7 +17,7 @@
         padding-bottom: 0 !important;
     }
 
-    /* Main element positioning - account for fixed header (72px) */
+    /* Main element - account for fixed header 72px */
     main {
         margin-top: 72px !important;
         height: calc(100vh - 72px) !important;
@@ -25,51 +25,42 @@
         overflow-x: hidden !important;
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
     }
 
-    /* Remove any extra padding from parent */
-    main > div:first-child {
-        margin-top: 0 !important;
-    }
-
-    /* Sidebar transitions */
+    /* Sidebar fixed */
     aside {
         transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         will-change: width;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        height: 100vh !important;
-        overflow-y: auto !important;
-        z-index: 40 !important;
     }
 
-    /* Sidebar expanded state */
-    html:not(.sidebar-collapsed) aside {
+    html:not(.sidebar-collapsed) aside.lg\:flex {
         width: 224px !important;
     }
 
-    /* Sidebar collapsed state */
-    html.sidebar-collapsed aside {
+    html.sidebar-collapsed aside.lg\:flex {
         width: 80px !important;
     }
 
-    /* Header positioning */
+    /* Header fixed positioning */
     header.desktop-header {
-        position: fixed !important;
-        top: 0 !important;
-        height: 72px !important;
-        z-index: 30 !important;
         transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: left, width;
     }
 
-    /* Main content wrapper */
+    html:not(.sidebar-collapsed) header.desktop-header {
+        left: 224px !important;
+        width: calc(100vw - 224px) !important;
+    }
+
+    html.sidebar-collapsed header.desktop-header {
+        left: 80px !important;
+        width: calc(100vw - 80px) !important;
+    }
+
+    /* Main content wrapper margin */
     .main-content-wrapper {
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        height: 100vh !important;
-        overflow: hidden !important;
+        will-change: margin-left;
     }
 
     html:not(.sidebar-collapsed) .main-content-wrapper {
@@ -80,56 +71,38 @@
         margin-left: 80px !important;
     }
 
-    /* Custom scrollbar for main */
-    main::-webkit-scrollbar {
-        width: 8px;
-    }
-    main::-webkit-scrollbar-track {
-        background: #f1f5f9;
-    }
-    main::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-    }
-    main::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
+    /* Custom scrollbar - main */
+    main::-webkit-scrollbar { width: 8px; }
+    main::-webkit-scrollbar-track { background: #f1f5f9; }
+    main::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    main::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* Custom scrollbar for sidebar */
-    aside::-webkit-scrollbar {
-        width: 6px;
-    }
-    aside::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    aside::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 3px;
-    }
+    /* Custom scrollbar - sidebar */
+    aside::-webkit-scrollbar { width: 6px; }
+    aside::-webkit-scrollbar-track { background: transparent; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
 
     /* GPU acceleration */
-    aside, header, .main-content-wrapper {
+    aside, header.desktop-header, .main-content-wrapper {
         backface-visibility: hidden;
         transform: translateZ(0);
         -webkit-font-smoothing: antialiased;
     }
 
     /* Hide mobile elements */
-    .mobile-header,
-    .mobile-nav {
+    .mobile-header, .mobile-nav {
         display: none !important;
     }
 }
 
 /* ============================================ */
-/* MOBILE MODE */
+/* MOBILE MODE (<1024px) */
 /* ============================================ */
 
 @media (max-width: 1023px) {
     main {
         padding-top: 72px !important;
         padding-bottom: 80px !important;
-        min-height: 100vh;
     }
 
     .desktop-header {
@@ -138,24 +111,9 @@
 }
 
 /* ============================================ */
-/* COMPONENT STYLES */
+/* COMPONENTS */
 /* ============================================ */
 
-/* Stats Card */
-.stat-card {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.25rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s ease;
-}
-.stat-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-}
-
-/* Gradient backgrounds */
 .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
 .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
 .gradient-amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
@@ -163,27 +121,6 @@
 .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
 .gradient-indigo { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
 
-/* Section card */
-.section-card {
-    background: white;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-}
-.section-header {
-    padding: 0.875rem 1rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    color: #1e293b;
-}
-.section-header i { color: #3b82f6; }
-
-/* Badge */
 .badge {
     display: inline-flex;
     align-items: center;

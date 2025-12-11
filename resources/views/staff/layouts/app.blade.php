@@ -30,7 +30,6 @@
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
     @stack('styles')
 
-    <!-- Prevent sidebar flicker -->
     <script>
         (function() {
             const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
@@ -52,29 +51,34 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center text-white">
-                <i class="fas fa-bell"></i>
-            </button>
             <div class="w-9 h-9 rounded-full bg-white/20 overflow-hidden border-2 border-white/30">
                 <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" class="w-full h-full object-cover">
             </div>
         </div>
     </header>
 
-    <div class="lg:flex lg:h-screen lg:overflow-hidden">
-        {{-- Desktop Sidebar --}}
-        <aside class="hidden lg:flex lg:flex-col bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800 text-white/80 shadow-xl"
-               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'">
+    <div class="lg:flex lg:min-h-screen w-full lg:pt-0 lg:h-screen lg:overflow-hidden">
+        {{-- Desktop Sidebar - FIXED --}}
+        <aside class="hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800 text-white/80 shadow-xl transition-all duration-300 lg:w-56 z-40"
+               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'"
+               x-cloak>
             
             {{-- Logo --}}
-            <div class="p-4 border-b border-white/10 h-[72px] flex items-center">
-                <div class="flex items-center gap-3 transition-all duration-300" :class="sidebarCollapsed ? 'justify-center w-full' : ''">
+            <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
+                <div class="flex items-center gap-3 transition-all duration-300"
+                     :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
                     <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-book-open text-white"></i>
                     </div>
-                    <div x-show="!sidebarCollapsed" x-transition.opacity class="leading-tight">
+                    <div class="leading-tight whitespace-nowrap">
                         <p class="text-[10px] uppercase tracking-widest text-white/60 font-semibold">PERPUSTAKAAN</p>
                         <p class="text-sm font-bold text-white">Staff Portal</p>
+                    </div>
+                </div>
+                <div class="transition-all duration-300 mx-auto"
+                     :class="sidebarCollapsed ? 'opacity-100 relative' : 'opacity-0 absolute pointer-events-none'">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-book-open text-white"></i>
                     </div>
                 </div>
             </div>
@@ -92,60 +96,63 @@
                         <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-white/20' : 'bg-white/10' }} flex-shrink-0">
                             <i class="fas {{ $item['icon'] }} text-sm"></i>
                         </div>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity class="text-sm font-medium">{{ $item['label'] }}</span>
+                        <span class="text-sm font-medium transition-all duration-300"
+                              :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">{{ $item['label'] }}</span>
                     </a>
                 @endforeach
             </nav>
 
             {{-- User Info --}}
             <div class="border-t border-white/10 p-4">
-                <div x-show="!sidebarCollapsed" x-transition.opacity class="bg-white/10 rounded-xl p-3 mb-3">
+                <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
+                     :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
                     <p class="text-xs text-white/60">{{ ucfirst($user->role) }}</p>
                     <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
                 </div>
                 <form action="{{ route('filament.admin.auth.logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-white transition-all"
-                            :class="sidebarCollapsed ? 'px-0' : ''">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-white transition-all">
                         <i class="fas fa-sign-out-alt"></i>
-                        <span x-show="!sidebarCollapsed" x-transition.opacity class="text-sm font-medium">Logout</span>
+                        <span class="text-sm font-medium transition-all duration-300"
+                              :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
                     </button>
                 </form>
             </div>
         </aside>
 
-        {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col bg-slate-50/70 lg:h-screen lg:overflow-hidden main-content-wrapper">
-            {{-- Desktop Header --}}
-            <header class="hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm h-[72px] flex-shrink-0">
-                <div class="flex items-center gap-4">
-                    <button @click="toggleSidebar()" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400 flex items-center justify-center transition-all">
-                        <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
-                    </button>
-                    <div class="h-8 w-px bg-slate-200"></div>
-                    <div>
-                        <h2 class="text-lg font-semibold leading-tight text-slate-900">@yield('title', 'Dashboard')</h2>
-                        <p class="text-xs text-slate-500">{{ $currentDate }}</p>
-                    </div>
+        {{-- Desktop Header - FIXED --}}
+        <header class="desktop-header hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm fixed top-0 z-30 h-[72px]"
+                :class="sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]'">
+            <div class="flex items-center gap-4">
+                <button @click="toggleSidebar()" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400 flex items-center justify-center transition-all">
+                    <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
+                </button>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <div>
+                    <h2 class="text-lg font-semibold leading-tight text-slate-900">@yield('title', 'Dashboard')</h2>
+                    <p class="text-xs text-slate-500">{{ $currentDate }}</p>
                 </div>
-                <div class="flex items-center gap-4">
-                    <button class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold text-sm shadow hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                        <i class="fas fa-qrcode"></i>
-                        <span>Scan</span>
-                    </button>
-                    <div class="h-8 w-px bg-slate-200"></div>
-                    <div class="text-right">
-                        <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
-                        <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" class="w-full h-full object-cover">
-                    </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold text-sm shadow hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Scan</span>
+                </button>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
+                    <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
                 </div>
-            </header>
+                <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </header>
 
-            {{-- Main Content --}}
-            <main class="flex-1 w-full lg:overflow-y-auto">
+        {{-- Main Content Wrapper --}}
+        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 lg:h-screen lg:overflow-hidden main-content-wrapper"
+             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
+            <main class="flex-1 w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-0 lg:pb-8 lg:h-screen lg:overflow-y-auto">
                 @yield('content')
             </main>
         </div>
