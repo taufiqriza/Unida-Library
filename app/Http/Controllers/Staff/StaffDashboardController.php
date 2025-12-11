@@ -12,10 +12,15 @@ use Illuminate\Support\Carbon;
 
 class StaffDashboardController extends Controller
 {
-    public function index()
+    protected function getBranchId()
     {
         $user = auth()->user();
-        $branchId = $user->branch_id ?? session('staff_branch_id') ?? 1;
+        return $user->branch_id ?? session('staff_branch_id') ?? 1;
+    }
+
+    public function index()
+    {
+        $branchId = $this->getBranchId();
 
         $stats = [
             'loans_today' => Loan::where('branch_id', $branchId)->whereDate('loan_date', today())->count(),
@@ -25,6 +30,7 @@ class StaffDashboardController extends Controller
             'total_books' => Book::where('branch_id', $branchId)->count(),
             'total_items' => Item::where('branch_id', $branchId)->count(),
             'total_members' => Member::where('branch_id', $branchId)->count(),
+            'active_loans' => Loan::where('branch_id', $branchId)->where('is_returned', false)->count(),
         ];
 
         $recentLoans = Loan::with(['member', 'item.book'])
@@ -41,6 +47,47 @@ class StaffDashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('staff.dashboard.index', compact('stats', 'recentLoans', 'overdueLoans'));
+        $chartData = $this->getChartData($branchId);
+
+        return view('staff.dashboard.index', compact('stats', 'recentLoans', 'overdueLoans', 'chartData'));
+    }
+
+    protected function getChartData($branchId): array
+    {
+        // 7 Days Loan Chart
+        $dailyLabels = [];
+        $dailyLoans = [];
+        $dailyReturns = [];
+
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $dailyLabels[] = $date->format('d M');
+            $dailyLoans[] = Loan::where('branch_id', $branchId)->whereDate('loan_date', $date)->count();
+            $dailyReturns[] = Loan::where('branch_id', $branchId)->whereDate('return_date', $date)->count();
+        }
+
+        // Monthly Loan Chart (current year)
+        $monthlyLabels = [];
+        $monthlyLoans = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $monthlyLabels[] = Carbon::create(null, $i, 1)->format('M');
+            $monthlyLoans[] = Loan::where('branch_id', $branchId)
+                ->whereYear('loan_date', now()->year)
+                ->whereMonth('loan_date', $i)
+                ->count();
+        }
+
+        return [
+            'daily' => [
+                'labels' => $dailyLabels,
+                'loans' => $dailyLoans,
+                'returns' => $dailyReturns,
+            ],
+            'monthly' => [
+                'labels' => $monthlyLabels,
+                'totals' => $monthlyLoans,
+            ],
+        ];
     }
 }
