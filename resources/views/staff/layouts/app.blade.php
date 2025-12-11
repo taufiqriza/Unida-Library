@@ -134,10 +134,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <button class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold text-sm shadow hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Scan</span>
-                </button>
+                @include('staff.components.quick-actions')
                 <div class="h-8 w-px bg-slate-200"></div>
                 <div class="text-right">
                     <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>

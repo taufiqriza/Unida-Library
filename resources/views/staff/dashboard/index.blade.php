@@ -8,13 +8,8 @@
     .stat-card-premium:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15); }
     .counter-value { animation: countUp 0.8s ease-out forwards; }
     @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .progress-animated { animation: progressFill 1s ease-out forwards; }
-    @keyframes progressFill { from { width: 0; } }
     .pulse-ring::before { content: ''; position: absolute; inset: -4px; border-radius: inherit; border: 2px solid currentColor; opacity: 0.3; animation: pulse-ring 2s ease-out infinite; }
     @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.3; } 100% { transform: scale(1.1); opacity: 0; } }
-    .quick-action-premium { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .quick-action-premium:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15); }
-    .quick-action-premium:hover .action-icon { transform: scale(1.1); }
     .table-row-premium { transition: all 0.2s ease; }
     .table-row-premium:hover { background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%); }
     .chart-container { position: relative; height: 220px; width: 100%; }
@@ -45,10 +40,6 @@
                 </p>
             </div>
         </div>
-        <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25">
-            <i class="fas fa-qrcode"></i>
-            <span>Mulai Sirkulasi</span>
-        </a>
     </div>
 
     <!-- Stats Cards -->
@@ -131,31 +122,6 @@
             <div class="p-5">
                 <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-            <i class="fas fa-bolt text-amber-500"></i>
-            <h3 class="font-bold text-gray-900">Aksi Cepat</h3>
-        </div>
-        <div class="p-4 grid grid-cols-3 lg:grid-cols-6 gap-3">
-            @foreach([
-                ['icon' => 'fa-qrcode', 'label' => 'Scan Pinjam', 'gradient' => 'from-blue-500 to-indigo-600', 'shadow' => 'blue'],
-                ['icon' => 'fa-rotate-left', 'label' => 'Scan Kembali', 'gradient' => 'from-emerald-500 to-teal-600', 'shadow' => 'emerald'],
-                ['icon' => 'fa-user-plus', 'label' => 'Member Baru', 'gradient' => 'from-purple-500 to-pink-600', 'shadow' => 'purple'],
-                ['icon' => 'fa-search', 'label' => 'Cari Buku', 'gradient' => 'from-amber-400 to-orange-500', 'shadow' => 'amber'],
-                ['icon' => 'fa-id-card', 'label' => 'Cetak Kartu', 'gradient' => 'from-indigo-500 to-blue-600', 'shadow' => 'indigo'],
-                ['icon' => 'fa-receipt', 'label' => 'Bayar Denda', 'gradient' => 'from-rose-500 to-red-600', 'shadow' => 'rose'],
-            ] as $action)
-            <a href="#" class="quick-action-premium flex flex-col items-center gap-3 p-4 bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-gray-200 hover:border-{{ $action['shadow'] }}-300">
-                <div class="action-icon w-12 h-12 bg-gradient-to-br {{ $action['gradient'] }} rounded-xl flex items-center justify-center text-white shadow-lg shadow-{{ $action['shadow'] }}-500/30 transition-transform">
-                    <i class="fas {{ $action['icon'] }} text-lg"></i>
-                </div>
-                <span class="text-xs font-semibold text-gray-700 text-center">{{ $action['label'] }}</span>
-            </a>
-            @endforeach
         </div>
     </div>
 
