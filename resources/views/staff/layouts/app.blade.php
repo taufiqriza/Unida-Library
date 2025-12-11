@@ -59,25 +59,25 @@
 
     <div class="lg:flex lg:min-h-screen w-full lg:pt-0 lg:h-screen lg:overflow-hidden">
         {{-- Desktop Sidebar - FIXED --}}
-        <aside class="hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800 text-white/80 shadow-xl transition-all duration-300 lg:w-56 z-40"
+        <aside class="hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white/80 shadow-xl transition-all duration-300 lg:w-56 z-40"
                :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'"
                x-cloak>
             
             {{-- Logo --}}
-            <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
+            <div class="p-4 border-b border-white/5 min-h-[72px] flex items-center transition-all duration-300">
                 <div class="flex items-center gap-3 transition-all duration-300"
                      :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
                         <i class="fas fa-book-open text-white"></i>
                     </div>
                     <div class="leading-tight whitespace-nowrap">
-                        <p class="text-[10px] uppercase tracking-widest text-white/60 font-semibold">PERPUSTAKAAN</p>
+                        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">PERPUSTAKAAN</p>
                         <p class="text-sm font-bold text-white">Staff Portal</p>
                     </div>
                 </div>
                 <div class="transition-all duration-300 mx-auto"
                      :class="sidebarCollapsed ? 'opacity-100 relative' : 'opacity-0 absolute pointer-events-none'">
-                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                         <i class="fas fa-book-open text-white"></i>
                     </div>
                 </div>
@@ -88,12 +88,12 @@
                 @foreach($navItems as $item)
                     @php $active = request()->routeIs($item['patterns']); @endphp
                     <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}"
-                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white' }}"
+                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}"
                        :class="sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5'">
                         @if($active)
-                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-amber-400 to-orange-500 rounded-r-full"></div>
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-r-full"></div>
                         @endif
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-white/20' : 'bg-white/10' }} flex-shrink-0">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25' : 'bg-slate-700/50 text-slate-400 group-hover:text-white' }} flex-shrink-0 transition-all">
                             <i class="fas {{ $item['icon'] }} text-sm"></i>
                         </div>
                         <span class="text-sm font-medium transition-all duration-300"
@@ -103,15 +103,15 @@
             </nav>
 
             {{-- User Info --}}
-            <div class="border-t border-white/10 p-4">
-                <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
+            <div class="border-t border-white/5 p-4">
+                <div class="bg-slate-800/50 rounded-xl p-3 mb-3 transition-all duration-300"
                      :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
-                    <p class="text-xs text-white/60">{{ ucfirst($user->role) }}</p>
+                    <p class="text-xs text-slate-500">{{ ucfirst($user->role) }}</p>
                     <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
                 </div>
                 <form action="{{ route('filament.admin.auth.logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 hover:text-white transition-all">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-all">
                         <i class="fas fa-sign-out-alt"></i>
                         <span class="text-sm font-medium transition-all duration-300"
                               :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
