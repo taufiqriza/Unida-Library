@@ -20,7 +20,7 @@
         $navItems = [
             ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'staff.dashboard', 'patterns' => ['staff.dashboard*']],
             ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.dashboard', 'patterns' => ['staff.circulation*']],
-            ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.dashboard', 'patterns' => ['staff.books*']],
+            ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.biblio.index', 'patterns' => ['staff.biblio*']],
             ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.dashboard', 'patterns' => ['staff.members*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.dashboard', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
