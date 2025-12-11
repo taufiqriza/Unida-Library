@@ -28,6 +28,7 @@
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
+    @stack('styles')
     <script>
         (function() {
             const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
