@@ -1,21 +1,21 @@
 <x-opac.layout title="Cek Plagiasi">
     <div class="min-h-screen bg-gray-50">
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-teal-600 to-emerald-700 text-white">
-            <div class="max-w-3xl mx-auto px-4 py-6">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+            <div class="max-w-5xl mx-auto px-4 py-6">
                 <div class="flex items-center gap-3">
                     <a href="{{ route('opac.member.plagiarism.index') }}" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition">
                         <i class="fas fa-arrow-left"></i>
                     </a>
                     <div>
                         <h1 class="text-xl font-bold">Cek Plagiasi</h1>
-                        <p class="text-teal-200 text-sm">Upload dokumen untuk mengecek tingkat plagiarisme</p>
+                        <p class="text-primary-200 text-sm">Upload dokumen untuk mengecek tingkat plagiarisme</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-3xl mx-auto px-4 py-6">
+        <div class="max-w-5xl mx-auto px-4 py-6">
             {{-- Errors --}}
             @if($errors->any())
             <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-800">

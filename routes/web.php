@@ -43,11 +43,15 @@ Route::middleware('auth:member')->group(function () {
 });
 
 // Member Area (Protected)
-Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(function () {
+Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->prefix('member')->name('opac.member.')->group(function () {
     Route::get('/', [MemberAuthController::class, 'dashboard'])->name('dashboard');
     Route::get('/submissions', fn() => view('opac.member.submissions'))->name('submissions');
     Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
     Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
+    
+    // Settings Profile
+    Route::get('/settings', [\App\Http\Controllers\Opac\MemberSettingsController::class, 'index'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Opac\MemberSettingsController::class, 'update'])->name('settings.update');
     
     // Plagiarism Check
     Route::prefix('plagiarism')->name('plagiarism.')->group(function () {
@@ -65,7 +69,7 @@ Route::middleware('auth:member')->prefix('member')->name('opac.member.')->group(
 Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismController::class, 'verify'])->name('plagiarism.verify');
 
 // Alias for member.dashboard
-Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->middleware('auth:member')->name('member.dashboard');
+Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->name('member.dashboard');
 
 // E-Thesis detail
 Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');

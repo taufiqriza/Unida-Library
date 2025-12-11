@@ -1,53 +1,23 @@
 <div>
     {{-- Hero Header --}}
-    <div class="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 rounded-2xl lg:rounded-3xl p-4 lg:p-8 mb-4 lg:mb-6 overflow-hidden">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 bg-purple-400/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
-        
-        {{-- Back Button --}}
-        <a href="{{ route('opac.member.dashboard') }}" class="relative inline-flex items-center gap-2 text-white/80 hover:text-white text-sm mb-4 transition group">
-            <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-            <span>Kembali ke Dashboard</span>
-        </a>
-        
-        <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <i class="fas fa-file-alt text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl lg:text-3xl font-bold text-white">Submission Saya</h1>
-                        <p class="text-violet-200 text-xs lg:text-sm">Kelola pengajuan tugas akhir Anda</p>
-                    </div>
-                </div>
+    {{-- Stats Cards --}}
+    <div class="grid grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4 lg:mb-6">
+        @foreach([
+            'all' => ['label' => 'Total', 'icon' => 'fa-layer-group', 'color' => 'bg-gray-100 text-gray-600', 'border' => 'border-gray-200'],
+            'draft' => ['label' => 'Draft', 'icon' => 'fa-file', 'color' => 'bg-gray-50 text-gray-500', 'border' => 'border-gray-200'],
+            'submitted' => ['label' => 'Diajukan', 'icon' => 'fa-paper-plane', 'color' => 'bg-blue-50 text-blue-600', 'border' => 'border-blue-200'],
+            'revision_required' => ['label' => 'Revisi', 'icon' => 'fa-edit', 'color' => 'bg-orange-50 text-orange-600', 'border' => 'border-orange-200'],
+            'approved' => ['label' => 'Disetujui', 'icon' => 'fa-check-circle', 'color' => 'bg-emerald-50 text-emerald-600', 'border' => 'border-emerald-200'],
+            'rejected' => ['label' => 'Ditolak', 'icon' => 'fa-times-circle', 'color' => 'bg-red-50 text-red-600', 'border' => 'border-red-200'],
+        ] as $key => $stat)
+        <div class="bg-white rounded-xl border {{ $stat['border'] }} p-3 text-center hover:shadow-md transition cursor-pointer group" wire:click="setFilter('{{ $key }}')">
+            <div class="text-xl lg:text-2xl font-bold text-gray-900 group-hover:scale-110 transition-transform">{{ $counts[$key] ?? 0 }}</div>
+            <div class="text-[10px] lg:text-xs text-gray-500 flex items-center justify-center gap-1.5 mt-1">
+                <i class="fas {{ $stat['icon'] }} {{ Str::after($stat['color'], ' ') }}"></i>
+                <span class="hidden sm:inline">{{ $stat['label'] }}</span>
             </div>
-            <a href="{{ route('opac.member.submit-thesis') }}" class="inline-flex items-center justify-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-white text-violet-700 text-sm lg:text-base font-semibold rounded-xl hover:bg-violet-50 transition shadow-lg shadow-violet-900/20 group">
-                <i class="fas fa-plus group-hover:rotate-90 transition-transform"></i> 
-                <span>Ajukan Baru</span>
-            </a>
         </div>
-
-        {{-- Stats Mini --}}
-        <div class="relative grid grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mt-4 lg:mt-6">
-            @foreach([
-                'all' => ['label' => 'Total', 'icon' => 'fa-layer-group', 'color' => 'white'],
-                'draft' => ['label' => 'Draft', 'icon' => 'fa-file', 'color' => 'gray'],
-                'submitted' => ['label' => 'Diajukan', 'icon' => 'fa-paper-plane', 'color' => 'blue'],
-                'revision_required' => ['label' => 'Revisi', 'icon' => 'fa-edit', 'color' => 'orange'],
-                'approved' => ['label' => 'Disetujui', 'icon' => 'fa-check-circle', 'color' => 'emerald'],
-                'rejected' => ['label' => 'Ditolak', 'icon' => 'fa-times-circle', 'color' => 'red'],
-            ] as $key => $stat)
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg lg:rounded-xl p-2 lg:p-3 text-center hover:bg-white/20 transition cursor-pointer" wire:click="setFilter('{{ $key }}')">
-                <div class="text-lg lg:text-2xl font-bold text-white">{{ $counts[$key] ?? 0 }}</div>
-                <div class="text-[9px] lg:text-[10px] text-violet-200 flex items-center justify-center gap-1">
-                    <i class="fas {{ $stat['icon'] }}"></i>
-                    <span class="hidden sm:inline">{{ $stat['label'] }}</span>
-                </div>
-            </div>
-            @endforeach
-        </div>
+        @endforeach
     </div>
 
     {{-- Flash Messages --}}
@@ -84,7 +54,7 @@
                     wire:click="setFilter('{{ $key }}')"
                     @class([
                         'px-3 lg:px-4 py-2 lg:py-2.5 rounded-lg lg:rounded-xl text-xs lg:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-1.5 lg:gap-2',
-                        'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md shadow-violet-500/30' => $filter === $key,
+                        'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/30' => $filter === $key,
                         'text-gray-600 hover:bg-gray-100' => $filter !== $key,
                     ])
                 >
@@ -140,18 +110,18 @@
     {{-- Submissions List --}}
     <div class="space-y-3 lg:space-y-4">
         @forelse($submissions as $submission)
-            <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-violet-200 transition-all group">
+            <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md hover:border-primary-200 transition-all group">
                 {{-- Main Content --}}
                 <div class="p-3 lg:p-6">
                     <div class="flex items-start gap-3 lg:gap-4">
                         {{-- Cover with Status Indicator --}}
                         <div class="relative flex-shrink-0">
-                            <div class="w-16 h-22 lg:w-24 lg:h-32 bg-gradient-to-br from-violet-100 via-purple-100 to-indigo-100 rounded-lg lg:rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition">
+                            <div class="w-16 h-22 lg:w-24 lg:h-32 bg-gradient-to-br from-primary-50 via-blue-50 to-sky-50 rounded-lg lg:rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition">
                                 @if($submission->cover_file)
                                     <img src="{{ Storage::url($submission->cover_file) }}" alt="" class="w-full h-full object-cover">
                                 @else
                                     <div class="text-center">
-                                        <i class="fas fa-book text-violet-300 text-xl lg:text-3xl"></i>
+                                        <i class="fas fa-book text-primary-300 text-xl lg:text-3xl"></i>
                                     </div>
                                 @endif
                             </div>
@@ -175,7 +145,7 @@
                         <div class="flex-1 min-w-0">
                             {{-- Title & Status --}}
                             <div class="flex items-start justify-between gap-2">
-                                <h3 class="font-bold text-gray-900 text-sm lg:text-lg line-clamp-2 group-hover:text-violet-700 transition">{{ $submission->title }}</h3>
+                                <h3 class="font-bold text-gray-900 text-sm lg:text-lg line-clamp-2 group-hover:text-primary-700 transition">{{ $submission->title }}</h3>
                                 {{-- Status Badge - Desktop --}}
                                 <span @class([
                                     'hidden lg:flex px-3 py-1.5 text-xs font-bold rounded-xl flex-shrink-0 items-center gap-1.5 shadow-sm',
@@ -183,7 +153,7 @@
                                     'bg-blue-100 text-blue-700' => in_array($submission->status, ['submitted', 'under_review']),
                                     'bg-orange-100 text-orange-700' => $submission->status === 'revision_required',
                                     'bg-emerald-100 text-emerald-700' => $submission->status === 'approved',
-                                    'bg-gradient-to-r from-primary-100 to-violet-100 text-primary-700' => $submission->status === 'published',
+                                    'bg-gradient-to-r from-primary-100 to-blue-100 text-primary-700' => $submission->status === 'published',
                                     'bg-red-100 text-red-700' => $submission->status === 'rejected',
                                 ])>
                                     @if($submission->status === 'under_review')
@@ -210,7 +180,7 @@
                                     {{ $submission->status_label }}
                                 </span>
                                 @if($submission->thesis_type)
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 lg:px-2.5 lg:py-1 bg-violet-50 text-violet-700 rounded lg:rounded-lg text-[10px] lg:text-xs font-medium">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 lg:px-2.5 lg:py-1 bg-primary-50 text-primary-700 rounded lg:rounded-lg text-[10px] lg:text-xs font-medium">
                                     <i class="fas {{ $submission->getThesisTypeEnum()?->icon() ?? 'fa-file' }} text-[8px] lg:text-[10px]"></i>
                                     {{ $submission->getTypeDegree() }}
                                 </span>
@@ -240,7 +210,7 @@
                             {{-- Actions --}}
                             <div class="flex items-center gap-1.5 lg:gap-2 mt-3 lg:mt-4 pt-3 lg:pt-4 border-t border-gray-100 flex-wrap">
                                 @if($submission->canEdit())
-                                    <a href="{{ route('opac.member.edit-submission', $submission->id) }}" class="px-2.5 lg:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-[10px] lg:text-xs font-semibold rounded-lg hover:from-violet-700 hover:to-purple-700 transition shadow-sm inline-flex items-center gap-1">
+                                    <a href="{{ route('opac.member.edit-submission', $submission->id) }}" class="px-2.5 lg:px-4 py-1.5 lg:py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] lg:text-xs font-semibold rounded-lg hover:from-primary-700 hover:to-primary-800 transition shadow-sm inline-flex items-center gap-1">
                                         <i class="fas fa-edit"></i> <span class="hidden sm:inline">Edit &</span> Revisi
                                     </a>
                                 @endif
@@ -363,12 +333,12 @@
         @empty
             {{-- Empty State --}}
             <div class="bg-white rounded-2xl lg:rounded-3xl shadow-sm border border-gray-100 p-8 lg:p-12 text-center">
-                <div class="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-br from-violet-100 to-purple-100 rounded-2xl lg:rounded-3xl flex items-center justify-center mx-auto mb-4 lg:mb-6 shadow-inner">
-                    <i class="fas fa-inbox text-2xl lg:text-4xl text-violet-300"></i>
+                <div class="w-16 h-16 lg:w-24 lg:h-24 bg-gradient-to-br from-primary-50 to-blue-50 rounded-2xl lg:rounded-3xl flex items-center justify-center mx-auto mb-4 lg:mb-6 shadow-inner">
+                    <i class="fas fa-inbox text-2xl lg:text-4xl text-primary-300"></i>
                 </div>
                 <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-2">Belum Ada Submission</h3>
                 <p class="text-sm lg:text-base text-gray-500 mb-4 lg:mb-6 max-w-md mx-auto">Mulai ajukan tugas akhir Anda sekarang.</p>
-                <a href="{{ route('opac.member.submit-thesis') }}" class="inline-flex items-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm lg:text-base font-semibold rounded-xl hover:from-violet-700 hover:to-purple-700 transition shadow-lg shadow-violet-500/30">
+                <a href="{{ route('opac.member.submit-thesis') }}" class="inline-flex items-center gap-2 px-4 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm lg:text-base font-semibold rounded-xl hover:from-primary-700 hover:to-primary-800 transition shadow-lg shadow-primary-500/30">
                     <i class="fas fa-plus"></i> Ajukan Tugas Akhir
                 </a>
             </div>

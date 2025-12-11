@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class EnsureStaffAccess
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $user = auth()->user();
+        
+        if (!$user || !in_array($user->role, ['super_admin', 'admin', 'librarian'])) {
+            abort(403, 'Akses ditolak. Anda bukan staff perpustakaan.');
+        }
+
+        return $next($request);
+    }
+}

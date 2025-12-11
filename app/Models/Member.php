@@ -13,7 +13,7 @@ class Member extends Authenticatable
     use BelongsToBranch, HasApiTokens;
 
     protected $fillable = [
-        'branch_id', 'member_id', 'name', 'gender', 'birth_date', 'identity_number',
+        'branch_id', 'faculty_id', 'department_id', 'member_id', 'name', 'gender', 'birth_date', 
         'address', 'city', 'phone', 'email', 'password', 'member_type_id', 'register_date',
         'expire_date', 'photo', 'is_active', 'profile_completed', 'notes'
     ];
@@ -30,6 +30,8 @@ class Member extends Authenticatable
     ];
 
     public function memberType(): BelongsTo { return $this->belongsTo(MemberType::class); }
+    public function faculty(): BelongsTo { return $this->belongsTo(Faculty::class); }
+    public function department(): BelongsTo { return $this->belongsTo(Department::class); }
     public function loans(): HasMany { return $this->hasMany(Loan::class); }
     public function fines(): HasMany { return $this->hasMany(Fine::class); }
 

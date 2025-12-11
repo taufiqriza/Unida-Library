@@ -238,7 +238,10 @@ class IthenticateProvider
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             $response = Http::withHeaders($this->getHeaders())
-                ->get("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity");
+                ->timeout(60)
+                ->connectTimeout(30)
+                ->retry(3, 2000)
+                ->get($this->baseUrl . "/api/v1/submissions/{$submissionId}/similarity");
 
             if ($response->successful()) {
                 $data = $response->json();

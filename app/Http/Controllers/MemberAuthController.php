@@ -20,11 +20,32 @@ class MemberAuthController extends Controller
                 'password' => 'required',
             ]);
 
-            $member = Member::where('member_id', $request->identifier)
-                ->orWhere('email', $request->identifier)
+            $identifier = $request->identifier;
+            $password = $request->password;
+
+            // Auto-detect: Email with @ = check staff first, then member
+            if (str_contains($identifier, '@')) {
+                // Try staff login first
+                $user = \App\Models\User::where('email', $identifier)->first();
+                if ($user && Hash::check($password, $user->password)) {
+                    if (in_array($user->role, ['super_admin', 'admin', 'librarian'])) {
+                        Log::channel('daily')->info('Staff login success', [
+                            'user_id' => $user->id,
+                            'email' => $user->email,
+                            'ip' => $request->ip(),
+                        ]);
+                        Auth::guard('web')->login($user);
+                        return redirect()->route('staff.dashboard');
+                    }
+                }
+            }
+
+            // Try member login
+            $member = Member::where('member_id', $identifier)
+                ->orWhere('email', $identifier)
                 ->first();
 
-            if ($member && Hash::check($request->password, $member->password)) {
+            if ($member && Hash::check($password, $member->password)) {
                 Log::channel('daily')->info('Member login success', [
                     'member_id' => $member->member_id,
                     'ip' => $request->ip(),
@@ -34,12 +55,12 @@ class MemberAuthController extends Controller
                 return redirect()->route('opac.member.dashboard');
             }
 
-            Log::channel('daily')->warning('Member login failed', [
-                'identifier' => $request->identifier,
+            Log::channel('daily')->warning('Login failed', [
+                'identifier' => $identifier,
                 'ip' => $request->ip(),
             ]);
 
-            return back()->withErrors(['identifier' => 'No. Anggota/Email atau password salah']);
+            return back()->withErrors(['identifier' => 'Email/No. Anggota atau password salah']);
         }
 
         return view('opac.login');

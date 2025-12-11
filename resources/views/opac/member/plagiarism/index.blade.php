@@ -1,7 +1,7 @@
 <x-opac.layout title="Riwayat Cek Plagiasi">
     <div class="min-h-screen bg-gray-50">
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-teal-600 to-emerald-700 text-white">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
             <div class="max-w-5xl mx-auto px-4 py-6">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -10,7 +10,7 @@
                         </a>
                         <div>
                             <h1 class="text-xl font-bold">Riwayat Cek Plagiasi</h1>
-                            <p class="text-teal-200 text-sm">Daftar pengecekan plagiarisme dokumen Anda</p>
+                            <p class="text-primary-200 text-sm">Daftar pengecekan plagiarisme dokumen Anda</p>
                         </div>
                     </div>
                     <a href="{{ route('opac.member.plagiarism.create') }}" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition flex items-center gap-2">
@@ -40,7 +40,7 @@
             <div class="space-y-3">
                 @foreach($checks as $check)
                 <a href="{{ route('opac.member.plagiarism.show', $check) }}" 
-                   class="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-teal-300 transition">
+                   class="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-primary-300 transition">
                     <div class="flex items-start gap-4">
                         {{-- Status Icon --}}
                         <div @class([
@@ -115,13 +115,13 @@
             @else
             {{-- Empty State --}}
             <div class="text-center py-12">
-                <div class="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-shield-alt text-3xl text-teal-400"></i>
+                <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-3xl text-primary-400"></i>
                 </div>
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Belum Ada Pengecekan</h3>
                 <p class="text-gray-500 mb-6">Mulai cek plagiarisme dokumen Anda sekarang</p>
                 <a href="{{ route('opac.member.plagiarism.create') }}" 
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-medium rounded-xl hover:from-teal-600 hover:to-emerald-700 transition shadow-lg shadow-teal-500/30">
+                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-700 text-white font-medium rounded-xl hover:from-primary-600 hover:to-primary-800 transition shadow-lg shadow-primary-500/30">
                     <i class="fas fa-plus"></i>
                     Cek Plagiasi Sekarang
                 </a>

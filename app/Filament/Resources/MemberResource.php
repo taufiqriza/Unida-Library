@@ -60,9 +60,7 @@ class MemberResource extends Resource
                                 ]),
                             Forms\Components\DatePicker::make('birth_date')
                                 ->label('Tanggal Lahir'),
-                            Forms\Components\TextInput::make('identity_number')
-                                ->label('No. Identitas (KTP/NIM)')
-                                ->maxLength(30),
+
                             Forms\Components\FileUpload::make('photo')
                                 ->label('Foto')
                                 ->image()
@@ -95,6 +93,24 @@ class MemberResource extends Resource
                     Forms\Components\Tabs\Tab::make('Keanggotaan')
                         ->icon('heroicon-o-identification')
                         ->schema([
+                            Forms\Components\Select::make('branch_id')
+                                ->label('Kampus / Cabang')
+                                ->relationship('branch', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            Forms\Components\Select::make('faculty_id')
+                                ->label('Fakultas')
+                                ->relationship('faculty', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->live(),
+                            Forms\Components\Select::make('department_id')
+                                ->label('Program Studi')
+                                ->relationship('department', 'name', fn ($query, $get) => $query->where('faculty_id', $get('faculty_id')))
+                                ->searchable()
+                                ->preload()
+                                ->disabled(fn (Forms\Get $get) => !$get('faculty_id')),
                             Forms\Components\Select::make('member_type_id')
                                 ->label('Tipe Anggota')
                                 ->relationship('memberType', 'name')

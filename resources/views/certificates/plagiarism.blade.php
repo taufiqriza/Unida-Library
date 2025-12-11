@@ -2,480 +2,487 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Certificate - {{ $check->certificate_number }}</title>
+    <title>Sertifikat Cek Plagiasi - {{ $check->certificate_number }}</title>
     <style>
         @page {
-            margin: 0;
+            margin: 25px;
             size: A4 portrait;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
         }
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            background: #1a1a1a;
-            color: #333;
-            width: 595px;
-            height: 842px;
-            position: relative;
+            margin: 0;
+            padding: 0;
+            color: #1e3a8a;
+            background: #ffffff;
+            font-size: 11px;
+            line-height: 1.4;
         }
+        
         .certificate {
             width: 100%;
-            height: 100%;
+            max-width: 545px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 4px solid #2563eb;
+            border-radius: 20px;
             position: relative;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: #ffffff;
         }
         
-        /* Gold Border Effect */
-        .gold-border {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
-            border: 3px solid #c9a227;
-            background: linear-gradient(180deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%);
-        }
-        
-        /* Corner Decorations */
-        .corner-tl, .corner-tr, .corner-bl, .corner-br {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: repeating-linear-gradient(
-                45deg,
-                #c9a227,
-                #c9a227 2px,
-                transparent 2px,
-                transparent 8px
-            );
-        }
-        .corner-tl { top: 15px; left: 15px; }
-        .corner-tr { top: 15px; right: 15px; transform: rotate(90deg); }
-        .corner-bl { bottom: 15px; left: 15px; transform: rotate(-90deg); }
-        .corner-br { bottom: 15px; right: 15px; transform: rotate(180deg); }
-        
-        /* Content Container */
-        .content {
-            position: relative;
-            padding: 35px 45px;
-            height: 100%;
-        }
-        
-        /* Logos Header */
-        .logos-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .logo-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .inner-border {
+            border: 1px solid #93c5fd;
+            border-radius: 15px;
             overflow: hidden;
-            background: #fff;
-            border: 2px solid #c9a227;
-        }
-        .logo-circle img {
-            max-width: 40px;
-            max-height: 40px;
-            object-fit: contain;
-        }
-        .logo-placeholder {
-            font-size: 8px;
-            color: #999;
-            text-align: center;
         }
         
-        /* Certificate Title */
-        .title-certificate {
+        /* Header with Blue Background */
+        .header {
             text-align: center;
-            margin-bottom: 8px;
-        }
-        .title-text {
-            font-size: 42px;
-            font-weight: bold;
-            color: #1a1a1a;
-            text-shadow: 2px 2px 0 #c9a227, 3px 3px 0 #9a7b1a;
-            letter-spacing: 4px;
-            font-style: italic;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
         }
         
-        /* Gold Banner */
-        .gold-banner {
-            background: linear-gradient(90deg, #c9a227 0%, #f0d55c 50%, #c9a227 100%);
-            padding: 8px 25px;
-            margin: 0 auto 20px;
-            text-align: center;
-            position: relative;
-            max-width: 350px;
-        }
-        .gold-banner::before, .gold-banner::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-        }
-        .gold-banner::before {
-            left: -15px;
-            border-right: 15px solid #c9a227;
-            border-top: 18px solid transparent;
-            border-bottom: 18px solid transparent;
-        }
-        .gold-banner::after {
-            right: -15px;
-            border-left: 15px solid #c9a227;
-            border-top: 18px solid transparent;
-            border-bottom: 18px solid transparent;
-        }
-        .gold-banner-text {
-            color: #1a1a1a;
-            font-size: 14px;
-            font-weight: bold;
-            font-style: italic;
-        }
-        
-        /* Presented To */
-        .presented-to {
-            text-align: center;
+        .logo-row {
             margin-bottom: 10px;
+            display: block;
         }
-        .presented-text {
+        
+        .logo {
+            height: 50px;
+            vertical-align: middle;
+            margin: 0 10px;
+        }
+        
+        .institution {
             font-size: 16px;
-            font-style: italic;
-            color: #333;
-        }
-        
-        /* Recipient Name */
-        .recipient-name {
-            text-align: center;
-            font-size: 28px;
             font-weight: bold;
-            color: #1a1a1a;
-            letter-spacing: 3px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
+            color: white;
+            margin: 8px 0 3px;
         }
         
-        /* NIM */
-        .nim-section {
+        .sub-institution {
+            font-size: 10px;
+            color: #bfdbfe;
+        }
+        
+        /* Content Body */
+        .content-body {
+            padding: 20px 30px 25px;
+        }
+        
+        /* Title */
+        .title {
+            text-align: center;
+            margin: 0 0 15px;
+        }
+        
+        .title h1 {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e40af;
+            margin: 0 0 8px;
+            letter-spacing: 4px;
+        }
+        
+        .title-sub {
+            font-size: 12px;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .cert-number {
+            text-align: center;
+            margin: 10px 0 15px;
+        }
+        
+        .cert-badge {
+            display: inline-block;
+            padding: 5px 20px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            font-size: 9px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        
+        /* Recipient */
+        .recipient {
             text-align: center;
             margin-bottom: 15px;
         }
-        .nim-label {
-            font-size: 14px;
-            color: #666;
+        
+        .recipient .label {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 5px;
         }
-        .nim-value {
-            font-size: 18px;
+        
+        .recipient .name {
+            font-size: 20px;
             font-weight: bold;
-            color: #1a1a1a;
+            color: #1e3a8a;
+            margin-bottom: 3px;
         }
         
-        /* Description */
-        .description {
-            text-align: center;
+        .recipient .nim {
             font-size: 11px;
-            line-height: 1.6;
-            color: #444;
-            margin: 0 20px 15px;
-            padding: 10px 15px;
-            background: rgba(201, 162, 39, 0.08);
-            border-left: 3px solid #c9a227;
-            border-right: 3px solid #c9a227;
+            color: #475569;
         }
         
-        /* Similarity Score */
+        /* Document Box */
+        .document-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .doc-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        
+        .doc-meta {
+            font-size: 9px;
+            color: #64748b;
+        }
+        
+        /* Score Section */
         .score-section {
             text-align: center;
-            margin-bottom: 15px;
+            margin: 20px 0;
         }
+        
+        .score-container {
+            display: inline-block;
+        }
+        
         .score-box {
             display: inline-block;
-            padding: 10px 30px;
-            border: 3px solid {{ $isPassed ? '#059669' : '#d97706' }};
-            border-radius: 10px;
-            background: {{ $isPassed ? 'rgba(5, 150, 105, 0.1)' : 'rgba(217, 119, 6, 0.1)' }};
+            padding: 15px 35px;
+            border: 3px solid {{ $isPassed ? '#16a34a' : '#d97706' }};
+            border-radius: 15px;
+            background: {{ $isPassed ? '#f0fdf4' : '#fffbeb' }};
         }
+        
         .score-value {
-            font-size: 36px;
+            font-size: 38px;
             font-weight: bold;
-            color: {{ $isPassed ? '#059669' : '#d97706' }};
+            color: {{ $isPassed ? '#15803d' : '#b45309' }};
+            line-height: 1;
         }
+        
         .score-label {
-            font-size: 10px;
-            color: #666;
+            font-size: 9px;
+            color: #64748b;
             text-transform: uppercase;
-        }
-        .score-status {
-            font-size: 14px;
-            font-weight: bold;
-            color: {{ $isPassed ? '#059669' : '#d97706' }};
             margin-top: 5px;
         }
         
-        /* Location Date */
-        .location-date {
-            text-align: center;
+        .status-badge {
+            margin-top: 12px;
+        }
+        
+        .status-text {
+            display: inline-block;
             font-size: 12px;
-            color: #333;
-            font-style: italic;
-            margin-bottom: 10px;
+            font-weight: bold;
+            color: {{ $isPassed ? '#15803d' : '#b45309' }};
+            padding: 6px 20px;
+            background: {{ $isPassed ? '#dcfce7' : '#fef3c7' }};
+            border-radius: 20px;
         }
         
-        /* QR and Signature Section */
-        .footer-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 10px;
-        }
-        
-        .qr-signature {
+        /* iThenticate Info Box */
+        .ithenticate-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 15px 0;
             text-align: center;
         }
-        .qr-code {
-            width: 70px;
-            height: 70px;
+        
+        .ithenticate-title {
+            font-size: 9px;
+            color: #64748b;
             margin-bottom: 5px;
         }
-        .signature-name {
-            font-size: 11px;
-            font-weight: bold;
-            color: #333;
-            border-top: 1px solid #333;
-            padding-top: 5px;
-        }
-        .signature-title {
-            font-size: 9px;
-            color: #c9a227;
-            font-weight: bold;
+        
+        .ithenticate-text {
+            font-size: 10px;
+            color: #475569;
+            line-height: 1.5;
         }
         
-        /* Download QR */
-        .download-qr-section {
+        .ithenticate-text strong {
+            color: #2563eb;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 20px;
+        }
+        
+        .footer-row {
+            width: 100%;
+        }
+        
+        .footer-left {
+            float: left;
+            width: 28%;
             text-align: center;
         }
-        .download-qr {
-            width: 80px;
-            height: 80px;
-            border: 2px solid #0ea5e9;
-            padding: 3px;
-            background: #fff;
-        }
-        .download-label {
-            font-size: 7px;
-            color: #0ea5e9;
-            margin-top: 3px;
+        
+        .footer-center {
+            float: left;
+            width: 44%;
+            text-align: center;
         }
         
-        /* Provider Logos */
-        .provider-logos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
+        .footer-right {
+            float: left;
+            width: 28%;
+            text-align: center;
+        }
+        
+        .qr-code {
+            width: 65px;
+            height: 65px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 3px;
+            background: white;
+        }
+        
+        .qr-label {
+            font-size: 7px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        
+        .signature-section {
+            margin-top: 5px;
+        }
+        
+        .signature-date {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        
+        .signature-qr {
+            width: 55px;
+            height: 55px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+        
+        .signature-name {
+            font-size: 10px;
+            font-weight: bold;
+            color: #1e3a8a;
+            border-top: 1px solid #1e3a8a;
+            padding-top: 5px;
+            display: inline-block;
+        }
+        
+        .signature-title {
+            font-size: 8px;
+            color: #3b82f6;
+            margin-top: 2px;
+        }
+        
+        .provider-section {
             margin-top: 10px;
         }
+        
         .provider-logo {
-            height: 20px;
-            object-fit: contain;
+            height: 25px;
+            margin-bottom: 5px;
         }
-        .provider-text {
-            font-size: 12px;
-            color: #0d9488;
+        
+        .provider-box {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border-radius: 8px;
+            font-size: 8px;
+            color: white;
             font-weight: bold;
         }
         
-        /* Accreditation Badge */
-        .accreditation-badge {
-            position: absolute;
-            bottom: 40px;
-            right: 50px;
-            width: 70px;
-            height: 70px;
-        }
-        .accreditation-badge img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        .provider-label {
+            font-size: 7px;
+            color: #94a3b8;
+            margin-bottom: 4px;
         }
         
-        /* Certificate Number */
-        .certificate-number {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 8px;
-            color: #999;
-        }
-        
-        /* Verification Text */
-        .verify-text {
-            font-size: 8px;
-            color: #999;
+        /* Verify Footer */
+        .verify-footer {
+            clear: both;
             text-align: center;
+            margin: 0 30px;
+            padding-top: 12px;
+            border-top: 1px dashed #bfdbfe;
+            font-size: 8px;
+            color: #94a3b8;
+        }
+        
+        .verify-url {
+            color: #2563eb;
+            font-weight: bold;
+        }
+        
+        /* Automated Check Notice */
+        .auto-notice {
+            text-align: center;
+            font-size: 7px;
+            color: #94a3b8;
+            margin: 8px 30px 15px;
+            font-style: italic;
+        }
+        
+        /* Clear float */
+        .clearfix:after {
+            content: "";
+            display: table;
+            clear: both;
         }
     </style>
 </head>
 <body>
     <div class="certificate">
-        <!-- Gold Border -->
-        <div class="gold-border">
-            <!-- Corner Decorations -->
-            <div class="corner-tl"></div>
-            <div class="corner-tr"></div>
-            <div class="corner-bl"></div>
-            <div class="corner-br"></div>
+        <div class="inner-border">
             
-            <div class="content">
-                <!-- Logos Header -->
-                <div class="logos-header">
-                    <div class="logo-circle">
-                        @if(isset($logoGontor) && $logoGontor)
-                        <img src="{{ $logoGontor }}" alt="Gontor">
-                        @else
-                        <span class="logo-placeholder">GONTOR</span>
-                        @endif
-                    </div>
-                    <div class="logo-circle">
-                        @if(isset($logoUnida) && $logoUnida)
-                        <img src="{{ $logoUnida }}" alt="UNIDA">
-                        @else
-                        <span class="logo-placeholder">UNIDA</span>
-                        @endif
-                    </div>
-                    <div class="logo-circle">
-                        @if(isset($logoAkreditasi) && $logoAkreditasi)
-                        <img src="{{ $logoAkreditasi }}" alt="Akreditasi">
-                        @else
-                        <span class="logo-placeholder">AKRED</span>
-                        @endif
-                    </div>
-                    <div class="logo-circle">
-                        @if($institutionLogo)
-                        <img src="{{ $institutionLogo }}" alt="Library">
-                        @else
-                        <span class="logo-placeholder">LIBRARY</span>
-                        @endif
-                    </div>
+            <!-- Header with Logos -->
+            <div class="header">
+                <div class="logo-row">
+                    @if($institutionLogo)
+                    <img src="{{ $institutionLogo }}" class="logo" alt="Logo Perpustakaan">
+                    @endif
+                    @if(isset($logoIthenticate) && $logoIthenticate)
+                    <img src="{{ $logoIthenticate }}" class="logo" alt="iThenticate">
+                    @endif
                 </div>
-                
-                <!-- Certificate Title -->
-                <div class="title-certificate">
-                    <span class="title-text">CERTIFICATE</span>
+                <div class="institution">{{ $institutionName }}</div>
+                <div class="sub-institution">Universitas Darussalam Gontor • Ponorogo, Jawa Timur</div>
+            </div>
+            
+            <!-- Content Body -->
+            <div class="content-body">
+            
+            <!-- Title -->
+            <div class="title">
+                <h1>SERTIFIKAT</h1>
+                <div class="title-sub">Hasil Pemeriksaan Originalitas Dokumen</div>
+            </div>
+            
+            <div class="cert-number">
+                <span class="cert-badge">{{ $check->certificate_number }}</span>
+            </div>
+            
+            <!-- Recipient -->
+            <div class="recipient">
+                <div class="label">Diberikan kepada:</div>
+                <div class="name">{{ strtoupper($member->name) }}</div>
+                <div class="nim">NIM: {{ $member->member_id }}@if($member->memberType) • {{ $member->memberType->name }}@endif</div>
+            </div>
+            
+            <!-- Document Info -->
+            <div class="document-box">
+                <div class="doc-title">"{{ $check->document_title }}"</div>
+                <div class="doc-meta">
+                    {{ $check->original_filename }} • {{ $check->completed_at ? $check->completed_at->translatedFormat('d F Y, H:i') : $issuedDate }} WIB
+                    @if($check->word_count) • {{ number_format($check->word_count) }} kata @endif
                 </div>
-                
-                <!-- Gold Banner -->
-                <div class="gold-banner">
-                    <span class="gold-banner-text">— Thesis Plagiarism Screening —</span>
-                </div>
-                
-                <!-- Presented To -->
-                <div class="presented-to">
-                    <span class="presented-text">This certificate is presented to:</span>
-                </div>
-                
-                <!-- Recipient Name -->
-                <div class="recipient-name">{{ strtoupper($member->name) }}</div>
-                
-                <!-- NIM -->
-                <div class="nim-section">
-                    <span class="nim-label">NIM : </span>
-                    <span class="nim-value">{{ $member->member_id }}</span>
-                </div>
-                
-                <!-- Description -->
-                <div class="description">
-                    The thesis of the respective student has undergone a comprehensive plagiarism assessment using
-                    {{ $check->provider_label }} and has been officially certified as 
-                    <strong>{{ $isPassed ? 'PLAGIARISM-FREE' : 'REQUIRING REVIEW' }}</strong> by the
-                    {{ $institutionName }} of University of Darussalam Gontor, 
-                    {{ $isPassed ? 'meeting' : 'not meeting' }} the prescribed similarity tolerance
-                    threshold of ≤ {{ $passThreshold }}%, ensuring compliance with academic integrity and ethical research standards.
-                </div>
-                
-                <!-- Similarity Score -->
-                <div class="score-section">
+            </div>
+            
+            <!-- Score -->
+            <div class="score-section">
+                <div class="score-container">
                     <div class="score-box">
                         <div class="score-value">{{ number_format($check->similarity_score, 0) }}%</div>
                         <div class="score-label">Similarity Index</div>
-                        <div class="score-status">
+                    </div>
+                    <div class="status-badge">
+                        <span class="status-text">
                             @if($isPassed)
-                            ✓ PASSED
+                            ✓ LOLOS - Memenuhi Standar Originalitas
                             @else
-                            ⚠ NEEDS REVIEW
+                            ⚠ PERLU REVISI - Melebihi Batas Toleransi
+                            @endif
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- iThenticate Info -->
+            <div class="ithenticate-box">
+                <div class="ithenticate-title">INFORMASI PEMERIKSAAN</div>
+                <div class="ithenticate-text">
+                    Dokumen ini telah melalui proses pemeriksaan plagiarisme <strong>secara otomatis</strong> menggunakan 
+                    sistem <strong>iThenticate by Turnitin</strong> — standar internasional untuk deteksi kesamaan akademik.
+                    {{ $isPassed ? 'Tingkat similarity berada di bawah' : 'Tingkat similarity melebihi' }} 
+                    batas toleransi institusi (<strong>≤{{ $passThreshold }}%</strong>).
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer clearfix">
+                <div class="footer-row">
+                    <!-- QR Verification -->
+                    <div class="footer-left">
+                        <img src="{{ $qrCode }}" class="qr-code" alt="QR Verify">
+                        <div class="qr-label">Scan untuk verifikasi</div>
+                    </div>
+                    
+                    <!-- Signature with QR -->
+                    <div class="footer-center">
+                        <div class="signature-section">
+                            <div class="signature-date">Ponorogo, {{ $issuedDate }}</div>
+                            @if(isset($signatureQr) && $signatureQr)
+                            <img src="{{ $signatureQr }}" class="signature-qr" alt="Digital Signature">
+                            @endif
+                            @if($headLibrarian)
+                            <div class="signature-name">{{ $headLibrarian }}</div>
+                            <div class="signature-title">Kepala Perpustakaan</div>
+                            @endif
+                        </div>
+                    </div>
+                    
+                    <!-- Provider -->
+                    <div class="footer-right">
+                        <div class="provider-section">
+                            <div class="provider-label">Powered by</div>
+                            @if(isset($logoIthenticate) && $logoIthenticate)
+                            <img src="{{ $logoIthenticate }}" class="provider-logo" alt="iThenticate">
+                            @else
+                            <div class="provider-box">iThenticate</div>
                             @endif
                         </div>
                     </div>
                 </div>
-                
-                <!-- Location Date -->
-                <div class="location-date">Ponorogo, {{ $issuedDate }}</div>
-                
-                <!-- Footer Section: QR + Signature + Download -->
-                <div class="footer-section">
-                    <!-- Left: Verification QR -->
-                    <div class="qr-signature">
-                        <img src="{{ $qrCode }}" class="qr-code" alt="QR Verify">
-                        <p class="verify-text">Scan to verify</p>
-                    </div>
-                    
-                    <!-- Center: Signature -->
-                    <div class="qr-signature">
-                        @if(isset($signatureQr) && $signatureQr)
-                        <img src="{{ $signatureQr }}" class="qr-code" alt="Signature QR">
-                        @endif
-                        @if($headLibrarian)
-                        <p class="signature-name">{{ $headLibrarian }}</p>
-                        <p class="signature-title">Head of Library</p>
-                        @endif
-                    </div>
-                    
-                    <!-- Right: Download QR -->
-                    <div class="download-qr-section">
-                        @if(isset($downloadQr) && $downloadQr)
-                        <img src="{{ $downloadQr }}" class="download-qr" alt="Download QR">
-                        <p class="download-label">Download the Plagiarism Report File</p>
-                        @endif
-                    </div>
-                </div>
-                
-                <!-- Provider Logos -->
-                <div class="provider-logos">
-                    @if(isset($logoIthenticate) && $logoIthenticate)
-                    <img src="{{ $logoIthenticate }}" class="provider-logo" alt="iThenticate">
-                    @else
-                    <span class="provider-text">✓ iThenticate</span>
-                    @endif
-                    
-                    @if(isset($logoTurnitin) && $logoTurnitin)
-                    <img src="{{ $logoTurnitin }}" class="provider-logo" alt="Turnitin">
-                    @else
-                    <span class="provider-text">Powered by turnitin</span>
-                    @endif
-                </div>
-                
-                <!-- Accreditation Badge -->
-                @if(isset($badgeAccreditation) && $badgeAccreditation)
-                <div class="accreditation-badge">
-                    <img src="{{ $badgeAccreditation }}" alt="Accreditation Badge">
-                </div>
-                @endif
-                
-                <!-- Certificate Number -->
-                <div class="certificate-number">{{ $check->certificate_number }}</div>
             </div>
+            
+            </div> <!-- close content-body -->
+            
+            <!-- Verify Footer -->
+            <div class="verify-footer">
+                Verifikasi keaslian: <span class="verify-url">{{ $verifyUrl }}</span>
+            </div>
+            
+            <div class="auto-notice">
+                Sertifikat ini dihasilkan secara otomatis oleh sistem dan sah tanpa tanda tangan basah.
+            </div>
+            
         </div>
     </div>
 </body>

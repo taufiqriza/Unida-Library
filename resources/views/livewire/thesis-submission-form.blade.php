@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto px-1">
+<div class="max-w-5xl mx-auto px-1">
     {{-- Revision Notice --}}
     @if($isEdit && $submission?->isRevisionRequired())
         <div class="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-2xl">

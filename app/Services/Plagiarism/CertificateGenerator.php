@@ -37,6 +37,11 @@ class CertificateGenerator
             $downloadQr = $this->generateQrCode($this->check->external_report_url);
         }
 
+        // Generate signature QR for head librarian
+        $headLibrarian = Setting::get('plagiarism_head_librarian', 'Kepala Perpustakaan');
+        $signatureData = "DIGITAL SIGNATURE\n{$headLibrarian}\nKepala Perpustakaan\n" . now()->format('Y-m-d H:i:s');
+        $signatureQr = $this->generateQrCode($signatureData);
+
         // Prepare data for certificate
         $data = [
             'check' => $this->check,
@@ -44,19 +49,14 @@ class CertificateGenerator
             'qrCode' => $qrCode,
             'verifyUrl' => $verifyUrl,
             'institutionName' => Setting::get('app_name', 'Perpustakaan UNIDA Gontor'),
-            'institutionLogo' => $this->getLogoBase64(),
-            'headLibrarian' => Setting::get('plagiarism_head_librarian', 'Kepala Perpustakaan'),
+            'institutionLogo' => $this->getStorageLogoBase64(),
+            'headLibrarian' => $headLibrarian,
             'issuedDate' => now()->translatedFormat('d F Y'),
             'isPassed' => $this->check->isPassed(),
             'passThreshold' => (float) Setting::get('plagiarism_pass_threshold', 25),
-            // Additional logos for the certificate design
-            'logoGontor' => $this->getAssetBase64('images/certificates/logo-gontor.png'),
-            'logoUnida' => $this->getAssetBase64('images/certificates/logo-unida.png'),
-            'logoAkreditasi' => $this->getAssetBase64('images/certificates/logo-akreditasi.png'),
+            // Logos from public/images/certificates/
             'logoIthenticate' => $this->getAssetBase64('images/certificates/logo-ithenticate.png'),
-            'logoTurnitin' => $this->getAssetBase64('images/certificates/logo-turnitin.png'),
-            'badgeAccreditation' => $this->getAssetBase64('images/certificates/badge-unggul.png'),
-            'signatureQr' => null, // Can be added later for digital signature
+            'signatureQr' => $signatureQr,
             'downloadQr' => $downloadQr,
         ];
 
@@ -106,6 +106,23 @@ class CertificateGenerator
         $mimeType = Storage::disk('public')->mimeType($logoPath);
 
         return 'data:' . $mimeType . ';base64,' . base64_encode($logoContent);
+    }
+
+    /**
+     * Get logo directly from storage public folder
+     */
+    protected function getStorageLogoBase64(): ?string
+    {
+        // Try fixed path first: storage/app/public/logo.png
+        $fixedPath = storage_path('app/public/logo.png');
+        if (file_exists($fixedPath)) {
+            $content = file_get_contents($fixedPath);
+            $mimeType = mime_content_type($fixedPath);
+            return 'data:' . $mimeType . ';base64,' . base64_encode($content);
+        }
+
+        // Fallback to setting
+        return $this->getLogoBase64();
     }
 
     /**

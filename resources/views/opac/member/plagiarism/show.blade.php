@@ -1,7 +1,7 @@
 <x-opac.layout title="Hasil Cek Plagiasi">
     <div class="min-h-screen bg-gray-50">
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-teal-600 to-emerald-700 text-white">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
             <div class="max-w-4xl mx-auto px-4 py-6">
                 <div class="flex items-center gap-3">
                     <a href="{{ route('opac.member.plagiarism.index') }}" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition">
@@ -9,7 +9,7 @@
                     </a>
                     <div>
                         <h1 class="text-xl font-bold">Hasil Cek Plagiasi</h1>
-                        <p class="text-teal-200 text-sm">{{ $check->document_title }}</p>
+                        <p class="text-primary-200 text-sm">{{ $check->document_title }}</p>
                     </div>
                 </div>
             </div>

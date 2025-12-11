@@ -389,7 +389,7 @@
                     <!-- Search Button with Card Style -->
                     <button 
                         @click="searchOpen = true" 
-                        class="hidden lg:flex items-center gap-2 px-4 py-2 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm h-10 border border-white/10"
                     >
                         <i class="fas fa-search"></i>
                         <span>Cari</span>
@@ -397,10 +397,90 @@
                     
                     <!-- Auth Buttons Desktop -->
                     @auth('member')
-                        <a href="{{ route('opac.member.dashboard') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl shadow-sm transition">
-                            <i class="fas fa-user-circle"></i>
-                            <span>{{ auth('member')->user()->name }}</span>
-                        </a>
+                        <div class="hidden lg:block relative" x-data="{ openProfile: false }">
+                            <!-- Trigger Button -->
+                            <button @click="openProfile = !openProfile" @click.away="openProfile = false" class="flex items-center gap-2.5 px-1.5 py-1 pr-3 text-left text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl shadow-sm transition group border border-white/10 h-10">
+                                <div class="w-7 h-7 bg-gradient-to-br from-white/20 to-white/5 rounded-lg flex items-center justify-center border border-white/20 text-white shadow-inner overflow-hidden shrink-0">
+                                     @if(auth('member')->user()->photo)
+                                        <img src="{{ asset('storage/' . auth('member')->user()->photo) }}" class="w-full h-full object-cover">
+                                     @else
+                                        <i class="fas fa-user text-[10px]"></i>
+                                     @endif
+                                </div>
+                                <div class="leading-none flex flex-col justify-center">
+                                    <p class="text-[9px] font-medium text-primary-200 -mb-0.5">Hai,</p>
+                                    <p class="text-xs font-bold text-white max-w-[100px] truncate">{{ Str::words(auth('member')->user()->name, 2, '') }}</p>
+                                </div>
+                                <i class="fas fa-chevron-down text-[10px] text-primary-200 group-hover:text-white transition-transform duration-200 ml-0.5" :class="openProfile ? 'rotate-180' : ''"></i>
+                            </button>
+
+                            <!-- Dropdown Modal -->
+                            <div x-show="openProfile" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 translate-y-2"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 translate-y-2"
+                                 class="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 ring-1 ring-black/5 overflow-hidden z-50 origin-top-right md:w-96"
+                                 style="display: none;">
+                                 
+                                 <!-- Header Profil -->
+                                 <div class="p-5 bg-gradient-to-br from-primary-600 to-primary-800 relative overflow-hidden text-white">
+                                     <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] opacity-30"></div>
+                                     <div class="relative flex items-center gap-4">
+                                         <div class="w-16 h-16 bg-white p-1 rounded-2xl shadow-lg rotate-3 shrink-0">
+                                             @if(auth('member')->user()->photo)
+                                                 <img src="{{ asset('storage/' . auth('member')->user()->photo) }}" class="w-full h-full object-cover rounded-xl">
+                                             @else
+                                                 <div class="w-full h-full bg-primary-50 rounded-xl flex items-center justify-center text-primary-500 text-2xl"><i class="fas fa-user"></i></div>
+                                             @endif
+                                         </div>
+                                         <div class="min-w-0">
+                                             <h4 class="font-bold text-lg truncate">{{ auth('member')->user()->name }}</h4>
+                                             <p class="text-xs text-primary-200 font-mono mb-2">{{ auth('member')->user()->member_id }}</p>
+                                             <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-medium text-white backdrop-blur-md">
+                                                 <i class="fab fa-google"></i> Terhubung
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
+                                 <!-- Menu Navigasi (Clean Grid 2x2) -->
+                                 @if(auth('member')->user()->profile_completed)
+                                 <div class="p-4 grid grid-cols-2 gap-3 bg-gray-50/50 border-b border-gray-100">
+                                     <a href="{{ route('opac.member.dashboard') }}" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition group flex flex-col items-center gap-2 text-center">
+                                         <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-tachometer-alt"></i></div>
+                                         <span class="text-xs font-bold text-gray-600 group-hover:text-blue-600">Dashboard</span>
+                                     </a>
+                                     <a href="{{ route('opac.member.plagiarism.index') }}" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-teal-200 transition group flex flex-col items-center gap-2 text-center">
+                                         <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-shield-alt"></i></div>
+                                         <span class="text-xs font-bold text-gray-600 group-hover:text-teal-600">Cek Plagiasi</span>
+                                     </a>
+                                     <a href="{{ route('opac.member.submissions') }}" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-purple-200 transition group flex flex-col items-center gap-2 text-center">
+                                         <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-upload"></i></div>
+                                         <span class="text-xs font-bold text-gray-600 group-hover:text-purple-600">Unggah</span>
+                                     </a>
+                                     <a href="{{ route('opac.member.settings') }}" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-300 transition group flex flex-col items-center gap-2 text-center">
+                                         <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-cog"></i></div>
+                                         <span class="text-xs font-bold text-gray-600 group-hover:text-gray-900">Pengaturan</span>
+                                     </a>
+                                 </div>
+                                 @else
+                                 <div class="p-4 bg-yellow-50 border-b border-yellow-100 text-center">
+                                     <p class="text-xs font-medium text-yellow-700">Profil Anda belum lengkap.</p>
+                                     <a href="{{ route('member.complete-profile') }}" class="text-xs font-bold text-yellow-800 underline mt-1 block">Lengkapi Sekarang</a>
+                                 </div>
+                                 @endif
+                                 
+                                 <!-- Footer Logout -->
+                                 <div class="p-3 bg-gray-50 border-t border-gray-100">
+                                     <a href="{{ route('opac.logout') }}" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-gray-700 font-semibold text-sm rounded-xl border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition shadow-sm group">
+                                         <i class="fas fa-sign-out-alt group-hover:-translate-x-0.5 transition-transform"></i> Keluar
+                                     </a>
+                                 </div>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}" class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary-700 bg-white hover:bg-gray-50 rounded-xl shadow-sm transition">
                             <i class="fas fa-sign-in-alt"></i>
