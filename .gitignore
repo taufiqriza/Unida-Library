@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Migration files (large SQL dumps)
+doc/MIGRATION/*.sql
+doc/MIGRATION/cover_*/

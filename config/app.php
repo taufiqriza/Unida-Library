@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'migration_mode' => env('MIGRATION_MODE', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -85,6 +85,15 @@
 </head>
 <body class="pattern-bg min-h-screen" x-data="{ sidebarOpen: false, searchOpen: false }">
 
+    {{-- Migration Notice Banner - Remove after migration complete --}}
+    @if(config('app.migration_mode', false))
+    <div class="bg-amber-500 text-amber-900 px-4 py-3 text-center text-sm font-medium">
+        <i class="fas fa-sync-alt fa-spin mr-2"></i>
+        <span class="font-bold">Proses Migrasi Data Sedang Berlangsung</span> - 
+        Beberapa fitur mungkin tidak tersedia sementara. Mohon maaf atas ketidaknyamanannya.
+    </div>
+    @endif
+
     <!-- Top Bar -->
     <div class="bg-primary-800 text-white text-xs hidden lg:block">
         <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
