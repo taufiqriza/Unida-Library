@@ -233,11 +233,12 @@ class PlagiarismController extends Controller
         return response()->json([
             'status' => $check->status,
             'status_label' => $check->status_label,
+            'status_info' => $check->status_info,
             'similarity_score' => $check->similarity_score,
             'is_completed' => $check->isCompleted(),
             'is_failed' => $check->isFailed(),
+            'is_stuck' => $check->isStuck(),
             'has_certificate' => $check->hasCertificate(),
-            'error_message' => $check->error_message,
         ]);
     }
 }

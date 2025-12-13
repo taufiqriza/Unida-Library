@@ -16,21 +16,62 @@
         </div>
 
         <div class="max-w-4xl mx-auto px-4 py-6">
-            {{-- Status: Processing --}}
+            {{-- Status: Processing/Pending/Stuck --}}
             @if($check->isPending() || $check->isProcessing())
+            @php $statusInfo = $check->status_info; @endphp
+            
+            @if($statusInfo['status'] === 'stuck')
+            {{-- STUCK - Process seems to have stopped --}}
+            <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
+                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-circle text-3xl text-red-600"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">{{ $statusInfo['label'] }}</h2>
+                <p class="text-gray-600 mb-4">{{ $statusInfo['message'] }}</p>
+                
+                <div class="bg-red-50 rounded-xl p-4 mb-6 max-w-md mx-auto">
+                    <p class="text-sm text-red-700">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Proses sudah berjalan lebih dari 
+                        @if($check->started_at)
+                            {{ $check->started_at->diffForHumans(null, true) }}
+                        @else
+                            {{ $check->created_at->diffForHumans(null, true) }}
+                        @endif
+                        tanpa hasil.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="{{ route('opac.member.plagiarism.create') }}" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition">
+                        <i class="fas fa-redo"></i>
+                        Coba Lagi
+                    </a>
+                    <a href="https://wa.me/{{ config('app.whatsapp') }}?text=Halo, saya butuh bantuan untuk cek plagiasi yang terhenti (ID: {{ $check->id }})" 
+                       target="_blank"
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition">
+                        <i class="fab fa-whatsapp"></i>
+                        Hubungi Petugas
+                    </a>
+                </div>
+            </div>
+            
+            @else
+            {{-- NORMAL Processing --}}
             <div id="processing-state" class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
                 <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-cog fa-spin text-3xl text-blue-600"></i>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-2">
-                    {{ $check->isProcessing() ? 'Sedang Memproses Dokumen...' : 'Menunggu Antrian...' }}
-                </h2>
-                <p class="text-gray-600 mb-2">
-                    Dokumen Anda sedang dicek keasliannya.
+                <h2 class="text-xl font-bold text-gray-900 mb-2">{{ $statusInfo['label'] }}</h2>
+                <p class="text-gray-600 mb-2">{{ $statusInfo['message'] }}</p>
+                
+                @if($check->started_at)
+                <p class="text-sm text-gray-500 mb-4">
+                    <i class="fas fa-clock mr-1"></i>
+                    Sudah berjalan {{ $check->started_at->diffForHumans(null, true) }}
                 </p>
-                <p class="text-gray-500 text-sm mb-4">
-                    Proses ini biasanya memakan waktu <strong>5-15 menit</strong> tergantung ukuran dokumen.
-                </p>
+                @endif
                 
                 <div class="bg-blue-50 rounded-xl p-4 mb-4 max-w-md mx-auto">
                     <div class="flex items-start gap-3 text-left">
@@ -40,7 +81,6 @@
                             <ul class="text-blue-700 space-y-1">
                                 <li>• Anda bisa meninggalkan halaman ini</li>
                                 <li>• Hasil akan tersedia di dashboard</li>
-                                <li>• Notifikasi akan dikirim via email</li>
                             </ul>
                         </div>
                     </div>
@@ -51,27 +91,24 @@
                     <span><i class="fas fa-hdd mr-1"></i> {{ $check->file_size_formatted }}</span>
                 </div>
                 <p class="text-xs text-gray-400 mt-4">
-                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Halaman akan refresh otomatis setiap 10 detik...
+                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Halaman akan refresh otomatis...
                 </p>
             </div>
 
             @push('scripts')
             <script>
-                // Poll for status update every 10 seconds
                 setInterval(async function() {
                     try {
                         const response = await fetch('{{ route('opac.member.plagiarism.status', $check) }}');
                         const data = await response.json();
-                        
-                        if (data.is_completed || data.is_failed) {
+                        if (data.is_completed || data.is_failed || data.is_stuck) {
                             window.location.reload();
                         }
-                    } catch (e) {
-                        console.error('Status check failed:', e);
-                    }
+                    } catch (e) {}
                 }, 10000);
             </script>
             @endpush
+            @endif
 
             {{-- Status: Failed --}}
             @elseif($check->isFailed())

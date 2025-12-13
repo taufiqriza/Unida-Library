@@ -96,24 +96,94 @@ class PlagiarismCheck extends Model
         return $this->certificate_number && $this->certificate_path;
     }
 
+    /**
+     * Check if process seems stuck (no progress for too long)
+     */
+    public function isStuck(): bool
+    {
+        if (!in_array($this->status, [self::STATUS_PENDING, self::STATUS_PROCESSING])) {
+            return false;
+        }
+
+        // Pending > 30 minutes without being picked up
+        if ($this->status === self::STATUS_PENDING && $this->created_at->diffInMinutes(now()) > 30) {
+            return true;
+        }
+
+        // Processing > 60 minutes (even large docs should finish)
+        if ($this->status === self::STATUS_PROCESSING && $this->started_at && $this->started_at->diffInMinutes(now()) > 60) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get detailed status info for UI
+     */
+    public function getStatusInfoAttribute(): array
+    {
+        if ($this->isStuck()) {
+            return [
+                'status' => 'stuck',
+                'label' => 'Proses Terhenti',
+                'message' => 'Proses memakan waktu lebih lama dari biasanya. Silakan hubungi petugas perpustakaan.',
+                'color' => 'red',
+                'icon' => 'exclamation-circle',
+            ];
+        }
+
+        return match($this->status) {
+            self::STATUS_PENDING => [
+                'status' => 'pending',
+                'label' => 'Menunggu Antrian',
+                'message' => 'Dokumen Anda dalam antrian dan akan segera diproses.',
+                'color' => 'gray',
+                'icon' => 'clock',
+            ],
+            self::STATUS_PROCESSING => [
+                'status' => 'processing',
+                'label' => 'Sedang Diproses',
+                'message' => 'Dokumen sedang dicek. Proses ini memakan waktu 5-15 menit untuk dokumen besar.',
+                'color' => 'blue',
+                'icon' => 'cog',
+            ],
+            self::STATUS_COMPLETED => [
+                'status' => 'completed',
+                'label' => 'Selesai',
+                'message' => 'Pengecekan selesai.',
+                'color' => 'green',
+                'icon' => 'check-circle',
+            ],
+            self::STATUS_FAILED => [
+                'status' => 'failed',
+                'label' => 'Gagal Diproses',
+                'message' => 'Terjadi kendala saat memproses. Silakan coba lagi atau hubungi petugas.',
+                'color' => 'amber',
+                'icon' => 'exclamation-triangle',
+            ],
+            default => [
+                'status' => 'unknown',
+                'label' => 'Status Tidak Diketahui',
+                'message' => '',
+                'color' => 'gray',
+                'icon' => 'question-mark-circle',
+            ],
+        };
+    }
+
     // ========== Status Label & Color ==========
 
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
-            self::STATUS_PENDING => 'Menunggu Antrian',
-            self::STATUS_PROCESSING => 'Sedang Diproses',
-            self::STATUS_COMPLETED => 'Selesai',
-            self::STATUS_FAILED => 'Perlu Dicoba Ulang',
-            default => $this->status,
-        };
+        return $this->status_info['label'];
     }
 
     public function getStatusColorAttribute(): string
     {
         return match($this->status) {
             self::STATUS_PENDING => 'gray',
-            self::STATUS_PROCESSING => 'warning',
+            self::STATUS_PROCESSING => $this->isStuck() ? 'danger' : 'warning',
             self::STATUS_COMPLETED => 'success',
             self::STATUS_FAILED => 'warning',
             default => 'gray',
