@@ -19,27 +19,45 @@
             {{-- Status: Processing --}}
             @if($check->isPending() || $check->isProcessing())
             <div id="processing-state" class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-spinner fa-spin text-3xl text-amber-600"></i>
+                <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-cog fa-spin text-3xl text-blue-600"></i>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 mb-2">
-                    {{ $check->isProcessing() ? 'Sedang Memproses...' : 'Menunggu Antrian...' }}
+                    {{ $check->isProcessing() ? 'Sedang Memproses Dokumen...' : 'Menunggu Antrian...' }}
                 </h2>
-                <p class="text-gray-500 mb-4">
-                    Dokumen Anda sedang dicek. Proses ini mungkin memakan waktu beberapa menit.
+                <p class="text-gray-600 mb-2">
+                    Dokumen Anda sedang dicek keasliannya.
                 </p>
+                <p class="text-gray-500 text-sm mb-4">
+                    Proses ini biasanya memakan waktu <strong>5-15 menit</strong> tergantung ukuran dokumen.
+                </p>
+                
+                <div class="bg-blue-50 rounded-xl p-4 mb-4 max-w-md mx-auto">
+                    <div class="flex items-start gap-3 text-left">
+                        <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                        <div class="text-sm text-blue-800">
+                            <p class="font-medium mb-1">Tips:</p>
+                            <ul class="text-blue-700 space-y-1">
+                                <li>• Anda bisa meninggalkan halaman ini</li>
+                                <li>• Hasil akan tersedia di dashboard</li>
+                                <li>• Notifikasi akan dikirim via email</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex items-center justify-center gap-4 text-sm text-gray-500">
                     <span><i class="fas fa-file mr-1"></i> {{ $check->original_filename }}</span>
                     <span><i class="fas fa-hdd mr-1"></i> {{ $check->file_size_formatted }}</span>
                 </div>
                 <p class="text-xs text-gray-400 mt-4">
-                    Halaman ini akan refresh otomatis...
+                    <i class="fas fa-sync-alt fa-spin mr-1"></i> Halaman akan refresh otomatis setiap 10 detik...
                 </p>
             </div>
 
             @push('scripts')
             <script>
-                // Poll for status update every 5 seconds
+                // Poll for status update every 10 seconds
                 setInterval(async function() {
                     try {
                         const response = await fetch('{{ route('opac.member.plagiarism.status', $check) }}');
@@ -51,25 +69,41 @@
                     } catch (e) {
                         console.error('Status check failed:', e);
                     }
-                }, 5000);
+                }, 10000);
             </script>
             @endpush
 
             {{-- Status: Failed --}}
             @elseif($check->isFailed())
-            <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
-                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-times-circle text-3xl text-red-600"></i>
+            <div class="bg-white rounded-2xl border border-amber-200 p-8 text-center">
+                <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-3xl text-amber-600"></i>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-2">Pengecekan Gagal</h2>
-                <p class="text-gray-500 mb-4">
-                    {{ $check->error_message ?: 'Terjadi kesalahan saat memproses dokumen.' }}
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Proses Terganggu</h2>
+                <p class="text-gray-600 mb-4">
+                    Maaf, terjadi kendala saat memproses dokumen Anda.<br>
+                    Silakan coba lagi dalam beberapa saat.
                 </p>
-                <a href="{{ route('opac.member.plagiarism.create') }}" 
-                   class="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white font-medium rounded-xl hover:bg-teal-700 transition">
-                    <i class="fas fa-redo"></i>
-                    Coba Lagi
-                </a>
+                
+                <div class="bg-gray-50 rounded-xl p-4 mb-6 max-w-md mx-auto">
+                    <p class="text-sm text-gray-500">
+                        <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
+                        Jika masalah berlanjut, hubungi petugas perpustakaan.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="{{ route('opac.member.plagiarism.create') }}" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition">
+                        <i class="fas fa-redo"></i>
+                        Coba Lagi
+                    </a>
+                    <a href="{{ route('opac.member.plagiarism.index') }}" 
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition">
+                        <i class="fas fa-arrow-left"></i>
+                        Kembali
+                    </a>
+                </div>
             </div>
 
             {{-- Status: Completed --}}

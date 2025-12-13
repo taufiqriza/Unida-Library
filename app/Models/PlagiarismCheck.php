@@ -101,10 +101,10 @@ class PlagiarismCheck extends Model
     public function getStatusLabelAttribute(): string
     {
         return match($this->status) {
-            self::STATUS_PENDING => 'Menunggu',
+            self::STATUS_PENDING => 'Menunggu Antrian',
             self::STATUS_PROCESSING => 'Sedang Diproses',
             self::STATUS_COMPLETED => 'Selesai',
-            self::STATUS_FAILED => 'Gagal',
+            self::STATUS_FAILED => 'Perlu Dicoba Ulang',
             default => $this->status,
         };
     }
@@ -115,7 +115,7 @@ class PlagiarismCheck extends Model
             self::STATUS_PENDING => 'gray',
             self::STATUS_PROCESSING => 'warning',
             self::STATUS_COMPLETED => 'success',
-            self::STATUS_FAILED => 'danger',
+            self::STATUS_FAILED => 'warning',
             default => 'gray',
         };
     }
