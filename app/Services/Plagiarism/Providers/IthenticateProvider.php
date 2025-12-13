@@ -73,7 +73,11 @@ class IthenticateProvider
             // Step 3: Request similarity report
             $this->requestSimilarityReport($submission['id']);
             
-            // Step 4: Poll for results
+            // Step 4: Wait a bit before polling (Turnitin needs time to process)
+            Log::info("iThenticate: Waiting 30 seconds before polling for results...");
+            sleep(30);
+            
+            // Step 5: Poll for results
             $result = $this->pollForResults($submission['id']);
             
             return $result;
@@ -237,37 +241,52 @@ class IthenticateProvider
         Log::info("iThenticate: Polling for results on submission: {$submissionId}");
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
-            $response = Http::withHeaders($this->getHeaders())
-                ->timeout(60)
-                ->connectTimeout(30)
-                ->retry(3, 2000)
-                ->get($this->baseUrl . "/api/v1/submissions/{$submissionId}/similarity");
+            try {
+                $response = Http::withHeaders($this->getHeaders())
+                    ->timeout(60)
+                    ->connectTimeout(30)
+                    ->get($this->baseUrl . "/api/v1/submissions/{$submissionId}/similarity");
 
-            if ($response->successful()) {
-                $data = $response->json();
-                $status = $data['status'] ?? 'PENDING';
-
-                Log::info("iThenticate: Poll attempt {$attempt}, status: {$status}");
-
-                if ($status === 'COMPLETE') {
-                    return [
-                        'score' => $data['overall_match_percentage'] ?? 0,
-                        'sources' => $this->formatSources($data['top_sources'] ?? []),
-                        'report' => [
-                            'submission_id' => $submissionId,
-                            'overall_match_percentage' => $data['overall_match_percentage'] ?? 0,
-                            'internet_match_percentage' => $data['internet_match_percentage'] ?? 0,
-                            'publication_match_percentage' => $data['publication_match_percentage'] ?? 0,
-                            'submitted_works_match_percentage' => $data['submitted_works_match_percentage'] ?? 0,
-                            'status' => 'COMPLETE',
-                            'provider' => 'ithenticate',
-                        ],
-                    ];
+                // 404 means report not ready yet - continue polling
+                if ($response->status() === 404) {
+                    Log::info("iThenticate: Poll attempt {$attempt}, report not ready yet (404)");
+                    if ($attempt < $maxAttempts) {
+                        sleep($delaySeconds);
+                    }
+                    continue;
                 }
 
-                if (in_array($status, ['FAILED', 'ERROR'])) {
-                    throw new \Exception('Similarity check failed: ' . ($data['error_message'] ?? 'Unknown error'));
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $status = $data['status'] ?? 'PENDING';
+
+                    Log::info("iThenticate: Poll attempt {$attempt}, status: {$status}");
+
+                    if ($status === 'COMPLETE') {
+                        return [
+                            'score' => $data['overall_match_percentage'] ?? 0,
+                            'sources' => $this->formatSources($data['top_sources'] ?? []),
+                            'report' => [
+                                'submission_id' => $submissionId,
+                                'overall_match_percentage' => $data['overall_match_percentage'] ?? 0,
+                                'internet_match_percentage' => $data['internet_match_percentage'] ?? 0,
+                                'publication_match_percentage' => $data['publication_match_percentage'] ?? 0,
+                                'submitted_works_match_percentage' => $data['submitted_works_match_percentage'] ?? 0,
+                                'status' => 'COMPLETE',
+                                'provider' => 'ithenticate',
+                            ],
+                        ];
+                    }
+
+                    if (in_array($status, ['FAILED', 'ERROR'])) {
+                        throw new \Exception('Similarity check failed: ' . ($data['error_message'] ?? 'Unknown error'));
+                    }
+                } else {
+                    Log::warning("iThenticate: Poll attempt {$attempt} failed with status: " . $response->status());
                 }
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                Log::warning("iThenticate: Poll attempt {$attempt} connection error: " . $e->getMessage());
+                // Continue polling on connection errors
             }
 
             // Wait before next attempt
