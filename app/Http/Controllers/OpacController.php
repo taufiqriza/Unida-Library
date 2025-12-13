@@ -7,10 +7,13 @@ use App\Models\Branch;
 use App\Models\Ebook;
 use App\Models\Ethesis;
 use App\Models\Item;
+use App\Models\JournalArticle;
 use App\Models\Member;
 use App\Models\News;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class OpacController extends Controller
 {
@@ -19,15 +22,17 @@ class OpacController extends Controller
         $stats = [
             'books' => Book::withoutGlobalScopes()->count(),
             'items' => Item::withoutGlobalScopes()->count(),
-            'branches' => Branch::where('is_active', true)->count(),
+            'journals' => JournalArticle::count(),
             'ebooks' => Ebook::count(),
-            'etheses' => Ethesis::count(),
+            'etheses' => $this->getEthesisCount(),
         ];
 
         $newBooks = Book::withoutGlobalScopes()
             ->with('authors')
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
             ->latest()
-            ->take(8)
+            ->take(16)
             ->get()
             ->map(fn($b) => [
                 'id' => $b->id,
@@ -38,17 +43,19 @@ class OpacController extends Controller
             ]);
 
         $popularBooks = Book::withoutGlobalScopes()
-            ->with('authors')
-            ->withCount(['items as loans_count' => fn($q) => $q->withoutGlobalScopes()->whereHas('loans')])
-            ->orderByDesc('loans_count')
-            ->take(8)
+            ->with('authors', 'publisher')
+            ->whereNotNull('image')
+            ->where('image', '!=', '')
+            ->inRandomOrder()
+            ->take(16)
             ->get()
             ->map(fn($b) => [
                 'id' => $b->id,
                 'title' => $b->title,
                 'authors' => $b->author_names ?: '-',
                 'cover' => $b->cover_url,
-                'loans_count' => $b->loans_count,
+                'publisher' => $b->publisher?->name,
+                'year' => $b->publish_year,
             ]);
 
         $news = News::published()
@@ -325,5 +332,38 @@ class OpacController extends Controller
         $page = $pages[$slug];
 
         return view('opac.page', compact('page'));
+    }
+
+    /**
+     * Get total ethesis count from repo OAI-PMH (cached for 24 hours)
+     */
+    protected function getEthesisCount(): int
+    {
+        return Cache::remember('ethesis_total_count', 86400, function () {
+            try {
+                // Fetch first page to get resumptionToken with offset info
+                $response = Http::timeout(10)->get('https://repo.unida.gontor.ac.id/cgi/oai2', [
+                    'verb' => 'ListIdentifiers',
+                    'metadataPrefix' => 'oai_dc',
+                    'set' => '74797065733D746865736973', // Type = Thesis
+                ]);
+                
+                if ($response->successful()) {
+                    $body = $response->body();
+                    $firstPageCount = substr_count($body, '<identifier>');
+                    
+                    // Extract offset from resumptionToken (e.g., offset%3D461 means 461 total after first page)
+                    if (preg_match('/offset%3D(\d+)/', $body, $matches)) {
+                        return (int) $matches[1];
+                    }
+                    
+                    return $firstPageCount;
+                }
+            } catch (\Exception $e) {
+                // Fallback to local count
+            }
+            
+            return Ethesis::count();
+        });
     }
 }

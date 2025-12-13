@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ImportSlims extends Command
 {
-    protected $signature = 'slims:import {source : pusat or unput} {--step= : Specific step}';
+    protected $signature = 'slims:import {source} {--branch= : Branch ID} {--step= : Specific step}';
     protected $description = 'Import data from SLiMS temporary database';
 
     protected $sourceDb;
@@ -24,8 +24,14 @@ class ImportSlims extends Command
             $this->sourceDb = 'slims_temp_unput';
             $this->branchId = 2;
         } else {
-            $this->error('Invalid source. Use: pusat or unput');
-            return 1;
+            // Custom: source is temp db name (e.g., slims_temp_03)
+            $this->sourceDb = $source;
+            $this->branchId = $this->option('branch');
+            
+            if (!$this->branchId) {
+                $this->error('--branch option required for custom source');
+                return 1;
+            }
         }
 
         $this->info("Importing from {$this->sourceDb} to branch_id={$this->branchId}");
@@ -260,7 +266,7 @@ class ImportSlims extends Command
         DB::statement("SET SESSION sql_mode = ''");
         
         DB::statement("
-            INSERT INTO perpustakaan.items (
+            INSERT IGNORE INTO perpustakaan.items (
                 id, book_id, branch_id, barcode, call_number, collection_type_id, location_id,
                 inventory_code, received_date, price, created_at, updated_at
             )
@@ -279,7 +285,6 @@ class ImportSlims extends Command
                 COALESCE(i.last_update, NOW())
             FROM {$this->sourceDb}.item i
             WHERE i.biblio_id IN (SELECT biblio_id FROM {$this->sourceDb}.biblio)
-            ON DUPLICATE KEY UPDATE barcode = VALUES(barcode)
         ");
         
         $total = DB::table('items')->where('branch_id', $this->branchId)->count();

@@ -10,7 +10,7 @@
             <p class="text-blue-200 text-sm lg:text-base mb-6">Universitas Darussalam Gontor</p>
             
             <!-- Search Box - Powerful Rounded Full Design -->
-            <form action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto">
+            <form id="searchForm" action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto">
                 <div class="relative group">
                     <!-- Glow effect -->
                     <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
@@ -23,14 +23,21 @@
                         <input 
                             type="search" 
                             name="q" 
+                            id="searchInput"
                             placeholder="Cari buku, e-book, tugas akhir, berita..." 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                             autocomplete="off"
                         >
-                        <button type="submit" class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 flex items-center gap-2">
-                            <span class="hidden sm:inline">Cari</span>
-                            <i class="fas fa-arrow-right text-sm"></i>
-                        </button>
+                        <!-- Pill Switcher -->
+                        <div class="m-1.5 flex items-center bg-gray-100 rounded-full p-1 gap-1">
+                            <button type="submit" class="px-5 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 text-sm flex items-center gap-2">
+                                <i class="fas fa-search"></i>
+                                <span class="hidden sm:inline">Cari</span>
+                            </button>
+                            <button type="button" id="advancedBtn" onclick="openAdvancedSearch()" class="w-10 h-10 lg:w-11 lg:h-11 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-white rounded-full transition-all duration-300">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -43,6 +50,8 @@
                     <a href="{{ route('opac.search') }}?q=hukum" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
                 </div>
             </form>
+
+            </script>
         </div>
     </section>
 
@@ -69,11 +78,11 @@
             </div>
             <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
                 <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-building text-purple-600 text-sm lg:text-lg"></i>
+                    <i class="fas fa-newspaper text-purple-600 text-sm lg:text-lg"></i>
                 </div>
                 <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['branches']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Cabang</div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['journals']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Jurnal</div>
                 </div>
             </div>
             <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
@@ -97,9 +106,9 @@
         </div>
     </section>
 
-    <!-- Quick Actions: Unggah & Plagiasi -->
+    <!-- Quick Actions: Unggah, Plagiasi, Member -->
     <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
             <!-- Unggah Tugas Akhir -->
             <a href="{{ route('opac.panduan.thesis') }}" class="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-4 text-white hover:shadow-lg hover:shadow-purple-200 transition group flex items-center gap-4">
                 <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -123,6 +132,18 @@
                 </div>
                 <i class="fas fa-chevron-right text-teal-200 group-hover:translate-x-1 transition"></i>
             </a>
+
+            <!-- Panduan Member -->
+            <a href="{{ route('opac.panduan.member') }}" class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-4 text-white hover:shadow-lg hover:shadow-blue-200 transition group flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user-circle text-xl"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-sm lg:text-base">Panduan Member</h3>
+                    <p class="text-blue-200 text-[10px] lg:text-xs">Login & fitur perpustakaan</p>
+                </div>
+                <i class="fas fa-chevron-right text-blue-200 group-hover:translate-x-1 transition"></i>
+            </a>
         </div>
     </section>
 
@@ -133,20 +154,37 @@
             <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-sparkles text-blue-500 mr-2"></i>Koleksi Terbaru</h2>
             <a href="{{ route('opac.search') . '?type=book' }}?sort=latest" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
-            @foreach($newBooks as $book)
-            <a href="{{ route('opac.catalog.show', $book['id']) }}" class="bg-white rounded-xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-xl hover:-translate-y-1 transition group">
-                <div class="aspect-[3/4] bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 lg:gap-3">
+            @foreach($newBooks as $index => $book)
+            <a href="{{ route('opac.catalog.show', $book['id']) }}" class="group">
+                <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-blue-50 to-slate-50">
                     @if($book['cover'])
                         <img src="{{ $book['cover'] }}" alt="{{ $book['title'] }}" class="w-full h-full object-cover">
                     @else
-                        <i class="fas fa-book text-4xl text-blue-300"></i>
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-book text-2xl text-blue-200"></i>
+                        </div>
                     @endif
-                </div>
-                <div class="p-3">
-                    <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-blue-600">{{ $book['title'] }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">{{ $book['authors'] }}</p>
-                    <p class="text-xs text-gray-400 mt-1">{{ $book['publish_year'] }}</p>
+                    <!-- New badge for first 3 -->
+                    @if($index < 3)
+                    <div class="absolute top-1.5 left-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-[7px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide shadow">
+                        <i class="fas fa-certificate text-[6px] mr-0.5"></i>Baru
+                    </div>
+                    @endif
+                    <!-- Year badge -->
+                    @if($book['publish_year'])
+                    <div class="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded font-medium">
+                        {{ $book['publish_year'] }}
+                    </div>
+                    @endif
+                    <!-- Hover overlay with info -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                        <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-2 leading-tight">{{ $book['title'] }}</h3>
+                        <div class="flex items-center gap-1 mt-1">
+                            <i class="fas fa-user text-[8px] text-blue-400"></i>
+                            <p class="text-white/80 text-[8px] lg:text-[9px] truncate">{{ $book['authors'] }}</p>
+                        </div>
+                    </div>
                 </div>
             </a>
             @endforeach
@@ -156,26 +194,49 @@
 
     <!-- Popular Books -->
     @if($popularBooks->count() > 0)
-    <section class="bg-white py-8 lg:py-12">
+    <section class="bg-gradient-to-b from-slate-50 to-white py-8 lg:py-10">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-fire text-orange-500 mr-2"></i>Paling Diminati</h2>
-                <a href="{{ route('opac.search') . '?type=book' }}?sort=popular" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+                <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-star text-amber-500 mr-2"></i>Rekomendasi</h2>
+                <a href="{{ route('opac.search') . '?type=book' }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                @foreach($popularBooks as $book)
-                <a href="{{ route('opac.catalog.show', $book['id']) }}" class="flex gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition group">
-                    <div class="w-14 h-18 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 lg:gap-3">
+                @foreach($popularBooks as $index => $book)
+                <a href="{{ route('opac.catalog.show', $book['id']) }}" class="group">
+                    <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-amber-50 to-slate-50">
                         @if($book['cover'])
                             <img src="{{ $book['cover'] }}" alt="{{ $book['title'] }}" class="w-full h-full object-cover">
                         @else
-                            <i class="fas fa-book text-blue-300"></i>
+                            <div class="w-full h-full flex items-center justify-center">
+                                <i class="fas fa-book text-2xl text-amber-200"></i>
+                            </div>
                         @endif
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-blue-600">{{ $book['title'] }}</h3>
-                        <p class="text-xs text-gray-500 mt-1">{{ $book['authors'] }}</p>
-                        <p class="text-xs text-blue-600 mt-1"><i class="fas fa-chart-line mr-1"></i>{{ $book['loans_count'] }} peminjaman</p>
+                        <!-- Top badges -->
+                        @if($index < 3)
+                        <div class="absolute top-1.5 left-1.5 w-5 h-5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                            <span class="text-white text-[9px] font-bold">{{ $index + 1 }}</span>
+                        </div>
+                        @endif
+                        <!-- Year badge -->
+                        @if($book['year'])
+                        <div class="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded font-medium">
+                            {{ $book['year'] }}
+                        </div>
+                        @endif
+                        <!-- Hover overlay with info -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                            <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-2 leading-tight">{{ $book['title'] }}</h3>
+                            <div class="flex items-center gap-1 mt-1">
+                                <i class="fas fa-user text-[8px] text-amber-400"></i>
+                                <p class="text-white/80 text-[8px] lg:text-[9px] truncate">{{ $book['authors'] }}</p>
+                            </div>
+                            @if($book['publisher'])
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <i class="fas fa-building text-[8px] text-blue-400"></i>
+                                <p class="text-white/60 text-[8px] truncate">{{ $book['publisher'] }}</p>
+                            </div>
+                            @endif
+                        </div>
                     </div>
                 </a>
                 @endforeach
@@ -268,4 +329,7 @@
             </div>
         </div>
     </section>
+
+    <!-- Advanced Search Modal Component -->
+    <x-opac.advanced-search-modal />
 </x-opac.layout>

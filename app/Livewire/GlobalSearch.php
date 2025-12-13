@@ -23,16 +23,16 @@ class GlobalSearch extends Component
     
     // Primary Filters
     public string $resourceType = 'all';
-    public ?int $branchId = null;
+    public $branchId = null;
     
     // Advanced Filters
     public array $selectedSubjects = [];
-    public ?int $collectionTypeId = null;
-    public ?int $facultyId = null;
-    public ?int $departmentId = null;
+    public $collectionTypeId = null;
+    public $facultyId = null;
+    public $departmentId = null;
     public ?string $language = null;
-    public ?int $yearFrom = null;
-    public ?int $yearTo = null;
+    public $yearFrom = null;
+    public $yearTo = null;
     public string $thesisType = '';
     public ?string $journalCode = null;
     
@@ -42,7 +42,7 @@ class GlobalSearch extends Component
     
     // Pagination
     public int $page = 1;
-    public int $perPage = 12;
+    public int $perPage = 15;
     
     // UI State
     public bool $showMobileFilters = false;
@@ -69,6 +69,15 @@ class GlobalSearch extends Component
     public function mount()
     {
         $this->query = $this->sanitizeInput(request('q', ''));
+        
+        // Convert empty strings to null for optional params
+        if ($this->branchId === '') $this->branchId = null;
+        if ($this->collectionTypeId === '') $this->collectionTypeId = null;
+        if ($this->facultyId === '') $this->facultyId = null;
+        if ($this->departmentId === '') $this->departmentId = null;
+        if ($this->yearFrom === '') $this->yearFrom = null;
+        if ($this->yearTo === '') $this->yearTo = null;
+        if ($this->language === '') $this->language = null;
     }
 
     public function updatingQuery($value)
@@ -205,52 +214,66 @@ class GlobalSearch extends Component
 
     protected function searchBooks(): Collection
     {
+        // Build base query
         $query = Book::query()
             ->withoutGlobalScopes()
-            ->with(['authors', 'publisher', 'subjects'])
+            ->with(['authors', 'publisher', 'subjects', 'items.branch'])
             ->withCount('items')
             ->where(function($q) {
                 $q->where('is_opac_visible', true)
                   ->orWhereNull('is_opac_visible');
             });
 
+        // Use Meilisearch if search query exists
         if ($this->query) {
-            $searchTerm = $this->query;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhere('isbn', 'like', "%{$searchTerm}%")
-                  ->orWhere('call_number', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"))
-                  ->orWhereHas('publisher', fn($p) => $p->where('name', 'like', "%{$searchTerm}%"));
-            });
+            $searchBuilder = Book::search($this->query);
+            
+            // Apply Meilisearch filters
+            if ($this->branchId) {
+                $searchBuilder->where('branch_id', $this->branchId);
+            }
+            if ($this->language) {
+                $searchBuilder->where('language', $this->language);
+            }
+            if ($this->yearFrom) {
+                $searchBuilder->where('year', '>=', (int) $this->yearFrom);
+            }
+            if ($this->yearTo) {
+                $searchBuilder->where('year', '<=', (int) $this->yearTo);
+            }
+            
+            // Get IDs from Meilisearch
+            $bookIds = $searchBuilder->take(200)->keys()->toArray();
+            
+            if (empty($bookIds)) {
+                return collect();
+            }
+            
+            $query->whereIn('id', $bookIds);
+        } else {
+            // No search query - apply DB filters directly
+            if ($this->branchId) {
+                $query->where('branch_id', $this->branchId);
+            }
+            if ($this->language) {
+                $query->where('language', $this->language);
+            }
+            if ($this->yearFrom) {
+                $query->where('publish_year', '>=', $this->yearFrom);
+            }
+            if ($this->yearTo) {
+                $query->where('publish_year', '<=', $this->yearTo);
+            }
         }
 
-        // Branch filter - filter by items location
-        if ($this->branchId) {
-            $query->whereHas('items', fn($i) => $i->withoutGlobalScopes()->where('branch_id', $this->branchId));
-        }
-
-        // Subject filter
+        // Subject filter (always via DB - many-to-many relation)
         if (!empty($this->selectedSubjects)) {
             $query->whereHas('subjects', fn($s) => $s->whereIn('subjects.id', $this->selectedSubjects));
         }
 
-        // Collection type filter
+        // Collection type filter (via items relation)
         if ($this->collectionTypeId) {
             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
-        }
-
-        // Language filter
-        if ($this->language) {
-            $query->where('language', $this->language);
-        }
-
-        // Year filter
-        if ($this->yearFrom) {
-            $query->where('publish_year', '>=', $this->yearFrom);
-        }
-        if ($this->yearTo) {
-            $query->where('publish_year', '<=', $this->yearTo);
         }
 
         return $query->limit(100)->get()->map(fn($book) => [
@@ -269,6 +292,8 @@ class GlobalSearch extends Component
             'meta' => [
                 'isbn' => $book->isbn,
                 'call_number' => $book->call_number,
+                'branch' => $book->items->first()?->branch?->name,
+                'branches' => $book->items->pluck('branch.name')->unique()->filter()->values()->toArray(),
             ],
         ]);
     }
@@ -489,10 +514,44 @@ class GlobalSearch extends Component
 
     protected function getBookCount(?string $search): int
     {
-        $query = Book::withoutGlobalScopes();
         if ($search) {
-            $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
-                ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$search}%")));
+            try {
+                $searchBuilder = Book::search($search);
+                
+                // Apply same filters as searchBooks
+                if ($this->branchId) {
+                    $searchBuilder->where('branch_id', $this->branchId);
+                }
+                if ($this->language) {
+                    $searchBuilder->where('language', $this->language);
+                }
+                if ($this->yearFrom) {
+                    $searchBuilder->where('year', '>=', (int) $this->yearFrom);
+                }
+                if ($this->yearTo) {
+                    $searchBuilder->where('year', '<=', (int) $this->yearTo);
+                }
+                
+                $result = $searchBuilder->raw();
+                return $result['estimatedTotalHits'] ?? 0;
+            } catch (\Exception $e) {
+                return Book::withoutGlobalScopes()->where('title', 'like', "%{$search}%")->count();
+            }
+        }
+        
+        // No search - count from DB with filters
+        $query = Book::withoutGlobalScopes();
+        if ($this->branchId) {
+            $query->where('branch_id', $this->branchId);
+        }
+        if ($this->language) {
+            $query->where('language', $this->language);
+        }
+        if ($this->yearFrom) {
+            $query->where('publish_year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('publish_year', '<=', $this->yearTo);
         }
         return $query->count();
     }

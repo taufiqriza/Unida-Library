@@ -28,6 +28,7 @@
                         <input 
                             type="text" 
                             wire:model.live.debounce.400ms="query"
+                            id="searchInput"
                             placeholder="Ketik judul, pengarang, ISBN, atau kata kunci..." 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                             autofocus
@@ -37,10 +38,16 @@
                                 <i class="fas fa-times-circle text-lg"></i>
                             </button>
                         @endif
-                        <button class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-primary-600/30 hover:shadow-primary-600/50 flex items-center gap-2">
-                            <span class="hidden sm:inline">Cari</span>
-                            <i class="fas fa-arrow-right text-sm"></i>
-                        </button>
+                        {{-- Pill Switcher --}}
+                        <div class="m-1.5 flex items-center bg-gray-100 rounded-full p-1 gap-1">
+                            <button class="px-5 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-primary-600/30 text-sm flex items-center gap-2">
+                                <i class="fas fa-search"></i>
+                                <span class="hidden sm:inline">Cari</span>
+                            </button>
+                            <button type="button" id="advancedBtn" onclick="openAdvancedSearch()" class="w-10 h-10 lg:w-11 lg:h-11 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-white rounded-full transition-all duration-300">
+                                <i class="fas fa-sliders-h"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -422,7 +429,7 @@
                             <h2 class="text-lg font-bold text-gray-900">Semua Koleksi</h2>
                         @endif
                         <p class="text-sm text-gray-500 mt-0.5">
-                            {{ count($results) }} item ditemukan
+                            {{ number_format($this->totalResults) }} item ditemukan
                             @if($this->activeFiltersCount > 0)
                                 <span class="text-primary-600">({{ $this->activeFiltersCount }} filter aktif)</span>
                             @endif
@@ -528,120 +535,158 @@
                 <div wire:loading.remove wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy, journalCode">
                     @if(count($results) > 0)
                         @if($viewMode === 'grid')
-                        {{-- Grid View --}}
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {{-- Grid View - Modern Card Design --}}
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-primary-200 transition-all duration-300 hover:-translate-y-1">
-                                    {{-- Cover --}}
-                                    <div class="aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-50 relative overflow-hidden">
-                                        @if($item['cover'])
-                                            <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                        @else
-                                            <div class="w-full h-full flex flex-col items-center justify-center text-gray-300">
-                                                <i class="fas {{ $item['icon'] }} text-4xl mb-2"></i>
-                                                <span class="text-xs">No Cover</span>
+                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group">
+                                    {{-- Card Container --}}
+                                    <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100/50 transition-all duration-300 hover:-translate-y-1">
+                                        {{-- Cover Section --}}
+                                        <div class="aspect-[2/3] bg-gradient-to-br from-slate-100 to-slate-50 relative overflow-hidden">
+                                            @if($item['cover'])
+                                                <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center">
+                                                    <i class="fas {{ $item['icon'] }} text-3xl text-slate-300"></i>
+                                                </div>
+                                            @endif
+                                            
+                                            {{-- Year Badge - Top Right --}}
+                                            @if($item['year'])
+                                            <div class="absolute top-2 right-2">
+                                                <span class="px-2 py-0.5 text-[10px] font-bold bg-black/70 text-white rounded backdrop-blur-sm">
+                                                    {{ $item['year'] }}
+                                                </span>
                                             </div>
-                                        @endif
-                                        
-                                        {{-- Type Badge --}}
-                                        <div class="absolute top-2 left-2">
-                                            <span class="px-2.5 py-1 text-[10px] font-bold rounded-full shadow-lg
-                                                @if($item['badgeColor'] === 'blue') bg-blue-500 text-white
-                                                @elseif($item['badgeColor'] === 'orange') bg-orange-500 text-white
-                                                @elseif($item['badgeColor'] === 'purple') bg-purple-500 text-white
-                                                @elseif($item['badgeColor'] === 'green') bg-green-500 text-white
-                                                @else bg-gray-500 text-white
-                                                @endif
-                                            ">
-                                                {{ $item['badge'] }}
-                                            </span>
-                                        </div>
+                                            @endif
+                                            
+                                            {{-- Type Icon - Top Left --}}
+                                            <div class="absolute top-2 left-2">
+                                                <span class="w-7 h-7 flex items-center justify-center rounded-lg shadow-lg
+                                                    @if($item['badgeColor'] === 'blue') bg-blue-500 text-white
+                                                    @elseif($item['badgeColor'] === 'orange') bg-orange-500 text-white
+                                                    @elseif($item['badgeColor'] === 'purple') bg-purple-500 text-white
+                                                    @elseif($item['badgeColor'] === 'indigo') bg-indigo-500 text-white
+                                                    @elseif($item['badgeColor'] === 'green') bg-emerald-500 text-white
+                                                    @else bg-slate-500 text-white
+                                                    @endif
+                                                ">
+                                                    <i class="fas {{ $item['icon'] }} text-xs"></i>
+                                                </span>
+                                            </div>
 
-                                        {{-- Hover Overlay --}}
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
-                                            <span class="text-white text-xs font-medium">
-                                                <i class="fas fa-eye mr-1"></i> Lihat Detail
-                                            </span>
+                                            {{-- Hover Overlay --}}
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
+                                                <span class="text-white text-[10px] font-medium flex items-center gap-1">
+                                                    <i class="fas fa-arrow-right"></i> Lihat Detail
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    
-                                    {{-- Info --}}
-                                    <div class="p-3">
-                                        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-primary-600 transition-colors leading-snug">
-                                            {{ $item['title'] }}
-                                        </h3>
-                                        <p class="text-xs text-gray-500 mt-1.5 line-clamp-1">
-                                            <i class="fas fa-user mr-1 text-gray-400"></i>{{ $item['author'] }}
-                                        </p>
-                                        @if($item['year'])
-                                            <p class="text-xs text-gray-400 mt-1">
-                                                <i class="fas fa-calendar-alt mr-1"></i>{{ $item['year'] }}
+                                        
+                                        {{-- Info Section --}}
+                                        <div class="p-2.5">
+                                            <h3 class="font-semibold text-gray-900 text-xs line-clamp-2 group-hover:text-primary-600 transition-colors leading-snug min-h-[2.5rem]">
+                                                {{ $item['title'] }}
+                                            </h3>
+                                            <p class="text-[11px] text-gray-500 mt-1 line-clamp-1 flex items-center gap-1">
+                                                <i class="fas fa-pen-nib text-gray-400 text-[9px]"></i>
+                                                <span class="truncate">{{ $item['author'] }}</span>
                                             </p>
-                                        @endif
+                                            @if(isset($item['meta']['branch']) && $item['meta']['branch'])
+                                            <p class="text-[10px] text-emerald-600 mt-1 flex items-center gap-1">
+                                                <i class="fas fa-location-dot text-[8px]"></i>
+                                                <span class="truncate">{{ Str::limit($item['meta']['branch'], 20) }}</span>
+                                            </p>
+                                            @endif
+                                        </div>
                                     </div>
                                 </a>
                             @endforeach
                         </div>
                         @else
-                        {{-- List View --}}
+                        {{-- List View - Modern Design --}}
                         <div class="space-y-3">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group flex gap-4 bg-white rounded-2xl p-4 shadow-sm hover:shadow-lg border border-gray-100 hover:border-primary-200 transition-all duration-300">
+                                <a href="{{ $item['url'] }}" @if(isset($item['external']) && $item['external']) target="_blank" rel="noopener" @endif class="group flex gap-4 bg-white rounded-xl p-3 shadow-sm hover:shadow-lg border border-gray-100/50 hover:border-primary-200 transition-all duration-300">
                                     {{-- Cover --}}
-                                    <div class="w-20 h-28 flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl overflow-hidden">
+                                    <div class="w-16 sm:w-20 aspect-[2/3] flex-shrink-0 bg-gradient-to-br from-slate-100 to-slate-50 rounded-lg overflow-hidden relative">
                                         @if($item['cover'])
                                             <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         @else
-                                            <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                                <i class="fas {{ $item['icon'] }} text-2xl"></i>
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <i class="fas {{ $item['icon'] }} text-xl text-slate-300"></i>
                                             </div>
                                         @endif
+                                        {{-- Type Icon Overlay --}}
+                                        <div class="absolute top-1 left-1">
+                                            <span class="w-5 h-5 flex items-center justify-center rounded shadow
+                                                @if($item['badgeColor'] === 'blue') bg-blue-500 text-white
+                                                @elseif($item['badgeColor'] === 'orange') bg-orange-500 text-white
+                                                @elseif($item['badgeColor'] === 'purple') bg-purple-500 text-white
+                                                @elseif($item['badgeColor'] === 'indigo') bg-indigo-500 text-white
+                                                @elseif($item['badgeColor'] === 'green') bg-emerald-500 text-white
+                                                @else bg-slate-500 text-white
+                                                @endif
+                                            ">
+                                                <i class="fas {{ $item['icon'] }} text-[8px]"></i>
+                                            </span>
+                                        </div>
                                     </div>
                                     
                                     {{-- Info --}}
-                                    <div class="flex-1 min-w-0">
+                                    <div class="flex-1 min-w-0 py-0.5">
                                         <div class="flex items-start justify-between gap-2">
-                                            <div>
-                                                <span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded-full mb-1.5
-                                                    @if($item['badgeColor'] === 'blue') bg-blue-100 text-blue-700
-                                                    @elseif($item['badgeColor'] === 'orange') bg-orange-100 text-orange-700
-                                                    @elseif($item['badgeColor'] === 'purple') bg-purple-100 text-purple-700
-                                                    @elseif($item['badgeColor'] === 'green') bg-green-100 text-green-700
-                                                    @else bg-gray-100 text-gray-700
-                                                    @endif
-                                                ">
-                                                    {{ $item['badge'] }}
-                                                </span>
-                                                <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
-                                                    {{ $item['title'] }}
-                                                </h3>
-                                            </div>
+                                            <h3 class="font-semibold text-gray-900 text-sm group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
+                                                {{ $item['title'] }}
+                                            </h3>
+                                            @if($item['year'])
+                                            <span class="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600 rounded">
+                                                {{ $item['year'] }}
+                                            </span>
+                                            @endif
                                         </div>
                                         
-                                        <p class="text-sm text-gray-600 mt-1">
-                                            <i class="fas fa-user mr-1 text-gray-400"></i>{{ $item['author'] }}
+                                        <p class="text-xs text-gray-600 mt-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-pen-nib text-gray-400 text-[10px]"></i>
+                                            <span class="line-clamp-1">{{ $item['author'] }}</span>
                                         </p>
                                         
                                         @if($item['description'])
-                                            <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $item['description'] }}</p>
+                                            <p class="text-[11px] text-gray-500 mt-1.5 line-clamp-2 hidden sm:block">{{ $item['description'] }}</p>
                                         @endif
                                         
-                                        <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-400">
-                                            @if($item['year'])
-                                                <span><i class="fas fa-calendar-alt mr-1"></i>{{ $item['year'] }}</span>
+                                        <div class="flex items-center flex-wrap gap-x-3 gap-y-1 mt-2">
+                                            @if(isset($item['meta']['branch']) && $item['meta']['branch'])
+                                                <span class="text-[11px] text-emerald-600 flex items-center gap-1">
+                                                    <i class="fas fa-location-dot text-[9px]"></i>{{ $item['meta']['branch'] }}
+                                                </span>
                                             @endif
                                             @if(isset($item['meta']['department']))
-                                                <span><i class="fas fa-university mr-1"></i>{{ $item['meta']['department'] }}</span>
+                                                <span class="text-[11px] text-gray-500 flex items-center gap-1">
+                                                    <i class="fas fa-building-columns text-[9px]"></i>{{ Str::limit($item['meta']['department'], 25) }}
+                                                </span>
                                             @endif
-                                            @if(isset($item['meta']['isbn']))
-                                                <span><i class="fas fa-barcode mr-1"></i>{{ $item['meta']['isbn'] }}</span>
+                                            @if(isset($item['meta']['isbn']) && $item['meta']['isbn'])
+                                                <span class="text-[11px] text-gray-400 flex items-center gap-1 font-mono">
+                                                    <i class="fas fa-barcode text-[9px]"></i>{{ $item['meta']['isbn'] }}
+                                                </span>
                                             @endif
                                             @if(isset($item['meta']['journal']))
-                                                <span class="text-purple-500"><i class="fas fa-book-open mr-1"></i>{{ $item['meta']['journal'] }}</span>
+                                                <span class="text-[11px] text-purple-600 flex items-center gap-1">
+                                                    <i class="fas fa-book-open text-[9px]"></i>{{ Str::limit($item['meta']['journal'], 20) }}
+                                                </span>
                                             @endif
-                                            @if(isset($item['external']) && $item['external'])
-                                                <span class="text-blue-500"><i class="fas fa-external-link-alt mr-1"></i>Link Eksternal</span>
-                                            @endif
+                                            <span class="text-[11px] px-1.5 py-0.5 rounded
+                                                @if($item['badgeColor'] === 'blue') bg-blue-50 text-blue-600
+                                                @elseif($item['badgeColor'] === 'orange') bg-orange-50 text-orange-600
+                                                @elseif($item['badgeColor'] === 'purple') bg-purple-50 text-purple-600
+                                                @elseif($item['badgeColor'] === 'indigo') bg-indigo-50 text-indigo-600
+                                                @elseif($item['badgeColor'] === 'green') bg-emerald-50 text-emerald-600
+                                                @else bg-slate-50 text-slate-600
+                                                @endif
+                                            ">
+                                                {{ $item['badge'] }}
+                                            </span>
                                         </div>
                                     </div>
                                     
@@ -814,4 +859,7 @@
             </div>
         </div>
     </div>
+
+    {{-- Advanced Search Modal Component --}}
+    <x-opac.advanced-search-modal />
 </div>

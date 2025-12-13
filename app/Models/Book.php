@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 class Book extends Model
 {
-    use BelongsToBranch;
+    use BelongsToBranch, Searchable;
 
     protected $fillable = [
         'branch_id', 'user_id', 'title', 'sor', 'isbn', 'publisher_id', 'place_id',
@@ -52,7 +53,12 @@ class Book extends Model
 
     public function getCoverUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        if (!$this->image) {
+            return null;
+        }
+        // Normalize path - add covers/ prefix if not present
+        $path = str_starts_with($this->image, 'covers/') ? $this->image : 'covers/' . $this->image;
+        return asset('storage/' . $path);
     }
 
     public function getFileUrlAttribute(): ?string
@@ -74,5 +80,20 @@ class Book extends Model
     public function collectionType(): BelongsTo
     {
         return $this->belongsTo(CollectionType::class);
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'isbn' => $this->isbn,
+            'call_number' => $this->call_number,
+            'author' => $this->author_names,
+            'publisher' => $this->publisher?->name,
+            'year' => $this->publish_year,
+            'branch_id' => $this->branch_id,
+            'language' => $this->language,
+        ];
     }
 }
