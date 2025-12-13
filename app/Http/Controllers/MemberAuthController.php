@@ -46,6 +46,7 @@ class MemberAuthController extends Controller
                             'ip' => $request->ip(),
                         ]);
                         Auth::guard('web')->login($user);
+                        $request->session()->regenerate();
                         return redirect()->route('staff.dashboard');
                     }
                 }
@@ -70,6 +71,7 @@ class MemberAuthController extends Controller
                 ]);
                 
                 Auth::guard('member')->login($member);
+                $request->session()->regenerate();
                 return redirect()->route('opac.member.dashboard');
             }
 

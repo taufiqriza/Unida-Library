@@ -25,7 +25,7 @@ class StaffRegisterController extends Controller
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => $validated['password'],
+            'password' => Hash::make($validated['password']),
             'branch_id' => $validated['branch_id'],
             'role' => 'staff',
             'is_active' => false,

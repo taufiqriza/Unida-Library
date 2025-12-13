@@ -28,7 +28,20 @@ class StaffControl extends Component
 
     public function viewUser($id)
     {
-        $this->selectedUser = User::with('branch')->find($id);
+        $query = User::with('branch');
+        
+        // Authorization: Non-super admin can only view users from their branch
+        if (auth()->user()->role !== 'super_admin') {
+            $query->where('branch_id', auth()->user()->branch_id);
+        }
+        
+        $this->selectedUser = $query->find($id);
+        
+        if (!$this->selectedUser) {
+            $this->dispatch('notify', type: 'error', message: 'User tidak ditemukan atau tidak memiliki akses');
+            return;
+        }
+        
         $this->showModal = true;
         $this->rejectionReason = '';
     }
@@ -43,6 +56,13 @@ class StaffControl extends Component
     public function approveUser()
     {
         if (!$this->selectedUser) return;
+        
+        // Authorization check: Non-super admin can only approve users from their branch
+        if (auth()->user()->role !== 'super_admin' && 
+            $this->selectedUser->branch_id !== auth()->user()->branch_id) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses untuk menyetujui staff ini');
+            return;
+        }
 
         $this->selectedUser->update([
             'status' => 'approved',
@@ -58,6 +78,13 @@ class StaffControl extends Component
     public function rejectUser()
     {
         if (!$this->selectedUser) return;
+        
+        // Authorization check: Non-super admin can only reject users from their branch
+        if (auth()->user()->role !== 'super_admin' && 
+            $this->selectedUser->branch_id !== auth()->user()->branch_id) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses untuk menolak staff ini');
+            return;
+        }
 
         $this->validate(['rejectionReason' => 'required|min:10']);
 

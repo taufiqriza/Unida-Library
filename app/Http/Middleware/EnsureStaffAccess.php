@@ -11,7 +11,7 @@ class EnsureStaffAccess
     {
         $user = auth()->user();
         
-        if (!$user || !in_array($user->role, ['super_admin', 'admin', 'librarian'])) {
+        if (!$user || !in_array($user->role, ['super_admin', 'admin', 'librarian', 'staff'])) {
             abort(403, 'Akses ditolak. Anda bukan staff perpustakaan.');
         }
 

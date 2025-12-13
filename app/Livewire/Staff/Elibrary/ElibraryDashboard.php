@@ -196,31 +196,41 @@ class ElibraryDashboard extends Component
     public function render()
     {
         $isMain = $this->isMainBranch();
+        $userBranchId = auth()->user()->branch_id;
 
-        // Stats
+        // Stats - E-Book & E-Thesis are global, submissions filtered by member's branch
+        $submissionQuery = ThesisSubmission::query();
+        $plagiarismQuery = PlagiarismCheck::query();
+        
+        // Non-main branch only sees submissions from members of their branch
+        if (!$isMain) {
+            $submissionQuery->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
+            $plagiarismQuery->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
+        }
+
         $stats = [
             'ebooks' => Ebook::count(),
             'ethesis' => Ethesis::count(),
-            'submissions_pending' => ThesisSubmission::where('status', 'submitted')->count(),
-            'plagiarism_pending' => PlagiarismCheck::where('status', 'pending')->count(),
+            'submissions_pending' => (clone $submissionQuery)->where('status', 'submitted')->count(),
+            'plagiarism_pending' => (clone $plagiarismQuery)->where('status', 'pending')->count(),
         ];
 
         // Submission stats by status
         $submissionStats = [
-            'submitted' => ThesisSubmission::where('status', 'submitted')->count(),
-            'under_review' => ThesisSubmission::where('status', 'under_review')->count(),
-            'revision_required' => ThesisSubmission::where('status', 'revision_required')->count(),
-            'approved' => ThesisSubmission::where('status', 'approved')->count(),
-            'rejected' => ThesisSubmission::where('status', 'rejected')->count(),
-            'published' => ThesisSubmission::where('status', 'published')->count(),
+            'submitted' => (clone $submissionQuery)->where('status', 'submitted')->count(),
+            'under_review' => (clone $submissionQuery)->where('status', 'under_review')->count(),
+            'revision_required' => (clone $submissionQuery)->where('status', 'revision_required')->count(),
+            'approved' => (clone $submissionQuery)->where('status', 'approved')->count(),
+            'rejected' => (clone $submissionQuery)->where('status', 'rejected')->count(),
+            'published' => (clone $submissionQuery)->where('status', 'published')->count(),
         ];
 
         // Plagiarism stats
         $plagiarismStats = [
-            'pending' => PlagiarismCheck::where('status', 'pending')->count(),
-            'processing' => PlagiarismCheck::where('status', 'processing')->count(),
-            'completed' => PlagiarismCheck::where('status', 'completed')->count(),
-            'failed' => PlagiarismCheck::where('status', 'failed')->count(),
+            'pending' => (clone $plagiarismQuery)->where('status', 'pending')->count(),
+            'processing' => (clone $plagiarismQuery)->where('status', 'processing')->count(),
+            'completed' => (clone $plagiarismQuery)->where('status', 'completed')->count(),
+            'failed' => (clone $plagiarismQuery)->where('status', 'failed')->count(),
         ];
 
         $data = collect();
@@ -234,15 +244,27 @@ class ElibraryDashboard extends Component
                 ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%")->orWhere('author', 'like', "%{$this->search}%"))
                 ->latest()->paginate(10);
         } elseif ($this->activeTab === 'submissions') {
-            $data = ThesisSubmission::with(['member', 'department', 'department.faculty'])
+            $query = ThesisSubmission::with(['member', 'department', 'department.faculty'])
                 ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%")->orWhere('author', 'like', "%{$this->search}%")->orWhere('nim', 'like', "%{$this->search}%"))
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-                ->latest()->paginate(10);
+                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter));
+            
+            // Branch filter for non-main branch
+            if (!$isMain) {
+                $query->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
+            }
+            
+            $data = $query->latest()->paginate(10);
         } elseif ($this->activeTab === 'plagiarism') {
-            $data = PlagiarismCheck::with(['member', 'thesisSubmission'])
+            $query = PlagiarismCheck::with(['member', 'thesisSubmission'])
                 ->when($this->search, fn($q) => $q->where('document_title', 'like', "%{$this->search}%"))
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter))
-                ->latest()->paginate(10);
+                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter));
+            
+            // Branch filter for non-main branch
+            if (!$isMain) {
+                $query->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
+            }
+            
+            $data = $query->latest()->paginate(10);
         }
 
         return view('livewire.staff.elibrary.elibrary-dashboard', [

@@ -107,6 +107,13 @@ class StaffChat extends Component
         if (!$this->activeChat) return;
         if (empty(trim($this->message)) && !$this->attachment) return;
 
+        // Validate attachment if present
+        if ($this->attachment) {
+            $this->validate([
+                'attachment' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip'
+            ]);
+        }
+
         $data = [
             'sender_id' => auth()->id(),
             'receiver_id' => $this->activeChat,
@@ -136,6 +143,17 @@ class StaffChat extends Component
     {
         $userId = auth()->id();
 
+        // Get all conversation partner IDs first
+        $partnerIds = StaffMessage::where('sender_id', $userId)
+            ->orWhere('receiver_id', $userId)
+            ->get()
+            ->map(fn($msg) => $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id)
+            ->unique()
+            ->values();
+
+        // Eager load all users at once to avoid N+1
+        $users = User::with('branch')->whereIn('id', $partnerIds)->get()->keyBy('id');
+
         $conversations = StaffMessage::where('sender_id', $userId)
             ->orWhere('receiver_id', $userId)
             ->orderBy('created_at', 'desc')
@@ -143,13 +161,13 @@ class StaffChat extends Component
             ->groupBy(function ($msg) use ($userId) {
                 return $msg->sender_id === $userId ? $msg->receiver_id : $msg->sender_id;
             })
-            ->map(function ($messages) use ($userId) {
+            ->map(function ($messages) use ($userId, $users) {
                 $latest = $messages->first();
                 $otherUserId = $latest->sender_id === $userId ? $latest->receiver_id : $latest->sender_id;
                 $unread = $messages->where('receiver_id', $userId)->whereNull('read_at')->count();
                 
                 return [
-                    'user' => User::with('branch')->find($otherUserId),
+                    'user' => $users->get($otherUserId),
                     'latest' => $latest,
                     'unread' => $unread,
                 ];
