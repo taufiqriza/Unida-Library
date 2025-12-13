@@ -245,6 +245,89 @@
     </section>
     @endif
 
+    <!-- E-Thesis -->
+    @if($latestEtheses->count() > 0)
+    <section class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-graduation-cap text-purple-500 mr-2"></i>E-Thesis Terbaru</h2>
+            <a href="{{ route('opac.search') }}?type=ethesis" class="text-sm text-purple-600 hover:text-purple-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-3">
+            @foreach($latestEtheses->take(8) as $thesis)
+            <a href="{{ route('opac.ethesis.show', $thesis->id) }}" class="group">
+                <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-purple-100 to-indigo-100">
+                    <div class="w-full h-full flex flex-col items-center justify-center p-3 text-center">
+                        <i class="fas fa-graduation-cap text-3xl text-purple-300 mb-2"></i>
+                        <span class="text-[9px] text-purple-400 uppercase tracking-wide font-medium">Thesis</span>
+                    </div>
+                    <!-- Hover overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-purple-900/90 via-purple-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                        <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-3 leading-tight">{{ $thesis->title }}</h3>
+                        <p class="text-white/70 text-[8px] mt-1 truncate">{{ $thesis->author ?? '-' }}</p>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
+    <!-- Journals -->
+    @if($latestJournals->count() > 0)
+    <section class="bg-gradient-to-b from-slate-50 to-white py-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-file-lines text-emerald-500 mr-2"></i>Artikel Jurnal Terbaru</h2>
+                <a href="{{ route('opac.journals.index') }}" class="text-sm text-emerald-600 hover:text-emerald-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-3">
+                @foreach($latestJournals->take(8) as $journal)
+                <a href="{{ route('opac.journals.show', $journal->id) }}" class="group">
+                    <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-emerald-100 to-teal-100">
+                        <div class="w-full h-full flex flex-col items-center justify-center p-3 text-center">
+                            <i class="fas fa-file-lines text-3xl text-emerald-300 mb-2"></i>
+                            <span class="text-[9px] text-emerald-400 uppercase tracking-wide font-medium">Journal</span>
+                        </div>
+                        <!-- Hover overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/90 via-emerald-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                            <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-3 leading-tight">{{ $journal->title }}</h3>
+                            <p class="text-white/70 text-[8px] mt-1 truncate">{{ is_array($journal->authors) ? collect($journal->authors)->pluck('name')->first() : '-' }}</p>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    <!-- E-Books -->
+    @if($latestEbooks->count() > 0)
+    <section class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-file-pdf text-red-500 mr-2"></i>E-Book Terbaru</h2>
+            <a href="{{ route('opac.search') }}?type=ebook" class="text-sm text-red-600 hover:text-red-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 lg:gap-3">
+            @foreach($latestEbooks->take(8) as $ebook)
+            <a href="{{ route('opac.ebook.show', $ebook->id) }}" class="group">
+                <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-red-100 to-orange-100">
+                    <div class="w-full h-full flex flex-col items-center justify-center p-3 text-center">
+                        <i class="fas fa-file-pdf text-3xl text-red-300 mb-2"></i>
+                        <span class="text-[9px] text-red-400 uppercase tracking-wide font-medium">E-Book</span>
+                    </div>
+                    <!-- Hover overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-red-900/90 via-red-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                        <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-3 leading-tight">{{ $ebook->title }}</h3>
+                        <p class="text-white/70 text-[8px] mt-1 truncate">{{ $ebook->author ?? '-' }}</p>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </section>
+    @endif
+
     <!-- News -->
     @if(count($news) > 0)
     <section class="max-w-7xl mx-auto px-4 py-8">

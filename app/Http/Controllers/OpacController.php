@@ -58,6 +58,11 @@ class OpacController extends Controller
                 'year' => $b->publish_year,
             ]);
 
+        // Digital Collections
+        $latestEbooks = Ebook::latest()->take(4)->get();
+        $latestJournals = JournalArticle::latest()->take(4)->get();
+        $latestEtheses = Ethesis::latest()->take(4)->get();
+
         $news = News::published()
             ->latest('published_at')
             ->take(4)
@@ -75,7 +80,7 @@ class OpacController extends Controller
             'address' => $b->address ?? '',
         ]);
 
-        return view('opac.home', compact('stats', 'newBooks', 'popularBooks', 'news', 'branches'));
+        return view('opac.home', compact('stats', 'newBooks', 'popularBooks', 'latestEbooks', 'latestJournals', 'latestEtheses', 'news', 'branches'));
     }
 
     public function catalog(Request $request)

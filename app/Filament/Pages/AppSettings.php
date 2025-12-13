@@ -55,6 +55,18 @@ class AppSettings extends Page implements HasForms
             'ithenticate_api_key' => Setting::get('ithenticate_api_key', ''),
             'ithenticate_api_secret' => Setting::get('ithenticate_api_secret', ''),
             'ithenticate_base_url' => Setting::get('ithenticate_base_url', 'https://api.turnitin.com'),
+            // Integration Settings
+            'repo_enabled' => (bool) Setting::get('repo_enabled', true),
+            'repo_oai_url' => Setting::get('repo_oai_url', 'https://repo.unida.gontor.ac.id/cgi/oai2'),
+            'repo_sync_schedule' => Setting::get('repo_sync_schedule', 'weekly'),
+            'journal_enabled' => (bool) Setting::get('journal_enabled', true),
+            'journal_ojs_url' => Setting::get('journal_ojs_url', 'https://ejournal.unida.gontor.ac.id'),
+            'journal_sync_schedule' => Setting::get('journal_sync_schedule', 'daily'),
+            'journal_scrape_schedule' => Setting::get('journal_scrape_schedule', 'weekly'),
+            'kubuku_enabled' => (bool) Setting::get('kubuku_enabled', false),
+            'kubuku_api_url' => Setting::get('kubuku_api_url', ''),
+            'kubuku_api_key' => Setting::get('kubuku_api_key', ''),
+            'kubuku_library_id' => Setting::get('kubuku_library_id', ''),
         ]);
     }
 
@@ -218,25 +230,190 @@ class AppSettings extends Page implements HasForms
                                         ->helperText('Nama yang akan tercantum di sertifikat'),
                                 ]),
                             Forms\Components\Section::make('iThenticate / Turnitin API')
-                                ->description('Konfigurasi API untuk integrasi dengan iThenticate/Turnitin. Kosongkan jika menggunakan provider Internal.')
+                                ->description('Konfigurasi API untuk integrasi dengan iThenticate/Turnitin Core API (TCA). Hanya butuh Secret Key.')
                                 ->schema([
                                     Forms\Components\TextInput::make('ithenticate_integration_name')
-                                        ->label('Integration/Scope Name')
+                                        ->label('Integration Name')
                                         ->placeholder('Library-Portal-API')
-                                        ->helperText('Nama scope yang dibuat di dashboard iThenticate'),
+                                        ->helperText('Nama integrasi (opsional)'),
                                     Forms\Components\TextInput::make('ithenticate_api_key')
-                                        ->label('Key Name')
+                                        ->label('Key Name (Opsional)')
                                         ->placeholder('SYSTEM-LIBRARY')
-                                        ->helperText('Nama key dari TCA integration'),
+                                        ->helperText('Nama key untuk referensi'),
                                     Forms\Components\TextInput::make('ithenticate_api_secret')
-                                        ->label('Secret Key')
+                                        ->label('API Secret Key')
                                         ->password()
                                         ->revealable()
-                                        ->helperText('Secret key dari TCA integration (disimpan terenkripsi)'),
+                                        ->helperText('Secret key dari TCA integration (digunakan sebagai Bearer token)'),
                                     Forms\Components\TextInput::make('ithenticate_base_url')
-                                        ->label('Base URL')
+                                        ->label('API Base URL')
                                         ->default('https://unidagontor.turnitin.com')
-                                        ->helperText('URL dashboard iThenticate Anda'),
+                                        ->helperText('URL API iThenticate Anda (biasanya: https://[nama].turnitin.com)'),
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('test_ithenticate')
+                                            ->label('Test Koneksi API')
+                                            ->icon('heroicon-o-signal')
+                                            ->color('info')
+                                            ->action(function ($get) {
+                                                $baseUrl = rtrim($get('ithenticate_base_url') ?: 'https://unidagontor.turnitin.com', '/');
+                                                $apiSecret = $get('ithenticate_api_secret');
+                                                $integrationName = $get('ithenticate_integration_name') ?: 'Library-Portal-API';
+                                                
+                                                if (empty($apiSecret)) {
+                                                    Notification::make()
+                                                        ->title('API Secret Key harus diisi')
+                                                        ->danger()
+                                                        ->send();
+                                                    return;
+                                                }
+                                                
+                                                try {
+                                                    // Test dengan endpoint EULA (sesuai provider)
+                                                    $response = \Http::timeout(15)->withHeaders([
+                                                        'Authorization' => 'Bearer ' . $apiSecret,
+                                                        'X-Turnitin-Integration-Name' => $integrationName,
+                                                        'X-Turnitin-Integration-Version' => '1.0.0',
+                                                        'Content-Type' => 'application/json',
+                                                    ])->get($baseUrl . '/api/v1/eula/latest');
+                                                    
+                                                    if ($response->successful()) {
+                                                        $data = $response->json();
+                                                        Notification::make()
+                                                            ->title('Koneksi Berhasil!')
+                                                            ->body('API iThenticate terhubung. EULA Version: ' . ($data['version'] ?? 'OK'))
+                                                            ->success()
+                                                            ->send();
+                                                    } elseif ($response->status() === 401 || $response->status() === 403) {
+                                                        Notification::make()
+                                                            ->title('Kredensial Tidak Valid')
+                                                            ->body('Server merespons, tapi Secret Key tidak valid.')
+                                                            ->warning()
+                                                            ->send();
+                                                    } else {
+                                                        Notification::make()
+                                                            ->title('Koneksi Gagal')
+                                                            ->body('Status: ' . $response->status())
+                                                            ->danger()
+                                                            ->send();
+                                                    }
+                                                } catch (\Exception $e) {
+                                                    Notification::make()
+                                                        ->title('Error Koneksi')
+                                                        ->body('Tidak dapat terhubung ke ' . $baseUrl)
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            }),
+                                    ])->columnSpanFull(),
+                                ])->columns(2),
+                        ]),
+
+                    Forms\Components\Tabs\Tab::make('Integrasi')
+                        ->icon('heroicon-o-arrow-path')
+                        ->schema([
+                            Forms\Components\Section::make('Repository UNIDA (E-Thesis)')
+                                ->description('Sinkronisasi E-Thesis dari repo.unida.gontor.ac.id via OAI-PMH.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('repo_enabled')
+                                        ->label('Aktifkan Sinkronisasi')
+                                        ->helperText('Otomatis sync E-Thesis dari repository'),
+                                    Forms\Components\TextInput::make('repo_oai_url')
+                                        ->label('OAI-PMH URL')
+                                        ->default('https://repo.unida.gontor.ac.id/cgi/oai2')
+                                        ->helperText('Endpoint OAI-PMH repository'),
+                                    Forms\Components\Select::make('repo_sync_schedule')
+                                        ->label('Jadwal Sync')
+                                        ->options([
+                                            'daily' => 'Harian (setiap jam 02:00)',
+                                            'weekly' => 'Mingguan (Sabtu jam 02:00)',
+                                            'monthly' => 'Bulanan (tanggal 1)',
+                                        ])
+                                        ->default('weekly'),
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('sync_repo')
+                                            ->label('Sync Sekarang')
+                                            ->icon('heroicon-o-arrow-path')
+                                            ->color('success')
+                                            ->action(function () {
+                                                \Artisan::call('repo:sync');
+                                                Notification::make()->title('Sync Repository dimulai')->success()->send();
+                                            }),
+                                    ]),
+                                ])->columns(2),
+
+                            Forms\Components\Section::make('Journal OJS (Artikel Jurnal)')
+                                ->description('Sinkronisasi artikel jurnal dari ejournal.unida.gontor.ac.id. Tersedia 2 metode: Sync (via feed, cepat) dan Scrape (dari archive, lengkap).')
+                                ->schema([
+                                    Forms\Components\Toggle::make('journal_enabled')
+                                        ->label('Aktifkan Sinkronisasi')
+                                        ->helperText('Otomatis sync artikel dari OJS'),
+                                    Forms\Components\TextInput::make('journal_ojs_url')
+                                        ->label('OJS Base URL')
+                                        ->default('https://ejournal.unida.gontor.ac.id')
+                                        ->helperText('URL utama Open Journal Systems'),
+                                    Forms\Components\Select::make('journal_sync_schedule')
+                                        ->label('Jadwal Sync (Feed)')
+                                        ->options([
+                                            'daily' => 'Harian (setiap jam 03:00)',
+                                            'weekly' => 'Mingguan (Minggu jam 03:00)',
+                                            'disabled' => 'Nonaktif',
+                                        ])
+                                        ->default('daily')
+                                        ->helperText('Sync cepat via RSS/Atom feed'),
+                                    Forms\Components\Select::make('journal_scrape_schedule')
+                                        ->label('Jadwal Scrape (Archive)')
+                                        ->options([
+                                            'weekly' => 'Mingguan (Minggu jam 02:00)',
+                                            'monthly' => 'Bulanan (tanggal 1)',
+                                            'disabled' => 'Nonaktif',
+                                        ])
+                                        ->default('weekly')
+                                        ->helperText('Scrape lengkap dari halaman archive'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Aksi Manual Journal')
+                                ->schema([
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('sync_journal')
+                                            ->label('Sync Feed')
+                                            ->icon('heroicon-o-rss')
+                                            ->color('info')
+                                            ->action(function () {
+                                                \Artisan::call('journals:sync');
+                                                Notification::make()->title('Sync Journal (Feed) dimulai')->success()->send();
+                                            }),
+                                        Forms\Components\Actions\Action::make('scrape_journal')
+                                            ->label('Scrape Archive')
+                                            ->icon('heroicon-o-arrow-path')
+                                            ->color('warning')
+                                            ->requiresConfirmation()
+                                            ->modalHeading('Scrape Journal Archive')
+                                            ->modalDescription('Proses ini akan mengambil semua artikel dari archive OJS. Proses bisa memakan waktu lama. Lanjutkan?')
+                                            ->action(function () {
+                                                \Artisan::call('journals:scrape');
+                                                Notification::make()->title('Scrape Journal (Archive) dimulai')->success()->send();
+                                            }),
+                                    ]),
+                                ]),
+
+                            Forms\Components\Section::make('Kubuku (E-Book)')
+                                ->description('Integrasi dengan platform e-book Kubuku untuk koleksi digital.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('kubuku_enabled')
+                                        ->label('Aktifkan Integrasi')
+                                        ->helperText('Tampilkan koleksi e-book dari Kubuku'),
+                                    Forms\Components\TextInput::make('kubuku_api_url')
+                                        ->label('API URL')
+                                        ->placeholder('https://api.kubuku.id/v1')
+                                        ->helperText('Endpoint API Kubuku (hubungi Kubuku untuk info)'),
+                                    Forms\Components\TextInput::make('kubuku_api_key')
+                                        ->label('API Key')
+                                        ->password()
+                                        ->revealable()
+                                        ->helperText('API Key dari dashboard Kubuku'),
+                                    Forms\Components\TextInput::make('kubuku_library_id')
+                                        ->label('Library ID')
+                                        ->placeholder('unida-gontor')
+                                        ->helperText('ID perpustakaan di sistem Kubuku'),
                                 ])->columns(2),
                         ]),
                 ])->columnSpanFull(),
@@ -290,6 +467,20 @@ class AppSettings extends Page implements HasForms
             'ithenticate_api_secret' => $data['ithenticate_api_secret'],
             'ithenticate_base_url' => $data['ithenticate_base_url'],
         ], 'plagiarism');
+
+        Setting::setMany([
+            'repo_enabled' => $data['repo_enabled'],
+            'repo_oai_url' => $data['repo_oai_url'],
+            'repo_sync_schedule' => $data['repo_sync_schedule'],
+            'journal_enabled' => $data['journal_enabled'],
+            'journal_ojs_url' => $data['journal_ojs_url'],
+            'journal_sync_schedule' => $data['journal_sync_schedule'],
+            'journal_scrape_schedule' => $data['journal_scrape_schedule'],
+            'kubuku_enabled' => $data['kubuku_enabled'],
+            'kubuku_api_url' => $data['kubuku_api_url'],
+            'kubuku_api_key' => $data['kubuku_api_key'],
+            'kubuku_library_id' => $data['kubuku_library_id'],
+        ], 'integration');
 
         Notification::make()->title('Pengaturan berhasil disimpan')->success()->send();
     }
