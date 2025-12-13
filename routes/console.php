@@ -17,6 +17,11 @@ Schedule::command('queue:work --stop-when-empty --tries=3 --timeout=600 --memory
     ->withoutOverlapping()
     ->runInBackground();
 
+// Poll iThenticate for plagiarism results every 2 minutes
+Schedule::command('plagiarism:poll')
+    ->everyTwoMinutes()
+    ->withoutOverlapping();
+
 // Sync journal articles daily at 3:00 AM (Atom feed - artikel terbaru)
 Schedule::command('journals:sync')
     ->dailyAt('03:00')
