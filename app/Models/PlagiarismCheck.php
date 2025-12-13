@@ -294,7 +294,7 @@ class PlagiarismCheck extends Model
     {
         return match($this->provider) {
             self::PROVIDER_INTERNAL => 'Internal (E-Thesis Database)',
-            self::PROVIDER_ITHENTICATE => 'iThenticate',
+            self::PROVIDER_ITHENTICATE => 'Turnitin / iThenticate',
             self::PROVIDER_TURNITIN => 'Turnitin',
             self::PROVIDER_COPYLEAKS => 'Copyleaks',
             default => $this->provider,

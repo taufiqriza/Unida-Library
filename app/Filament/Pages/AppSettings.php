@@ -270,12 +270,10 @@ class AppSettings extends Page implements HasForms
                                         ->label('Provider')
                                         ->options([
                                             'internal' => 'Internal (Database E-Thesis)',
-                                            'ithenticate' => 'iThenticate',
-                                            'turnitin' => 'Turnitin',
-                                            'copyleaks' => 'Copyleaks',
+                                            'ithenticate' => 'Turnitin / iThenticate (TCA)',
                                         ])
-                                        ->default('internal')
-                                        ->helperText('Pilih layanan pengecekan plagiasi'),
+                                        ->default('ithenticate')
+                                        ->helperText('Turnitin dan iThenticate menggunakan API yang sama (TCA)'),
                                 ])->columns(2),
                             Forms\Components\Section::make('Threshold Similarity')
                                 ->description('Atur batas persentase similarity untuk hasil pengecekan.')
@@ -315,26 +313,26 @@ class AppSettings extends Page implements HasForms
                                         ->placeholder('Dr. H. Ahmad Fulan, M.A.')
                                         ->helperText('Nama yang akan tercantum di sertifikat'),
                                 ]),
-                            Forms\Components\Section::make('iThenticate / Turnitin API')
-                                ->description('Konfigurasi API untuk integrasi dengan iThenticate/Turnitin Core API (TCA). Hanya butuh Secret Key.')
+                            Forms\Components\Section::make('Turnitin Core API (TCA)')
+                                ->description('Konfigurasi API untuk Turnitin/iThenticate. Keduanya menggunakan API yang sama (TCA). Saat migrasi, cukup ganti Base URL dan API Key.')
                                 ->schema([
                                     Forms\Components\TextInput::make('ithenticate_integration_name')
                                         ->label('Integration Name')
                                         ->placeholder('Library-Portal-API')
-                                        ->helperText('Nama integrasi (opsional)'),
+                                        ->helperText('Nama integrasi untuk header X-Turnitin-Integration-Name'),
                                     Forms\Components\TextInput::make('ithenticate_api_key')
-                                        ->label('Key Name (Opsional)')
+                                        ->label('Key Name (Referensi)')
                                         ->placeholder('SYSTEM-LIBRARY')
-                                        ->helperText('Nama key untuk referensi'),
+                                        ->helperText('Nama key untuk referensi internal'),
                                     Forms\Components\TextInput::make('ithenticate_api_secret')
                                         ->label('API Secret Key')
                                         ->password()
                                         ->revealable()
-                                        ->helperText('Secret key dari TCA integration (digunakan sebagai Bearer token)'),
+                                        ->helperText('Secret key dari TCA Admin Console (Bearer token)'),
                                     Forms\Components\TextInput::make('ithenticate_base_url')
                                         ->label('API Base URL')
                                         ->default('https://unidagontor.turnitin.com')
-                                        ->helperText('URL API iThenticate Anda (biasanya: https://[nama].turnitin.com)'),
+                                        ->helperText('Format: https://[tenant-name].turnitin.com'),
                                     Forms\Components\Actions::make([
                                         Forms\Components\Actions\Action::make('test_ithenticate')
                                             ->label('Test Koneksi API')
@@ -366,7 +364,7 @@ class AppSettings extends Page implements HasForms
                                                         $data = $response->json();
                                                         Notification::make()
                                                             ->title('Koneksi Berhasil!')
-                                                            ->body('API iThenticate terhubung. EULA Version: ' . ($data['version'] ?? 'OK'))
+                                                            ->body('Turnitin TCA terhubung. EULA Version: ' . ($data['version'] ?? 'OK'))
                                                             ->success()
                                                             ->send();
                                                     } elseif ($response->status() === 401 || $response->status() === 403) {
