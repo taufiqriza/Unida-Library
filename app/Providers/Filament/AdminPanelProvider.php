@@ -58,6 +58,10 @@ class AdminPanelProvider extends PanelProvider
                 'panels::global-search.before',
                 fn () => view('filament.hooks.global-search-style')
             )
+            ->renderHook(
+                'panels::body.start',
+                fn () => view('filament.hooks.queue-status-banner')
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

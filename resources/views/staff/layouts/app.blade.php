@@ -214,6 +214,9 @@
         <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden"
              :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
             <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
+                {{-- Queue Status Alert for Admins --}}
+                <x-queue-status-alert />
+                
                 @yield('content')
             </main>
         </div>
