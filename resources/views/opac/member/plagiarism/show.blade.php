@@ -265,7 +265,13 @@
                         <i class="fas fa-check-double text-2xl text-emerald-600"></i>
                     </div>
                     <p class="font-semibold text-emerald-800">Tidak ditemukan kecocokan signifikan</p>
-                    <p class="text-sm text-emerald-600 mt-1">Dokumen Anda tidak memiliki similarity yang perlu diperhatikan dengan database E-Thesis.</p>
+                    <p class="text-sm text-emerald-600 mt-1">
+                        @if($check->provider === 'ithenticate' || $check->provider === 'turnitin')
+                        Dokumen Anda memiliki tingkat keaslian yang baik berdasarkan pengecekan iThenticate/Turnitin.
+                        @else
+                        Dokumen Anda tidak memiliki similarity yang perlu diperhatikan dengan database E-Thesis.
+                        @endif
+                    </p>
                 </div>
                 @endif
 
