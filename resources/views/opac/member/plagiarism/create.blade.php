@@ -158,31 +158,17 @@
                         </h3>
                     </div>
                     <div class="p-4">
-                        <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-teal-400 transition cursor-pointer" 
-                             onclick="document.getElementById('document').click()">
-                            <div id="upload-preview" class="hidden">
-                                <div class="w-16 h-16 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-file-pdf text-2xl text-teal-600"></i>
-                                </div>
-                                <p id="file-name" class="font-medium text-gray-900"></p>
-                                <p id="file-size" class="text-sm text-gray-500 mt-1"></p>
+                        <label class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-teal-400 transition cursor-pointer block">
+                            <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400"></i>
                             </div>
-                            <div id="upload-placeholder">
-                                <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                    <i class="fas fa-cloud-upload-alt text-2xl text-gray-400"></i>
-                                </div>
-                                <p class="text-gray-600 font-medium">Klik untuk memilih file</p>
-                                <p class="text-gray-400 text-sm mt-1">atau drag & drop di sini</p>
-                                <p class="text-xs text-gray-400 mt-3">Format: PDF, DOCX • Maks. 20MB</p>
-                            </div>
-                        </div>
-                        <input type="file" 
-                               name="document" 
-                               id="document" 
-                               accept=".pdf,.docx"
-                               class="hidden"
-                               required
-                               onchange="handleFileSelect(this)">
+                            <p class="text-xs text-gray-400 mb-4">Format: PDF, DOCX • Maks. 20MB</p>
+                            <input type="file" 
+                                   name="document" 
+                                   accept=".pdf,.docx"
+                                   class="mx-auto block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                                   required>
+                        </label>
                     </div>
                 </div>
 
@@ -211,26 +197,4 @@
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-        function handleFileSelect(input) {
-            const file = input.files[0];
-            if (file) {
-                document.getElementById('upload-placeholder').classList.add('hidden');
-                document.getElementById('upload-preview').classList.remove('hidden');
-                document.getElementById('file-name').textContent = file.name;
-                document.getElementById('file-size').textContent = formatFileSize(file.size);
-            }
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes >= 1048576) {
-                return (bytes / 1048576).toFixed(2) + ' MB';
-            } else if (bytes >= 1024) {
-                return (bytes / 1024).toFixed(2) + ' KB';
-            }
-            return bytes + ' bytes';
-        }
-    </script>
-    @endpush
 </x-opac.layout>

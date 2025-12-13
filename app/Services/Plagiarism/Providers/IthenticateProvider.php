@@ -337,4 +337,27 @@ class IthenticateProvider
 
         return null;
     }
+
+    /**
+     * Download PDF report from iThenticate
+     */
+    public function downloadPdfReport(string $submissionId): ?string
+    {
+        try {
+            $response = Http::withHeaders($this->getHeaders())
+                ->post("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity/pdf", [
+                    'locale' => 'id',
+                ]);
+
+            if ($response->successful()) {
+                return $response->json('download_url');
+            }
+            
+            Log::error("Failed to get PDF download URL: " . $response->body());
+        } catch (\Exception $e) {
+            Log::error("Failed to get PDF report: " . $e->getMessage());
+        }
+
+        return null;
+    }
 }

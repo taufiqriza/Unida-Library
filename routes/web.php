@@ -75,6 +75,7 @@ Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileComple
         Route::post('/', [App\Http\Controllers\Opac\PlagiarismController::class, 'store'])->name('store');
         Route::get('/{check}', [App\Http\Controllers\Opac\PlagiarismController::class, 'show'])->name('show');
         Route::get('/{check}/status', [App\Http\Controllers\Opac\PlagiarismController::class, 'status'])->name('status');
+        Route::get('/{check}/report', [App\Http\Controllers\Opac\PlagiarismController::class, 'viewReport'])->name('report');
         Route::get('/{check}/certificate', [App\Http\Controllers\Opac\PlagiarismController::class, 'certificate'])->name('certificate');
         Route::get('/{check}/certificate/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'downloadCertificate'])->name('certificate.download');
     });

@@ -311,6 +311,14 @@
                 {{-- Provider Info --}}
                 <div class="text-center text-xs text-gray-400">
                     <p>Diperiksa menggunakan: {{ $check->provider_label }}</p>
+                    @if($check->provider === 'ithenticate' && $check->external_id)
+                    <a href="{{ route('opac.member.plagiarism.report', $check) }}" 
+                       target="_blank"
+                       class="inline-flex items-center gap-1 mt-2 text-teal-600 hover:text-teal-700">
+                        <i class="fas fa-external-link-alt"></i>
+                        Lihat Report Lengkap di iThenticate
+                    </a>
+                    @endif
                 </div>
             </div>
             @endif

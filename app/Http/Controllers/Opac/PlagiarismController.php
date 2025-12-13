@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Opac;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessPlagiarismCheck;
 use App\Models\PlagiarismCheck;
+use App\Models\Setting;
 use App\Services\Plagiarism\CertificateGenerator;
 use App\Services\Plagiarism\PlagiarismService;
 use Illuminate\Http\Request;
@@ -118,6 +119,7 @@ class PlagiarismController extends Controller
             'file_type' => $file->getClientOriginalExtension(),
             'file_size' => $file->getSize(),
             'status' => PlagiarismCheck::STATUS_PENDING,
+            'provider' => Setting::get('plagiarism_provider', 'ithenticate'),
         ]);
 
         // Dispatch background job
@@ -240,5 +242,30 @@ class PlagiarismController extends Controller
             'is_stuck' => $check->isStuck(),
             'has_certificate' => $check->hasCertificate(),
         ]);
+    }
+
+    /**
+     * View full report on iThenticate
+     */
+    public function viewReport(PlagiarismCheck $check)
+    {
+        $member = Auth::guard('member')->user();
+
+        if ($check->member_id !== $member->id) {
+            abort(403);
+        }
+
+        if (!$check->isCompleted() || !$check->external_id || $check->provider !== 'ithenticate') {
+            return back()->with('error', 'Report tidak tersedia.');
+        }
+
+        $provider = new \App\Services\Plagiarism\Providers\IthenticateProvider();
+        $url = $provider->getReportUrl($check->external_id);
+
+        if (!$url) {
+            return back()->with('error', 'Gagal mengambil link report.');
+        }
+
+        return redirect($url);
     }
 }
