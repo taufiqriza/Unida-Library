@@ -61,15 +61,35 @@
             ['label' => 'Tasks', 'icon' => 'fa-clipboard-list', 'route' => 'staff.task.index', 'patterns' => ['staff.task*']],
             ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.circulation.index', 'patterns' => ['staff.circulation*']],
             ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.biblio.index', 'patterns' => ['staff.biblio*']],
+            ['label' => 'E-Library', 'icon' => 'fa-cloud', 'route' => 'staff.elibrary.index', 'patterns' => ['staff.elibrary*']],
             ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
-            ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.dashboard', 'patterns' => ['staff.stock-opname*']],
+            ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
+            ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
         ];
+        // Add Control menu for admin only
+        if (in_array($user->role, ['super_admin', 'admin'])) {
+            array_splice($navItems, 8, 0, [['label' => 'Control', 'icon' => 'fa-user-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']]]);
+        }
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css" rel="stylesheet">
     @stack('styles')
+
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        .staff-sidebar { width: 14rem; }
+        html.sidebar-collapsed .staff-sidebar { width: 5rem; }
+        .main-content-wrapper { margin-left: 14rem; }
+        html.sidebar-collapsed .main-content-wrapper { margin-left: 5rem; }
+        
+        @media (max-width: 1023px) {
+            .staff-sidebar { display: none !important; }
+            .main-content-wrapper { margin-left: 0 !important; }
+        }
+    </style>
 
     <script>
         (function() {
@@ -102,26 +122,26 @@
 
     <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
         {{-- Desktop Sidebar - FIXED --}}
-        <aside class="hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white/80 shadow-xl transition-all duration-300 lg:w-56 z-40"
+        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40"
                :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'"
                x-cloak>
             
             {{-- Logo --}}
-            <div class="p-4 border-b border-white/5 min-h-[72px] flex items-center transition-all duration-300">
+            <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
                 <div class="flex items-center gap-3 transition-all duration-300"
                      :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
-                        <i class="fas fa-book-open text-white"></i>
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+                        <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-8 h-8 object-contain">
                     </div>
                     <div class="leading-tight whitespace-nowrap">
-                        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">PERPUSTAKAAN</p>
-                        <p class="text-sm font-bold text-white">Staff Portal</p>
+                        <p class="text-sm font-bold text-white">UNIDA LIBRARY</p>
+                        <p class="text-[10px] text-blue-200">Admin Portal</p>
                     </div>
                 </div>
                 <div class="transition-all duration-300 mx-auto"
                      :class="sidebarCollapsed ? 'opacity-100 relative' : 'opacity-0 absolute pointer-events-none'">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                        <i class="fas fa-book-open text-white"></i>
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                        <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-8 h-8 object-contain">
                     </div>
                 </div>
             </div>
@@ -130,13 +150,13 @@
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                 @foreach($navItems as $item)
                     @php $active = request()->routeIs($item['patterns']); @endphp
-                    <a href="{{ route($item['route']) }}" title="{{ $item['label'] }}"
-                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-gradient-to-r from-blue-600/20 to-indigo-600/10 text-white' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}"
+                    <a href="{{ route($item['route']) }}" wire:navigate title="{{ $item['label'] }}"
+                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-white/15 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}"
                        :class="sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5'">
                         @if($active)
-                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-r-full"></div>
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
                         @endif
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25' : 'bg-slate-700/50 text-slate-400 group-hover:text-white' }} flex-shrink-0 transition-all">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-white/20 text-white shadow-lg' : 'bg-white/10 text-blue-200 group-hover:text-white' }} flex-shrink-0 transition-all">
                             <i class="fas {{ $item['icon'] }} text-sm"></i>
                         </div>
                         <span class="text-sm font-medium transition-all duration-300"
@@ -146,15 +166,15 @@
             </nav>
 
             {{-- User Info --}}
-            <div class="border-t border-white/5 p-4">
-                <div class="bg-slate-800/50 rounded-xl p-3 mb-3 transition-all duration-300"
+            <div class="border-t border-white/10 p-4">
+                <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
                      :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
-                    <p class="text-xs text-slate-500">{{ ucfirst($user->role) }}</p>
+                    <p class="text-xs text-blue-200">{{ ucfirst($user->role) }}</p>
                     <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
                 </div>
-                <form action="{{ route('filament.admin.auth.logout') }}" method="POST">
+                <form action="{{ route('staff.logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition-all">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-500 text-white transition-all">
                         <i class="fas fa-sign-out-alt"></i>
                         <span class="text-sm font-medium transition-all duration-300"
                               :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
@@ -177,6 +197,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
+                @include('staff.components.portal-switcher')
                 @include('staff.components.quick-actions')
                 <div class="h-8 w-px bg-slate-200"></div>
                 <div class="text-right">
@@ -190,19 +211,22 @@
         </header>
 
         {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper"
+        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden"
              :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
-            <main class="flex-1 w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8">
+            <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
                 @yield('content')
             </main>
         </div>
     </div>
 
+    {{-- Staff Chat Widget --}}
+    @livewire('staff.chat.staff-chat')
+
     {{-- Mobile Bottom Nav --}}
     <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-r from-blue-700 to-indigo-800 flex items-center justify-around px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
         @foreach(array_slice($navItems, 0, 5) as $item)
             @php $active = request()->routeIs($item['patterns']); @endphp
-            <a href="{{ route($item['route']) }}" class="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all {{ $active ? 'text-amber-400' : 'text-white/70' }}">
+            <a href="{{ route($item['route']) }}" wire:navigate class="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all {{ $active ? 'text-amber-400' : 'text-white/70' }}">
                 <i class="fas {{ $item['icon'] }} text-lg"></i>
                 <span class="text-[10px] font-medium">{{ $item['label'] }}</span>
             </a>

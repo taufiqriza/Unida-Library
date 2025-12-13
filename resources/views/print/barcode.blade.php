@@ -4,188 +4,163 @@
     <title>Cetak Barcode</title>
     <meta charset="utf-8">
     <style>
-        @page { margin: 0.5cm; }
+        @page { margin: 0.5cm; size: auto; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-family: Arial, sans-serif; 
             font-size: 10pt; 
-            background: #f8fafc;
-            padding: 0.5cm;
+            background: #f5f5f5;
+            padding: 10px;
         }
         
         .labels-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.3cm;
+            gap: 8px;
         }
         
+        /* Label Card - SLiMS Style */
         .label-card {
             width: 9cm;
-            height: 3.2cm;
+            height: 3cm;
             background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid #333;
             display: flex;
             overflow: hidden;
             page-break-inside: avoid;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         
-        /* Left - Barcode */
+        /* Left Section - Barcode */
         .barcode-section {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 0.25cm 0.3cm;
-            background: linear-gradient(135deg, #fafafa 0%, #f1f5f9 100%);
+            padding: 4px 8px;
+            position: relative;
         }
         
-        .title-text {
-            font-size: 7pt;
-            color: #64748b;
+        .book-title {
+            font-size: 8pt;
+            color: #333;
             text-align: center;
-            margin-bottom: 0.15cm;
-            max-height: 1.3em;
+            line-height: 1.2;
+            max-height: 2.4em;
             overflow: hidden;
-            width: 100%;
-            font-weight: 500;
+            margin-bottom: 2px;
+            background: #fff;
+            position: relative;
+            z-index: 1;
         }
         
-        .barcode-image {
-            font-family: 'Libre Barcode 39', monospace;
-            font-size: 40pt;
-            line-height: 1;
-            letter-spacing: -2px;
-            color: #1e293b;
-        }
-        
-        .barcode-text {
-            font-size: 9pt;
-            font-weight: 700;
-            margin-top: 0.1cm;
-            letter-spacing: 2px;
-            color: #334155;
-        }
-        
-        /* Right - Call Number */
-        .callnumber-section {
-            width: 2.8cm;
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 0 8px 8px 0;
-        }
-        
-        .library-name {
-            font-size: 6.5pt;
-            font-weight: 600;
-            text-align: center;
-            padding: 0.15cm 0.1cm;
-            background: rgba(0,0,0,0.15);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        
-        .callnumber-parts {
+        .barcode-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 0.1cm;
-            gap: 0.02cm;
+        }
+        
+        .barcode-image {
+            font-family: 'Libre Barcode 128', 'Libre Barcode 39', monospace;
+            font-size: 48pt;
+            line-height: 1;
+            letter-spacing: -1px;
+            color: #000;
+        }
+        
+        .barcode-text {
+            font-size: 9pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #000;
+            margin-top: 2px;
+        }
+        
+        /* Right Section - Call Number */
+        .callnumber-section {
+            width: 2.5cm;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+        
+        .library-header {
+            font-size: 7pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 3px 2px;
+            border-bottom: 1px solid #333;
+            background: #f0f0f0;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+        
+        .callnumber-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2px;
         }
         
         .callnumber-line {
-            font-weight: 700;
+            font-weight: bold;
+            font-size: 11pt;
             text-align: center;
-            line-height: 1.2;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            line-height: 1.3;
         }
         
-        .callnumber-line.collection-code {
-            font-size: 12pt;
-        }
-        
-        .callnumber-line.classification {
-            font-size: 11pt;
-        }
-        
-        .callnumber-line.author-code {
-            font-size: 11pt;
-        }
-        
-        .callnumber-line.title-code {
-            font-size: 11pt;
-        }
-        
-        /* Print controls */
+        /* Print Controls */
         .no-print { 
-            margin-bottom: 0.4cm; 
-            padding: 12px 16px;
+            margin-bottom: 10px; 
+            padding: 10px 15px;
             background: #fff;
-            border-radius: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             display: flex;
             gap: 10px;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .no-print button {
-            padding: 8px 18px;
+            padding: 8px 16px;
             cursor: pointer;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4CAF50;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.15s, box-shadow 0.15s;
+            font-weight: bold;
         }
-        .no-print button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        .no-print button:hover { background: #45a049; }
+        .no-print .btn-close {
+            background: #666;
         }
-        .no-print .btn-secondary {
-            background: #64748b;
-        }
-        .no-print .btn-secondary:hover {
-            background: #475569;
-            box-shadow: 0 4px 12px rgba(100,116,139,0.4);
-        }
+        .no-print .btn-close:hover { background: #555; }
         .no-print .label-count {
-            color: #64748b;
+            color: #666;
             font-size: 13px;
             margin-left: auto;
         }
         
         @media print { 
             .no-print { display: none !important; } 
-            body { background: #fff; padding: 0.3cm; }
-            .label-card { 
-                border: 1px solid #333; 
-                box-shadow: none;
-            }
-            .barcode-section { background: #fff; }
+            body { background: #fff; padding: 0; }
+            .label-card { border: 1px solid #000; }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+128&family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="no-print">
         <button onclick="window.print()">🖨️ Cetak</button>
-        <button onclick="window.close()" class="btn-secondary">✕ Tutup</button>
+        <button onclick="window.close()" class="btn-close">✕ Tutup</button>
         <span class="label-count">{{ $items->count() }} label</span>
     </div>
 
     @php
-        use App\Services\CallNumberService;
-        $libraryName = config('app.name', 'UNIDA Gontor');
+        $libraryName = \App\Models\Setting::get('library_name', 'PERPUSTAKAAN UNIDA GONTOR');
     @endphp
 
     <div class="labels-container">
@@ -194,49 +169,42 @@
             $book = $item->book;
             $callNumber = $item->call_number ?: $book?->call_number;
             
-            // Parse call number (format: S 827 TAR Z)
+            // Parse call number - split by space
+            // Format: S 827 TAR Z atau 297.1 MUH k
             $cnParts = $callNumber ? preg_split('/\s+/', trim($callNumber)) : [];
-            $parts = [
-                'collection_code' => $cnParts[0] ?? ($item->collectionType?->code ?? 'S'),
-                'classification' => $cnParts[1] ?? ($book?->classification ?? ''),
-                'author_code' => $cnParts[2] ?? '',
-                'title_code' => $cnParts[3] ?? '',
-            ];
-            
-            // Generate if missing
-            if (empty($parts['author_code']) && $book) {
-                $parts['author_code'] = CallNumberService::getAuthorCode($book->sor ?? $book->authors->first()?->name ?? '');
-            }
-            if (empty($parts['title_code']) && $book) {
-                $parts['title_code'] = CallNumberService::getTitleCode($book->title);
-            }
         @endphp
         <div class="label-card">
+            {{-- Barcode Section --}}
             <div class="barcode-section">
-                <div class="title-text">{{ Str::limit($book?->title ?? 'No Title', 45) }}</div>
-                <div class="barcode-image">*{{ $item->barcode }}*</div>
-                <div class="barcode-text">{{ $item->barcode }}</div>
+                <div class="book-title">{{ Str::limit($book?->title ?? 'No Title', 50) }}</div>
+                <div class="barcode-wrapper">
+                    <div class="barcode-image">{{ $item->barcode }}</div>
+                    <div class="barcode-text">{{ $item->barcode }}</div>
+                </div>
             </div>
             
+            {{-- Call Number Section --}}
             <div class="callnumber-section">
-                <div class="library-name">{{ $libraryName }}</div>
-                <div class="callnumber-parts">
-                    @if($parts['collection_code'])
-                    <div class="callnumber-line collection-code">{{ $parts['collection_code'] }}</div>
-                    @endif
-                    @if($parts['classification'])
-                    <div class="callnumber-line classification">{{ $parts['classification'] }}</div>
-                    @endif
-                    @if($parts['author_code'])
-                    <div class="callnumber-line author-code">{{ $parts['author_code'] }}</div>
-                    @endif
-                    @if($parts['title_code'])
-                    <div class="callnumber-line title-code">{{ $parts['title_code'] }}</div>
+                <div class="library-header">{{ Str::limit($libraryName, 20) }}</div>
+                <div class="callnumber-body">
+                    @foreach($cnParts as $part)
+                    <div class="callnumber-line">{{ $part }}</div>
+                    @endforeach
+                    @if(empty($cnParts))
+                    <div class="callnumber-line">-</div>
                     @endif
                 </div>
             </div>
         </div>
         @endforeach
     </div>
+    
+    <script>
+        // Auto print on load (like SLiMS)
+        window.onload = function() {
+            // Uncomment below to auto-print
+            // window.print();
+        }
+    </script>
 </body>
 </html>

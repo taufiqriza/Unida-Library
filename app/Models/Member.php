@@ -15,7 +15,8 @@ class Member extends Authenticatable
     protected $fillable = [
         'branch_id', 'faculty_id', 'department_id', 'member_id', 'name', 'gender', 'birth_date', 
         'address', 'city', 'phone', 'email', 'password', 'member_type_id', 'register_date',
-        'expire_date', 'photo', 'is_active', 'profile_completed', 'notes'
+        'expire_date', 'photo', 'is_active', 'profile_completed', 'notes',
+        'registration_type', 'institution', 'institution_city', 'email_verified', 'email_verified_at'
     ];
 
     protected $hidden = ['password'];
@@ -27,7 +28,18 @@ class Member extends Authenticatable
         'is_active' => 'boolean',
         'profile_completed' => 'boolean',
         'password' => 'hashed',
+        'email_verified_at' => 'datetime',
     ];
+
+    public function isEmailVerified(): bool
+    {
+        return $this->email_verified === 'verified';
+    }
+
+    public function isInternal(): bool
+    {
+        return $this->registration_type === 'internal';
+    }
 
     public function memberType(): BelongsTo { return $this->belongsTo(MemberType::class); }
     public function faculty(): BelongsTo { return $this->belongsTo(Faculty::class); }

@@ -31,10 +31,10 @@ class BiblioForm extends Component implements HasForms, HasActions
     public ?Book $book = null;
     public ?array $data = [];
 
-    public function mount($book = null): void
+    public function mount($id = null): void
     {
-        if ($book) {
-            $this->book = Book::with(['authors', 'subjects'])->findOrFail($book);
+        if ($id) {
+            $this->book = Book::withoutGlobalScopes()->with(['authors', 'subjects'])->findOrFail($id);
             $this->form->fill([
                 ...$this->book->toArray(),
                 'authors' => $this->book->authors->pluck('id')->toArray(),

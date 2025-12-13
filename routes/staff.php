@@ -23,11 +23,32 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             // Livewire Components for List, Create, Edit
             Route::get('/', \App\Livewire\Staff\Biblio\BiblioList::class)->name('index');
             Route::get('/create', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('create');
-            Route::get('/{book}/edit', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('edit');
+            Route::get('/{id}/edit', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('edit');
             
             // Keep Show for read-only view if needed, or replace later
             Route::get('/{book}', [BiblioController::class, 'show'])->name('show');
             Route::post('/{book}/items', [BiblioController::class, 'addItems'])->name('add-items');
+        });
+
+        // Stock Opname
+        Route::prefix('stock-opname')->name('stock-opname.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\StockOpname\StockOpnameList::class)->name('index');
+        });
+
+        // News
+        Route::prefix('news')->name('news.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\News\NewsList::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\News\NewsForm::class)->name('create');
+            Route::get('/{id}/edit', \App\Livewire\Staff\News\NewsForm::class)->name('edit');
+        });
+
+        // E-Library
+        Route::prefix('elibrary')->name('elibrary.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Elibrary\ElibraryDashboard::class)->name('index');
+            Route::get('/ebook/create', \App\Livewire\Staff\Elibrary\EbookForm::class)->name('ebook.create');
+            Route::get('/ebook/{id}/edit', \App\Livewire\Staff\Elibrary\EbookForm::class)->name('ebook.edit');
+            Route::get('/ethesis/create', \App\Livewire\Staff\Elibrary\EthesisForm::class)->name('ethesis.create');
+            Route::get('/ethesis/{id}/edit', \App\Livewire\Staff\Elibrary\EthesisForm::class)->name('ethesis.edit');
         });
 
         // Circulation
@@ -51,5 +72,18 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         });
 
         // Profile
-        Route::get('/profile', fn() => view('staff.profile.index'))->name('profile');
+        Route::get('/profile', \App\Livewire\Staff\Profile\StaffProfile::class)->name('profile');
+
+        // Control (Admin Only)
+        Route::prefix('control')->name('control.')->middleware('can:manage-staff')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Control\StaffControl::class)->name('index');
+        });
+        
+        // Logout
+        Route::post('/logout', function () {
+            auth()->logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+            return redirect('/login');
+        })->name('logout');
     });

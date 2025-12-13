@@ -67,6 +67,15 @@ class AppSettings extends Page implements HasForms
             'kubuku_api_url' => Setting::get('kubuku_api_url', ''),
             'kubuku_api_key' => Setting::get('kubuku_api_key', ''),
             'kubuku_library_id' => Setting::get('kubuku_library_id', ''),
+            // Email Settings
+            'mail_mailer' => Setting::get('mail_mailer', config('mail.default', 'smtp')),
+            'mail_host' => Setting::get('mail_host', config('mail.mailers.smtp.host', '')),
+            'mail_port' => Setting::get('mail_port', config('mail.mailers.smtp.port', 587)),
+            'mail_username' => Setting::get('mail_username', config('mail.mailers.smtp.username', '')),
+            'mail_password' => Setting::get('mail_password', ''),
+            'mail_encryption' => Setting::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls')),
+            'mail_from_address' => Setting::get('mail_from_address', config('mail.from.address', '')),
+            'mail_from_name' => Setting::get('mail_from_name', config('mail.from.name', 'UNIDA Library')),
         ]);
     }
 
@@ -135,6 +144,83 @@ class AppSettings extends Page implements HasForms
                                 Forms\Components\TextInput::make('social_youtube')
                                     ->label('YouTube'),
                             ])->columns(2),
+                        ]),
+
+                    Forms\Components\Tabs\Tab::make('Email')
+                        ->icon('heroicon-o-envelope')
+                        ->schema([
+                            Forms\Components\Section::make('Konfigurasi SMTP')
+                                ->description('Pengaturan untuk mengirim email (OTP verifikasi, notifikasi, dll).')
+                                ->schema([
+                                    Forms\Components\Select::make('mail_mailer')
+                                        ->label('Mailer')
+                                        ->options([
+                                            'smtp' => 'SMTP',
+                                            'sendmail' => 'Sendmail',
+                                            'log' => 'Log (Testing)',
+                                        ])
+                                        ->default('smtp'),
+                                    Forms\Components\TextInput::make('mail_host')
+                                        ->label('SMTP Host')
+                                        ->placeholder('smtp.gmail.com')
+                                        ->helperText('Untuk Google Workspace: smtp.gmail.com'),
+                                    Forms\Components\TextInput::make('mail_port')
+                                        ->label('Port')
+                                        ->numeric()
+                                        ->default(587)
+                                        ->helperText('587 untuk TLS, 465 untuk SSL'),
+                                    Forms\Components\Select::make('mail_encryption')
+                                        ->label('Enkripsi')
+                                        ->options([
+                                            'tls' => 'TLS',
+                                            'ssl' => 'SSL',
+                                            '' => 'None',
+                                        ])
+                                        ->default('tls'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Kredensial')
+                                ->schema([
+                                    Forms\Components\TextInput::make('mail_username')
+                                        ->label('Username/Email')
+                                        ->placeholder('library@unida.gontor.ac.id')
+                                        ->helperText('Email yang digunakan untuk login SMTP'),
+                                    Forms\Components\TextInput::make('mail_password')
+                                        ->label('Password / App Password')
+                                        ->password()
+                                        ->revealable()
+                                        ->helperText('Untuk Gmail: gunakan App Password (16 digit)'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Pengirim')
+                                ->schema([
+                                    Forms\Components\TextInput::make('mail_from_address')
+                                        ->label('Email Pengirim')
+                                        ->placeholder('library@unida.gontor.ac.id')
+                                        ->helperText('Alamat email yang tampil sebagai pengirim'),
+                                    Forms\Components\TextInput::make('mail_from_name')
+                                        ->label('Nama Pengirim')
+                                        ->placeholder('UNIDA Library')
+                                        ->helperText('Nama yang tampil sebagai pengirim'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Test Email')
+                                ->schema([
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('test_email')
+                                            ->label('Kirim Test Email')
+                                            ->icon('heroicon-o-paper-airplane')
+                                            ->color('success')
+                                            ->requiresConfirmation()
+                                            ->modalHeading('Test Kirim Email')
+                                            ->modalDescription('Email test akan dikirim ke alamat email pengirim yang dikonfigurasi.')
+                                            ->action(function ($get) {
+                                                $this->testEmail($get);
+                                            }),
+                                    ]),
+                                    Forms\Components\Placeholder::make('email_tips')
+                                        ->label('Tips Menghindari Spam')
+                                        ->content('1. Gunakan email domain sendiri (bukan @gmail.com)
+2. Pastikan SPF, DKIM, DMARC sudah dikonfigurasi di DNS
+3. Untuk Google Workspace, aktifkan "Less secure apps" atau gunakan App Password'),
+                                ]),
                         ]),
 
                     Forms\Components\Tabs\Tab::make('Google OAuth')
@@ -482,6 +568,52 @@ class AppSettings extends Page implements HasForms
             'kubuku_library_id' => $data['kubuku_library_id'],
         ], 'integration');
 
+        Setting::setMany([
+            'mail_mailer' => $data['mail_mailer'],
+            'mail_host' => $data['mail_host'],
+            'mail_port' => $data['mail_port'],
+            'mail_username' => $data['mail_username'],
+            'mail_password' => $data['mail_password'],
+            'mail_encryption' => $data['mail_encryption'],
+            'mail_from_address' => $data['mail_from_address'],
+            'mail_from_name' => $data['mail_from_name'],
+        ], 'mail');
+
         Notification::make()->title('Pengaturan berhasil disimpan')->success()->send();
+    }
+
+    protected function testEmail($get): void
+    {
+        try {
+            $config = [
+                'transport' => $get('mail_mailer') ?: 'smtp',
+                'host' => $get('mail_host'),
+                'port' => $get('mail_port'),
+                'encryption' => $get('mail_encryption'),
+                'username' => $get('mail_username'),
+                'password' => $get('mail_password'),
+            ];
+
+            config(['mail.mailers.smtp' => $config]);
+            config(['mail.from.address' => $get('mail_from_address')]);
+            config(['mail.from.name' => $get('mail_from_name')]);
+
+            \Mail::raw('Test email dari UNIDA Library. Jika Anda menerima email ini, konfigurasi SMTP sudah benar.', function ($message) use ($get) {
+                $message->to($get('mail_from_address'))
+                    ->subject('Test Email - UNIDA Library');
+            });
+
+            Notification::make()
+                ->title('Email Terkirim!')
+                ->body('Cek inbox ' . $get('mail_from_address'))
+                ->success()
+                ->send();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Gagal Mengirim Email')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
     }
 }

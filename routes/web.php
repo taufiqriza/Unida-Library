@@ -33,11 +33,23 @@ Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])
 Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])
     ->middleware('throttle:login')
     ->name('opac.register');
+Route::match(['get', 'post'], '/verify-email', [MemberAuthController::class, 'verifyEmail'])
+    ->middleware('throttle:10,1')
+    ->name('opac.verify-email');
+Route::post('/resend-otp', [MemberAuthController::class, 'resendOtp'])
+    ->middleware('throttle:5,1')
+    ->name('opac.resend-otp');
+Route::post('/register/staff', [App\Http\Controllers\Auth\StaffRegisterController::class, 'register'])
+    ->middleware('throttle:login')
+    ->name('opac.register.staff');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');
 
 // Google OAuth
 Route::get('/auth/google', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'callback']);
+Route::get('/auth/choose-role', [App\Http\Controllers\Auth\SocialAuthController::class, 'chooseRole'])->name('auth.choose-role');
+Route::get('/auth/select-role/{role}', [App\Http\Controllers\Auth\SocialAuthController::class, 'selectRole'])->name('auth.select-role');
+Route::get('/auth/switch-portal/{role}', [App\Http\Controllers\Auth\SocialAuthController::class, 'switchPortal'])->name('auth.switch-portal');
 
 // Complete Profile (for OAuth users)
 Route::middleware('auth:member')->group(function () {

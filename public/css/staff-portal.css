@@ -72,14 +72,19 @@
     .main-content-wrapper {
         transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
         will-change: margin-left;
+        max-width: 100vw;
     }
 
     html:not(.sidebar-collapsed) .main-content-wrapper {
         margin-left: 224px !important;
+        max-width: calc(100vw - 224px) !important;
+        width: calc(100vw - 224px) !important;
     }
 
     html.sidebar-collapsed .main-content-wrapper {
         margin-left: 80px !important;
+        max-width: calc(100vw - 80px) !important;
+        width: calc(100vw - 80px) !important;
     }
 
     /* Custom scrollbar - main */

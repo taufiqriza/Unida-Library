@@ -31,11 +31,12 @@ class BiblioController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('isbn', 'like', "%{$search}%")
-                  ->orWhere('call_number', 'like', "%{$search}%");
+                  ->orWhere('call_number', 'like', "%{$search}%")
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$search}%"));
             });
         }
 
-        $books = $query->latest()->paginate(15)->withQueryString();
+        $books = $query->latest()->paginate(20)->withQueryString();
 
         return view('staff.biblio.index', compact('books'));
     }
