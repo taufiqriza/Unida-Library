@@ -44,6 +44,24 @@ class JournalArticle extends Model
         return $this->belongsTo(JournalSource::class, 'journal_code', 'code');
     }
 
+    /**
+     * Get cover URL - returns article cover or falls back to journal source cover
+     */
+    public function getCoverUrlAttribute($value): ?string
+    {
+        // If article has its own cover, use it
+        if ($value) {
+            return $value;
+        }
+        
+        // Fall back to journal source cover
+        if ($this->source) {
+            return $this->source->cover_url;
+        }
+        
+        return null;
+    }
+
     public function getAuthorsStringAttribute(): string
     {
         if (empty($this->authors)) return '';
