@@ -291,10 +291,23 @@ class ShamelaService
     ];
 
     /**
-     * Search books by category using predefined popular books
+     * Search books by category - tries live scraping first, falls back to hardcoded
      */
     public function searchByCategory(int $categoryId, int $limit = 20): Collection
     {
+        // Try live scraping first (cached for 24 hours)
+        $liveBooks = $this->scrapeCategoryFromWeb($categoryId);
+        
+        if ($liveBooks->isNotEmpty()) {
+            return $liveBooks->take($limit)->map(fn($book) => [
+                'id' => $book['id'],
+                'title' => $book['title'],
+                'cover' => $this->getCoverUrl($book['id'], $book['title']),
+                'url' => $this->getBookUrl($book['id']),
+            ]);
+        }
+        
+        // Fallback to hardcoded popular books
         if (!isset($this->popularBooks[$categoryId])) {
             return collect();
         }
@@ -307,6 +320,62 @@ class ShamelaService
                 'cover' => $this->getCoverUrl($book['id'], $book['title']),
                 'url' => $this->getBookUrl($book['id']),
             ]);
+    }
+    
+    /**
+     * Scrape books from Shamela.ws category page
+     */
+    protected function scrapeCategoryFromWeb(int $categoryId): Collection
+    {
+        $cacheKey = "shamela_live_category_{$categoryId}";
+        
+        return Cache::remember($cacheKey, now()->addHours(24), function () use ($categoryId) {
+            try {
+                $response = Http::timeout(30)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+                        'Accept' => 'text/html,application/xhtml+xml',
+                    ])
+                    ->get("{$this->baseUrl}/category/{$categoryId}");
+                
+                if (!$response->successful()) {
+                    return collect();
+                }
+                
+                return $this->parseBookListFromHtml($response->body());
+            } catch (\Exception $e) {
+                Log::warning("Shamela scrape failed for category {$categoryId}: " . $e->getMessage());
+                return collect();
+            }
+        });
+    }
+    
+    /**
+     * Parse book list from HTML
+     */
+    protected function parseBookListFromHtml(string $html): Collection
+    {
+        $books = collect();
+        
+        // Pattern: /book/ID">TITLE<
+        preg_match_all('/\/book\/(\d+)"[^>]*>([^<]+)</u', $html, $matches, PREG_SET_ORDER);
+        
+        foreach ($matches as $match) {
+            $id = (int) $match[1];
+            $title = trim($match[2]);
+            
+            // Skip short titles (navigation links) or numeric-only
+            if (mb_strlen($title) < 5 || is_numeric($title)) continue;
+            // Skip if already exists
+            if ($books->contains('id', $id)) continue;
+            
+            $books->push([
+                'id' => $id,
+                'title' => $title,
+            ]);
+        }
+        
+        return $books;
     }
 
     /**
@@ -476,9 +545,9 @@ class ShamelaService
         
         $categoriesToSearch = array_unique($categoriesToSearch);
         
-        // Get 20 books per category for more results
+        // Get more books per category for comprehensive results
         foreach ($categoriesToSearch as $catId) {
-            $catBooks = $this->searchByCategory($catId, 20);
+            $catBooks = $this->searchByCategory($catId, 100);
             $results = $results->merge($catBooks);
         }
         
