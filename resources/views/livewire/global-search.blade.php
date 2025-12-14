@@ -86,30 +86,27 @@
             <div x-data="{ showEResourcesNotice: true }" x-show="showEResourcesNotice" x-cloak
                  class="mt-6 max-w-3xl mx-auto" 
                  x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 -translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
                  x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0 -translate-y-2">
-                <div class="flex items-center gap-3 px-4 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow flex-shrink-0">
-                        <i class="fas fa-lightbulb text-white text-sm"></i>
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                <div class="relative flex items-center gap-3 px-4 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 pr-12">
+                    <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow flex-shrink-0">
+                        <i class="fas fa-lightbulb text-white text-xs"></i>
                     </div>
-                    <p class="flex-1 text-sm text-white/90">
-                        <span class="font-semibold text-white">100K+ sumber eksternal</span> tersedia — 
-                        <a href="{{ route('opac.page', 'journal-subscription') }}" class="underline decoration-dashed hover:text-amber-300 transition">
-                            Shamela, Waqfeya, Open Library, DOAJ & lainnya
+                    <p class="text-sm text-white/90 truncate">
+                        <span class="font-semibold text-white">100K+ e-resources</span>
+                        <span class="hidden sm:inline"> — Shamela, Waqfeya, Open Library</span>
+                        <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium transition">
+                            Lihat →
                         </a>
                     </p>
-                    <a href="{{ route('opac.page', 'journal-subscription') }}" 
-                       class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold rounded-lg transition">
-                        <i class="fas fa-external-link-alt text-[10px]"></i>
-                        Lihat Semua
-                    </a>
+                    {{-- Close Button - Prominent --}}
                     <button @click="showEResourcesNotice = false" 
-                            class="w-7 h-7 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 rounded-lg transition flex-shrink-0"
+                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all duration-200 group"
                             title="Tutup">
-                        <i class="fas fa-times text-sm"></i>
+                        <i class="fas fa-times text-sm group-hover:scale-110 transition-transform"></i>
                     </button>
                 </div>
             </div>
