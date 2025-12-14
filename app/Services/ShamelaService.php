@@ -40,51 +40,133 @@ class ShamelaService
         31 => 'النحو والصرف',
         32 => 'الأدب',
     ];
+    
+    // Popular books per category (cached list)
+    protected array $popularBooks = [
+        // كتب السنة (Hadith)
+        6 => [
+            ['id' => 1680, 'title' => 'صحيح البخاري'],
+            ['id' => 1681, 'title' => 'صحيح مسلم'],
+            ['id' => 1673, 'title' => 'سنن أبي داود'],
+            ['id' => 1672, 'title' => 'سنن الترمذي'],
+            ['id' => 1674, 'title' => 'سنن النسائي'],
+            ['id' => 1675, 'title' => 'سنن ابن ماجه'],
+            ['id' => 21493, 'title' => 'مسند الإمام أحمد'],
+            ['id' => 1667, 'title' => 'موطأ مالك'],
+            ['id' => 1684, 'title' => 'سنن الدارمي'],
+            ['id' => 5722, 'title' => 'المعجم الكبير للطبراني'],
+        ],
+        // شروح الحديث
+        7 => [
+            ['id' => 52, 'title' => 'فتح الباري شرح صحيح البخاري'],
+            ['id' => 9289, 'title' => 'عمدة القاري شرح صحيح البخاري'],
+            ['id' => 3088, 'title' => 'شرح النووي على مسلم'],
+            ['id' => 6526, 'title' => 'عون المعبود شرح سنن أبي داود'],
+            ['id' => 6527, 'title' => 'تحفة الأحوذي شرح سنن الترمذي'],
+        ],
+        // التفسير
+        3 => [
+            ['id' => 23, 'title' => 'تفسير الطبري'],
+            ['id' => 11, 'title' => 'تفسير ابن كثير'],
+            ['id' => 118, 'title' => 'تفسير القرطبي'],
+            ['id' => 8310, 'title' => 'تفسير البغوي'],
+            ['id' => 205, 'title' => 'تفسير السعدي'],
+            ['id' => 130, 'title' => 'الكشاف للزمخشري'],
+            ['id' => 12963, 'title' => 'تفسير الرازي'],
+            ['id' => 18, 'title' => 'زاد المسير لابن الجوزي'],
+        ],
+        // العقيدة
+        1 => [
+            ['id' => 1301, 'title' => 'كتاب التوحيد'],
+            ['id' => 826, 'title' => 'شرح العقيدة الطحاوية'],
+            ['id' => 824, 'title' => 'العقيدة الواسطية'],
+            ['id' => 7414, 'title' => 'مجموع الفتاوى لابن تيمية'],
+            ['id' => 2289, 'title' => 'درء تعارض العقل والنقل'],
+        ],
+        // الفقه العام
+        18 => [
+            ['id' => 2095, 'title' => 'المغني لابن قدامة'],
+            ['id' => 2050, 'title' => 'الأم للشافعي'],
+            ['id' => 8361, 'title' => 'المجموع شرح المهذب'],
+            ['id' => 8374, 'title' => 'روضة الطالبين'],
+            ['id' => 2017, 'title' => 'المدونة الكبرى'],
+        ],
+        // الفقه الحنفي
+        14 => [
+            ['id' => 2177, 'title' => 'بدائع الصنائع'],
+            ['id' => 2178, 'title' => 'رد المحتار على الدر المختار'],
+            ['id' => 2188, 'title' => 'الهداية شرح البداية'],
+        ],
+        // الفقه المالكي
+        15 => [
+            ['id' => 2017, 'title' => 'المدونة الكبرى'],
+            ['id' => 1301, 'title' => 'مختصر خليل'],
+            ['id' => 22984, 'title' => 'الشرح الكبير للدردير'],
+        ],
+        // الفقه الشافعي
+        16 => [
+            ['id' => 2050, 'title' => 'الأم للشافعي'],
+            ['id' => 8361, 'title' => 'المجموع شرح المهذب'], 
+            ['id' => 285, 'title' => 'منهاج الطالبين'],
+        ],
+        // الفقه الحنبلي
+        17 => [
+            ['id' => 2095, 'title' => 'المغني لابن قدامة'],
+            ['id' => 27869, 'title' => 'الإنصاف في معرفة الراجح'],
+            ['id' => 3107, 'title' => 'كشاف القناع'],
+        ],
+        // السيرة النبوية
+        24 => [
+            ['id' => 2220, 'title' => 'سيرة ابن هشام'],
+            ['id' => 20247, 'title' => 'السيرة النبوية لابن كثير'],
+            ['id' => 3180, 'title' => 'زاد المعاد'],
+            ['id' => 3097, 'title' => 'الشمائل المحمدية'],
+        ],
+        // التاريخ
+        25 => [
+            ['id' => 3315, 'title' => 'تاريخ الطبري'],
+            ['id' => 8315, 'title' => 'البداية والنهاية'],
+            ['id' => 3278, 'title' => 'الكامل في التاريخ'],
+            ['id' => 3309, 'title' => 'تاريخ الإسلام للذهبي'],
+        ],
+        // التراجم والطبقات
+        26 => [
+            ['id' => 3477, 'title' => 'سير أعلام النبلاء'],
+            ['id' => 3339, 'title' => 'تهذيب التهذيب'],
+            ['id' => 3386, 'title' => 'تقريب التهذيب'],
+            ['id' => 3459, 'title' => 'الطبقات الكبرى لابن سعد'],
+        ],
+        // النحو والصرف
+        31 => [
+            ['id' => 12038, 'title' => 'الكتاب لسيبويه'],
+            ['id' => 11989, 'title' => 'أوضح المسالك إلى ألفية ابن مالك'],
+            ['id' => 12148, 'title' => 'شرح ابن عقيل'],
+        ],
+        // الأدب
+        32 => [
+            ['id' => 11749, 'title' => 'الأغاني للأصفهاني'],
+            ['id' => 11692, 'title' => 'البيان والتبيين'],
+            ['id' => 11687, 'title' => 'الكامل في اللغة والأدب'],
+        ],
+    ];
 
     /**
-     * Search books by category (predefined results)
+     * Search books by category using predefined popular books
      */
     public function searchByCategory(int $categoryId, int $limit = 20): Collection
     {
-        $cacheKey = "shamela_category_{$categoryId}_{$limit}";
+        if (!isset($this->popularBooks[$categoryId])) {
+            return collect();
+        }
         
-        return Cache::remember($cacheKey, now()->addHours(24), function () use ($categoryId, $limit) {
-            try {
-                $response = Http::timeout(15)->get("{$this->baseUrl}/category/{$categoryId}");
-                
-                if (!$response->successful()) {
-                    return collect();
-                }
-                
-                return $this->parseBookListHtml($response->body(), $limit);
-            } catch (\Exception $e) {
-                Log::error("Shamela category fetch failed: " . $e->getMessage());
-                return collect();
-            }
-        });
-    }
-
-    /**
-     * Get featured/recent books from Shamela homepage
-     */
-    public function getFeaturedBooks(int $limit = 20): Collection
-    {
-        $cacheKey = "shamela_featured_{$limit}";
-        
-        return Cache::remember($cacheKey, now()->addHours(6), function () use ($limit) {
-            try {
-                $response = Http::timeout(15)->get($this->baseUrl);
-                
-                if (!$response->successful()) {
-                    return collect();
-                }
-                
-                return $this->parseBookListHtml($response->body(), $limit);
-            } catch (\Exception $e) {
-                Log::error("Shamela homepage fetch failed: " . $e->getMessage());
-                return collect();
-            }
-        });
+        return collect($this->popularBooks[$categoryId])
+            ->take($limit)
+            ->map(fn($book) => [
+                'id' => $book['id'],
+                'title' => $book['title'],
+                'cover' => $this->getCoverUrl($book['id']),
+                'url' => $this->getBookUrl($book['id']),
+            ]);
     }
 
     /**
@@ -127,34 +209,6 @@ class ShamelaService
     }
 
     /**
-     * Parse book list from HTML
-     */
-    protected function parseBookListHtml(string $html, int $limit): Collection
-    {
-        $books = collect();
-        
-        // Match book links: /book/{id}
-        preg_match_all('/<a[^>]*href="\/book\/(\d+)"[^>]*>([^<]+)<\/a>/u', $html, $matches, PREG_SET_ORDER);
-        
-        foreach (array_slice($matches, 0, $limit) as $match) {
-            $bookId = (int) $match[1];
-            $title = trim(strip_tags($match[2]));
-            
-            // Skip navigation links
-            if (mb_strlen($title) < 5) continue;
-            
-            $books->push([
-                'id' => $bookId,
-                'title' => $title,
-                'cover' => $this->getCoverUrl($bookId),
-                'url' => $this->getBookUrl($bookId),
-            ]);
-        }
-        
-        return $books->unique('id')->take($limit);
-    }
-
-    /**
      * Parse book detail from HTML
      */
     protected function parseBookDetailHtml(string $html, int $bookId): array
@@ -166,25 +220,25 @@ class ShamelaService
         $categoryId = null;
         
         // Extract title from <title> tag
-        if (preg_match('/<title>([^-<]+)/u', $html, $match)) {
+        if (preg_match('/<title>([^<]+)/u', $html, $match)) {
             $title = trim(str_replace('- المكتبة الشاملة', '', $match[1]));
         }
         
-        // Extract author
-        if (preg_match('/href="\/author\/(\d+)"[^>]*>([^<]+)/u', $html, $match)) {
+        // Extract author - look for author link pattern
+        if (preg_match('/href="\/author\/(\d+)"[^>]*>\s*([^<]+)/u', $html, $match)) {
             $authorId = (int) $match[1];
             $author = trim($match[2]);
         }
         
-        // Extract category
-        if (preg_match('/href="\/category\/(\d+)"[^>]*>([^<]+)/u', $html, $match)) {
+        // Extract category - look for category link pattern
+        if (preg_match('/href="\/category\/(\d+)"[^>]*>\s*([^<]+)/u', $html, $match)) {
             $categoryId = (int) $match[1];
             $category = trim($match[2]);
         }
         
         // Extract table of contents
         $toc = [];
-        preg_match_all('/href="\/book\/' . $bookId . '\/(\d+)"[^>]*>([^<]+)/u', $html, $matches, PREG_SET_ORDER);
+        preg_match_all('/href="\/book\/' . $bookId . '\/(\d+)"[^>]*>\s*([^<]+)/u', $html, $matches, PREG_SET_ORDER);
         foreach (array_slice($matches, 0, 50) as $match) {
             $toc[] = [
                 'page' => (int) $match[1],
@@ -214,13 +268,10 @@ class ShamelaService
     }
 
     /**
-     * Simple keyword search using predefined popular books
+     * Search books by keyword
      */
     public function search(string $query, int $limit = 20): Collection
     {
-        // For now, search by fetching category and filtering
-        // In future, could implement actual search API if available
-        
         $results = collect();
         $query = mb_strtolower($query);
         
@@ -229,19 +280,21 @@ class ShamelaService
             'حديث' => [6, 7],
             'سنة' => [6],
             'hadith' => [6, 7],
+            'bukhari' => [6],
+            'muslim' => [6],
             'فقه' => [14, 15, 16, 17, 18],
             'fiqh' => [14, 15, 16, 17, 18],
-            'تفسير' => [3, 4],
-            'tafsir' => [3, 4],
-            'quran' => [3, 4, 5],
-            'قرآن' => [3, 4, 5],
+            'تفسير' => [3],
+            'tafsir' => [3],
+            'quran' => [3],
+            'قرآن' => [3],
             'سيرة' => [24],
             'sirah' => [24],
             'عقيدة' => [1],
             'aqidah' => [1],
             'تاريخ' => [25, 26],
             'history' => [25, 26],
-            'لغة' => [29, 31],
+            'لغة' => [31],
             'نحو' => [31],
             'أدب' => [32],
         ];
@@ -253,18 +306,26 @@ class ShamelaService
             }
         }
         
-        // Default to hadith and fiqh if no match
+        // Default to hadith and tafsir if no match
         if (empty($categoriesToSearch)) {
-            $categoriesToSearch = [6, 7, 18];
+            $categoriesToSearch = [6, 3];
         }
         
-        $categoriesToSearch = array_unique(array_slice($categoriesToSearch, 0, 3));
+        $categoriesToSearch = array_unique($categoriesToSearch);
         
         foreach ($categoriesToSearch as $catId) {
-            $catBooks = $this->searchByCategory($catId, 10);
+            $catBooks = $this->searchByCategory($catId, 15);
             $results = $results->merge($catBooks);
         }
         
         return $results->unique('id')->take($limit);
+    }
+    
+    /**
+     * Check if service is enabled
+     */
+    public function isEnabled(): bool
+    {
+        return true; // Always enabled, uses static data
     }
 }
