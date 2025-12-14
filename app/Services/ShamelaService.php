@@ -164,7 +164,7 @@ class ShamelaService
             ->map(fn($book) => [
                 'id' => $book['id'],
                 'title' => $book['title'],
-                'cover' => $this->getCoverUrl($book['id']),
+                'cover' => $this->getCoverUrl($book['id'], $book['title']),
                 'url' => $this->getBookUrl($book['id']),
             ]);
     }
@@ -193,11 +193,13 @@ class ShamelaService
     }
 
     /**
-     * Get cover URL for a book
+     * Get cover URL for a book (fallback since Shamela covers not publicly accessible)
      */
-    public function getCoverUrl(int $bookId): string
+    public function getCoverUrl(int $bookId, ?string $title = null): string
     {
-        return "{$this->baseUrl}/covers/{$bookId}.jpg";
+        // Shamela doesn't have public cover URLs, use generated image
+        $name = $title ? urlencode(mb_substr($title, 0, 10)) : 'كتاب';
+        return "https://ui-avatars.com/api/?name={$name}&background=059669&color=fff&size=300&font-size=0.35&bold=true";
     }
 
     /**
