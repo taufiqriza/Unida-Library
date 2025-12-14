@@ -12,6 +12,7 @@ use App\Models\Faculty;
 use App\Models\News;
 use App\Models\Subject;
 use App\Models\JournalSource;
+use App\Services\OpenLibraryService;
 use Livewire\Component;
 use Illuminate\Support\Collection;
 
@@ -195,6 +196,11 @@ class GlobalSearch extends Component
 
         if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
             $results = $results->merge($this->searchJournals());
+        }
+
+        // External Sources (Open Library)
+        if (($this->resourceType === 'all' || $this->resourceType === 'external') && $this->query) {
+            $results = $results->merge($this->searchExternal());
         }
 
         // Apply sorting then paginate
@@ -484,6 +490,16 @@ class GlobalSearch extends Component
         ]);
     }
 
+    protected function searchExternal(): Collection
+    {
+        if (empty($this->query)) {
+            return collect();
+        }
+        
+        $openLibrary = app(OpenLibraryService::class);
+        return $openLibrary->search($this->query);
+    }
+
     protected function applySorting(Collection $results): Collection
     {
         return match($this->sortBy) {
@@ -499,16 +515,18 @@ class GlobalSearch extends Component
     public function getCountsProperty(): array
     {
         $baseQuery = $this->query;
+        $externalCount = $this->getExternalCount($baseQuery);
         
         return [
             'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
                      $this->getEthesisCount($baseQuery) + $this->getNewsCount($baseQuery) +
-                     $this->getJournalCount($baseQuery),
+                     $this->getJournalCount($baseQuery) + $externalCount,
             'book' => $this->getBookCount($baseQuery),
             'ebook' => $this->getEbookCount($baseQuery),
             'ethesis' => $this->getEthesisCount($baseQuery),
             'news' => $this->getNewsCount($baseQuery),
             'journal' => $this->getJournalCount($baseQuery),
+            'external' => $externalCount,
         ];
     }
 
@@ -593,6 +611,21 @@ class GlobalSearch extends Component
                 ->orWhere('abstract', 'like', "%{$search}%"));
         }
         return $query->count();
+    }
+
+    protected function getExternalCount(?string $search): int
+    {
+        if (empty($search)) {
+            return 0;
+        }
+        
+        $openLibrary = app(OpenLibraryService::class);
+        if (!$openLibrary->isEnabled()) {
+            return 0;
+        }
+        
+        // Return the limit as count (actual count would require API call)
+        return $openLibrary->getSearchLimit();
     }
 
     // Computed: Filter Options

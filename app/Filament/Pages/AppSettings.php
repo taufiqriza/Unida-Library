@@ -68,6 +68,9 @@ class AppSettings extends Page implements HasForms
             'kubuku_api_url' => Setting::get('kubuku_api_url', ''),
             'kubuku_api_key' => Setting::get('kubuku_api_key', ''),
             'kubuku_library_id' => Setting::get('kubuku_library_id', ''),
+            // Open Library Settings
+            'openlibrary_enabled' => (bool) Setting::get('openlibrary_enabled', true),
+            'openlibrary_search_limit' => (int) Setting::get('openlibrary_search_limit', 10),
             // Email Settings
             'mail_mailer' => Setting::get('mail_mailer', config('mail.default', 'smtp')),
             'mail_host' => Setting::get('mail_host', config('mail.mailers.smtp.host', '')),
@@ -589,6 +592,71 @@ class AppSettings extends Page implements HasForms
                                         ->label('Informasi')
                                         ->content('Dokumentasi API Kubuku akan tersedia dari pihak Kubuku. Sync otomatis berjalan sesuai jadwal yang dipilih di jam traffic rendah (rekomendasi: 02:00 dini hari).'),
                                 ]),
+
+                            Forms\Components\Section::make('Open Library (Internet Archive)')
+                                ->description('Integrasi dengan Open Library untuk pencarian e-book global. API gratis dengan 4+ juta buku.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('openlibrary_enabled')
+                                        ->label('Aktifkan Integrasi')
+                                        ->helperText('Tampilkan hasil dari Open Library di Global Search'),
+                                    Forms\Components\TextInput::make('openlibrary_search_limit')
+                                        ->label('Limit Hasil')
+                                        ->numeric()
+                                        ->default(10)
+                                        ->minValue(5)
+                                        ->maxValue(50)
+                                        ->helperText('Jumlah maksimal hasil pencarian dari Open Library'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Test Open Library')
+                                ->schema([
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('test_openlibrary')
+                                            ->label('Test Pencarian')
+                                            ->icon('heroicon-o-magnifying-glass')
+                                            ->color('info')
+                                            ->form([
+                                                Forms\Components\TextInput::make('test_query')
+                                                    ->label('Kata Kunci')
+                                                    ->placeholder('Contoh: Laravel')
+                                                    ->required(),
+                                            ])
+                                            ->action(function (array $data) {
+                                                try {
+                                                    $response = \Http::timeout(10)->get('https://openlibrary.org/search.json', [
+                                                        'q' => $data['test_query'],
+                                                        'limit' => 5,
+                                                    ]);
+                                                    
+                                                    if ($response->successful()) {
+                                                        $result = $response->json();
+                                                        $count = $result['numFound'] ?? 0;
+                                                        $titles = collect($result['docs'] ?? [])->take(3)->pluck('title')->join(', ');
+                                                        
+                                                        Notification::make()
+                                                            ->title('Berhasil! ' . number_format($count) . ' buku ditemukan')
+                                                            ->body('Contoh: ' . \Str::limit($titles, 100))
+                                                            ->success()
+                                                            ->send();
+                                                    } else {
+                                                        Notification::make()
+                                                            ->title('Gagal')
+                                                            ->body('Status: ' . $response->status())
+                                                            ->danger()
+                                                            ->send();
+                                                    }
+                                                } catch (\Exception $e) {
+                                                    Notification::make()
+                                                        ->title('Error Koneksi')
+                                                        ->body($e->getMessage())
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            }),
+                                    ]),
+                                    Forms\Components\Placeholder::make('openlibrary_info')
+                                        ->label('Informasi')
+                                        ->content('Open Library menyediakan akses ke 4+ juta buku secara gratis. Hasil pencarian akan muncul di tab "External" pada Global Search.'),
+                                ]),
                         ]),
                 ])->columnSpanFull(),
             ])
@@ -655,6 +723,9 @@ class AppSettings extends Page implements HasForms
             'kubuku_api_url' => $data['kubuku_api_url'],
             'kubuku_api_key' => $data['kubuku_api_key'],
             'kubuku_library_id' => $data['kubuku_library_id'],
+            // Open Library
+            'openlibrary_enabled' => $data['openlibrary_enabled'],
+            'openlibrary_search_limit' => $data['openlibrary_search_limit'],
         ], 'integration');
 
         Setting::setMany([
