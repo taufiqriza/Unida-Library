@@ -247,7 +247,26 @@
         </div>
 
 
-        <!-- Database Berlangganan -->
+        <!-- Database Berlangganan - Enhanced with Portal Link -->
+        <div class="mb-6 p-5 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="relative flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold flex items-center gap-2">
+                        <i class="fas fa-database"></i>
+                        Database & Jurnal Berlangganan
+                    </h3>
+                    <p class="text-blue-200 text-sm mt-1">Akses jurnal internasional melalui konsorsium FPPTI Jawa Timur</p>
+                </div>
+                <a href="{{ route('opac.database-access') }}" 
+                   class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg">
+                    <i class="fas fa-key"></i>
+                    Akses Portal Database
+                    <i class="fas fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+        </div>
+
         <h3 class="font-bold text-gray-900 mb-4 text-base lg:text-lg flex items-center gap-2">
             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-database text-blue-600 text-sm"></i>
