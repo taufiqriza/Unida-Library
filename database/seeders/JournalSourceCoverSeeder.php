@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\JournalSource;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Http;
 
 class JournalSourceCoverSeeder extends Seeder
 {
@@ -12,100 +13,87 @@ class JournalSourceCoverSeeder extends Seeder
      */
     public function run(): void
     {
-        // UNIDA Gontor Journal Covers
-        // Source: https://ejournal.unida.gontor.ac.id
-        $journals = [
-            // SINTA 2
-            'al-tijarah' => [
-                'name' => 'Al-Tijarah',
-                'sinta_rank' => 2,
-                'issn' => '2460-4089',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/1/journalThumbnail_id_ID.png',
-            ],
-            'tsaqafah' => [
-                'name' => 'Tsaqafah',
-                'sinta_rank' => 2,
-                'issn' => '0800-1723',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/6/journalThumbnail_id_ID.jpg',
-            ],
-            'al-tahrir' => [
-                'name' => 'Al-Tahrir',
-                'sinta_rank' => 2,
-                'issn' => '2502-2253',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/2/journalThumbnail_id_ID.png',
-            ],
+        // Get all journal sources
+        $sources = JournalSource::all();
+        
+        $this->command->info("Found {$sources->count()} journal sources");
+        
+        foreach ($sources as $source) {
+            // Skip if already has cover_url
+            if ($source->getRawOriginal('cover_url')) {
+                $this->command->info("Skipped {$source->name} (already has cover)");
+                continue;
+            }
             
-            // SINTA 3
-            'islamica' => [
-                'name' => 'Islamica: Jurnal Studi Keislaman',
-                'sinta_rank' => 3,
-                'issn' => '1978-3183',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/3/journalThumbnail_id_ID.png',
-            ],
-            'ta_dibuna' => [
-                'name' => "Ta'dibuna",
-                'sinta_rank' => 3,
-                'issn' => '2252-5793',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/5/journalThumbnail_id_ID.jpg',
-            ],
-            'at_ta_dib' => [
-                'name' => "At-Ta'dib",
-                'sinta_rank' => 3,
-                'issn' => '0216-9142',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/4/journalThumbnail_id_ID.png',
-            ],
+            // Try to fetch cover from OJS
+            $coverUrl = $this->fetchCoverFromOjs($source);
             
-            // SINTA 4
-            'ulumuna' => [
-                'name' => 'Ulumuna',
-                'sinta_rank' => 4,
-                'issn' => '2476-9533',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/7/journalThumbnail_id_ID.png',
-            ],
-            'ettijahat' => [
-                'name' => 'Ettijahat',
-                'sinta_rank' => 4,
-                'issn' => '2722-3868',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/8/journalThumbnail_id_ID.png',
-            ],
-            'dauliyah' => [
-                'name' => 'Dauliyah',
-                'sinta_rank' => 4,
-                'issn' => '2549-4023',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/9/journalThumbnail_id_ID.png',
-            ],
-            'kodifikasia' => [
-                'name' => 'Kodifikasia',
-                'sinta_rank' => 4,
-                'issn' => '1907-6371',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/10/journalThumbnail_id_ID.png',
-            ],
-            
-            // SINTA 5
-            'hermeneutik' => [
-                'name' => 'Hermeneutik',
-                'sinta_rank' => 5,
-                'issn' => '2549-8088',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/11/journalThumbnail_id_ID.png',
-            ],
-            'tsamratul_fikri' => [
-                'name' => 'Tsamratul Fikri',
-                'sinta_rank' => 5,
-                'issn' => '2723-5769',
-                'cover_url' => 'https://ejournal.unida.gontor.ac.id/public/journals/12/journalThumbnail_id_ID.png',
-            ],
-        ];
-
-        foreach ($journals as $code => $data) {
-            JournalSource::where('code', $code)->update([
-                'cover_url' => $data['cover_url'],
-                'sinta_rank' => $data['sinta_rank'],
-                'issn' => $data['issn'],
-            ]);
-            
-            $this->command->info("Updated journal: {$data['name']}");
+            if ($coverUrl) {
+                $source->update(['cover_url' => $coverUrl]);
+                $this->command->info("✓ Updated cover for: {$source->name}");
+            } else {
+                $this->command->warn("✗ No cover found for: {$source->name}");
+            }
         }
 
-        $this->command->info('Journal covers and SINTA ranks updated!');
+        $this->command->info('Journal covers update completed!');
+    }
+
+    /**
+     * Try to fetch cover URL from OJS journal page
+     */
+    protected function fetchCoverFromOjs(JournalSource $source): ?string
+    {
+        if (!$source->base_url) {
+            return null;
+        }
+
+        $baseUrl = rtrim($source->base_url, '/');
+        
+        // Common OJS cover URL patterns to try
+        $patterns = [
+            '/public/journals/journalThumbnail.png',
+            '/public/journals/journalThumbnail.jpg', 
+            '/public/site/images/homepageImage_en_US.jpg',
+            '/public/site/images/homepageImage_id_ID.jpg',
+        ];
+        
+        // Try to extract journal ID from URL and construct cover path
+        // URL pattern: https://ejournal.unida.gontor.ac.id/index.php/al-tijarah
+        if (preg_match('/index\.php\/([^\/]+)/', $source->base_url, $matches)) {
+            $journalPath = $matches[1];
+            
+            // Try specific journal thumbnail patterns
+            $specificPatterns = [
+                "/public/journals/{$journalPath}/journalThumbnail_id_ID.png",
+                "/public/journals/{$journalPath}/journalThumbnail_id_ID.jpg",
+                "/public/journals/{$journalPath}/journalThumbnail_en_US.png",
+                "/public/journals/{$journalPath}/journalThumbnail_en_US.jpg",
+                "/public/journals/{$journalPath}/journalThumbnail.png",
+                "/public/journals/{$journalPath}/journalThumbnail.jpg",
+            ];
+            
+            $patterns = array_merge($specificPatterns, $patterns);
+        }
+        
+        // Try fetching each pattern
+        foreach ($patterns as $pattern) {
+            $url = 'https://ejournal.unida.gontor.ac.id' . $pattern;
+            
+            try {
+                $response = Http::timeout(5)->head($url);
+                
+                if ($response->successful()) {
+                    $contentType = $response->header('Content-Type');
+                    if (str_contains($contentType, 'image')) {
+                        return $url;
+                    }
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+        
+        return null;
     }
 }
