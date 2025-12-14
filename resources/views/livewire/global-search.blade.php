@@ -52,8 +52,9 @@
                 </div>
             </div>
 
-            {{-- Resource Type Tabs --}}
-            <div class="flex items-center justify-center gap-2 lg:gap-3 mt-8 overflow-x-auto pb-2 scrollbar-hide">
+            {{-- Resource Type Tabs + E-Resources Notice --}}
+            <div class="flex items-center justify-center gap-2 lg:gap-3 mt-8 overflow-x-auto pb-2 scrollbar-hide relative">
+                {{-- Tabs --}}
                 @php
                     $tabs = [
                         'all' => ['icon' => 'fa-layer-group', 'label' => 'Semua'],
@@ -80,33 +81,24 @@
                         </span>
                     </button>
                 @endforeach
-            </div>
-            
-            {{-- E-Resources Notice - Always visible, dismissible --}}
-            <div x-data="{ showEResourcesNotice: true }" x-show="showEResourcesNotice" x-cloak
-                 class="mt-6 max-w-3xl mx-auto" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95">
-                <div class="relative flex items-center gap-3 px-4 py-2.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 pr-12">
-                    <div class="w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow flex-shrink-0">
-                        <i class="fas fa-lightbulb text-white text-xs"></i>
-                    </div>
-                    <p class="text-sm text-white/90 truncate">
-                        <span class="font-semibold text-white">100K+ e-resources</span>
-                        <span class="hidden sm:inline"> — Shamela, Waqfeya, Open Library</span>
-                        <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium transition">
-                            Lihat →
-                        </a>
-                    </p>
-                    {{-- Close Button - Prominent --}}
-                    <button @click="showEResourcesNotice = false" 
-                            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all duration-200 group"
+                
+                {{-- E-Resources Notice - Inline as last "tab" --}}
+                <div x-data="{ showNotice: true }" x-show="showNotice" x-cloak
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="flex items-center">
+                    <a href="{{ route('opac.page', 'journal-subscription') }}" 
+                       class="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 backdrop-blur-sm border border-amber-400/30 text-white rounded-full text-sm font-medium hover:from-amber-500/30 hover:to-orange-500/30 transition whitespace-nowrap group">
+                        <i class="fas fa-lightbulb text-amber-300"></i>
+                        <span class="hidden lg:inline">100K+ sumber eksternal</span>
+                        <span class="lg:hidden">E-Resources</span>
+                        <i class="fas fa-external-link-alt text-xs text-amber-300/70 group-hover:translate-x-0.5 transition-transform"></i>
+                    </a>
+                    <button @click="showNotice = false" 
+                            class="ml-1 w-7 h-7 flex items-center justify-center bg-white/10 hover:bg-red-500 text-white/60 hover:text-white rounded-full transition-all"
                             title="Tutup">
-                        <i class="fas fa-times text-sm group-hover:scale-110 transition-transform"></i>
+                        <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
             </div>
