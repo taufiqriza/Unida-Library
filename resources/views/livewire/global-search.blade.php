@@ -62,6 +62,7 @@
                         'ethesis' => ['icon' => 'fa-graduation-cap', 'label' => 'E-Thesis'],
                         'journal' => ['icon' => 'fa-file-lines', 'label' => 'Jurnal'],
                         'external' => ['icon' => 'fa-globe', 'label' => 'Open Library'],
+                        'shamela' => ['icon' => 'fa-book-quran', 'label' => 'Shamela'],
                     ];
                 @endphp
                 @foreach($tabs as $key => $tab)
@@ -798,6 +799,39 @@
                                 <p class="text-xs text-gray-400 mt-6">
                                     <i class="fas fa-info-circle mr-1"></i>
                                     Hasil pencarian berasal dari <a href="https://openlibrary.org" target="_blank" class="text-cyan-600 hover:underline">openlibrary.org</a>
+                                </p>
+                            @elseif($resourceType === 'shamela' && !$query)
+                                {{-- Special message for Shamela - Islamic Books --}}
+                                <div class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-book-quran text-4xl text-emerald-600"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Kitab di Maktabah Shamela</h3>
+                                <p class="text-gray-500 max-w-md mx-auto mb-6">
+                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-emerald-600">ribuan kitab-kitab Islam klasik</span> 
+                                    di المكتبة الشاملة (Shamela.ws).
+                                </p>
+                                
+                                {{-- Example Keywords --}}
+                                <div class="mt-6 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl max-w-lg mx-auto border border-emerald-100">
+                                    <h4 class="font-semibold text-gray-700 mb-3">
+                                        <i class="fas fa-mosque text-emerald-600 mr-2"></i>
+                                        Coba cari:
+                                    </h4>
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        @foreach(['حديث', 'فقه', 'تفسير', 'سيرة', 'عقيدة', 'تاريخ'] as $suggestion)
+                                            <button 
+                                                wire:click="$set('query', '{{ $suggestion }}')"
+                                                class="px-4 py-2 bg-white text-emerald-700 rounded-full text-sm hover:bg-emerald-600 hover:text-white transition border border-emerald-200 shadow-sm"
+                                            >
+                                                {{ $suggestion }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs text-gray-400 mt-6">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Hasil pencarian berasal dari <a href="https://shamela.ws" target="_blank" class="text-emerald-600 hover:underline">shamela.ws</a>
                                 </p>
                             @else
                                 {{-- Default empty state --}}

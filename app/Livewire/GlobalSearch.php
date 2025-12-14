@@ -13,6 +13,7 @@ use App\Models\News;
 use App\Models\Subject;
 use App\Models\JournalSource;
 use App\Services\OpenLibraryService;
+use App\Services\ShamelaService;
 use Livewire\Component;
 use Illuminate\Support\Collection;
 
@@ -197,6 +198,11 @@ class GlobalSearch extends Component
         // External Sources (Open Library)
         if (($this->resourceType === 'all' || $this->resourceType === 'external') && $this->query) {
             $results = $results->merge($this->searchExternal());
+        }
+
+        // Shamela (Islamic Books)
+        if (($this->resourceType === 'all' || $this->resourceType === 'shamela') && $this->query) {
+            $results = $results->merge($this->searchShamela());
         }
 
         // Apply sorting then paginate
@@ -504,6 +510,35 @@ class GlobalSearch extends Component
         return $openLibrary->search($this->query);
     }
 
+    protected function searchShamela(): Collection
+    {
+        if (empty($this->query)) {
+            return collect();
+        }
+        
+        $shamela = app(ShamelaService::class);
+        $books = $shamela->search($this->query, 20);
+        
+        return $books->map(fn($book) => [
+            'type' => 'shamela',
+            'id' => $book['id'],
+            'title' => $book['title'],
+            'author' => 'المكتبة الشاملة',
+            'cover' => $book['cover'],
+            'year' => null,
+            'publisher' => 'Shamela.ws',
+            'badge' => 'كتاب إسلامي',
+            'badgeColor' => 'emerald',
+            'icon' => 'fa-book-quran',
+            'url' => route('opac.shamela.show', $book['id']),
+            'description' => null,
+            'meta' => [
+                'source' => 'shamela',
+                'external_url' => $book['url'],
+            ],
+        ]);
+    }
+
     protected function applySorting(Collection $results): Collection
     {
         return match($this->sortBy) {
@@ -520,16 +555,18 @@ class GlobalSearch extends Component
     {
         $baseQuery = $this->query;
         $externalCount = $this->getExternalCount($baseQuery);
+        $shamelaCount = $this->getShamelaCount($baseQuery);
         
         return [
             'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
                      $this->getEthesisCount($baseQuery) +
-                     $this->getJournalCount($baseQuery) + $externalCount,
+                     $this->getJournalCount($baseQuery) + $externalCount + $shamelaCount,
             'book' => $this->getBookCount($baseQuery),
             'ebook' => $this->getEbookCount($baseQuery),
             'ethesis' => $this->getEthesisCount($baseQuery),
             'journal' => $this->getJournalCount($baseQuery),
             'external' => $externalCount,
+            'shamela' => $shamelaCount,
         ];
     }
 
@@ -629,6 +666,18 @@ class GlobalSearch extends Component
         
         // Get actual count from API (cached)
         return $openLibrary->getSearchCount($search);
+    }
+
+    protected function getShamelaCount(?string $search): int
+    {
+        if (empty($search)) {
+            return 0;
+        }
+        
+        // Since Shamela search is keyword-based matching to categories,
+        // return estimated count based on search
+        $shamela = app(ShamelaService::class);
+        return $shamela->search($search, 20)->count();
     }
 
     // Computed: Filter Options
