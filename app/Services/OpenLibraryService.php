@@ -36,7 +36,7 @@ class OpenLibraryService
      * @param int|null $limit Override default limit
      * @return Collection
      */
-    public function search(string $query, ?int $limit = null): Collection
+    public function search(string $query, ?int $limit = null, int $offset = 0): Collection
     {
         if (!$this->isEnabled()) {
             return collect();
@@ -47,17 +47,51 @@ class OpenLibraryService
         }
         
         $limit = $limit ?? $this->getSearchLimit();
-        $cacheKey = 'openlibrary_search_' . md5($query . '_' . $limit);
+        $cacheKey = 'openlibrary_search_' . md5($query . '_' . $limit . '_' . $offset);
         
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit) {
-            return $this->fetchFromApi($query, $limit);
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $limit, $offset) {
+            return $this->fetchFromApi($query, $limit, $offset);
+        });
+    }
+    
+    /**
+     * Get search count from Open Library API
+     */
+    public function getSearchCount(string $query): int
+    {
+        if (!$this->isEnabled() || empty(trim($query))) {
+            return 0;
+        }
+        
+        $cacheKey = 'openlibrary_count_' . md5($query);
+        
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders([
+                        'User-Agent' => 'UNIDA-Library/1.0 (library@unida.gontor.ac.id)',
+                    ])
+                    ->get(self::API_URL . '/search.json', [
+                        'q' => $query,
+                        'limit' => 1, // Just need count
+                        'fields' => 'key',
+                    ]);
+                
+                if ($response->successful()) {
+                    return $response->json()['numFound'] ?? 0;
+                }
+                
+                return 0;
+            } catch (\Exception $e) {
+                return 0;
+            }
         });
     }
     
     /**
      * Fetch books from Open Library API
      */
-    protected function fetchFromApi(string $query, int $limit): Collection
+    protected function fetchFromApi(string $query, int $limit, int $offset = 0): Collection
     {
         try {
             $response = Http::timeout(10)
@@ -67,7 +101,8 @@ class OpenLibraryService
                 ->get(self::API_URL . '/search.json', [
                     'q' => $query,
                     'limit' => $limit,
-                    'fields' => 'key,title,author_name,first_publish_year,cover_i,isbn,publisher,subject,language',
+                    'offset' => $offset,
+                    'fields' => 'key,title,author_name,first_publish_year,cover_i,isbn,publisher,subject,language,ebook_access,has_fulltext,ia',
                 ]);
             
             if (!$response->successful()) {

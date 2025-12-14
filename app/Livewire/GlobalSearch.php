@@ -493,6 +493,14 @@ class GlobalSearch extends Component
         }
         
         $openLibrary = app(OpenLibraryService::class);
+        
+        // When showing only external, use pagination with offset
+        if ($this->resourceType === 'external') {
+            $offset = ($this->page - 1) * $this->perPage;
+            return $openLibrary->search($this->query, $this->perPage, $offset);
+        }
+        
+        // When showing 'all', just return limited results
         return $openLibrary->search($this->query);
     }
 
@@ -619,8 +627,8 @@ class GlobalSearch extends Component
             return 0;
         }
         
-        // Return the limit as count (actual count would require API call)
-        return $openLibrary->getSearchLimit();
+        // Get actual count from API (cached)
+        return $openLibrary->getSearchCount($search);
     }
 
     // Computed: Filter Options
