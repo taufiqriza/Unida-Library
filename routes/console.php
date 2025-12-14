@@ -38,3 +38,26 @@ Schedule::command('repo:sync')
     ->weeklyOn(6, '02:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Sync Kubuku E-Books daily at 2:00 AM (low traffic as recommended by Kubuku)
+// Schedule is controlled by kubuku_sync_schedule setting
+Schedule::command('kubuku:sync')
+    ->dailyAt('02:00')
+    ->when(function () {
+        $schedule = \App\Models\Setting::get('kubuku_sync_schedule', 'daily');
+        $enabled = \App\Models\Setting::get('kubuku_enabled', false);
+        
+        if (!$enabled || $schedule === 'disabled') {
+            return false;
+        }
+        
+        // For weekly, only run on Saturday
+        if ($schedule === 'weekly') {
+            return now()->isSaturday();
+        }
+        
+        return true; // daily
+    })
+    ->withoutOverlapping()
+    ->runInBackground();
+

@@ -64,6 +64,7 @@ class AppSettings extends Page implements HasForms
             'journal_sync_schedule' => Setting::get('journal_sync_schedule', 'daily'),
             'journal_scrape_schedule' => Setting::get('journal_scrape_schedule', 'weekly'),
             'kubuku_enabled' => (bool) Setting::get('kubuku_enabled', false),
+            'kubuku_sync_schedule' => Setting::get('kubuku_sync_schedule', 'daily'),
             'kubuku_api_url' => Setting::get('kubuku_api_url', ''),
             'kubuku_api_key' => Setting::get('kubuku_api_key', ''),
             'kubuku_library_id' => Setting::get('kubuku_library_id', ''),
@@ -480,25 +481,114 @@ class AppSettings extends Page implements HasForms
                                 ]),
 
                             Forms\Components\Section::make('Kubuku (E-Book)')
-                                ->description('Integrasi dengan platform e-book Kubuku untuk koleksi digital.')
+                                ->description('Integrasi dengan platform e-book Kubuku untuk koleksi digital. Sync dilakukan secara terjadwal di jam traffic rendah (dini hari).')
                                 ->schema([
                                     Forms\Components\Toggle::make('kubuku_enabled')
                                         ->label('Aktifkan Integrasi')
                                         ->helperText('Tampilkan koleksi e-book dari Kubuku'),
+                                    Forms\Components\Select::make('kubuku_sync_schedule')
+                                        ->label('Jadwal Sync')
+                                        ->options([
+                                            'daily' => 'Harian (jam 02:00)',
+                                            'weekly' => 'Mingguan (Sabtu jam 02:00)',
+                                            'disabled' => 'Nonaktif',
+                                        ])
+                                        ->default('daily')
+                                        ->helperText('Rekomendasi Kubuku: sync di jam traffic rendah'),
                                     Forms\Components\TextInput::make('kubuku_api_url')
                                         ->label('API URL')
                                         ->placeholder('https://api.kubuku.id/v1')
-                                        ->helperText('Endpoint API Kubuku (hubungi Kubuku untuk info)'),
+                                        ->helperText('Endpoint REST API Kubuku'),
                                     Forms\Components\TextInput::make('kubuku_api_key')
                                         ->label('API Key')
                                         ->password()
                                         ->revealable()
-                                        ->helperText('API Key dari dashboard Kubuku'),
+                                        ->helperText('API Key/Token dari Kubuku'),
                                     Forms\Components\TextInput::make('kubuku_library_id')
                                         ->label('Library ID')
                                         ->placeholder('unida-gontor')
                                         ->helperText('ID perpustakaan di sistem Kubuku'),
                                 ])->columns(2),
+                            Forms\Components\Section::make('Aksi Manual Kubuku')
+                                ->schema([
+                                    Forms\Components\Actions::make([
+                                        Forms\Components\Actions\Action::make('test_kubuku')
+                                            ->label('Test Koneksi API')
+                                            ->icon('heroicon-o-signal')
+                                            ->color('info')
+                                            ->action(function ($get) {
+                                                $apiUrl = $get('kubuku_api_url');
+                                                $apiKey = $get('kubuku_api_key');
+                                                
+                                                if (empty($apiUrl) || empty($apiKey)) {
+                                                    Notification::make()
+                                                        ->title('API URL dan API Key harus diisi')
+                                                        ->danger()
+                                                        ->send();
+                                                    return;
+                                                }
+                                                
+                                                try {
+                                                    $response = \Http::timeout(15)->withHeaders([
+                                                        'Authorization' => 'Bearer ' . $apiKey,
+                                                        'Accept' => 'application/json',
+                                                    ])->get(rtrim($apiUrl, '/'));
+                                                    
+                                                    if ($response->successful()) {
+                                                        Notification::make()
+                                                            ->title('Koneksi Berhasil!')
+                                                            ->body('Kubuku API terhubung.')
+                                                            ->success()
+                                                            ->send();
+                                                    } elseif ($response->status() === 401 || $response->status() === 403) {
+                                                        Notification::make()
+                                                            ->title('Autentikasi Gagal')
+                                                            ->body('API Key tidak valid atau akses ditolak.')
+                                                            ->warning()
+                                                            ->send();
+                                                    } else {
+                                                        Notification::make()
+                                                            ->title('Response: ' . $response->status())
+                                                            ->body('Server merespons, periksa konfigurasi.')
+                                                            ->warning()
+                                                            ->send();
+                                                    }
+                                                } catch (\Exception $e) {
+                                                    Notification::make()
+                                                        ->title('Error Koneksi')
+                                                        ->body('Tidak dapat terhubung: ' . $e->getMessage())
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            }),
+                                        Forms\Components\Actions\Action::make('sync_kubuku')
+                                            ->label('Sync Sekarang')
+                                            ->icon('heroicon-o-arrow-path')
+                                            ->color('success')
+                                            ->requiresConfirmation()
+                                            ->modalHeading('Sync Kubuku E-Books')
+                                            ->modalDescription('Proses ini akan mengambil data katalog e-book dari Kubuku. Lanjutkan?')
+                                            ->action(function () {
+                                                try {
+                                                    \Artisan::call('kubuku:sync');
+                                                    Notification::make()
+                                                        ->title('Sync Kubuku dimulai')
+                                                        ->body('Cek log untuk progress.')
+                                                        ->success()
+                                                        ->send();
+                                                } catch (\Exception $e) {
+                                                    Notification::make()
+                                                        ->title('Gagal memulai sync')
+                                                        ->body($e->getMessage())
+                                                        ->danger()
+                                                        ->send();
+                                                }
+                                            }),
+                                    ]),
+                                    Forms\Components\Placeholder::make('kubuku_info')
+                                        ->label('Informasi')
+                                        ->content('Dokumentasi API Kubuku akan tersedia dari pihak Kubuku. Sync otomatis berjalan sesuai jadwal yang dipilih di jam traffic rendah (rekomendasi: 02:00 dini hari).'),
+                                ]),
                         ]),
                 ])->columnSpanFull(),
             ])
@@ -561,6 +651,7 @@ class AppSettings extends Page implements HasForms
             'journal_sync_schedule' => $data['journal_sync_schedule'],
             'journal_scrape_schedule' => $data['journal_scrape_schedule'],
             'kubuku_enabled' => $data['kubuku_enabled'],
+            'kubuku_sync_schedule' => $data['kubuku_sync_schedule'],
             'kubuku_api_url' => $data['kubuku_api_url'],
             'kubuku_api_key' => $data['kubuku_api_key'],
             'kubuku_library_id' => $data['kubuku_library_id'],
