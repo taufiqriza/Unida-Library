@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\Staff\StaffDashboardController;
-use App\Http\Controllers\Staff\BiblioController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Staff Portal Routes
+| Staff Portal Routes (100% Livewire)
 |--------------------------------------------------------------------------
 */
 
@@ -15,19 +13,15 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
     ->name('staff.')
     ->group(function () {
         
-        // Dashboard
-        Route::get('/', [StaffDashboardController::class, 'index'])->name('dashboard');
+        // Dashboard (Livewire)
+        Route::get('/', \App\Livewire\Staff\Dashboard\StaffDashboard::class)->name('dashboard');
 
-        // Bibliography
+        // Bibliography (Livewire)
         Route::prefix('biblio')->name('biblio.')->group(function () {
-            // Livewire Components for List, Create, Edit
             Route::get('/', \App\Livewire\Staff\Biblio\BiblioList::class)->name('index');
             Route::get('/create', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('create');
+            Route::get('/{book}', \App\Livewire\Staff\Biblio\BiblioShow::class)->name('show');
             Route::get('/{id}/edit', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('edit');
-            
-            // Keep Show for read-only view if needed, or replace later
-            Route::get('/{book}', [BiblioController::class, 'show'])->name('show');
-            Route::post('/{book}/items', [BiblioController::class, 'addItems'])->name('add-items');
         });
 
         // Stock Opname

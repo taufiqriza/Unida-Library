@@ -9,16 +9,16 @@ use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// OPAC Routes
-Route::get('/', [OpacController::class, 'home'])->name('opac.home');
+// OPAC Routes (Livewire)
+Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');
-Route::get('/catalog/{id}', [OpacController::class, 'catalogShow'])->name('opac.catalog.show');
-Route::get('/ebook/{id}', [OpacController::class, 'ebookShow'])->name('opac.ebook.show');
-Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');
-Route::get('/news/{slug}', [OpacController::class, 'newsShow'])->name('opac.news.show');
-Route::get('/journals', [\App\Http\Controllers\Opac\JournalController::class, 'index'])->name('opac.journals.index');
-Route::get('/journals/{article}', [\App\Http\Controllers\Opac\JournalController::class, 'show'])->name('opac.journals.show');
-Route::get('/page/{slug}', [OpacController::class, 'page'])->name('opac.page');
+Route::get('/catalog/{id}', \App\Livewire\Opac\CatalogShow::class)->name('opac.catalog.show');
+Route::get('/ebook/{id}', \App\Livewire\Opac\EbookShow::class)->name('opac.ebook.show');
+Route::get('/ethesis/{id}', \App\Livewire\Opac\EthesisShow::class)->name('opac.ethesis.show');
+Route::get('/news/{slug}', \App\Livewire\Opac\NewsShow::class)->name('opac.news.show');
+Route::get('/journals', \App\Livewire\Opac\Journal\JournalIndex::class)->name('opac.journals.index');
+Route::get('/journals/{article}', \App\Livewire\Opac\Journal\JournalShow::class)->name('opac.journals.show');
+Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
 // Panduan Pages
 Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');
@@ -26,69 +26,62 @@ Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-
 Route::get('/panduan/member', fn() => view('opac.pages.panduan-member'))->name('opac.panduan.member');
 
 
-// Member Auth - with rate limiting
-Route::match(['get', 'post'], '/login', [MemberAuthController::class, 'login'])
+// Auth Routes (Livewire) - with rate limiting
+Route::get('/login', \App\Livewire\Opac\Auth\Login::class)
     ->middleware('throttle:login')
     ->name('login');
-Route::match(['get', 'post'], '/register', [MemberAuthController::class, 'register'])
+Route::get('/register', \App\Livewire\Opac\Auth\Register::class)
     ->middleware('throttle:login')
     ->name('opac.register');
-Route::match(['get', 'post'], '/verify-email', [MemberAuthController::class, 'verifyEmail'])
+Route::get('/verify-email', \App\Livewire\Opac\Auth\VerifyEmail::class)
     ->middleware('throttle:10,1')
     ->name('opac.verify-email');
-Route::post('/resend-otp', [MemberAuthController::class, 'resendOtp'])
-    ->middleware('throttle:5,1')
-    ->name('opac.resend-otp');
 Route::post('/register/staff', [App\Http\Controllers\Auth\StaffRegisterController::class, 'register'])
     ->middleware('throttle:login')
     ->name('opac.register.staff');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');
 
-// Google OAuth
+// Google OAuth (tetap controller - redirect/callback nature)
 Route::get('/auth/google', [App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [App\Http\Controllers\Auth\SocialAuthController::class, 'callback']);
 Route::get('/auth/choose-role', [App\Http\Controllers\Auth\SocialAuthController::class, 'chooseRole'])->name('auth.choose-role');
 Route::get('/auth/select-role/{role}', [App\Http\Controllers\Auth\SocialAuthController::class, 'selectRole'])->name('auth.select-role');
 Route::get('/auth/switch-portal/{role}', [App\Http\Controllers\Auth\SocialAuthController::class, 'switchPortal'])->name('auth.switch-portal');
 
-// Complete Profile (for OAuth users)
+// Complete Profile (Livewire - for OAuth users)
 Route::middleware('auth:member')->group(function () {
-    Route::get('/member/complete-profile', [App\Http\Controllers\Auth\CompleteProfileController::class, 'show'])->name('member.complete-profile');
-    Route::post('/member/complete-profile', [App\Http\Controllers\Auth\CompleteProfileController::class, 'update']);
+    Route::get('/member/complete-profile', \App\Livewire\Opac\Auth\CompleteProfile::class)->name('member.complete-profile');
 });
 
-// Member Area (Protected)
+// Member Area (Livewire - Protected)
 Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->prefix('member')->name('opac.member.')->group(function () {
-    Route::get('/', [MemberAuthController::class, 'dashboard'])->name('dashboard');
+    Route::get('/', \App\Livewire\Opac\Member\Dashboard::class)->name('dashboard');
     Route::get('/submissions', fn() => view('opac.member.submissions'))->name('submissions');
     Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
     Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
     
-    // Settings Profile
-    Route::get('/settings', [\App\Http\Controllers\Opac\MemberSettingsController::class, 'index'])->name('settings');
-    Route::post('/settings', [\App\Http\Controllers\Opac\MemberSettingsController::class, 'update'])->name('settings.update');
+    // Settings Profile (Livewire)
+    Route::get('/settings', \App\Livewire\Opac\Member\Settings::class)->name('settings');
     
-    // Plagiarism Check
+    // Plagiarism Check (Livewire)
     Route::prefix('plagiarism')->name('plagiarism.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Opac\PlagiarismController::class, 'index'])->name('index');
-        Route::get('/create', [App\Http\Controllers\Opac\PlagiarismController::class, 'create'])->name('create');
-        Route::post('/', [App\Http\Controllers\Opac\PlagiarismController::class, 'store'])->name('store');
-        Route::get('/{check}', [App\Http\Controllers\Opac\PlagiarismController::class, 'show'])->name('show');
-        Route::get('/{check}/status', [App\Http\Controllers\Opac\PlagiarismController::class, 'status'])->name('status');
-        Route::get('/{check}/report', [App\Http\Controllers\Opac\PlagiarismController::class, 'viewReport'])->name('report');
-        Route::get('/{check}/certificate', [App\Http\Controllers\Opac\PlagiarismController::class, 'certificate'])->name('certificate');
-        Route::get('/{check}/certificate/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'downloadCertificate'])->name('certificate.download');
+        Route::get('/', \App\Livewire\Opac\Plagiarism\PlagiarismIndex::class)->name('index');
+        Route::get('/create', \App\Livewire\Opac\Plagiarism\PlagiarismCreate::class)->name('create');
+        Route::get('/{check}', \App\Livewire\Opac\Plagiarism\PlagiarismShow::class)->name('show');
+        Route::get('/{check}/status', [App\Http\Controllers\Opac\PlagiarismController::class, 'status'])->name('status'); // AJAX
+        Route::get('/{check}/report', [App\Http\Controllers\Opac\PlagiarismController::class, 'viewReport'])->name('report'); // Redirect
+        Route::get('/{check}/certificate', \App\Livewire\Opac\Plagiarism\PlagiarismCertificate::class)->name('certificate');
+        Route::get('/{check}/certificate/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'downloadCertificate'])->name('certificate.download'); // File download
     });
 });
 
 // Public Plagiarism Certificate Verification
 Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismController::class, 'verify'])->name('plagiarism.verify');
 
-// Alias for member.dashboard
-Route::get('/member/dashboard', [MemberAuthController::class, 'dashboard'])->middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->name('member.dashboard');
+// Alias for member.dashboard (Livewire)
+Route::get('/member/dashboard', \App\Livewire\Opac\Member\Dashboard::class)->middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->name('member.dashboard');
 
-// E-Thesis detail
-Route::get('/ethesis/{id}', [OpacController::class, 'ethesisShow'])->name('opac.ethesis.show');
+// Note: E-Thesis route is now handled by Livewire at line 16
 
 // Thesis file access (with access control)
 Route::get('/thesis-file/{submission}/{type}', [ThesisFileController::class, 'show'])->name('thesis.file');
