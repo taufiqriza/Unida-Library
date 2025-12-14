@@ -88,20 +88,18 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             class="absolute bottom-3 left-0 right-0 flex justify-center z-20 pointer-events-none">
-            <div class="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-full border border-white/25 shadow-lg">
-                <i class="fas fa-lightbulb text-amber-300 text-sm"></i>
-                <p class="text-sm text-white/90">
-                    <span class="font-semibold text-white">100K+ sumber eksternal</span>
-                    <span class="hidden sm:inline"> tersedia — Shamela, Waqfeya, Open Library</span>
-                    <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium transition">
-                        Lihat →
-                    </a>
-                </p>
+             class="absolute bottom-2 left-0 right-0 flex justify-center z-20 pointer-events-none">
+            <div class="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 shadow-lg text-xs">
+                <i class="fas fa-lightbulb text-amber-300"></i>
+                <span class="text-white/90">
+                    <span class="font-semibold text-white">100K+ e-resources</span>
+                    <span class="hidden sm:inline"> — Shamela, Waqfeya, Open Library</span>
+                    <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium">Lihat →</a>
+                </span>
                 <button @click="showNotice = false" 
-                        class="ml-2 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all"
+                        class="ml-1 w-5 h-5 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all"
                         title="Tutup">
-                    <i class="fas fa-times text-xs"></i>
+                    <i class="fas fa-times text-[10px]"></i>
                 </button>
             </div>
         </div>
