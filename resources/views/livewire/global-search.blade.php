@@ -81,28 +81,28 @@
                     </button>
                 @endforeach
             </div>
-            
-            {{-- E-Resources Notice - Below tabs, uses existing bottom padding --}}
-            <div x-data="{ showNotice: true }" x-show="showNotice" x-cloak
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="flex items-center justify-center mt-3 -mb-4">
-                <div class="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                    <i class="fas fa-lightbulb text-amber-300 text-sm"></i>
-                    <p class="text-sm text-white/90">
-                        <span class="font-semibold text-white">100K+ sumber eksternal</span>
-                        <span class="hidden sm:inline"> tersedia — Shamela, Waqfeya, Open Library</span>
-                        <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium transition">
-                            Lihat →
-                        </a>
-                    </p>
-                    <button @click="showNotice = false" 
-                            class="ml-2 w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-red-500 text-white/60 hover:text-white rounded-full transition-all"
-                            title="Tutup">
-                        <i class="fas fa-times text-xs"></i>
-                    </button>
-                </div>
+        </div>
+        
+        {{-- E-Resources Notice - Absolute at bottom of header, no height change --}}
+        <div x-data="{ showNotice: true }" x-show="showNotice" x-cloak
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute bottom-3 left-0 right-0 flex justify-center z-20 pointer-events-none">
+            <div class="pointer-events-auto flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-full border border-white/25 shadow-lg">
+                <i class="fas fa-lightbulb text-amber-300 text-sm"></i>
+                <p class="text-sm text-white/90">
+                    <span class="font-semibold text-white">100K+ sumber eksternal</span>
+                    <span class="hidden sm:inline"> tersedia — Shamela, Waqfeya, Open Library</span>
+                    <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium transition">
+                        Lihat →
+                    </a>
+                </p>
+                <button @click="showNotice = false" 
+                        class="ml-2 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all"
+                        title="Tutup">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
             </div>
         </div>
     </div>
