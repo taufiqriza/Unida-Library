@@ -873,118 +873,24 @@
                         </div>
                     @endif
                     
-                    {{-- External E-Resources Banner - Show when results < 10 or no results --}}
+                    {{-- External E-Resources Notice - Compact notification --}}
                     @if($query && count($results) < 10)
-                    <div class="mt-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl border border-indigo-100 overflow-hidden">
-                        <div class="p-6">
-                            <div class="flex items-start gap-4">
-                                <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
-                                    <i class="fas fa-external-link-alt text-2xl text-white"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="text-lg font-bold text-gray-900 mb-1">
-                                        Tidak menemukan yang Anda cari?
-                                    </h3>
-                                    <p class="text-gray-600 text-sm mb-4">
-                                        Akses koleksi lebih lengkap dari <span class="font-semibold text-indigo-600">sumber e-resources eksternal</span> berikut:
-                                    </p>
-                                    
-                                    {{-- External Resources Grid --}}
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                                        @php
-                                            $encodedQuery = urlencode($query);
-                                            $externalResources = [
-                                                [
-                                                    'name' => 'Internet Archive',
-                                                    'icon' => 'fa-building-columns',
-                                                    'color' => 'from-amber-500 to-orange-500',
-                                                    'url' => "https://archive.org/search?query=$encodedQuery",
-                                                    'desc' => 'Jutaan buku gratis'
-                                                ],
-                                                [
-                                                    'name' => 'Google Books',
-                                                    'icon' => 'fa-google',
-                                                    'color' => 'from-blue-500 to-blue-600',
-                                                    'url' => "https://books.google.com/books?q=$encodedQuery",
-                                                    'desc' => 'Preview buku'
-                                                ],
-                                                [
-                                                    'name' => 'Google Scholar',
-                                                    'icon' => 'fa-graduation-cap',
-                                                    'color' => 'from-blue-600 to-indigo-600',
-                                                    'url' => "https://scholar.google.com/scholar?q=$encodedQuery",
-                                                    'desc' => 'Jurnal akademik'
-                                                ],
-                                                [
-                                                    'name' => 'Shamela.ws',
-                                                    'icon' => 'fa-mosque',
-                                                    'color' => 'from-emerald-500 to-teal-600',
-                                                    'url' => "https://shamela.ws/search?q=$encodedQuery",
-                                                    'desc' => 'Kitab Islam'
-                                                ],
-                                                [
-                                                    'name' => 'Waqfeya',
-                                                    'icon' => 'fa-book-quran',
-                                                    'color' => 'from-teal-500 to-cyan-600',
-                                                    'url' => "https://waqfeya.net/search.php?query=$encodedQuery",
-                                                    'desc' => 'Perpustakaan Islam'
-                                                ],
-                                                [
-                                                    'name' => 'DOAJ',
-                                                    'icon' => 'fa-unlock',
-                                                    'color' => 'from-green-500 to-emerald-600',
-                                                    'url' => "https://doaj.org/search/articles?ref=homepage-box&source=%7B%22query%22%3A%7B%22query_string%22%3A%7B%22query%22%3A%22$encodedQuery%22%7D%7D%7D",
-                                                    'desc' => 'Open Access Journal'
-                                                ],
-                                                [
-                                                    'name' => 'Garuda',
-                                                    'icon' => 'fa-flag',
-                                                    'color' => 'from-red-500 to-rose-600',
-                                                    'url' => "https://garuda.kemdikbud.go.id/documents?q=$encodedQuery",
-                                                    'desc' => 'Jurnal Indonesia'
-                                                ],
-                                                [
-                                                    'name' => 'Project Gutenberg',
-                                                    'icon' => 'fa-book-open',
-                                                    'color' => 'from-gray-600 to-gray-700',
-                                                    'url' => "https://www.gutenberg.org/ebooks/search/?query=$encodedQuery",
-                                                    'desc' => 'Buku klasik gratis'
-                                                ],
-                                            ];
-                                        @endphp
-                                        
-                                        @foreach($externalResources as $resource)
-                                        <a href="{{ $resource['url'] }}" 
-                                           target="_blank" 
-                                           rel="noopener noreferrer"
-                                           class="group flex flex-col p-3 bg-white rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-                                            <div class="flex items-center gap-2 mb-1.5">
-                                                <div class="w-8 h-8 bg-gradient-to-br {{ $resource['color'] }} rounded-lg flex items-center justify-center shadow-sm">
-                                                    <i class="fas {{ $resource['icon'] }} text-white text-sm"></i>
-                                                </div>
-                                                <span class="font-semibold text-gray-900 text-sm group-hover:text-indigo-600 transition">{{ $resource['name'] }}</span>
-                                            </div>
-                                            <span class="text-xs text-gray-500 flex items-center gap-1">
-                                                {{ $resource['desc'] }}
-                                                <i class="fas fa-external-link-alt text-[10px] opacity-50"></i>
-                                            </span>
-                                        </a>
-                                        @endforeach
-                                    </div>
-                                    
-                                    {{-- Additional Info --}}
-                                    <div class="mt-4 pt-4 border-t border-indigo-100 flex items-center justify-between">
-                                        <p class="text-xs text-gray-500">
-                                            <i class="fas fa-info-circle mr-1 text-indigo-400"></i>
-                                            Sumber eksternal membuka di tab baru
-                                        </p>
-                                        <span class="text-xs text-indigo-600 font-medium">
-                                            Pencarian: "{{ Str::limit($query, 30) }}"
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="mt-6 flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0">
+                            <i class="fas fa-globe text-white"></i>
                         </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-gray-700">
+                                <span class="font-semibold text-gray-900">Butuh referensi lebih?</span>
+                                Akses 100K+ koleksi e-book, jurnal & database eksternal
+                            </p>
+                        </div>
+                        <a href="{{ route('opac.page', 'journal-subscription') }}" 
+                           class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition shadow-md shadow-indigo-500/20">
+                            <i class="fas fa-external-link-alt text-xs"></i>
+                            <span class="hidden sm:inline">Akses E-Resources</span>
+                            <span class="sm:hidden">Akses</span>
+                        </a>
                     </div>
                     @endif
                 </div>
