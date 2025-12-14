@@ -61,8 +61,7 @@
                         'ebook' => ['icon' => 'fa-file-pdf', 'label' => 'E-Book'],
                         'ethesis' => ['icon' => 'fa-graduation-cap', 'label' => 'E-Thesis'],
                         'journal' => ['icon' => 'fa-file-lines', 'label' => 'Jurnal'],
-                        'news' => ['icon' => 'fa-newspaper', 'label' => 'Berita'],
-                        'external' => ['icon' => 'fa-globe', 'label' => 'External'],
+                        'external' => ['icon' => 'fa-globe', 'label' => 'Open Library'],
                     ];
                 @endphp
                 @foreach($tabs as $key => $tab)
@@ -381,12 +380,6 @@
                             </div>
                             <div class="flex items-center justify-between p-2 bg-white/10 rounded-lg">
                                 <span class="flex items-center gap-2 text-sm text-primary-100">
-                                    <i class="fas fa-newspaper w-4"></i> Berita
-                                </span>
-                                <span class="font-bold">{{ number_format($counts['news']) }}</span>
-                            </div>
-                            <div class="flex items-center justify-between p-2 bg-white/10 rounded-lg">
-                                <span class="flex items-center gap-2 text-sm text-primary-100">
                                     <i class="fas fa-file-lines w-4"></i> Jurnal
                                 </span>
                                 <span class="font-bold">{{ number_format($counts['journal']) }}</span>
@@ -547,7 +540,7 @@
                         {{-- Grid View - Modern Card Design --}}
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" @if($item['type'] === 'external') target="_blank" rel="noopener" @endif class="group">
+                                <a href="{{ $item['url'] }}" class="group">
                                     {{-- Card Container --}}
                                     <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100/50 transition-all duration-300 hover:-translate-y-1">
                                         {{-- Cover Section --}}
@@ -617,7 +610,7 @@
                         {{-- List View - Modern Design --}}
                         <div class="space-y-3">
                             @foreach($results as $item)
-                                <a href="{{ $item['url'] }}" @if($item['type'] === 'external') target="_blank" rel="noopener" @endif class="group flex gap-4 bg-white rounded-xl p-3 shadow-sm hover:shadow-lg border border-gray-100/50 hover:border-primary-200 transition-all duration-300">
+                                <a href="{{ $item['url'] }}" class="group flex gap-4 bg-white rounded-xl p-3 shadow-sm hover:shadow-lg border border-gray-100/50 hover:border-primary-200 transition-all duration-300">
                                     {{-- Cover --}}
                                     <div class="w-16 sm:w-20 aspect-[2/3] flex-shrink-0 bg-gradient-to-br from-slate-100 to-slate-50 rounded-lg overflow-hidden relative">
                                         @if($item['cover'])

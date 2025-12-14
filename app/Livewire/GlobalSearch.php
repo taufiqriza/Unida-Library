@@ -190,10 +190,6 @@ class GlobalSearch extends Component
             $results = $results->merge($this->searchEtheses());
         }
 
-        if ($this->resourceType === 'all' || $this->resourceType === 'news') {
-            $results = $results->merge($this->searchNews());
-        }
-
         if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
             $results = $results->merge($this->searchJournals());
         }
@@ -519,12 +515,11 @@ class GlobalSearch extends Component
         
         return [
             'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
-                     $this->getEthesisCount($baseQuery) + $this->getNewsCount($baseQuery) +
+                     $this->getEthesisCount($baseQuery) +
                      $this->getJournalCount($baseQuery) + $externalCount,
             'book' => $this->getBookCount($baseQuery),
             'ebook' => $this->getEbookCount($baseQuery),
             'ethesis' => $this->getEthesisCount($baseQuery),
-            'news' => $this->getNewsCount($baseQuery),
             'journal' => $this->getJournalCount($baseQuery),
             'external' => $externalCount,
         ];

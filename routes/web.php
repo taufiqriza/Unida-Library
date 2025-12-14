@@ -18,6 +18,7 @@ Route::get('/ethesis/{id}', \App\Livewire\Opac\EthesisShow::class)->name('opac.e
 Route::get('/news/{slug}', \App\Livewire\Opac\NewsShow::class)->name('opac.news.show');
 Route::get('/journals', \App\Livewire\Opac\Journal\JournalIndex::class)->name('opac.journals.index');
 Route::get('/journals/{article}', \App\Livewire\Opac\Journal\JournalShow::class)->name('opac.journals.show');
+Route::get('/external/{source}/{id}', \App\Livewire\Opac\ExternalBookShow::class)->name('opac.external.show')->where('id', '.*');
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
 // Panduan Pages

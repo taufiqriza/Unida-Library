@@ -112,16 +112,14 @@ class OpenLibraryService
         $isbn = $book['isbn'][0] ?? null;
         $key = $book['key'] ?? null;
         
-        // Build read URL
-        $readUrl = $key ? self::API_URL . $key : null;
-        if ($isbn) {
-            $readUrl = self::API_URL . "/isbn/{$isbn}";
-        }
+        // Build internal detail page URL
+        $bookId = $key ?? $isbn ?? uniqid();
+        $internalUrl = route('opac.external.show', ['source' => 'openlibrary', 'id' => $bookId]);
         
         return [
             'type' => 'external',
             'source' => 'openlibrary',
-            'id' => $key ?? $isbn ?? uniqid(),
+            'id' => $bookId,
             'title' => $title,
             'author' => is_array($book['author_name'] ?? null) 
                 ? implode(', ', array_slice($book['author_name'], 0, 3))
@@ -135,7 +133,7 @@ class OpenLibraryService
             'badge' => 'Open Library',
             'badgeColor' => 'cyan',
             'icon' => 'fa-globe',
-            'url' => $readUrl,
+            'url' => $internalUrl,
             'description' => null,
             'meta' => [
                 'source' => 'Open Library',
