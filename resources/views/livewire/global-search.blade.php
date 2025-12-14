@@ -766,38 +766,74 @@
 
                         {{-- Empty State --}}
                         <div class="text-center py-16">
-                            <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <i class="fas fa-search text-4xl text-gray-300"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ada hasil ditemukan</h3>
-                            <p class="text-gray-500 max-w-md mx-auto mb-6">
-                                @if($query)
-                                    Tidak ditemukan koleksi dengan kata kunci "<span class="font-medium">{{ $query }}</span>". 
-                                    Coba kata kunci lain atau sesuaikan filter pencarian.
-                                @else
-                                    Mulai pencarian dengan mengetik kata kunci di kolom pencarian.
-                                @endif
-                            </p>
-                            @if($this->activeFiltersCount > 0)
-                                <button wire:click="clearAllFilters" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition shadow-lg shadow-primary-600/30">
-                                    <i class="fas fa-redo"></i> Reset Semua Filter
-                                </button>
-                            @endif
-                            
-                            {{-- Suggestions --}}
-                            <div class="mt-8 p-6 bg-gray-50 rounded-2xl max-w-lg mx-auto">
-                                <h4 class="font-semibold text-gray-700 mb-3">Saran pencarian:</h4>
-                                <div class="flex flex-wrap justify-center gap-2">
-                                    @foreach(['Manajemen', 'Akuntansi', 'Hukum', 'Teknik', 'Ekonomi'] as $suggestion)
-                                        <button 
-                                            wire:click="$set('query', '{{ $suggestion }}')"
-                                            class="px-4 py-2 bg-white text-gray-600 rounded-full text-sm hover:bg-primary-50 hover:text-primary-600 transition border border-gray-200"
-                                        >
-                                            {{ $suggestion }}
-                                        </button>
-                                    @endforeach
+                            @if($resourceType === 'external' && !$query)
+                                {{-- Special message for External/Open Library --}}
+                                <div class="w-24 h-24 bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-globe text-4xl text-cyan-500"></i>
                                 </div>
-                            </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Buku di Open Library</h3>
+                                <p class="text-gray-500 max-w-md mx-auto mb-6">
+                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-cyan-600">4+ juta koleksi buku internasional</span> 
+                                    di Open Library (Internet Archive).
+                                </p>
+                                
+                                {{-- Example Keywords --}}
+                                <div class="mt-6 p-6 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl max-w-lg mx-auto border border-cyan-100">
+                                    <h4 class="font-semibold text-gray-700 mb-3">
+                                        <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                                        Coba cari:
+                                    </h4>
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        @foreach(['Laravel', 'Python', 'Machine Learning', 'Islamic Finance', 'Entrepreneurship'] as $suggestion)
+                                            <button 
+                                                wire:click="$set('query', '{{ $suggestion }}')"
+                                                class="px-4 py-2 bg-white text-cyan-700 rounded-full text-sm hover:bg-cyan-600 hover:text-white transition border border-cyan-200 shadow-sm"
+                                            >
+                                                {{ $suggestion }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs text-gray-400 mt-6">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Hasil pencarian berasal dari <a href="https://openlibrary.org" target="_blank" class="text-cyan-600 hover:underline">openlibrary.org</a>
+                                </p>
+                            @else
+                                {{-- Default empty state --}}
+                                <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-search text-4xl text-gray-300"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ada hasil ditemukan</h3>
+                                <p class="text-gray-500 max-w-md mx-auto mb-6">
+                                    @if($query)
+                                        Tidak ditemukan koleksi dengan kata kunci "<span class="font-medium">{{ $query }}</span>". 
+                                        Coba kata kunci lain atau sesuaikan filter pencarian.
+                                    @else
+                                        Mulai pencarian dengan mengetik kata kunci di kolom pencarian.
+                                    @endif
+                                </p>
+                                @if($this->activeFiltersCount > 0)
+                                    <button wire:click="clearAllFilters" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition shadow-lg shadow-primary-600/30">
+                                        <i class="fas fa-redo"></i> Reset Semua Filter
+                                    </button>
+                                @endif
+                                
+                                {{-- Suggestions --}}
+                                <div class="mt-8 p-6 bg-gray-50 rounded-2xl max-w-lg mx-auto">
+                                    <h4 class="font-semibold text-gray-700 mb-3">Saran pencarian:</h4>
+                                    <div class="flex flex-wrap justify-center gap-2">
+                                        @foreach(['Manajemen', 'Akuntansi', 'Hukum', 'Teknik', 'Ekonomi'] as $suggestion)
+                                            <button 
+                                                wire:click="$set('query', '{{ $suggestion }}')"
+                                                class="px-4 py-2 bg-white text-gray-600 rounded-full text-sm hover:bg-primary-50 hover:text-primary-600 transition border border-gray-200"
+                                            >
+                                                {{ $suggestion }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>
