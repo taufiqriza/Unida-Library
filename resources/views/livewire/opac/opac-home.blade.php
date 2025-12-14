@@ -147,6 +147,59 @@
         </div>
     </section>
 
+    <!-- E-Resources Section -->
+    <section class="max-w-7xl mx-auto px-3 lg:px-4 py-4">
+        <h2 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <i class="fas fa-globe text-indigo-500"></i>
+            Akses E-Resources
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+            <!-- Database Jurnal Berlangganan -->
+            <a href="{{ route('opac.database-access') }}" class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-indigo-200 transition group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative flex items-start gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-database text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-base lg:text-lg">Database Jurnal</h3>
+                            <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">KONSORSIUM</span>
+                        </div>
+                        <p class="text-indigo-200 text-xs mb-2">Gale Academic & ProQuest — 120K+ jurnal internasional</p>
+                        <div class="flex items-center gap-1 text-indigo-300 text-xs">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>FPPTI Jawa Timur</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right text-indigo-300 group-hover:translate-x-1 transition self-center"></i>
+                </div>
+            </a>
+
+            <!-- E-Book & Resources Eksternal -->
+            <a href="{{ route('opac.page', 'journal-subscription') }}" class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-emerald-200 transition group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative flex items-start gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-book-open text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-base lg:text-lg">E-Book Eksternal</h3>
+                            <span class="px-2 py-0.5 bg-emerald-400 text-emerald-900 text-[10px] font-bold rounded-full">GRATIS</span>
+                        </div>
+                        <p class="text-emerald-200 text-xs mb-2">Shamela, Open Library, Internet Archive & lainnya</p>
+                        <div class="flex items-center gap-1 text-emerald-300 text-xs">
+                            <i class="fas fa-infinity"></i>
+                            <span>100K+ sumber terbuka</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right text-emerald-300 group-hover:translate-x-1 transition self-center"></i>
+                </div>
+            </a>
+        </div>
+    </section>
+
     <!-- New Books -->
     @if($newBooks->count() > 0)
     <section class="max-w-7xl mx-auto px-4 py-6">

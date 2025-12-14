@@ -218,6 +218,10 @@
                                     <div>
                                         <h3 class="font-bold text-gray-900 mb-3 text-sm">Sumber External</h3>
                                         <div class="space-y-2">
+                                            <a href="{{ route('opac.database-access') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100">
+                                                <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-database text-white"></i></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Database Jurnal <span class="ml-1 px-1.5 py-0.5 bg-amber-400 text-amber-900 text-[8px] font-bold rounded">PRO</span></p><p class="text-xs text-gray-500">Gale & ProQuest</p></div>
+                                            </a>
                                             <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center"><i class="fas fa-database text-indigo-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Repository <i class="fas fa-external-link-alt text-[8px] text-gray-400"></i></p><p class="text-xs text-gray-500">Karya Ilmiah Civitas</p></div>
@@ -228,7 +232,7 @@
                                             </a>
                                             <a href="{{ route('opac.page', 'journal-subscription') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-yellow-100 rounded-lg flex items-center justify-center"><i class="fas fa-bookmark text-yellow-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Akses E-Resources</p><p class="text-xs text-gray-500">E-Book & Database</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Akses E-Resources</p><p class="text-xs text-gray-500">E-Book & Database Gratis</p></div>
                                             </a>
                                         </div>
                                     </div>
@@ -601,6 +605,10 @@
                             <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> E-Thesis</a>
                             <a href="{{ route('opac.page', 'digilib-apps') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-mobile-alt text-xs text-gray-400"></i> Digilib Apps</a>
                             <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider px-3 py-1.5 mt-2">Sumber External</p>
+                            <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100">
+                                <i class="fas fa-database text-xs text-indigo-500"></i> Database Jurnal 
+                                <span class="ml-auto px-1.5 py-0.5 bg-amber-400 text-amber-900 text-[8px] font-bold rounded">PRO</span>
+                            </a>
                             <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-database text-xs text-gray-400"></i> Repository <i class="fas fa-external-link-alt text-[10px] text-gray-300 ml-auto"></i></a>
                             <a href="https://ejournal.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-journal-whills text-xs text-gray-400"></i> UNIDA Journal <i class="fas fa-external-link-alt text-[10px] text-gray-300 ml-auto"></i></a>
                             <a href="{{ route('opac.page', 'journal-subscription') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-bookmark text-xs text-gray-400"></i> Akses E-Resources</a>

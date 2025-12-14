@@ -632,6 +632,20 @@
                                 <span class="text-xs text-gray-700">Riwayat Plagiasi</span>
                             </a>
                             @endif
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-database text-indigo-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">Database Jurnal</span>
+                                <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded">PRO</span>
+                            </a>
+                            <a href="{{ route('opac.page', 'journal-subscription') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-book-open text-emerald-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">E-Resources Gratis</span>
+                            </a>
                             <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
                                 <div class="w-7 h-7 bg-amber-50 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-question-circle text-amber-500 text-[10px]"></i>
