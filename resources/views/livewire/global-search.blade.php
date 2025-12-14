@@ -571,6 +571,7 @@
                                                     @elseif($item['badgeColor'] === 'purple') bg-purple-500 text-white
                                                     @elseif($item['badgeColor'] === 'indigo') bg-indigo-500 text-white
                                                     @elseif($item['badgeColor'] === 'green') bg-emerald-500 text-white
+                                                    @elseif($item['badgeColor'] === 'emerald') bg-emerald-600 text-white
                                                     @elseif($item['badgeColor'] === 'cyan') bg-cyan-500 text-white
                                                     @else bg-slate-500 text-white
                                                     @endif
@@ -629,6 +630,7 @@
                                                 @elseif($item['badgeColor'] === 'purple') bg-purple-500 text-white
                                                 @elseif($item['badgeColor'] === 'indigo') bg-indigo-500 text-white
                                                 @elseif($item['badgeColor'] === 'green') bg-emerald-500 text-white
+                                                @elseif($item['badgeColor'] === 'emerald') bg-emerald-600 text-white
                                                 @elseif($item['badgeColor'] === 'cyan') bg-cyan-500 text-white
                                                 @else bg-slate-500 text-white
                                                 @endif

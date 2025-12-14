@@ -17,7 +17,7 @@
                 <ol class="flex items-center gap-2 text-sm text-emerald-100">
                     <li><a href="{{ route('opac.home') }}" class="hover:text-white transition">Beranda</a></li>
                     <li class="text-emerald-300">/</li>
-                    <li><a href="{{ route('search') }}" class="hover:text-white transition">Pencarian</a></li>
+                    <li><a href="{{ route('opac.search') }}" class="hover:text-white transition">Pencarian</a></li>
                     <li class="text-emerald-300">/</li>
                     <li class="text-white font-medium">Maktabah Shamela</li>
                 </ol>
@@ -36,7 +36,7 @@
                         <i class="fas fa-exclamation-triangle text-3xl text-yellow-300"></i>
                     </div>
                     <h2 class="text-xl font-bold text-white mb-2">{{ $error }}</h2>
-                    <a href="{{ route('search') }}" class="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition">
+                    <a href="{{ route('opac.search') }}" class="inline-flex items-center gap-2 mt-4 px-6 py-2 bg-white/20 text-white rounded-xl hover:bg-white/30 transition">
                         <i class="fas fa-arrow-left"></i>
                         Kembali ke Pencarian
                     </a>
