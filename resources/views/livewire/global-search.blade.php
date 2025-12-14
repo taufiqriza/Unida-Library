@@ -81,6 +81,38 @@
                     </button>
                 @endforeach
             </div>
+            
+            {{-- E-Resources Notice - Always visible, dismissible --}}
+            <div x-data="{ showEResourcesNotice: true }" x-show="showEResourcesNotice" x-cloak
+                 class="mt-6 max-w-3xl mx-auto" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0 -translate-y-2">
+                <div class="flex items-center gap-3 px-4 py-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow flex-shrink-0">
+                        <i class="fas fa-lightbulb text-white text-sm"></i>
+                    </div>
+                    <p class="flex-1 text-sm text-white/90">
+                        <span class="font-semibold text-white">100K+ sumber eksternal</span> tersedia — 
+                        <a href="{{ route('opac.page', 'journal-subscription') }}" class="underline decoration-dashed hover:text-amber-300 transition">
+                            Shamela, Waqfeya, Open Library, DOAJ & lainnya
+                        </a>
+                    </p>
+                    <a href="{{ route('opac.page', 'journal-subscription') }}" 
+                       class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold rounded-lg transition">
+                        <i class="fas fa-external-link-alt text-[10px]"></i>
+                        Lihat Semua
+                    </a>
+                    <button @click="showEResourcesNotice = false" 
+                            class="w-7 h-7 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/20 rounded-lg transition flex-shrink-0"
+                            title="Tutup">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -871,27 +903,6 @@
                                 </div>
                             @endif
                         </div>
-                    @endif
-                    
-                    {{-- External E-Resources Notice - Compact notification --}}
-                    @if($query && count($results) < 10)
-                    <div class="mt-6 flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                        <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0">
-                            <i class="fas fa-globe text-white"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-gray-700">
-                                <span class="font-semibold text-gray-900">Butuh referensi lebih?</span>
-                                Akses 100K+ koleksi e-book, jurnal & database eksternal
-                            </p>
-                        </div>
-                        <a href="{{ route('opac.page', 'journal-subscription') }}" 
-                           class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 transition shadow-md shadow-indigo-500/20">
-                            <i class="fas fa-external-link-alt text-xs"></i>
-                            <span class="hidden sm:inline">Akses E-Resources</span>
-                            <span class="sm:hidden">Akses</span>
-                        </a>
-                    </div>
                     @endif
                 </div>
             </main>
