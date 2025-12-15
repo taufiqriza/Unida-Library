@@ -110,20 +110,37 @@ class ShamelaContentService
     }
     
     /**
-     * Get page count for a book
+     * Get page count for a book (cached for performance)
      */
     public function getBookPageCount(int $bookId): int
     {
-        $db = $this->getDb();
-        if (!$db) {
-            return 0;
-        }
-        
-        $stmt = $db->prepare('SELECT COUNT(*) FROM pages WHERE book_id = :book_id');
-        $stmt->bindValue(':book_id', $bookId, SQLITE3_INTEGER);
-        $result = $stmt->execute();
-        
-        return (int) $result->fetchArray()[0];
+        return Cache::remember("shamela_book_count_{$bookId}", 3600, function () use ($bookId) {
+            $db = $this->getDb();
+            if (!$db) {
+                return 0;
+            }
+            
+            // Use MAX(page_num) as proxy for count - much faster
+            $result = $db->querySingle("SELECT MAX(page_num) FROM pages WHERE book_id = $bookId");
+            return $result ?: 0;
+        });
+    }
+    
+    /**
+     * Quick check if book has any content (faster than count)
+     */
+    public function hasContent(int $bookId): bool
+    {
+        return Cache::remember("shamela_has_content_{$bookId}", 3600, function () use ($bookId) {
+            $db = $this->getDb();
+            if (!$db) {
+                return false;
+            }
+            
+            // EXISTS query is much faster than COUNT
+            $result = $db->querySingle("SELECT 1 FROM pages WHERE book_id = $bookId LIMIT 1");
+            return $result !== null && $result !== false;
+        });
     }
     
     /**
@@ -190,22 +207,31 @@ class ShamelaContentService
     }
     
     /**
-     * Get first and last page numbers for a book
+     * Get first and last page numbers for a book (cached)
      */
     public function getBookPageRange(int $bookId): array
     {
-        $db = $this->getDb();
-        if (!$db) {
+        return Cache::remember("shamela_page_range_{$bookId}", 3600, function () use ($bookId) {
+            $db = $this->getDb();
+            if (!$db) {
+                return ['min' => 1, 'max' => 1];
+            }
+            
+            // Combined query is faster
+            $result = $db->querySingle(
+                "SELECT MIN(page_num) || ',' || MAX(page_num) FROM pages WHERE book_id = $bookId"
+            );
+            
+            if ($result) {
+                $parts = explode(',', $result);
+                return [
+                    'min' => (int)($parts[0] ?? 1),
+                    'max' => (int)($parts[1] ?? 1),
+                ];
+            }
+            
             return ['min' => 1, 'max' => 1];
-        }
-        
-        $min = $db->querySingle("SELECT MIN(page_num) FROM pages WHERE book_id = $bookId");
-        $max = $db->querySingle("SELECT MAX(page_num) FROM pages WHERE book_id = $bookId");
-        
-        return [
-            'min' => $min ?: 1,
-            'max' => $max ?: 1,
-        ];
+        });
     }
     
     public function __destruct()

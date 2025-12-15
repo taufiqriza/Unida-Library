@@ -83,10 +83,7 @@ class ShamelaShow extends Component
     public function getHasContentProperty(): bool
     {
         $contentService = new \App\Services\ShamelaContentService();
-        if (!$contentService->isAvailable()) {
-            return false;
-        }
-        return $contentService->getBookPageCount($this->bookId) > 0;
+        return $contentService->hasContent($this->bookId);
     }
 
     public function render()

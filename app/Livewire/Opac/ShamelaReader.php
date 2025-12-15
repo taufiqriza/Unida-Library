@@ -4,6 +4,7 @@ namespace App\Livewire\Opac;
 
 use App\Services\ShamelaContentService;
 use App\Services\ShamelaLocalService;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ShamelaReader extends Component
@@ -17,13 +18,12 @@ class ShamelaReader extends Component
     public bool $showModal = false;
     public string $error = '';
     
-    protected $listeners = ['openReader' => 'openBook'];
-    
     public function mount(int $bookId = 0)
     {
         $this->bookId = $bookId;
     }
     
+    #[On('openReader')]
     public function openBook(int $bookId, int $page = 1)
     {
         $this->bookId = $bookId;
