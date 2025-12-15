@@ -167,9 +167,17 @@ class WordPressNewsImportSeeder extends Seeder
         ];
 
         foreach ($posts as $post) {
-            // Check if already exists
-            if (News::where('slug', $post['slug'])->exists()) {
-                $this->command->info("Skipping: {$post['title']} (already exists)");
+            // Check if already exists - update with image if exists
+            $existing = News::where('slug', $post['slug'])->first();
+            
+            if ($existing) {
+                // Update with external image if not set
+                if (!$existing->external_image && $post['featured_image_url']) {
+                    $existing->update(['external_image' => $post['featured_image_url']]);
+                    $this->command->info("Updated image: {$post['title']}");
+                } else {
+                    $this->command->info("Skipping: {$post['title']} (already exists)");
+                }
                 continue;
             }
 
@@ -181,7 +189,8 @@ class WordPressNewsImportSeeder extends Seeder
                 'slug' => $post['slug'],
                 'excerpt' => $post['excerpt'],
                 'content' => $post['content'],
-                'featured_image' => null, // Images will need to be downloaded separately
+                'featured_image' => null,
+                'external_image' => $post['featured_image_url'], // WordPress og:image URL
                 'status' => 'published',
                 'is_featured' => false,
                 'is_pinned' => false,

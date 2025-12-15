@@ -15,6 +15,7 @@ Route::get('/search', fn() => view('opac.search'))->name('opac.search');
 Route::get('/catalog/{id}', \App\Livewire\Opac\CatalogShow::class)->name('opac.catalog.show');
 Route::get('/ebook/{id}', \App\Livewire\Opac\EbookShow::class)->name('opac.ebook.show');
 Route::get('/ethesis/{id}', \App\Livewire\Opac\EthesisShow::class)->name('opac.ethesis.show');
+Route::get('/news', \App\Livewire\Opac\NewsList::class)->name('opac.news.index');
 Route::get('/news/{slug}', \App\Livewire\Opac\NewsShow::class)->name('opac.news.show');
 Route::get('/journals', \App\Livewire\Opac\Journal\JournalIndex::class)->name('opac.journals.index');
 Route::get('/journals/{article}', \App\Livewire\Opac\Journal\JournalShow::class)->name('opac.journals.show');

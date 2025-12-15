@@ -9,7 +9,7 @@ class News extends Model
 {
     protected $fillable = [
         'branch_id', 'news_category_id', 'user_id', 'title', 'slug', 'excerpt',
-        'content', 'featured_image', 'status', 'is_featured', 'is_pinned',
+        'content', 'featured_image', 'external_image', 'status', 'is_featured', 'is_pinned',
         'published_at', 'views'
     ];
 
@@ -36,6 +36,11 @@ class News extends Model
 
     public function getImageUrlAttribute(): ?string
     {
+        // Check external image first (from WordPress import)
+        if ($this->external_image) {
+            return $this->external_image;
+        }
+        // Then check local storage
         return $this->featured_image ? asset('storage/' . $this->featured_image) : null;
     }
 

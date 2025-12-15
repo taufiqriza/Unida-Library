@@ -469,7 +469,7 @@
             <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <i class="fas fa-newspaper text-blue-500"></i> Berita & Pengumuman
             </h2>
-            <a href="{{ route('opac.search') . '?type=news' }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+            <a href="{{ route('opac.news.index') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             @foreach($news as $item)

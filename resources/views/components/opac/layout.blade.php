@@ -485,7 +485,7 @@
                     </div>
 
                     <!-- NEWS Link -->
-                    <a href="{{ route('opac.search') . '?type=news' }}" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
+                    <a href="{{ route('opac.news.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
                         <i class="fas fa-newspaper text-xs"></i> NEWS
                     </a>
                 </nav>
@@ -789,7 +789,7 @@
                 </div>
 
                 <!-- NEWS -->
-                <a href="{{ route('opac.search') . '?type=news' }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-pink-50 transition group">
+                <a href="{{ route('opac.news.index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-pink-50 transition group">
                     <span class="w-9 h-9 bg-pink-100 group-hover:bg-pink-600 rounded-lg flex items-center justify-center text-pink-600 group-hover:text-white transition">
                         <i class="fas fa-newspaper"></i>
                     </span>
@@ -950,7 +950,7 @@
                     <a href="{{ route('opac.journals.index') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-file-lines text-[10px]"></i> Jurnal
                     </a>
-                    <a href="{{ route('opac.search') }}?type=news" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
+                    <a href="{{ route('opac.news.index') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-newspaper text-[10px]"></i> Berita
                     </a>
                 </div>
