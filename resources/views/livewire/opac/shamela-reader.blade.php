@@ -12,7 +12,7 @@
              @click.away="$wire.closeModal()">
             
             {{-- Header --}}
-            <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex-shrink-0">
+            <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white flex-shrink-0">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-book-quran"></i>

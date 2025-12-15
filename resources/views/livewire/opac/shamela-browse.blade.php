@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
     
     {{-- Hero Section --}}
-    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-700">
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800">
         {{-- Decorative elements --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
@@ -163,39 +163,56 @@
                     </p>
                 </div>
                 
-                {{-- Books Grid --}}
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {{-- Books List --}}
+                <div class="space-y-3">
                     @forelse($this->results['results'] ?? [] as $book)
                     <a href="{{ route('opac.shamela.show', $book['id']) }}" 
-                       class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 transition group">
+                       class="flex gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-lg hover:border-blue-200 transition group">
                         {{-- Cover --}}
-                        <div class="relative aspect-[3/4] bg-gradient-to-br from-blue-50 to-indigo-50">
+                        <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
                             <img src="{{ $book['cover'] }}" 
                                  alt="{{ $book['title'] }}"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                  loading="lazy"
-                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(mb_substr($book['title'], 0, 2)) }}&background=059669&color=fff&size=200'">
-                            
-                            @if($book['has_pdf'] ?? false)
-                            <div class="absolute top-2 right-2 px-2 py-1 bg-rose-500 text-white text-[10px] font-bold rounded-full shadow">
-                                <i class="fas fa-file-pdf mr-1"></i>PDF
-                            </div>
-                            @endif
+                                 onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(mb_substr($book['title'], 0, 2)) }}&background=2563eb&color=fff&size=200'">
                         </div>
                         
                         {{-- Info --}}
-                        <div class="p-3" dir="rtl">
-                            <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 mb-1 group-hover:text-blue-600 transition">
+                        <div class="flex-1 min-w-0" dir="rtl">
+                            <h3 class="font-bold text-gray-900 text-base line-clamp-2 mb-1 group-hover:text-blue-600 transition">
                                 {{ $book['title'] }}
                             </h3>
-                            <p class="text-xs text-gray-500 truncate">{{ $book['author'] ?? 'غير معروف' }}</p>
-                            @if($book['hijri_year'] ?? null)
-                            <p class="text-[10px] text-blue-600 mt-1">{{ $book['hijri_year'] }}</p>
-                            @endif
+                            <p class="text-sm text-gray-600 truncate mb-2">
+                                <i class="fas fa-user-edit text-blue-400 ml-1"></i>
+                                {{ $book['author'] ?? 'المؤلف غير معروف' }}
+                            </p>
+                            
+                            <div class="flex flex-wrap items-center gap-2 text-xs">
+                                @if($book['category'] ?? null)
+                                <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full">
+                                    <i class="fas fa-folder-open ml-1"></i>{{ $book['category'] }}
+                                </span>
+                                @endif
+                                @if($book['hijri_year'] ?? null)
+                                <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                                    <i class="fas fa-calendar-alt ml-1"></i>{{ $book['hijri_year'] }}
+                                </span>
+                                @endif
+                                @if($book['has_pdf'] ?? false)
+                                <span class="px-2 py-1 bg-rose-50 text-rose-600 rounded-full">
+                                    <i class="fas fa-file-pdf ml-1"></i>PDF
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        {{-- Arrow --}}
+                        <div class="flex-shrink-0 flex items-center text-gray-300 group-hover:text-blue-500 transition">
+                            <i class="fas fa-chevron-left text-lg"></i>
                         </div>
                     </a>
                     @empty
-                    <div class="col-span-full text-center py-12">
+                    <div class="text-center py-12 bg-white rounded-xl">
                         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-book text-2xl text-gray-400"></i>
                         </div>

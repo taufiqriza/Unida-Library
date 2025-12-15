@@ -565,7 +565,54 @@
                 {{-- Results --}}
                 <div wire:loading.remove wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy, journalCode">
                     @if(count($results) > 0)
-                        @if($viewMode === 'grid')
+                        @if($resourceType === 'shamela')
+                        {{-- Shamela List View - Special RTL Layout --}}
+                        <div class="space-y-3">
+                            @foreach($results as $item)
+                                <a href="{{ $item['url'] }}" class="flex gap-4 bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-lg hover:border-blue-200 transition group">
+                                    {{-- Cover --}}
+                                    <div class="flex-shrink-0 w-20 h-28 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg overflow-hidden">
+                                        @if($item['cover'])
+                                            <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        @else
+                                            <div class="w-full h-full flex items-center justify-center">
+                                                <i class="fas fa-book-quran text-2xl text-blue-300"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    {{-- Info --}}
+                                    <div class="flex-1 min-w-0" dir="rtl">
+                                        <h3 class="font-bold text-gray-900 text-base line-clamp-2 mb-1 group-hover:text-blue-600 transition">
+                                            {{ $item['title'] }}
+                                        </h3>
+                                        <p class="text-sm text-gray-600 truncate mb-2">
+                                            <i class="fas fa-user-edit text-blue-400 ml-1"></i>
+                                            {{ $item['author'] ?? 'المؤلف غير معروف' }}
+                                        </p>
+                                        
+                                        <div class="flex flex-wrap items-center gap-2 text-xs">
+                                            @if($item['meta']['category'] ?? null)
+                                            <span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full">
+                                                <i class="fas fa-folder-open ml-1"></i>{{ $item['meta']['category'] }}
+                                            </span>
+                                            @endif
+                                            @if($item['year'])
+                                            <span class="px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                                                <i class="fas fa-calendar-alt ml-1"></i>{{ $item['year'] }}
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Arrow --}}
+                                    <div class="flex-shrink-0 flex items-center text-gray-300 group-hover:text-blue-500 transition">
+                                        <i class="fas fa-chevron-left text-lg"></i>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                        @elseif($viewMode === 'grid')
                         {{-- Grid View - Modern Card Design --}}
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 lg:gap-4">
                             @foreach($results as $item)
@@ -832,26 +879,26 @@
                                 </p>
                             @elseif($resourceType === 'shamela' && !$query)
                                 {{-- Special message for Shamela - Islamic Books --}}
-                                <div class="w-24 h-24 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <i class="fas fa-book-quran text-4xl text-emerald-600"></i>
+                                <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i class="fas fa-book-quran text-4xl text-blue-600"></i>
                                 </div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Kitab di Maktabah Shamela</h3>
                                 <p class="text-gray-500 max-w-md mx-auto mb-6">
-                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-emerald-600">8,425 kitab Islam klasik</span> 
+                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-blue-600">8,425 kitab Islam klasik</span> 
                                     dalam database lokal المكتبة الشاملة.
                                 </p>
                                 
                                 {{-- Example Keywords --}}
-                                <div class="mt-6 p-6 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl max-w-lg mx-auto border border-emerald-100">
+                                <div class="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl max-w-lg mx-auto border border-blue-100">
                                     <h4 class="font-semibold text-gray-700 mb-3">
-                                        <i class="fas fa-mosque text-emerald-600 mr-2"></i>
+                                        <i class="fas fa-mosque text-blue-600 mr-2"></i>
                                         Coba cari:
                                     </h4>
                                     <div class="flex flex-wrap justify-center gap-2">
                                         @foreach(['حديث', 'فقه', 'تفسير', 'سيرة', 'عقيدة', 'تاريخ'] as $suggestion)
                                             <button 
                                                 wire:click="$set('query', '{{ $suggestion }}')"
-                                                class="px-4 py-2 bg-white text-emerald-700 rounded-full text-sm hover:bg-emerald-600 hover:text-white transition border border-emerald-200 shadow-sm"
+                                                class="px-4 py-2 bg-white text-blue-700 rounded-full text-sm hover:bg-blue-600 hover:text-white transition border border-blue-200 shadow-sm"
                                             >
                                                 {{ $suggestion }}
                                             </button>

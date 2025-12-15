@@ -8,7 +8,7 @@
             <div class="absolute inset-0 bg-cover bg-center opacity-20" 
                  style="background-image: url('{{ $book['cover'] }}'); filter: blur(40px);"></div>
             @endif
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-sky-700/90"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-blue-700/90 to-indigo-800/90"></div>
         </div>
         
         <div class="relative z-10 max-w-6xl mx-auto px-4 py-12">
