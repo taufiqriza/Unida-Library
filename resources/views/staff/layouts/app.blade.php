@@ -174,20 +174,79 @@
             </nav>
 
             {{-- User Info --}}
-            <div class="border-t border-white/10 p-4">
+            <div class="border-t border-white/10 p-4" x-data="{ showLogoutModal: false }">
                 <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
                      :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
                     <p class="text-xs text-blue-200">{{ ucfirst($user->role) }}</p>
                     <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
                 </div>
-                <form action="{{ route('staff.logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-500 text-white transition-all">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="text-sm font-medium transition-all duration-300"
-                              :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
-                    </button>
-                </form>
+                <button @click="showLogoutModal = true" 
+                        type="button"
+                        class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-500 text-white transition-all">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="text-sm font-medium transition-all duration-300"
+                          :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
+                </button>
+
+                {{-- Logout Confirmation Modal - Teleported to body --}}
+                <template x-teleport="body">
+                    <div x-show="showLogoutModal" 
+                         x-cloak
+                         class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0">
+                        
+                        {{-- Backdrop --}}
+                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showLogoutModal = false"></div>
+                        
+                        {{-- Modal Content --}}
+                        <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                             @click.stop>
+                            
+                            {{-- Icon Header --}}
+                            <div class="pt-8 pb-4 flex justify-center">
+                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
+                                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+                                        <i class="fas fa-sign-out-alt text-white text-2xl"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {{-- Content --}}
+                            <div class="px-6 pb-6 text-center">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Keluar dari Portal?</h3>
+                                <p class="text-gray-500 text-sm mb-6">
+                                    Anda akan keluar dari akun <span class="font-semibold text-gray-700">{{ $user->name }}</span>. 
+                                    Pastikan semua pekerjaan sudah tersimpan.
+                                </p>
+                                
+                                {{-- Actions --}}
+                                <div class="flex gap-3">
+                                    <button @click="showLogoutModal = false" 
+                                            type="button"
+                                            class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition">
+                                        Batal
+                                    </button>
+                                    <a href="{{ route('staff.logout') }}" 
+                                       class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-500/25 transition flex items-center justify-center gap-2">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Ya, Keluar</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </aside>
 
@@ -207,6 +266,10 @@
             <div class="flex items-center gap-4">
                 @include('staff.components.portal-switcher')
                 @include('staff.components.quick-actions')
+                
+                {{-- Notification Bell --}}
+                @livewire('staff.notification.notification-bell')
+                
                 <div class="h-8 w-px bg-slate-200"></div>
                 <div class="text-right">
                     <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>

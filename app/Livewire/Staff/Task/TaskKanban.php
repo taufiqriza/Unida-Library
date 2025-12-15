@@ -213,8 +213,53 @@ class TaskKanban extends Component
             'content' => trim($this->newComment),
         ]);
         
+        // Send notification to task owner and assignee
+        $this->notifyCommentAdded($this->selectedTask);
+        
         $this->newComment = '';
         $this->refreshSelectedTask();
+    }
+    
+    protected function notifyCommentAdded($task)
+    {
+        $notificationService = app(\App\Services\NotificationService::class);
+        $currentUserId = auth()->id();
+        $notifiedUsers = [$currentUserId]; // Don't notify the commenter
+        
+        // Notify reporter if not the commenter
+        if ($task->reported_by && !in_array($task->reported_by, $notifiedUsers)) {
+            $notificationService->send(
+                $task->reporter,
+                'task',
+                'Komentar Baru di Tugas',
+                auth()->user()->name . " mengomentari tugas \"{$task->title}\"",
+                [
+                    'priority' => 'normal',
+                    'action_url' => route('staff.task.index'),
+                    'action_label' => 'Lihat Komentar',
+                    'icon' => 'fa-comment',
+                    'data' => ['task_id' => $task->id],
+                ]
+            );
+            $notifiedUsers[] = $task->reported_by;
+        }
+        
+        // Notify assignee if not the commenter and not already notified
+        if ($task->assigned_to && !in_array($task->assigned_to, $notifiedUsers)) {
+            $notificationService->send(
+                $task->assignee,
+                'task',
+                'Komentar Baru di Tugas Anda',
+                auth()->user()->name . " mengomentari tugas \"{$task->title}\"",
+                [
+                    'priority' => 'normal',
+                    'action_url' => route('staff.task.index'),
+                    'action_label' => 'Lihat Komentar',
+                    'icon' => 'fa-comment',
+                    'data' => ['task_id' => $task->id],
+                ]
+            );
+        }
     }
     
     public function deleteComment($commentId)

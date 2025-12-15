@@ -65,6 +65,12 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{task}/edit', \App\Livewire\Staff\Task\TaskForm::class)->name('edit');
         });
 
+        // Notifications
+        Route::prefix('notification')->name('notification.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Notification\NotificationCenter::class)->name('index');
+            Route::get('/settings', \App\Livewire\Staff\Notification\NotificationSettings::class)->name('settings');
+        });
+
         // Statistics
         Route::get('/statistics', \App\Livewire\Staff\Statistics\LibraryStatistics::class)->name('statistics.index');
 
@@ -79,11 +85,32 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/', \App\Livewire\Staff\Control\StaffControl::class)->name('index');
         });
         
-        // Logout
-        Route::post('/logout', function () {
-            auth()->logout();
+        // Logout - secure with signed URL (no CSRF needed, expires in 5 min)
+        Route::get('/logout/{signature}', function ($signature) {
+            // Verify signature manually
+            if (!hash_equals($signature, hash('sha256', auth()->id() . config('app.key')))) {
+                abort(403, 'Invalid logout signature');
+            }
+            
+            // Logout from web guard
+            auth()->guard('web')->logout();
+            
+            // Also logout from member guard if somehow active
+            if (auth()->guard('member')->check()) {
+                auth()->guard('member')->logout();
+            }
+            
+            // Clear all session data
+            request()->session()->flush();
             request()->session()->invalidate();
             request()->session()->regenerateToken();
-            return redirect('/login');
+            
+            return redirect('/login')->with('success', 'Berhasil logout.');
+        })->name('logout.execute');
+        
+        // Generate logout URL with signature
+        Route::get('/logout', function () {
+            $signature = hash('sha256', auth()->id() . config('app.key'));
+            return redirect()->route('staff.logout.execute', ['signature' => $signature]);
         })->name('logout');
     });

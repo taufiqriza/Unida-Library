@@ -24,7 +24,10 @@ class SocialAuthController extends Controller
             session(['google_intent' => 'link_staff', 'link_user_id' => auth()->id()]);
         }
         
-        return Socialite::driver('google')->redirect();
+        // Use prompt=select_account to force account picker
+        return Socialite::driver('google')
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
     }
 
     public function callback()

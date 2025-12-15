@@ -32,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
             return in_array($user->role, ['super_admin', 'admin']);
         });
 
+        // Register Observers
+        \App\Models\Task::observe(\App\Observers\TaskObserver::class);
+
         // Load mail config from database
         $this->configureMailFromDatabase();
     }

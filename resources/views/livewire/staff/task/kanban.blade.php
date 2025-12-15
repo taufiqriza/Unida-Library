@@ -191,8 +191,53 @@
         </div>
     </div>
 
-    {{-- Kanban Board --}}
-    <div class="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0">
+    {{-- Kanban Board with Scroll Navigation --}}
+    <div class="relative" 
+         x-data="{ 
+             canScrollLeft: false, 
+             canScrollRight: true,
+             checkScroll() {
+                 const el = this.$refs.kanbanScroll;
+                 this.canScrollLeft = el.scrollLeft > 10;
+                 this.canScrollRight = el.scrollLeft < (el.scrollWidth - el.clientWidth - 10);
+             },
+             scrollLeft() {
+                 this.$refs.kanbanScroll.scrollBy({ left: -320, behavior: 'smooth' });
+             },
+             scrollRight() {
+                 this.$refs.kanbanScroll.scrollBy({ left: 320, behavior: 'smooth' });
+             }
+         }"
+         x-init="$nextTick(() => checkScroll())">
+        
+        {{-- Scroll Left Button --}}
+        <button x-show="canScrollLeft" 
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 -translate-x-2"
+                x-transition:enter-end="opacity-100 translate-x-0"
+                @click="scrollLeft()"
+                class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-violet-600 transition border border-gray-100 backdrop-blur-sm">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        {{-- Scroll Right Button --}}
+        <button x-show="canScrollRight" 
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 translate-x-2"
+                x-transition:enter-end="opacity-100 translate-x-0"
+                @click="scrollRight()"
+                class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-violet-600 transition border border-gray-100 backdrop-blur-sm">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        {{-- Scroll Indicator --}}
+        <div x-show="canScrollRight" class="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-[5] hidden lg:block"></div>
+        <div x-show="canScrollLeft" class="absolute left-0 top-0 bottom-4 w-16 bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-[5] hidden lg:block"></div>
+
+        {{-- Kanban Scrollable Container --}}
+        <div class="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 lg:mx-0 lg:px-0 scroll-smooth scrollbar-hide"
+             x-ref="kanbanScroll"
+             @scroll="checkScroll()">
         @foreach($statuses as $status)
             <div class="flex-shrink-0 w-72 lg:w-80">
                 {{-- Column Header --}}
@@ -330,6 +375,7 @@
                 </div>
             </div>
         @endforeach
+        </div>
     </div>
 
     {{-- Modals teleported to body for proper z-index --}}
