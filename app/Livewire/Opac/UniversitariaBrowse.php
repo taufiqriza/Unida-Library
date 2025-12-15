@@ -64,7 +64,7 @@ class UniversitariaBrowse extends Component
         return view('livewire.opac.universitaria-browse', [
             'categories' => $this->categories,
             'ebooks' => $this->ebooks,
-        ])->layout('opac.layouts.app', [
+        ])->layout('components.opac.layout', [
             'title' => 'Universitaria - Warisan Intelektual PMDG',
             'description' => 'Koleksi berharga warisan intelektual dan sejarah Pondok Modern Darussalam Gontor',
         ]);
