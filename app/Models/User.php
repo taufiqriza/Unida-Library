@@ -118,4 +118,75 @@ class User extends Authenticatable implements FilamentUser
     {
         return self::getRoles()[$this->role] ?? $this->role;
     }
+
+    /**
+     * Get the user's avatar URL
+     * Returns real photo if available, otherwise generates initials-based avatar
+     */
+    public function getAvatarUrl(int $size = 100): string
+    {
+        // Check if user has a real photo
+        if ($this->photo) {
+            // Check if it's a full URL (e.g., from Google OAuth)
+            if (str_starts_with($this->photo, 'http://') || str_starts_with($this->photo, 'https://')) {
+                return $this->photo;
+            }
+            // Local storage photo
+            return asset('storage/' . $this->photo);
+        }
+
+        // Generate initials-based avatar
+        return $this->getInitialsAvatarUrl($size);
+    }
+
+    /**
+     * Get initials from name
+     */
+    public function getInitials(): string
+    {
+        $words = explode(' ', $this->name);
+        $initials = '';
+        
+        foreach ($words as $index => $word) {
+            if ($index < 2 && !empty($word)) { // Max 2 initials
+                $initials .= strtoupper(mb_substr($word, 0, 1));
+            }
+        }
+        
+        return $initials ?: '?';
+    }
+
+    /**
+     * Generate a consistent color based on name (for avatar background)
+     */
+    public function getAvatarColor(): string
+    {
+        $colors = [
+            '3b82f6', // blue
+            '22c55e', // green
+            'f59e0b', // amber
+            'ef4444', // red
+            '8b5cf6', // violet
+            'ec4899', // pink
+            '14b8a6', // teal
+            'f97316', // orange
+            '6366f1', // indigo
+            '06b6d4', // cyan
+        ];
+        
+        $hash = crc32($this->name);
+        return $colors[abs($hash) % count($colors)];
+    }
+
+    /**
+     * Get initials-based avatar URL (using ui-avatars.com)
+     */
+    public function getInitialsAvatarUrl(int $size = 100): string
+    {
+        $initials = $this->getInitials();
+        $color = $this->getAvatarColor();
+        
+        return "https://ui-avatars.com/api/?name=" . urlencode($initials) 
+            . "&size={$size}&background={$color}&color=ffffff&bold=true&format=svg";
+    }
 }
