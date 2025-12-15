@@ -12,7 +12,7 @@
              @click.away="$wire.closeModal()">
             
             {{-- Header --}}
-            <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex-shrink-0">
+            <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex-shrink-0">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-book-quran"></i>
@@ -20,7 +20,7 @@
                     <div class="min-w-0" dir="rtl">
                         @if($bookInfo)
                         <h3 class="font-bold text-base line-clamp-1">{{ $bookInfo['title'] }}</h3>
-                        <p class="text-emerald-200 text-xs">{{ $bookInfo['author'] ?? 'المكتبة الشاملة' }}</p>
+                        <p class="text-blue-200 text-xs">{{ $bookInfo['author'] ?? 'المكتبة الشاملة' }}</p>
                         @else
                         <h3 class="font-bold">جارٍ التحميل...</h3>
                         @endif
@@ -78,7 +78,7 @@
                 {{-- Loading --}}
                 <div class="flex items-center justify-center h-full">
                     <div class="text-center">
-                        <div class="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
                         <p class="text-gray-600">جارٍ تحميل الصفحة...</p>
                     </div>
                 </div>
@@ -108,8 +108,8 @@
                     
                     {{-- Footnotes --}}
                     @if(!empty($pageData['foot']))
-                    <div class="mt-8 pt-6 border-t-2 border-emerald-200">
-                        <h4 class="font-bold text-emerald-700 mb-4 flex items-center gap-2">
+                    <div class="mt-8 pt-6 border-t-2 border-blue-200">
+                        <h4 class="font-bold text-blue-700 mb-4 flex items-center gap-2">
                             <i class="fas fa-sticky-note"></i>
                             الحواشي
                         </h4>
@@ -136,7 +136,7 @@
                 
                 <div class="flex items-center gap-2">
                     {{-- Watermark --}}
-                    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                         <i class="fas fa-book-quran mr-1"></i>
                         المكتبة الشاملة - قراءة فقط
                     </span>

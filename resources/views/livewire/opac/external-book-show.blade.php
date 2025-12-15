@@ -30,22 +30,22 @@
                 @endif
             </div>
             
-            {{-- Back Button (Mobile) --}}
-            <div class="relative z-10 px-4 pt-4 lg:hidden">
-                <a href="{{ route('opac.search') }}?type=external" class="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
+            {{-- Back Button --}}
+            <div class="relative z-10 px-4 pt-4 lg:px-6 lg:pt-6 flex items-center justify-between">
+                <button onclick="window.history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-xl transition backdrop-blur-sm">
                     <i class="fas fa-arrow-left"></i>
                     <span>Kembali</span>
-                </a>
+                </button>
+                
+                {{-- Breadcrumb (Desktop) --}}
+                <nav class="hidden lg:flex items-center gap-2 text-sm text-white/70">
+                    <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                    <span>/</span>
+                    <a href="{{ route('opac.search') }}?type=external" class="hover:text-white">Open Library</a>
+                    <span>/</span>
+                    <span class="text-white truncate max-w-[200px]">{{ Str::limit($book['title'], 30) }}</span>
+                </nav>
             </div>
-            
-            {{-- Breadcrumb (Desktop) --}}
-            <nav class="hidden lg:block relative z-10 px-6 pt-6 text-sm text-white/70">
-                <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
-                <span class="mx-2">/</span>
-                <a href="{{ route('opac.search') }}" class="hover:text-white">Pencarian</a>
-                <span class="mx-2">/</span>
-                <span class="text-white">Open Library</span>
-            </nav>
             
             {{-- Cover & Basic Info --}}
             <div class="relative z-10 px-4 pb-6 pt-4 lg:p-8">

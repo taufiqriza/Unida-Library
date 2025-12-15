@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
     
     {{-- Hero Section --}}
-    <div class="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700">
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-700">
         {{-- Decorative elements --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
@@ -17,21 +17,21 @@
                 <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4" dir="rtl">
                     المكتبة الشاملة
                 </h1>
-                <p class="text-emerald-100 text-lg mb-2">Maktabah Shamela Library</p>
+                <p class="text-blue-100 text-lg mb-2">Maktabah Shamela Library</p>
                 
                 @if($isAvailable)
                 <div class="flex flex-wrap justify-center gap-4 mt-6">
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_books'] ?? 0) }}</p>
-                        <p class="text-xs text-emerald-200">Kitab</p>
+                        <p class="text-xs text-blue-200">Kitab</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_authors'] ?? 0) }}</p>
-                        <p class="text-xs text-emerald-200">Ulama</p>
+                        <p class="text-xs text-blue-200">Ulama</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_categories'] ?? 0) }}</p>
-                        <p class="text-xs text-emerald-200">Kategori</p>
+                        <p class="text-xs text-blue-200">Kategori</p>
                     </div>
                 </div>
                 @endif
@@ -40,7 +40,7 @@
             {{-- Search Box --}}
             <div class="max-w-2xl mx-auto">
                 <div class="relative">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-emerald-400 via-white to-emerald-400 rounded-full opacity-30 blur-lg"></div>
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 blur-lg"></div>
                     <div class="relative flex items-center bg-white rounded-full shadow-2xl overflow-hidden">
                         <div class="pl-5 pr-2">
                             <i class="fas fa-search text-gray-400"></i>
@@ -57,7 +57,7 @@
                             <i class="fas fa-times-circle"></i>
                         </button>
                         @endif
-                        <button class="m-1.5 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold rounded-full shadow-lg">
+                        <button class="m-1.5 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full shadow-lg">
                             بحث
                         </button>
                     </div>
@@ -78,7 +78,7 @@
             Silakan hubungi administrator untuk informasi lebih lanjut.
         </p>
         <a href="{{ route('opac.search') }}" 
-           class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition">
+           class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
             <i class="fas fa-search"></i>
             Cari Koleksi Lainnya
         </a>
@@ -92,25 +92,25 @@
             {{-- Sidebar Categories --}}
             <aside class="w-full lg:w-72 flex-shrink-0">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-4">
-                    <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
+                    <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
                         <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-folder-tree text-emerald-600"></i>
+                            <i class="fas fa-folder-tree text-blue-600"></i>
                             التصنيفات
                         </h3>
                     </div>
                     <div class="p-2 max-h-[60vh] overflow-y-auto">
                         <button 
                             wire:click="setCategory(null)"
-                            class="w-full flex items-center gap-3 p-3 rounded-xl text-sm transition {{ !$categoryId ? 'bg-emerald-100 text-emerald-700 font-medium' : 'hover:bg-gray-50 text-gray-700' }}"
+                            class="w-full flex items-center gap-3 p-3 rounded-xl text-sm transition {{ !$categoryId ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-50 text-gray-700' }}"
                         >
                             <i class="fas fa-layer-group"></i>
                             <span>الكل</span>
-                            <span class="ml-auto px-2 py-0.5 bg-emerald-200 text-emerald-800 text-xs rounded-full">{{ number_format($stats['total_books'] ?? 0) }}</span>
+                            <span class="ml-auto px-2 py-0.5 bg-blue-200 text-emerald-800 text-xs rounded-full">{{ number_format($stats['total_books'] ?? 0) }}</span>
                         </button>
                         @foreach($categories as $cat)
                         <button 
                             wire:click="setCategory({{ $cat['id'] }})"
-                            class="w-full flex items-center gap-3 p-3 rounded-xl text-sm transition {{ $categoryId === $cat['id'] ? 'bg-emerald-100 text-emerald-700 font-medium' : 'hover:bg-gray-50 text-gray-700' }}"
+                            class="w-full flex items-center gap-3 p-3 rounded-xl text-sm transition {{ $categoryId === $cat['id'] ? 'bg-blue-100 text-blue-700 font-medium' : 'hover:bg-gray-50 text-gray-700' }}"
                             dir="rtl"
                         >
                             <span class="truncate">{{ $cat['name'] }}</span>
@@ -128,14 +128,14 @@
                 <div class="flex items-center gap-2 mb-6 flex-wrap">
                     <span class="text-sm text-gray-500">Filter aktif:</span>
                     @if($search)
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                         <i class="fas fa-search text-xs"></i>
                         "{{ $search }}"
                         <button wire:click="$set('search', '')" class="hover:text-emerald-900"><i class="fas fa-times"></i></button>
                     </span>
                     @endif
                     @if($categoryId)
-                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm" dir="rtl">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm" dir="rtl">
                         <i class="fas fa-folder"></i>
                         {{ $this->categoryName }}
                         <button wire:click="setCategory(null)" class="hover:text-teal-900"><i class="fas fa-times"></i></button>
@@ -167,9 +167,9 @@
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     @forelse($this->results['results'] ?? [] as $book)
                     <a href="{{ route('opac.shamela.show', $book['id']) }}" 
-                       class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-emerald-200 transition group">
+                       class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-blue-200 transition group">
                         {{-- Cover --}}
-                        <div class="relative aspect-[3/4] bg-gradient-to-br from-emerald-50 to-teal-50">
+                        <div class="relative aspect-[3/4] bg-gradient-to-br from-blue-50 to-indigo-50">
                             <img src="{{ $book['cover'] }}" 
                                  alt="{{ $book['title'] }}"
                                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -185,12 +185,12 @@
                         
                         {{-- Info --}}
                         <div class="p-3" dir="rtl">
-                            <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 mb-1 group-hover:text-emerald-600 transition">
+                            <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 mb-1 group-hover:text-blue-600 transition">
                                 {{ $book['title'] }}
                             </h3>
                             <p class="text-xs text-gray-500 truncate">{{ $book['author'] ?? 'غير معروف' }}</p>
                             @if($book['hijri_year'] ?? null)
-                            <p class="text-[10px] text-emerald-600 mt-1">{{ $book['hijri_year'] }}</p>
+                            <p class="text-[10px] text-blue-600 mt-1">{{ $book['hijri_year'] }}</p>
                             @endif
                         </div>
                     </a>
@@ -214,7 +214,7 @@
                     </a>
                     @endif
                     
-                    <span class="px-4 py-2 bg-emerald-600 text-white rounded-lg">
+                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg">
                         {{ $this->getPage() }} / {{ $this->totalPages }}
                     </span>
                     

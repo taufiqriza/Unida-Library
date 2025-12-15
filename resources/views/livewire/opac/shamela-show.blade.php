@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
     
     {{-- Hero Section --}}
     <div class="relative overflow-hidden">
@@ -8,26 +8,34 @@
             <div class="absolute inset-0 bg-cover bg-center opacity-20" 
                  style="background-image: url('{{ $book['cover'] }}'); filter: blur(40px);"></div>
             @endif
-            <div class="absolute inset-0 bg-gradient-to-br from-emerald-600/90 via-teal-600/90 to-cyan-700/90"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-sky-700/90"></div>
         </div>
         
         <div class="relative z-10 max-w-6xl mx-auto px-4 py-12">
-            {{-- Breadcrumb --}}
-            <nav class="mb-6">
-                <ol class="flex items-center gap-2 text-sm text-emerald-100">
-                    <li><a href="{{ route('opac.home') }}" class="hover:text-white transition">Beranda</a></li>
-                    <li class="text-emerald-300">/</li>
-                    <li><a href="{{ route('opac.search') }}" class="hover:text-white transition">Pencarian</a></li>
-                    <li class="text-emerald-300">/</li>
-                    <li class="text-white font-medium">Maktabah Shamela</li>
-                </ol>
-            </nav>
+            {{-- Back Button & Breadcrumb --}}
+            <div class="flex items-center justify-between mb-6">
+                <button onclick="window.history.back()" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-xl transition backdrop-blur-sm">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Kembali</span>
+                </button>
+                
+                <nav>
+                    <ol class="flex items-center gap-2 text-sm text-blue-100">
+                        <li><a href="{{ route('opac.home') }}" class="hover:text-white transition">Beranda</a></li>
+                        <li class="text-blue-300">/</li>
+                        <li><a href="{{ route('opac.shamela.index') }}" class="hover:text-white transition">Shamela</a></li>
+                        <li class="text-blue-300">/</li>
+                        <li class="text-white font-medium truncate max-w-[200px]">{{ $book['title'] ?? 'Kitab' }}</li>
+                    </ol>
+                </nav>
+            </div>
             
             @if($loading)
                 {{-- Loading State --}}
                 <div class="text-center py-16">
                     <div class="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-                    <p class="text-emerald-100">Memuat data kitab...</p>
+                    <p class="text-blue-100">Memuat data kitab...</p>
                 </div>
             @elseif($error)
                 {{-- Error State --}}
@@ -55,7 +63,7 @@
                                 onerror="this.src='https://ui-avatars.com/api/?name=كتاب&background=059669&color=fff&size=200'"
                             >
                             {{-- Shamela Badge --}}
-                            <div class="absolute -top-3 -right-3 px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            <div class="absolute -top-3 -right-3 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
                                 <i class="fas fa-book-quran mr-1"></i> Shamela
                             </div>
                         </div>
@@ -68,7 +76,7 @@
                         </h1>
                         
                         @if($book['author'])
-                        <p class="text-xl text-emerald-100 mb-4">
+                        <p class="text-xl text-blue-100 mb-4">
                             <i class="fas fa-user-pen ml-2"></i>
                             {{ $book['author'] }}
                         </p>
@@ -91,7 +99,7 @@
                         
                         {{-- Author Death Year --}}
                         @if($book['author_death'] ?? null)
-                        <p class="text-emerald-200 text-sm mb-4">
+                        <p class="text-blue-200 text-sm mb-4">
                             <i class="fas fa-skull mr-1"></i> وفاة المؤلف: {{ $book['author_death'] }} هـ
                         </p>
                         @endif
@@ -114,7 +122,7 @@
                         
                         @if($isLocalDatabase)
                         <div class="mt-4 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg inline-flex items-center gap-2 text-sm text-white/80">
-                            <i class="fas fa-database text-emerald-300"></i>
+                            <i class="fas fa-database text-blue-300"></i>
                             <span>Data dari database lokal (8,425 kitab)</span>
                         </div>
                         @endif
@@ -134,9 +142,9 @@
                 {{-- Table of Contents --}}
                 @if(!empty($book['toc']))
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+                    <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
                         <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-list-ol text-emerald-600"></i>
+                            <i class="fas fa-list-ol text-blue-600"></i>
                             فهرس الموضوعات
                         </h2>
                     </div>
@@ -146,9 +154,9 @@
                             <li>
                                 <a href="{{ $book['url'] }}/{{ $item['page'] }}" 
                                    target="_blank"
-                                   class="flex items-center justify-between p-3 rounded-lg hover:bg-emerald-50 transition group">
-                                    <span class="text-gray-700 group-hover:text-emerald-700">{{ $item['title'] }}</span>
-                                    <span class="text-xs text-gray-400 group-hover:text-emerald-500">
+                                   class="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 transition group">
+                                    <span class="text-gray-700 group-hover:text-blue-700">{{ $item['title'] }}</span>
+                                    <span class="text-xs text-gray-400 group-hover:text-blue-500">
                                         صفحة {{ $item['page'] }}
                                         <i class="fas fa-arrow-left mr-1"></i>
                                     </span>
@@ -161,10 +169,10 @@
                 @endif
                 
                 {{-- About Shamela --}}
-                <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
                     <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-mosque text-emerald-600 text-xl"></i>
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-mosque text-blue-600 text-xl"></i>
                         </div>
                         <div>
                             <h3 class="font-bold text-gray-900 mb-2">Koleksi Maktabah Shamela</h3>
@@ -173,7 +181,7 @@
                                 dalam berbagai bidang ilmu syar'i seperti hadits, fiqh, tafsir, sejarah, dan lainnya.
                                 Semua konten tersedia secara offline di database lokal.
                             </p>
-                            <a href="{{ route('opac.shamela.index') }}" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 text-sm mt-3">
+                            <a href="{{ route('opac.shamela.index') }}" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm mt-3">
                                 <i class="fas fa-search"></i>
                                 Jelajahi Semua Kitab
                             </a>
@@ -187,7 +195,7 @@
                 {{-- Book Details Card --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-emerald-600"></i>
+                        <i class="fas fa-info-circle text-blue-600"></i>
                         Detail Kitab
                     </h3>
                     <dl class="space-y-3" dir="rtl">
@@ -209,7 +217,7 @@
                         @endif
                         <div class="flex justify-between py-2">
                             <dt class="text-gray-500">المصدر</dt>
-                            <dd class="text-emerald-600">
+                            <dd class="text-blue-600">
                                 <i class="fas fa-database mr-1 text-xs"></i>
                                 Database Lokal
                             </dd>
@@ -220,7 +228,7 @@
                 {{-- Action Card --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-hand-pointer text-emerald-600"></i>
+                        <i class="fas fa-hand-pointer text-blue-600"></i>
                         Aksi
                     </h3>
                     <div class="space-y-3">
@@ -239,7 +247,7 @@
                         
                         @if($book['category_id'] ?? null)
                         <a href="{{ route('opac.shamela.index') }}?cat={{ $book['category_id'] }}"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition">
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition">
                             <i class="fas fa-folder"></i>
                             Kitab Kategori Ini
                         </a>
@@ -257,19 +265,19 @@
                 @if(!empty($relatedBooks))
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-books text-emerald-600"></i>
+                        <i class="fas fa-books text-blue-600"></i>
                         كتب ذات صلة
                     </h3>
                     <div class="space-y-3">
                         @foreach($relatedBooks as $related)
                         <a href="{{ route('opac.shamela.show', $related['id']) }}" 
-                           class="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 transition group">
+                           class="flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition group">
                             <img src="{{ $related['cover'] }}" 
                                  alt="{{ $related['title'] }}"
                                  class="w-10 h-14 object-cover rounded-lg shadow-sm border border-gray-100"
                                  onerror="this.src='https://ui-avatars.com/api/?name=ك&background=059669&color=fff&size=80'">
                             <div class="flex-1 min-w-0" dir="rtl">
-                                <p class="text-sm font-medium text-gray-900 group-hover:text-emerald-600 truncate">
+                                <p class="text-sm font-medium text-gray-900 group-hover:text-blue-600 truncate">
                                     {{ $related['title'] }}
                                 </p>
                                 <p class="text-xs text-gray-500 truncate">{{ $related['author'] ?? '-' }}</p>
