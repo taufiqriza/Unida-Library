@@ -153,7 +153,7 @@
             <i class="fas fa-globe text-indigo-500"></i>
             Akses E-Resources
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
             <!-- Database Jurnal Berlangganan -->
             <a href="{{ route('opac.database-access') }}" class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-indigo-200 transition group relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
@@ -166,13 +166,36 @@
                             <h3 class="font-bold text-base lg:text-lg">Database Jurnal</h3>
                             <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">KONSORSIUM</span>
                         </div>
-                        <p class="text-indigo-200 text-xs mb-2">Gale Academic & ProQuest — 120K+ jurnal internasional</p>
+                        <p class="text-indigo-200 text-xs mb-2">Gale Academic & ProQuest — 120K+ jurnal</p>
                         <div class="flex items-center gap-1 text-indigo-300 text-xs">
                             <i class="fas fa-shield-alt"></i>
                             <span>FPPTI Jawa Timur</span>
                         </div>
                     </div>
                     <i class="fas fa-arrow-right text-indigo-300 group-hover:translate-x-1 transition self-center"></i>
+                </div>
+            </a>
+
+            <!-- Maktabah Shamela -->
+            <a href="{{ route('opac.shamela.index') }}" class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-blue-200 transition group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                <div class="relative flex items-start gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-book-quran text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-base lg:text-lg">Maktabah Shamela</h3>
+                            <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">LOKAL</span>
+                        </div>
+                        <p class="text-blue-200 text-xs mb-2">8,425 kitab Islam klasik — 7+ juta halaman</p>
+                        <div class="flex items-center gap-1 text-blue-300 text-xs" dir="rtl">
+                            <i class="fas fa-mosque"></i>
+                            <span>المكتبة الشاملة</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-arrow-right text-blue-300 group-hover:translate-x-1 transition self-center"></i>
                 </div>
             </a>
 
@@ -188,7 +211,7 @@
                             <h3 class="font-bold text-base lg:text-lg">E-Book Eksternal</h3>
                             <span class="px-2 py-0.5 bg-emerald-400 text-emerald-900 text-[10px] font-bold rounded-full">GRATIS</span>
                         </div>
-                        <p class="text-emerald-200 text-xs mb-2">Shamela, Open Library, Internet Archive & lainnya</p>
+                        <p class="text-emerald-200 text-xs mb-2">Open Library, Internet Archive & lainnya</p>
                         <div class="flex items-center gap-1 text-emerald-300 text-xs">
                             <i class="fas fa-infinity"></i>
                             <span>100K+ sumber terbuka</span>

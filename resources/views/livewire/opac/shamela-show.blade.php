@@ -50,83 +50,99 @@
                     </a>
                 </div>
             @else
-                {{-- Book Header --}}
-                <div class="flex flex-col lg:flex-row gap-8">
-                    {{-- Cover --}}
-                    <div class="flex-shrink-0 flex justify-center lg:justify-start">
-                        <div class="relative group">
-                            <div class="absolute -inset-4 bg-gradient-to-br from-white/20 to-white/5 rounded-2xl blur-xl group-hover:from-white/30 transition"></div>
-                            <img 
-                                src="{{ $book['cover'] }}" 
-                                alt="{{ $book['title'] }}"
-                                class="relative w-48 h-64 object-cover rounded-xl shadow-2xl border-4 border-white/30"
-                                onerror="this.src='https://ui-avatars.com/api/?name=كتاب&background=059669&color=fff&size=200'"
-                            >
-                            {{-- Shamela Badge --}}
-                            <div class="absolute -top-3 -right-3 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full shadow-lg">
-                                <i class="fas fa-book-quran mr-1"></i> Shamela
-                            </div>
+                {{-- Book Header - Centered Layout --}}
+                <div class="text-center">
+                    {{-- Cover & Badge --}}
+                    <div class="relative inline-block mb-6">
+                        <div class="absolute -inset-6 bg-gradient-to-br from-white/20 to-white/5 rounded-3xl blur-2xl"></div>
+                        <img 
+                            src="{{ $book['cover'] }}" 
+                            alt="{{ $book['title'] }}"
+                            class="relative w-40 h-56 lg:w-48 lg:h-64 object-cover rounded-2xl shadow-2xl border-4 border-white/40 mx-auto"
+                            onerror="this.src='https://ui-avatars.com/api/?name=كتاب&background=2563eb&color=fff&size=200'"
+                        >
+                        {{-- Shamela Badge --}}
+                        <div class="absolute -top-3 -right-3 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1">
+                            <i class="fas fa-book-quran"></i>
+                            <span>Shamela</span>
                         </div>
                     </div>
                     
-                    {{-- Book Info --}}
-                    <div class="flex-1 text-center lg:text-right" dir="rtl">
-                        <h1 class="text-3xl lg:text-4xl font-bold text-white mb-4 leading-relaxed">
+                    {{-- Title & Author --}}
+                    <div dir="rtl" class="mb-6">
+                        <h1 class="text-2xl lg:text-4xl font-bold text-white mb-3 leading-relaxed">
                             {{ $book['title'] }}
                         </h1>
                         
                         @if($book['author'])
-                        <p class="text-xl text-blue-100 mb-4">
-                            <i class="fas fa-user-pen ml-2"></i>
+                        <p class="text-lg lg:text-xl text-blue-100 mb-4">
+                            <i class="fas fa-user-pen ml-2 text-blue-300"></i>
                             {{ $book['author'] }}
                         </p>
                         @endif
                         
-                            @if($book['category'])
-                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm mb-3">
-                            <i class="fas fa-folder"></i>
-                            {{ $book['category'] }}
-                        </span>
-                        @endif
-                        
-                        {{-- Year Badge --}}
-                        @if($book['hijri_year'] ?? null)
-                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/30 backdrop-blur rounded-full text-white text-sm mr-2 mb-3">
-                            <i class="fas fa-calendar"></i>
-                            {{ $book['hijri_year'] }}
-                        </span>
-                        @endif
-                        
-                        {{-- Author Death Year --}}
                         @if($book['author_death'] ?? null)
-                        <p class="text-blue-200 text-sm mb-4">
-                            <i class="fas fa-skull mr-1"></i> وفاة المؤلف: {{ $book['author_death'] }} هـ
+                        <p class="text-blue-200 text-sm">
+                            <i class="fas fa-star ml-1 text-amber-300"></i> 
+                            توفي {{ $book['author_death'] }} هـ
                         </p>
                         @endif
-                        
-                        <div class="flex flex-wrap justify-center lg:justify-end gap-3 mt-6" dir="ltr">
-                            {{-- Local Reader Button (Primary) --}}
-                            @if($this->hasContent)
-                            <button onclick="Livewire.dispatch('openReader', { bookId: {{ $book['id'] }} })"
-                               class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-lg rounded-xl hover:from-amber-500 hover:to-orange-600 transition shadow-lg shadow-amber-500/30">
-                                <i class="fas fa-book-open-reader text-xl"></i>
-                                اقرأ الكتاب الآن
-                            </button>
-                            @else
-                            <div class="px-6 py-3 bg-white/10 text-white/70 rounded-xl backdrop-blur">
-                                <i class="fas fa-clock mr-2"></i>
-                                قريباً - الكتاب قيد المعالجة
+                    </div>
+                    
+                    {{-- Stats Cards --}}
+                    <div class="flex flex-wrap justify-center gap-3 mb-6">
+                        @if($book['category'])
+                        <div class="px-4 py-2.5 bg-white/15 backdrop-blur-sm rounded-xl border border-white/20">
+                            <div class="flex items-center gap-2 text-white">
+                                <i class="fas fa-folder-open text-blue-300"></i>
+                                <span class="text-sm font-medium" dir="rtl">{{ $book['category'] }}</span>
                             </div>
-                            @endif
                         </div>
+                        @endif
                         
-                        @if($isLocalDatabase)
-                        <div class="mt-4 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg inline-flex items-center gap-2 text-sm text-white/80">
-                            <i class="fas fa-database text-blue-300"></i>
-                            <span>Data dari database lokal (8,425 kitab)</span>
+                        @if($book['hijri_year'] ?? null)
+                        <div class="px-4 py-2.5 bg-white/15 backdrop-blur-sm rounded-xl border border-white/20">
+                            <div class="flex items-center gap-2 text-white">
+                                <i class="fas fa-calendar-alt text-amber-300"></i>
+                                <span class="text-sm font-medium">{{ $book['hijri_year'] }}</span>
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if($this->hasContent)
+                        <div class="px-4 py-2.5 bg-emerald-500/30 backdrop-blur-sm rounded-xl border border-emerald-400/30">
+                            <div class="flex items-center gap-2 text-white">
+                                <i class="fas fa-check-circle text-emerald-300"></i>
+                                <span class="text-sm font-medium">متوفر للقراءة</span>
+                            </div>
                         </div>
                         @endif
                     </div>
+                    
+                    {{-- CTA Button --}}
+                    <div class="mb-4">
+                        @if($this->hasContent)
+                        <button onclick="Livewire.dispatch('openReader', { bookId: {{ $book['id'] }} })"
+                           class="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white font-bold text-lg rounded-2xl hover:from-amber-500 hover:via-orange-600 hover:to-rose-600 transition-all duration-300 shadow-2xl shadow-orange-500/40 hover:shadow-orange-500/60 hover:scale-105 transform">
+                            <i class="fas fa-book-open-reader text-2xl"></i>
+                            <span dir="rtl">اقرأ الكتاب الآن</span>
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        @else
+                        <div class="inline-flex items-center gap-3 px-8 py-4 bg-white/10 text-white/70 rounded-2xl backdrop-blur">
+                            <i class="fas fa-hourglass-half text-xl"></i>
+                            <span dir="rtl">قريباً - الكتاب قيد المعالجة</span>
+                        </div>
+                        @endif
+                    </div>
+                    
+                    {{-- Database Info --}}
+                    @if($isLocalDatabase)
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-blue-100">
+                        <i class="fas fa-database text-blue-300"></i>
+                        <span>Database Lokal • 8,425 Kitab • 7+ Juta Halaman</span>
+                    </div>
+                    @endif
                 </div>
             @endif
         </div>

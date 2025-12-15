@@ -206,6 +206,28 @@
                         </a>
                     </div>
 
+                    {{-- Maktabah Shamela Card --}}
+                    <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-4 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                        <div class="relative flex items-center gap-4">
+                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
+                                <i class="fas fa-book-quran text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-base lg:text-lg">Maktabah Shamela</h3>
+                                    <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">LOKAL</span>
+                                </div>
+                                <p class="text-blue-200 text-xs lg:text-sm">Akses 8,425 kitab Islam klasik — 7+ juta halaman</p>
+                                <p class="text-blue-300 text-xs mt-1" dir="rtl">
+                                    <i class="fas fa-mosque ml-1"></i> المكتبة الشاملة
+                                </p>
+                            </div>
+                            <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </a>
+
                     {{-- Peminjaman Aktif --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="p-4 border-b border-gray-100 flex items-center justify-between">
