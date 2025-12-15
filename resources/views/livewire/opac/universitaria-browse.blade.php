@@ -114,11 +114,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($ebooks as $ebook)
             <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer"
-                 @if(auth()->check())
-                 @click="openReader('{{ asset('storage/' . $ebook->file_path) }}', '{{ addslashes($ebook->title) }}')"
-                 @else
-                 onclick="window.location.href='{{ route('opac.login') }}'"
-                 @endif>
+                 x-on:click="{{ auth()->check() ? "openReader('" . asset('storage/' . $ebook->file_path) . "', '" . addslashes($ebook->title) . "')" : "window.location.href='" . route('opac.login') . "'" }}">
                 {{-- Cover --}}
                 <div class="aspect-[3/4] bg-gradient-to-br from-blue-100 to-indigo-100 relative overflow-hidden">
                     @if($ebook->cover_image)
