@@ -73,7 +73,37 @@ class ShamelaContentService
     }
     
     /**
-     * Get a specific page of a book
+     * Clean Shamela content - remove HTML tags and fix encoding
+     */
+    public function cleanContent(string $text): string
+    {
+        // Remove HTML tags like <span data-type="title" ...>
+        $text = preg_replace('/<[^>]+>/', '', $text);
+        
+        // Remove leftover closing tags
+        $text = preg_replace('/<\/[^>]+>/', '', $text);
+        
+        // Clean up Shamela-specific markup patterns
+        $text = preg_replace('/\[span[^\]]*\]/', '', $text);
+        $text = preg_replace('/\[\/span\]/', '', $text);
+        
+        // Remove Unicode replacement characters (encoding issues)
+        $text = preg_replace('/\x{FFFD}/u', '', $text);
+        
+        // Clean up reference markers like (¬١) 
+        $text = preg_replace('/\(¬[٠-٩]+\)/', '', $text);
+        
+        // Remove multiple consecutive newlines
+        $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        
+        // Trim whitespace
+        $text = trim($text);
+        
+        return $text;
+    }
+    
+    /**
+     * Get a specific page of a book with cleaned content
      */
     public function getPage(int $bookId, int $pageNum): ?array
     {
@@ -88,6 +118,17 @@ class ShamelaContentService
         $result = $stmt->execute();
         
         $row = $result->fetchArray(SQLITE3_ASSOC);
+        
+        if ($row) {
+            // Clean the content
+            if (!empty($row['body'])) {
+                $row['body'] = $this->cleanContent($row['body']);
+            }
+            if (!empty($row['foot'])) {
+                $row['foot'] = $this->cleanContent($row['foot']);
+            }
+        }
+        
         return $row ?: null;
     }
     
