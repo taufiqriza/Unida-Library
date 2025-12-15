@@ -114,7 +114,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($ebooks as $ebook)
             <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer"
-                 x-on:click="{{ auth()->check() ? "openReader('" . asset('storage/' . $ebook->file_path) . "', '" . addslashes($ebook->title) . "')" : "window.location.href='" . route('opac.login') . "'" }}">
+                 x-on:click="{{ auth()->check() ? "openReader('" . asset('storage/' . $ebook->file_path) . "', '" . addslashes($ebook->title) . "', " . ($ebook->file_size ?? 0) . ")" : "window.location.href='" . route('opac.login') . "'" }}">
                 {{-- Cover --}}
                 <div class="aspect-[3/4] bg-gradient-to-br from-blue-100 to-indigo-100 relative overflow-hidden">
                     @if($ebook->cover_image)
@@ -237,8 +237,14 @@
                 <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-900">
                     <div class="text-center">
                         <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p class="text-white font-medium">Memuat dokumen...</p>
-                        <p class="text-gray-400 text-sm mt-1">Mohon tunggu sebentar</p>
+                        <p class="text-white font-medium" x-text="statusMessage"></p>
+                        <p class="text-gray-400 text-sm mt-1">
+                            <span x-show="currentSize > 0">Ukuran: <span x-text="currentSize"></span> MB | </span>
+                            Viewer: <span x-text="getViewerName()" class="text-blue-400"></span>
+                        </p>
+                        <p class="text-gray-500 text-xs mt-2" x-show="viewerAttempts > 0">
+                            Mencoba viewer ke-<span x-text="viewerAttempts + 1"></span>...
+                        </p>
                     </div>
                 </div>
                 
@@ -249,13 +255,16 @@
                             <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
                         </div>
                         <h4 class="text-xl font-bold text-white mb-2">Gagal Memuat PDF</h4>
-                        <p class="text-gray-400 text-sm mb-4">Dokumen tidak dapat ditampilkan. Coba gunakan viewer lain.</p>
-                        <div class="flex gap-2 justify-center">
-                            <button @click="retryLoad()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <p class="text-gray-400 text-sm mb-2">Semua viewer telah dicoba. Dokumen mungkin terlalu besar atau format tidak didukung.</p>
+                        <p class="text-gray-500 text-xs mb-4" x-show="currentSize > 20">
+                            <i class="fas fa-info-circle mr-1"></i>File besar (>20MB) mungkin memerlukan waktu lebih lama
+                        </p>
+                        <div class="flex gap-2 justify-center flex-wrap">
+                            <button x-on:click="retryLoad()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                                 <i class="fas fa-redo mr-1"></i> Coba Lagi
                             </button>
-                            <button @click="toggleViewer()" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">
-                                <i class="fas fa-sync-alt mr-1"></i> Ganti Viewer
+                            <button x-on:click="openInNewTab()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                                <i class="fas fa-external-link-alt mr-1"></i> Buka Tab Baru
                             </button>
                         </div>
                     </div>
@@ -297,16 +306,40 @@ function universitariaReader() {
         showWarning: true,
         currentUrl: '',
         currentTitle: '',
-        viewerType: 'google',
+        currentSize: 0,
+        viewerType: 'native', // Start with native for speed
+        viewerAttempts: 0,
+        maxAttempts: 3,
         loadTimeout: null,
+        viewerOrder: ['native', 'google', 'mozilla'], // Fallback order
+        statusMessage: 'Memuat dokumen...',
         
-        openReader(url, title) {
+        openReader(url, title, size = 0) {
             this.currentUrl = url;
             this.currentTitle = title;
+            this.currentSize = size;
             this.showReader = true;
             this.loading = true;
             this.error = false;
             this.showWarning = true;
+            this.viewerAttempts = 0;
+            this.statusMessage = 'Memuat dokumen...';
+            
+            // Choose best initial viewer based on file size
+            if (size > 50) {
+                // Large files (>50MB) - use native first, faster
+                this.viewerType = 'native';
+                this.viewerOrder = ['native', 'mozilla', 'google'];
+            } else if (size > 20) {
+                // Medium files - use native
+                this.viewerType = 'native';
+                this.viewerOrder = ['native', 'google', 'mozilla'];
+            } else {
+                // Small files - Google is reliable
+                this.viewerType = 'google';
+                this.viewerOrder = ['google', 'native', 'mozilla'];
+            }
+            
             document.body.style.overflow = 'hidden';
             this.$nextTick(() => {
                 this.loadPdf();
@@ -316,7 +349,7 @@ function universitariaReader() {
         closeReader() {
             this.showReader = false;
             if (this.$refs.pdfFrame) {
-                this.$refs.pdfFrame.src = '';
+                this.$refs.pdfFrame.src = 'about:blank';
             }
             clearTimeout(this.loadTimeout);
             document.body.style.overflow = '';
@@ -326,12 +359,17 @@ function universitariaReader() {
             const frame = this.$refs.pdfFrame;
             if (!frame) return;
             
+            this.statusMessage = `Mencoba ${this.getViewerName()}...`;
+            
+            // Shorter timeout, faster fallback
+            const timeoutMs = this.viewerType === 'native' ? 8000 : 12000;
+            
             this.loadTimeout = setTimeout(() => {
                 if (this.loading) {
-                    this.error = true;
-                    this.loading = false;
+                    console.log(`${this.viewerType} timeout, trying next...`);
+                    this.tryNextViewer();
                 }
-            }, 15000);
+            }, timeoutMs);
             
             let src = '';
             switch(this.viewerType) {
@@ -341,41 +379,79 @@ function universitariaReader() {
                 case 'mozilla':
                     src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(this.currentUrl)}`;
                     break;
-                default:
+                default: // native
                     src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
             }
             
             frame.src = src;
         },
         
+        tryNextViewer() {
+            this.viewerAttempts++;
+            clearTimeout(this.loadTimeout);
+            
+            if (this.viewerAttempts >= this.maxAttempts) {
+                this.error = true;
+                this.loading = false;
+                this.statusMessage = 'Gagal memuat dokumen';
+                return;
+            }
+            
+            // Get next viewer in order
+            const currentIdx = this.viewerOrder.indexOf(this.viewerType);
+            const nextIdx = (currentIdx + 1) % this.viewerOrder.length;
+            this.viewerType = this.viewerOrder[nextIdx];
+            
+            console.log(`Switching to ${this.viewerType}`);
+            this.loadPdf();
+        },
+        
+        getViewerName() {
+            const names = {
+                'google': 'Google Docs',
+                'mozilla': 'Mozilla PDF.js',
+                'native': 'Browser PDF'
+            };
+            return names[this.viewerType] || this.viewerType;
+        },
+        
         onFrameLoad() {
             clearTimeout(this.loadTimeout);
             this.loading = false;
+            this.statusMessage = 'Dokumen berhasil dimuat';
             setTimeout(() => {
                 this.showWarning = false;
-            }, 3000);
+            }, 2000);
         },
         
         onFrameError() {
-            clearTimeout(this.loadTimeout);
-            this.error = true;
-            this.loading = false;
+            console.log(`${this.viewerType} error, trying next...`);
+            this.tryNextViewer();
         },
         
         retryLoad() {
             this.error = false;
             this.loading = true;
+            this.viewerAttempts = 0;
+            this.viewerType = this.viewerOrder[0];
             this.loadPdf();
         },
         
         toggleViewer() {
-            const viewers = ['google', 'mozilla', 'native'];
-            const currentIndex = viewers.indexOf(this.viewerType);
-            this.viewerType = viewers[(currentIndex + 1) % viewers.length];
+            clearTimeout(this.loadTimeout);
+            const currentIdx = this.viewerOrder.indexOf(this.viewerType);
+            const nextIdx = (currentIdx + 1) % this.viewerOrder.length;
+            this.viewerType = this.viewerOrder[nextIdx];
             this.error = false;
             this.loading = true;
+            this.viewerAttempts = 0;
             this.loadPdf();
+        },
+        
+        openInNewTab() {
+            window.open(this.currentUrl, '_blank');
         }
     }
 }
 </script>
+
