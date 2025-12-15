@@ -65,6 +65,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{task}/edit', \App\Livewire\Staff\Task\TaskForm::class)->name('edit');
         });
 
+        // Statistics
+        Route::get('/statistics', \App\Livewire\Staff\Statistics\LibraryStatistics::class)->name('statistics.index');
+
         // Profile
         Route::get('/profile', \App\Livewire\Staff\Profile\StaffProfile::class)->name('profile');
 

@@ -65,11 +65,12 @@
             ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
             ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
+            ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
             ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
         ];
         // Add Control menu for admin only
         if (in_array($user->role, ['super_admin', 'admin'])) {
-            array_splice($navItems, 8, 0, [['label' => 'Control', 'icon' => 'fa-user-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']]]);
+            array_splice($navItems, 9, 0, [['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']]]);
         }
     @endphp
 

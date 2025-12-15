@@ -115,7 +115,7 @@
                                         </span>
                                         <input type="text" wire:model="identifier" required 
                                             placeholder="Masukkan no. anggota atau email"
-                                            class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                                            class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
                                     </div>
                                 </div>
                                 <div>
@@ -126,7 +126,7 @@
                                         </span>
                                         <input :type="show ? 'text' : 'password'" wire:model="password" required 
                                             placeholder="Masukkan password"
-                                            class="w-full pl-11 pr-12 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition">
+                                            class="w-full pl-11 pr-12 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
                                         <button type="button" @click="show = !show" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                             <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                                         </button>
