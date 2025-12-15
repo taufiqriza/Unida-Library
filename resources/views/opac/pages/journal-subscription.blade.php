@@ -69,9 +69,9 @@
         $ebooks = [
             [
                 'name' => 'Maktabah Syamilah',
-                'url' => 'https://shamela.ws/',
-                'desc' => 'Perpustakaan digital Islam klasik terlengkap',
-                'collections' => '7,000+',
+                'url' => route('opac.shamela.index'),
+                'desc' => 'Perpustakaan digital Islam klasik - Database Lokal',
+                'collections' => '8,425',
                 'type' => 'Kitab',
                 'color' => 'emerald',
                 'icon' => 'fa-mosque',

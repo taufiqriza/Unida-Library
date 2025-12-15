@@ -100,30 +100,16 @@
                             {{-- Local Reader Button (Primary) --}}
                             @if($this->hasContent)
                             <button onclick="Livewire.dispatch('openReader', { bookId: {{ $book['id'] }} })"
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-500 hover:to-orange-600 transition shadow-lg shadow-amber-500/30">
-                                <i class="fas fa-book-open-reader text-lg"></i>
-                                اقرأ الآن
-                                <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">مجاني</span>
+                               class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold text-lg rounded-xl hover:from-amber-500 hover:to-orange-600 transition shadow-lg shadow-amber-500/30">
+                                <i class="fas fa-book-open-reader text-xl"></i>
+                                اقرأ الكتاب الآن
                             </button>
+                            @else
+                            <div class="px-6 py-3 bg-white/10 text-white/70 rounded-xl backdrop-blur">
+                                <i class="fas fa-clock mr-2"></i>
+                                قريباً - الكتاب قيد المعالجة
+                            </div>
                             @endif
-                            
-                            {{-- PDF Download if available --}}
-                            @if(!empty($book['pdf_links']))
-                            <a href="{{ $book['pdf_links'][0] }}" 
-                               target="_blank"
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-rose-500 text-white font-semibold rounded-xl hover:bg-rose-600 transition shadow-lg">
-                                <i class="fas fa-file-pdf text-lg"></i>
-                                تحميل PDF
-                            </a>
-                            @endif
-                            
-                            {{-- Shamela.ws Link --}}
-                            <a href="{{ $book['url'] }}" 
-                               target="_blank"
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white font-semibold rounded-xl hover:bg-white/30 transition backdrop-blur">
-                                <i class="fas fa-external-link-alt"></i>
-                                Shamela.ws
-                            </a>
                         </div>
                         
                         @if($isLocalDatabase)
@@ -181,14 +167,15 @@
                             <i class="fas fa-mosque text-emerald-600 text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="font-bold text-gray-900 mb-2">Tentang Maktabah Shamela</h3>
+                            <h3 class="font-bold text-gray-900 mb-2">Koleksi Maktabah Shamela</h3>
                             <p class="text-gray-600 text-sm leading-relaxed">
-                                المكتبة الشاملة adalah perpustakaan digital terbesar untuk kitab-kitab Islam klasik dan kontemporer. 
-                                Berisi ribuan kitab dalam berbagai bidang ilmu syar'i seperti hadits, fiqh, tafsir, sejarah, dan lainnya.
+                                Perpustakaan digital berisi <strong>8,425 kitab</strong> Islam klasik dan kontemporer 
+                                dalam berbagai bidang ilmu syar'i seperti hadits, fiqh, tafsir, sejarah, dan lainnya.
+                                Semua konten tersedia secara offline di database lokal.
                             </p>
-                            <a href="https://shamela.ws" target="_blank" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 text-sm mt-3">
-                                Kunjungi Shamela.ws
-                                <i class="fas fa-external-link-alt text-xs"></i>
+                            <a href="{{ route('opac.shamela.index') }}" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 text-sm mt-3">
+                                <i class="fas fa-search"></i>
+                                Jelajahi Semua Kitab
                             </a>
                         </div>
                     </div>
@@ -222,7 +209,10 @@
                         @endif
                         <div class="flex justify-between py-2">
                             <dt class="text-gray-500">المصدر</dt>
-                            <dd class="text-emerald-600">Shamela.ws</dd>
+                            <dd class="text-emerald-600">
+                                <i class="fas fa-database mr-1 text-xs"></i>
+                                Database Lokal
+                            </dd>
                         </div>
                     </dl>
                 </div>
@@ -234,22 +224,31 @@
                         Aksi
                     </h3>
                     <div class="space-y-3">
-                        @if(!empty($book['pdf_links']))
-                        <a href="{{ $book['pdf_links'][0] }}" target="_blank"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition font-medium">
-                            <i class="fas fa-file-pdf"></i>
-                            Download PDF
-                        </a>
-                        @endif
-                        <a href="{{ $book['url'] }}" target="_blank"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition font-medium">
-                            <i class="fas fa-book-open"></i>
+                        @if($this->hasContent)
+                        <button onclick="Livewire.dispatch('openReader', { bookId: {{ $book['id'] }} })"
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-xl hover:from-amber-500 hover:to-orange-600 transition font-medium shadow-lg shadow-amber-500/20">
+                            <i class="fas fa-book-open-reader"></i>
                             Baca Kitab
-                        </a>
-                        <a href="https://shamela.ws/category/{{ $book['category_id'] ?? '' }}" target="_blank"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition {{ !($book['category_id'] ?? null) ? 'opacity-50 pointer-events-none' : '' }}">
+                        </button>
+                        @else
+                        <div class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-500 rounded-xl">
+                            <i class="fas fa-clock"></i>
+                            Segera Tersedia
+                        </div>
+                        @endif
+                        
+                        @if($book['category_id'] ?? null)
+                        <a href="{{ route('opac.shamela.index') }}?cat={{ $book['category_id'] }}"
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition">
                             <i class="fas fa-folder"></i>
                             Kitab Kategori Ini
+                        </a>
+                        @endif
+                        
+                        <a href="{{ route('opac.shamela.index') }}"
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition">
+                            <i class="fas fa-search"></i>
+                            Jelajahi Semua Kitab
                         </a>
                     </div>
                 </div>

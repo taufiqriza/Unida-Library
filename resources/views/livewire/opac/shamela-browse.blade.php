@@ -74,12 +74,13 @@
         </div>
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Database Shamela Belum Tersedia</h2>
         <p class="text-gray-600 mb-8">
-            Untuk menggunakan fitur ini, database Shamela perlu diinstall terlebih dahulu di server.
+            Database konten Maktabah Shamela sedang dalam proses instalasi. 
+            Silakan hubungi administrator untuk informasi lebih lanjut.
         </p>
-        <a href="https://shamela.ws" target="_blank" 
+        <a href="{{ route('opac.search') }}" 
            class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition">
-            <i class="fas fa-external-link-alt"></i>
-            Kunjungi Shamela.ws
+            <i class="fas fa-search"></i>
+            Cari Koleksi Lainnya
         </a>
     </div>
     @else

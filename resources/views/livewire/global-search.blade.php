@@ -837,8 +837,8 @@
                                 </div>
                                 <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Kitab di Maktabah Shamela</h3>
                                 <p class="text-gray-500 max-w-md mx-auto mb-6">
-                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-emerald-600">ribuan kitab-kitab Islam klasik</span> 
-                                    di المكتبة الشاملة (Shamela.ws).
+                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-emerald-600">8,425 kitab Islam klasik</span> 
+                                    dalam database lokal المكتبة الشاملة.
                                 </p>
                                 
                                 {{-- Example Keywords --}}
@@ -860,8 +860,8 @@
                                 </div>
                                 
                                 <p class="text-xs text-gray-400 mt-6">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Hasil pencarian berasal dari <a href="https://shamela.ws" target="_blank" class="text-emerald-600 hover:underline">shamela.ws</a>
+                                    <i class="fas fa-database mr-1"></i>
+                                    Data tersimpan secara lokal (7+ juta halaman)
                                 </p>
                             @else
                                 {{-- Default empty state --}}
