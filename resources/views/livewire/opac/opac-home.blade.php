@@ -153,71 +153,63 @@
             <i class="fas fa-globe text-indigo-500"></i>
             Akses E-Resources
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
             <!-- Database Jurnal Berlangganan -->
             <a href="{{ route('opac.database-access') }}" class="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-indigo-200 transition group relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                <div class="relative flex items-start gap-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-database text-xl"></i>
+                <div class="relative flex items-start gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-database text-lg"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <h3 class="font-bold text-base lg:text-lg">Database Jurnal</h3>
-                            <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">KONSORSIUM</span>
-                        </div>
-                        <p class="text-indigo-200 text-xs mb-2">Gale Academic & ProQuest — 120K+ jurnal</p>
-                        <div class="flex items-center gap-1 text-indigo-300 text-xs">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>FPPTI Jawa Timur</span>
-                        </div>
+                        <h3 class="font-bold text-sm lg:text-base">Database Jurnal</h3>
+                        <p class="text-indigo-200 text-[11px] mt-0.5">120K+ jurnal ilmiah</p>
                     </div>
-                    <i class="fas fa-arrow-right text-indigo-300 group-hover:translate-x-1 transition self-center"></i>
                 </div>
             </a>
 
             <!-- Maktabah Shamela -->
             <a href="{{ route('opac.shamela.index') }}" class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-blue-200 transition group relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-                <div class="relative flex items-start gap-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-book-quran text-xl"></i>
+                <div class="relative flex items-start gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-book-quran text-lg"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <h3 class="font-bold text-base lg:text-lg">Maktabah Shamela</h3>
-                            <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">LOKAL</span>
-                        </div>
-                        <p class="text-blue-200 text-xs mb-2">8,425 kitab Islam klasik — 7+ juta halaman</p>
-                        <div class="flex items-center gap-1 text-blue-300 text-xs" dir="rtl">
-                            <i class="fas fa-mosque"></i>
-                            <span>المكتبة الشاملة</span>
-                        </div>
+                        <h3 class="font-bold text-sm lg:text-base">Maktabah Shamela</h3>
+                        <p class="text-blue-200 text-[11px] mt-0.5">8,425 kitab Islam</p>
                     </div>
-                    <i class="fas fa-arrow-right text-blue-300 group-hover:translate-x-1 transition self-center"></i>
+                </div>
+            </a>
+
+            <!-- Universitaria - Premium Heritage -->
+            <a href="{{ route('opac.universitaria.index') }}" class="bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-amber-200 transition group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute top-2 right-2">
+                    <span class="px-1.5 py-0.5 bg-white/25 text-[9px] font-bold rounded-full"><i class="fas fa-crown mr-0.5"></i>PREMIUM</span>
+                </div>
+                <div class="relative flex items-start gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-landmark text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-sm lg:text-base">Universitaria</h3>
+                        <p class="text-amber-100 text-[11px] mt-0.5">Warisan Sejarah PMDG</p>
+                    </div>
                 </div>
             </a>
 
             <!-- E-Book & Resources Eksternal -->
             <a href="{{ route('opac.page', 'journal-subscription') }}" class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-emerald-200 transition group relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                <div class="relative flex items-start gap-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-book-open text-xl"></i>
+                <div class="relative flex items-start gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-book-open text-lg"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 mb-1">
-                            <h3 class="font-bold text-base lg:text-lg">E-Book Eksternal</h3>
-                            <span class="px-2 py-0.5 bg-emerald-400 text-emerald-900 text-[10px] font-bold rounded-full">GRATIS</span>
-                        </div>
-                        <p class="text-emerald-200 text-xs mb-2">Open Library, Internet Archive & lainnya</p>
-                        <div class="flex items-center gap-1 text-emerald-300 text-xs">
-                            <i class="fas fa-infinity"></i>
-                            <span>100K+ sumber terbuka</span>
-                        </div>
+                        <h3 class="font-bold text-sm lg:text-base">E-Book Eksternal</h3>
+                        <p class="text-emerald-200 text-[11px] mt-0.5">100K+ sumber terbuka</p>
                     </div>
-                    <i class="fas fa-arrow-right text-emerald-300 group-hover:translate-x-1 transition self-center"></i>
                 </div>
             </a>
         </div>
