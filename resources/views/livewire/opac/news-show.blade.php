@@ -13,7 +13,7 @@
         </div>
         @endif
         
-        <div class="max-w-5xl mx-auto px-4 py-8 lg:py-16 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 py-8 lg:py-16 relative z-10">
             <!-- Breadcrumb -->
             <nav class="flex items-center gap-2 text-sm text-blue-200 mb-6">
                 <a href="{{ route('opac.home') }}" class="hover:text-white transition">
@@ -25,59 +25,62 @@
                 <span class="text-white/80 truncate max-w-[200px]">{{ Str::limit($news->title, 30) }}</span>
             </nav>
             
-            <!-- Meta Info -->
-            <div class="flex flex-wrap items-center gap-3 mb-4">
-                @if($news->category)
-                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
-                    {{ $news->category->name }}
-                </span>
-                @endif
-                @if($news->is_featured)
-                <span class="px-3 py-1 bg-amber-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-amber-200">
-                    <i class="fas fa-star mr-1"></i> Featured
-                </span>
-                @endif
-                @if($news->is_pinned)
-                <span class="px-3 py-1 bg-rose-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-rose-200">
-                    <i class="fas fa-thumbtack mr-1"></i> Pinned
-                </span>
-                @endif
-            </div>
-            
-            <!-- Title -->
-            <h1 class="text-2xl lg:text-4xl font-bold leading-tight mb-6">{{ $news->title }}</h1>
-            
-            <!-- Author & Date -->
-            <div class="flex flex-wrap items-center gap-6 text-blue-200">
-                @if($news->author)
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        @if($news->author->photo)
-                            <img src="{{ asset('storage/' . $news->author->photo) }}" class="w-full h-full object-cover rounded-full">
-                        @else
-                            <i class="fas fa-user text-sm"></i>
-                        @endif
+            <!-- Content wrapper matching main layout -->
+            <div class="lg:max-w-3xl">
+                <!-- Meta Info -->
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    @if($news->category)
+                    <span class="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+                        {{ $news->category->name }}
+                    </span>
+                    @endif
+                    @if($news->is_featured)
+                    <span class="px-3 py-1 bg-amber-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-amber-200">
+                        <i class="fas fa-star mr-1"></i> Featured
+                    </span>
+                    @endif
+                    @if($news->is_pinned)
+                    <span class="px-3 py-1 bg-rose-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-rose-200">
+                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                    </span>
+                    @endif
+                </div>
+                
+                <!-- Title -->
+                <h1 class="text-2xl lg:text-4xl font-bold leading-tight mb-6">{{ $news->title }}</h1>
+                
+                <!-- Author & Date -->
+                <div class="flex flex-wrap items-center gap-6 text-blue-200">
+                    @if($news->author)
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                            @if($news->author->photo)
+                                <img src="{{ asset('storage/' . $news->author->photo) }}" class="w-full h-full object-cover rounded-full">
+                            @else
+                                <i class="fas fa-user text-sm"></i>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="text-white font-medium text-sm">{{ $news->author->name }}</p>
+                            <p class="text-xs">Penulis</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-white font-medium text-sm">{{ $news->author->name }}</p>
-                        <p class="text-xs">Penulis</p>
+                    @endif
+                    
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-calendar"></i>
+                        <span>{{ $news->published_at?->format('d F Y') }}</span>
                     </div>
-                </div>
-                @endif
-                
-                <div class="flex items-center gap-2">
-                    <i class="far fa-calendar"></i>
-                    <span>{{ $news->published_at?->format('d F Y') }}</span>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <i class="far fa-eye"></i>
-                    <span>{{ number_format($news->views) }} views</span>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <i class="far fa-clock"></i>
-                    <span>{{ ceil(str_word_count(strip_tags($news->content)) / 200) }} menit baca</span>
+                    
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-eye"></i>
+                        <span>{{ number_format($news->views) }} views</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-clock"></i>
+                        <span>{{ ceil(str_word_count(strip_tags($news->content)) / 200) }} menit baca</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -35,6 +35,7 @@ class Task extends Model
     public function comments(): HasMany { return $this->hasMany(TaskComment::class)->whereNull('parent_id')->latest(); }
     public function attachments(): HasMany { return $this->hasMany(TaskAttachment::class); }
     public function activities(): HasMany { return $this->hasMany(TaskActivity::class)->latest(); }
+    public function checklists(): HasMany { return $this->hasMany(TaskChecklist::class)->orderBy('order'); }
 
     public function isOverdue(): bool
     {

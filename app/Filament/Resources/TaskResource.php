@@ -42,14 +42,15 @@ class TaskResource extends Resource
                             ->searchable()
                             ->preload(),
                         Forms\Components\Select::make('type')
-                            ->label('Tipe')
+                            ->label('Kategori')
                             ->options([
-                                'task' => '📋 Task',
-                                'bug' => '🐛 Bug',
-                                'feature' => '✨ Feature',
-                                'improvement' => '📈 Improvement',
+                                'general' => 'Tugas Umum',
+                                'collection' => 'Pengembangan Koleksi',
+                                'service' => 'Pelayanan',
+                                'admin' => 'Administrasi',
+                                'event' => 'Kegiatan/Event',
                             ])
-                            ->default('task')
+                            ->default('general')
                             ->native(false),
                         Forms\Components\Select::make('priority')
                             ->label('Prioritas')
@@ -167,14 +168,22 @@ class TaskResource extends Resource
                     ->formatStateUsing(fn ($state) => "#{$state}")
                     ->color('gray'),
                 Tables\Columns\TextColumn::make('type')
-                    ->label('')
+                    ->label('Kategori')
+                    ->badge()
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'bug' => '🐛',
-                        'feature' => '✨',
-                        'improvement' => '📈',
-                        default => '📋',
+                        'collection' => 'Koleksi',
+                        'service' => 'Pelayanan',
+                        'admin' => 'Administrasi',
+                        'event' => 'Kegiatan',
+                        default => 'Umum',
                     })
-                    ->tooltip(fn ($state) => ucfirst($state)),
+                    ->color(fn ($state) => match ($state) {
+                        'collection' => 'success',
+                        'service' => 'info',
+                        'admin' => 'warning',
+                        'event' => 'danger',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('title')
                     ->label('Task')
                     ->searchable()
@@ -198,8 +207,8 @@ class TaskResource extends Resource
                     })
                     ->formatStateUsing(fn ($state) => ucfirst($state)),
                 Tables\Columns\TextColumn::make('assignee.name')
-                    ->label('Assignee')
-                    ->placeholder('Unassigned')
+                    ->label('Ditugaskan ke')
+                    ->placeholder('Belum ditugaskan')
                     ->color(fn ($state) => $state ? null : 'gray'),
                 Tables\Columns\TextColumn::make('due_date')
                     ->label('Deadline')
@@ -236,11 +245,13 @@ class TaskResource extends Resource
                     ->searchable()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('type')
+                    ->label('Kategori')
                     ->options([
-                        'task' => 'Task',
-                        'bug' => 'Bug',
-                        'feature' => 'Feature',
-                        'improvement' => 'Improvement',
+                        'general' => 'Tugas Umum',
+                        'collection' => 'Pengembangan Koleksi',
+                        'service' => 'Pelayanan',
+                        'admin' => 'Administrasi',
+                        'event' => 'Kegiatan/Event',
                     ]),
                 Tables\Filters\Filter::make('overdue')
                     ->label('Overdue')

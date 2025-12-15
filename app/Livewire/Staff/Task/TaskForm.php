@@ -20,7 +20,7 @@ class TaskForm extends Component
     public $division_id = '';
     public $status_id = '';
     public $priority = 'medium';
-    public $type = 'task';
+    public $type = 'general';
     public $assigned_to = '';
     public $start_date = '';
     public $due_date = '';
@@ -36,7 +36,7 @@ class TaskForm extends Component
             'division_id' => 'nullable|exists:divisions,id',
             'status_id' => 'required|exists:task_statuses,id',
             'priority' => 'required|in:low,medium,high,urgent',
-            'type' => 'required|in:task,bug,feature,improvement',
+            'type' => 'required|in:general,collection,service,admin,event,task,bug,feature,improvement',
             'assigned_to' => 'nullable|exists:users,id',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date|after_or_equal:start_date',
@@ -94,12 +94,12 @@ class TaskForm extends Component
 
         if ($this->task) {
             $this->task->update($data);
-            session()->flash('success', 'Task berhasil diperbarui');
+            session()->flash('success', 'Tugas berhasil diperbarui');
         } else {
             $data['branch_id'] = $user->branch_id;
             $data['reported_by'] = $user->id;
             Task::create($data);
-            session()->flash('success', 'Task baru berhasil dibuat');
+            session()->flash('success', 'Tugas baru berhasil dibuat');
         }
 
         return redirect()->route('staff.task.index');
@@ -119,7 +119,7 @@ class TaskForm extends Component
             'statuses' => $statuses,
             'projects' => Project::orderBy('name')->get(),
             'divisions' => Division::orderBy('name')->get(),
-            'users' => User::whereIn('role', ['admin', 'pustakawan'])->orderBy('name')->get(),
+            'users' => User::whereIn('role', ['admin', 'super_admin', 'pustakawan'])->orderBy('name')->get(),
         ])->extends('staff.layouts.app')->section('content');
     }
 }

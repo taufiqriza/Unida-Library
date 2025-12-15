@@ -16,45 +16,60 @@ class RepoSyncService
     {
         $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0, 'errors' => 0];
         $url = "{$this->baseUrl}?verb=ListRecords&metadataPrefix=oai_dc";
+        $pageCount = 0;
 
         while ($url) {
             try {
+                $pageCount++;
+                Log::info("Syncing page {$pageCount}...");
+                
                 $response = Http::retry(3, 2000)->timeout($this->timeout)->get($url);
                 if (!$response->successful()) {
+                    Log::warning("HTTP error on page {$pageCount}", ['status' => $response->status()]);
                     $stats['errors']++;
-                    break;
+                    // Try to get next page anyway
+                    $url = $this->getNextPageUrl($response->body());
+                    continue;
                 }
 
                 $result = $this->processPage($response->body());
                 $stats['thesis'] += $result['thesis'];
                 $stats['article'] += $result['article'];
                 $stats['skipped'] += $result['skipped'];
+                $stats['errors'] += $result['errors'] ?? 0;
 
                 // Get next page
                 $url = $this->getNextPageUrl($response->body());
                 
                 if ($url) usleep(500000); // 500ms delay
             } catch (\Exception $e) {
-                Log::error('Repo sync error', ['error' => $e->getMessage()]);
+                Log::error('Repo sync page error', ['page' => $pageCount, 'error' => $e->getMessage()]);
                 $stats['errors']++;
+                // Don't break - try to continue if there might be more pages
                 break;
             }
         }
 
+        Log::info("Sync completed", ['pages' => $pageCount, 'stats' => $stats]);
         return $stats;
     }
 
     protected function processPage(string $xml): array
     {
-        $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0];
+        $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0, 'errors' => 0];
         
         preg_match_all('/<record>(.*?)<\/record>/s', $xml, $matches);
         
         foreach ($matches[1] as $record) {
-            $result = $this->processRecord($record);
-            if ($result === 'thesis') $stats['thesis']++;
-            elseif ($result === 'article') $stats['article']++;
-            else $stats['skipped']++;
+            try {
+                $result = $this->processRecord($record);
+                if ($result === 'thesis') $stats['thesis']++;
+                elseif ($result === 'article') $stats['article']++;
+                else $stats['skipped']++;
+            } catch (\Exception $e) {
+                Log::warning('Record process error', ['error' => substr($e->getMessage(), 0, 200)]);
+                $stats['errors']++;
+            }
         }
         
         return $stats;

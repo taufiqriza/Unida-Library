@@ -4,6 +4,7 @@ namespace App\Livewire\Staff\Biblio;
 
 use App\Models\Book;
 use App\Models\Item;
+use App\Models\Branch;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,12 +19,24 @@ class BiblioList extends Component
     public $deleteConfirmId = null;
     public $selectedItems = [];
     public $selectAll = false;
+    public $filterBranch = '';
     
     protected $queryString = [
         'search' => ['except' => ''],
         'viewMode' => ['except' => 'list'],
         'activeTab' => ['except' => 'biblio'],
+        'filterBranch' => ['except' => ''],
     ];
+
+    public function mount()
+    {
+        $user = auth()->user();
+        // For super_admin, don't default to any branch (show all)
+        // For others, default to their branch
+        if ($user->role !== 'super_admin' && $user->branch_id) {
+            $this->filterBranch = $user->branch_id;
+        }
+    }
 
     public function updatingSearch()
     {
@@ -60,7 +73,7 @@ class BiblioList extends Component
             $book = Book::find($this->deleteConfirmId);
             if ($book) {
                 $user = auth()->user();
-                if ($user->role === 'admin' || $book->branch_id === $user->branch_id) {
+                if ($user->role === 'super_admin' || $user->role === 'admin' || $book->branch_id === $user->branch_id) {
                     $book->delete();
                     session()->flash('success', 'Bibliografi berhasil dihapus.');
                 }
@@ -80,12 +93,25 @@ class BiblioList extends Component
         return redirect()->route('print.barcodes', ['items' => implode(',', $this->selectedItems)]);
     }
 
+    protected function getBranchFilter()
+    {
+        $user = auth()->user();
+        
+        // Super admin can see all or filter by branch
+        if ($user->role === 'super_admin') {
+            return $this->filterBranch ?: null; // null means all branches
+        }
+        
+        // Others can only see their branch
+        return $user->branch_id;
+    }
+
     protected function getItemsQuery()
     {
-        $userBranchId = auth()->user()->branch_id;
+        $branchFilter = $this->getBranchFilter();
         
         return Item::with(['book', 'collectionType', 'location', 'itemStatus'])
-            ->where('branch_id', $userBranchId)
+            ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
             ->when($this->search, function (Builder $query) {
                 $query->where(function($q) {
                     $q->where('barcode', 'like', '%' . $this->search . '%')
@@ -100,13 +126,16 @@ class BiblioList extends Component
     public function render()
     {
         $user = auth()->user();
-        $userBranchId = $user->branch_id;
+        $isSuperAdmin = $user->role === 'super_admin';
+        $branchFilter = $this->getBranchFilter();
         
-        $baseQuery = Book::where('branch_id', $userBranchId);
+        // Base query with branch filter
+        $baseQuery = Book::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
+        $itemBaseQuery = Item::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
         
         $stats = [
             'total_books' => (clone $baseQuery)->count(),
-            'total_items' => Item::where('branch_id', $userBranchId)->count(),
+            'total_items' => (clone $itemBaseQuery)->count(),
             'recent_additions' => (clone $baseQuery)->where('created_at', '>=', now()->subDays(7))->count(),
             'books_without_items' => (clone $baseQuery)->doesntHave('items')->count(),
         ];
@@ -117,7 +146,7 @@ class BiblioList extends Component
         } else {
             $books = Book::query()
                 ->with(['branch', 'publisher', 'authors', 'items', 'user'])
-                ->where('branch_id', $userBranchId)
+                ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
                 ->when($this->search, function (Builder $query) {
                     $query->where(function($q) {
                         $q->where('title', 'like', '%' . $this->search . '%')
@@ -131,11 +160,16 @@ class BiblioList extends Component
             $items = collect();
         }
 
+        // Get branches for filter (super_admin only)
+        $branches = $isSuperAdmin ? Branch::orderBy('name')->get() : collect();
+
         return view('livewire.staff.biblio.biblio-list', [
             'books' => $books,
             'items' => $items,
             'stats' => $stats,
             'userBranch' => $user->branch,
+            'branches' => $branches,
+            'isSuperAdmin' => $isSuperAdmin,
         ])->extends('staff.layouts.app')->section('content');
     }
 }

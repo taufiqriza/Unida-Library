@@ -18,11 +18,10 @@ class TaskStatus extends Model
     public static function getDefaultStatuses(): array
     {
         return [
-            ['name' => 'Backlog', 'slug' => 'backlog', 'color' => '#6b7280', 'order' => 1, 'is_default' => true],
-            ['name' => 'To Do', 'slug' => 'todo', 'color' => '#3b82f6', 'order' => 2],
-            ['name' => 'In Progress', 'slug' => 'in_progress', 'color' => '#f59e0b', 'order' => 3],
-            ['name' => 'Review', 'slug' => 'review', 'color' => '#8b5cf6', 'order' => 4],
-            ['name' => 'Done', 'slug' => 'done', 'color' => '#10b981', 'order' => 5, 'is_done' => true],
+            ['name' => 'Belum Dikerjakan', 'slug' => 'pending', 'color' => '#6b7280', 'order' => 1, 'is_default' => true],
+            ['name' => 'Sedang Dikerjakan', 'slug' => 'in_progress', 'color' => '#f59e0b', 'order' => 2],
+            ['name' => 'Menunggu Konfirmasi', 'slug' => 'review', 'color' => '#8b5cf6', 'order' => 3],
+            ['name' => 'Selesai', 'slug' => 'done', 'color' => '#10b981', 'order' => 4, 'is_done' => true],
         ];
     }
 }

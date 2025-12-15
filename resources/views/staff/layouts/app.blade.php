@@ -66,6 +66,7 @@
             ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
+            ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
             ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
         ];
         // Add Control menu for admin only
@@ -89,6 +90,12 @@
         @media (max-width: 1023px) {
             .staff-sidebar { display: none !important; }
             .main-content-wrapper { margin-left: 0 !important; }
+        }
+        
+        /* Ensure modals with high z-index appear above everything */
+        .fixed[style*="z-index: 9999"],
+        .fixed[style*="z-index: 10000"] {
+            position: fixed !important;
         }
     </style>
 
@@ -222,6 +229,8 @@
             </main>
         </div>
     </div>
+
+    @stack('modals')
 
     {{-- Staff Chat Widget --}}
     @livewire('staff.chat.staff-chat')

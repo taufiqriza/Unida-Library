@@ -465,70 +465,203 @@
     <!-- News & Events -->
     @if(count($news) > 0)
     <section class="max-w-7xl mx-auto px-4 py-8 lg:py-10">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                <i class="fas fa-newspaper text-blue-500"></i> Berita & Pengumuman
-            </h2>
-            <a href="{{ route('opac.news.index') }}" class="text-sm text-blue-600 hover:text-blue-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            @foreach($news as $item)
-            <a href="{{ route('opac.news.show', $item['slug']) }}" class="bg-white rounded-xl overflow-hidden shadow-lg shadow-gray-200/50 hover:shadow-xl transition group">
-                <div class="aspect-video bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center overflow-hidden">
-                    @if($item['image'])
-                        <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    @else
-                        <i class="fas fa-newspaper text-3xl text-blue-300"></i>
-                    @endif
-                </div>
-                <div class="p-4">
-                    <p class="text-xs text-gray-400 mb-1">{{ $item['published_at'] }}</p>
-                    <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-blue-600 transition">{{ $item['title'] }}</h3>
-                </div>
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-1 h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">Berita & Pengumuman</h2>
+            </div>
+            <a href="{{ route('opac.news.index') }}" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium group">
+                <span>Lihat Semua</span>
+                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
-            @endforeach
+        </div>
+        
+        <!-- Horizontal Scroll Container -->
+        <div class="relative group/scroll">
+            <!-- Navigation Arrows -->
+            <button onclick="document.getElementById('newsScroll').scrollBy({left: -280, behavior: 'smooth'})" 
+                    class="absolute -left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full items-center justify-center text-gray-600 hover:text-blue-600 hover:shadow-xl transition-all hidden lg:flex opacity-0 group-hover/scroll:opacity-100">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="document.getElementById('newsScroll').scrollBy({left: 280, behavior: 'smooth'})" 
+                    class="absolute -right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-lg rounded-full items-center justify-center text-gray-600 hover:text-blue-600 hover:shadow-xl transition-all hidden lg:flex opacity-0 group-hover/scroll:opacity-100">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- News Cards - 5 visible -->
+            <div id="newsScroll" class="flex gap-4 overflow-x-auto pb-2 scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+                <style>#newsScroll::-webkit-scrollbar { display: none; }</style>
+                
+                @foreach($news as $index => $item)
+                <a href="{{ route('opac.news.show', $item['slug']) }}" 
+                   class="flex-shrink-0 w-[calc(100%-1rem)] sm:w-[calc(50%-0.5rem)] lg:w-[calc(20%-0.8rem)] group">
+                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
+                        <!-- Image -->
+                        <div class="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                            @if($item['image'])
+                                <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            @else
+                                <div class="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-newspaper text-3xl text-blue-300"></i>
+                                </div>
+                            @endif
+                            
+                            <!-- Category Badge -->
+                            @if(isset($item['category']) && $item['category'])
+                            <div class="absolute top-2 left-2">
+                                <span class="px-2 py-1 bg-blue-600 text-white text-[10px] font-medium rounded">
+                                    <i class="fas fa-tag mr-1"></i>{{ strtoupper($item['category']) }}
+                                </span>
+                            </div>
+                            @endif
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="p-3">
+                            <!-- Date -->
+                            <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
+                                <span><i class="far fa-calendar mr-1"></i>{{ $item['published_at'] }}</span>
+                            </div>
+                            
+                            <!-- Title -->
+                            <h3 class="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition mb-2">
+                                {{ $item['title'] }}
+                            </h3>
+                            
+                            <!-- Excerpt -->
+                            @if(isset($item['excerpt']) && $item['excerpt'])
+                            <p class="text-gray-500 text-xs line-clamp-2 mb-3">{{ Str::limit(strip_tags($item['excerpt']), 80) }}</p>
+                            @endif
+                            
+                            <!-- Read More Button -->
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                                <span class="inline-flex items-center gap-1.5 text-blue-600 text-xs font-medium group-hover:gap-2 transition-all">
+                                    Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
         </div>
     </section>
     @endif
 
-    <!-- Library Info Footer -->
-    <section class="bg-slate-100 py-6 lg:py-8">
+    <!-- Library Branches & Contact -->
+    <section class="bg-gradient-to-b from-white to-slate-50 py-8 lg:py-12 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <!-- Branches - Compact Inline -->
-                @if(count($branches) > 0)
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-map-marker-alt text-blue-500"></i>
-                        <span class="font-semibold text-gray-900 text-sm">Lokasi:</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($branches as $branch)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full text-xs text-gray-700 shadow-sm">
-                            <i class="fas fa-building text-blue-400 text-[10px]"></i>
-                            {{ $branch['name'] }}
-                        </span>
-                        @endforeach
+            <!-- Section Header -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full text-blue-600 text-sm font-medium mb-3">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Jaringan Perpustakaan</span>
+                </div>
+                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">Kunjungi Cabang Kami</h2>
+                <p class="text-gray-500 text-sm mt-1">{{ count($branches) }} lokasi perpustakaan di seluruh kampus</p>
+            </div>
+        </div>
+        
+        <!-- Auto Scroll Branches -->
+        @if(count($branches) > 0)
+        <div class="relative">
+            <!-- Gradient Fade -->
+            <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+            
+            <!-- Scrolling Container -->
+            <div class="flex animate-scroll hover:pause-animation">
+                @php $icons = ['fa-building', 'fa-landmark', 'fa-university', 'fa-school', 'fa-book-reader', 'fa-graduation-cap']; @endphp
+                @php $colors = ['from-blue-500 to-indigo-600', 'from-emerald-500 to-teal-600', 'from-purple-500 to-violet-600', 'from-amber-500 to-orange-600', 'from-rose-500 to-pink-600', 'from-cyan-500 to-blue-600']; @endphp
+                
+                <!-- First set of cards -->
+                @foreach($branches as $index => $branch)
+                <div class="flex-shrink-0 w-48 mx-2">
+                    <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 group h-full">
+                        <div class="w-10 h-10 bg-gradient-to-br {{ $colors[$index % count($colors)] }} rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas {{ $icons[$index % count($icons)] }} text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 text-sm leading-tight mb-1">{{ $branch['name'] }}</h4>
+                        @if($branch['address'])
+                        <p class="text-gray-400 text-[10px] line-clamp-2"><i class="fas fa-map-pin mr-1"></i>{{ $branch['address'] }}</p>
+                        @else
+                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>Tersedia</p>
+                        @endif
                     </div>
                 </div>
-                @endif
+                @endforeach
                 
-                <!-- Contact - Compact Inline -->
-                <div class="flex flex-wrap items-center gap-3 lg:gap-4">
-                    <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
-                        <i class="fas fa-envelope text-blue-500"></i>
-                        <span class="hidden sm:inline">library@unida.gontor.ac.id</span>
-                        <span class="sm:hidden">Email</span>
-                    </a>
-                    <a href="https://wa.me/6285183053934" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
-                        <i class="fab fa-whatsapp text-green-500"></i>
-                        <span>0851-8305-3934</span>
-                    </a>
-                    <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
-                        <i class="fab fa-instagram text-pink-500"></i>
-                        <span class="hidden sm:inline">@libraryunidagontor</span>
-                        <span class="sm:hidden">IG</span>
-                    </a>
+                <!-- Duplicate for seamless loop -->
+                @foreach($branches as $index => $branch)
+                <div class="flex-shrink-0 w-48 mx-2">
+                    <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 group h-full">
+                        <div class="w-10 h-10 bg-gradient-to-br {{ $colors[$index % count($colors)] }} rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas {{ $icons[$index % count($icons)] }} text-white text-sm"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-900 text-sm leading-tight mb-1">{{ $branch['name'] }}</h4>
+                        @if($branch['address'])
+                        <p class="text-gray-400 text-[10px] line-clamp-2"><i class="fas fa-map-pin mr-1"></i>{{ $branch['address'] }}</p>
+                        @else
+                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>Tersedia</p>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            
+            <style>
+                @keyframes scroll {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                }
+                .animate-scroll {
+                    animation: scroll 30s linear infinite;
+                }
+                .animate-scroll:hover {
+                    animation-play-state: paused;
+                }
+            </style>
+        </div>
+        @endif
+        
+        <!-- Contact Bar -->
+        <div class="max-w-7xl mx-auto px-4 mt-8">
+            <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-5 lg:p-6 relative overflow-hidden">
+                <!-- Decorative -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                
+                <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <!-- Info -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-headset text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold">Butuh Bantuan?</h3>
+                            <p class="text-blue-200 text-sm">Hubungi kami untuk informasi lebih lanjut</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Buttons -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white text-sm transition group">
+                            <i class="fas fa-envelope"></i>
+                            <span class="hidden sm:inline">library@unida.gontor.ac.id</span>
+                            <span class="sm:hidden">Email</span>
+                        </a>
+                        <a href="https://wa.me/6285183053934" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 rounded-xl text-white text-sm font-medium transition group">
+                            <i class="fab fa-whatsapp text-lg"></i>
+                            <span>0851-8305-3934</span>
+                        </a>
+                        <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 rounded-xl text-white text-sm font-medium transition">
+                            <i class="fab fa-instagram text-lg"></i>
+                            <span class="hidden sm:inline">@libraryunidagontor</span>
+                            <span class="sm:hidden">Instagram</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

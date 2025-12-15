@@ -80,6 +80,11 @@ class AppSettings extends Page implements HasForms
             'mail_encryption' => Setting::get('mail_encryption', config('mail.mailers.smtp.encryption', 'tls')),
             'mail_from_address' => Setting::get('mail_from_address', config('mail.from.address', '')),
             'mail_from_name' => Setting::get('mail_from_name', config('mail.from.name', 'UNIDA Library')),
+            // Google Analytics Settings
+            'ga_enabled' => (bool) Setting::get('ga_enabled', false),
+            'ga_measurement_id' => Setting::get('ga_measurement_id', ''),
+            'ga_property_id' => Setting::get('ga_property_id', ''),
+            'ga_service_account_json' => Setting::get('ga_service_account_json', ''),
         ]);
     }
 
@@ -658,6 +663,55 @@ class AppSettings extends Page implements HasForms
                                         ->content('Open Library menyediakan akses ke 4+ juta buku secara gratis. Hasil pencarian akan muncul di tab "External" pada Global Search.'),
                                 ]),
                         ]),
+
+                    Forms\Components\Tabs\Tab::make('Analytics')
+                        ->icon('heroicon-o-chart-bar')
+                        ->schema([
+                            Forms\Components\Section::make('Google Analytics 4')
+                                ->description('Integrasikan Google Analytics untuk melacak pengunjung website. Data analytics akan ditampilkan di Staff Portal.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('ga_enabled')
+                                        ->label('Aktifkan Google Analytics')
+                                        ->helperText('Tampilkan tracking code GA4 di website publik'),
+                                    Forms\Components\TextInput::make('ga_measurement_id')
+                                        ->label('Measurement ID')
+                                        ->placeholder('G-XXXXXXXXXX')
+                                        ->helperText('Dapatkan dari Google Analytics > Admin > Data Streams'),
+                                ])->columns(2),
+                            Forms\Components\Section::make('Google Analytics Data API')
+                                ->description('Untuk menampilkan statistik di Staff Portal, diperlukan akses ke Google Analytics Data API menggunakan Service Account.')
+                                ->schema([
+                                    Forms\Components\TextInput::make('ga_property_id')
+                                        ->label('Property ID')
+                                        ->placeholder('123456789')
+                                        ->helperText('ID properti GA4 (bukan Measurement ID). Lihat di Admin > Property Settings'),
+                                    Forms\Components\Textarea::make('ga_service_account_json')
+                                        ->label('Service Account JSON')
+                                        ->rows(6)
+                                        ->placeholder('Paste isi file JSON service account di sini...')
+                                        ->helperText('Buat Service Account di Google Cloud Console, lalu tambahkan ke GA4 sebagai Viewer'),
+                                ]),
+                            Forms\Components\Section::make('Panduan Setup')
+                                ->collapsed()
+                                ->schema([
+                                    Forms\Components\Placeholder::make('ga_guide')
+                                        ->label('')
+                                        ->content(new \Illuminate\Support\HtmlString('
+                                            <div class="text-sm space-y-3">
+                                                <p class="font-semibold">Langkah Setup Google Analytics:</p>
+                                                <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                                                    <li><strong>Buat Property GA4:</strong> Kunjungi <a href="https://analytics.google.com" target="_blank" class="text-blue-600 underline">analytics.google.com</a>, buat property baru</li>
+                                                    <li><strong>Salin Measurement ID:</strong> Admin → Data Streams → Web → Measurement ID (G-XXXXXXXX)</li>
+                                                    <li><strong>Buat Service Account:</strong> Kunjungi <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank" class="text-blue-600 underline">Google Cloud Console</a>, buat service account baru</li>
+                                                    <li><strong>Enable Analytics Data API:</strong> Di Cloud Console, cari "Google Analytics Data API" dan enable</li>
+                                                    <li><strong>Download JSON Key:</strong> Di Service Account, buat key baru (JSON format), download file-nya</li>
+                                                    <li><strong>Tambah ke GA4:</strong> Di GA4 Admin → Property Access Management, tambahkan email service account sebagai Viewer</li>
+                                                    <li><strong>Paste JSON:</strong> Buka file JSON yang didownload, salin isinya ke field di atas</li>
+                                                </ol>
+                                            </div>
+                                        ')),
+                                ]),
+                        ]),
                 ])->columnSpanFull(),
             ])
             ->statePath('data');
@@ -738,6 +792,13 @@ class AppSettings extends Page implements HasForms
             'mail_from_address' => $data['mail_from_address'],
             'mail_from_name' => $data['mail_from_name'],
         ], 'mail');
+
+        Setting::setMany([
+            'ga_enabled' => $data['ga_enabled'] ?? false,
+            'ga_measurement_id' => $data['ga_measurement_id'] ?? '',
+            'ga_property_id' => $data['ga_property_id'] ?? '',
+            'ga_service_account_json' => $data['ga_service_account_json'] ?? '',
+        ], 'analytics');
 
         Notification::make()->title('Pengaturan berhasil disimpan')->success()->send();
     }

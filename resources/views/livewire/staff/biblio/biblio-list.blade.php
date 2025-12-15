@@ -7,15 +7,39 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-gray-900">Katalog Bibliografi</h1>
-                <p class="text-sm text-gray-500">{{ $userBranch->name ?? 'Cabang' }} • {{ $stats['total_books'] }} judul, {{ $stats['total_items'] }} eksemplar</p>
+                <p class="text-sm text-gray-500">
+                    @if($isSuperAdmin && !$filterBranch)
+                        Semua Cabang
+                    @else
+                        {{ $userBranch->name ?? 'Cabang' }}
+                    @endif
+                    • {{ number_format($stats['total_books']) }} judul, {{ number_format($stats['total_items']) }} eksemplar
+                </p>
             </div>
         </div>
 
-        <a href="{{ route('staff.biblio.create') }}" 
-           class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/25 transition text-sm">
-            <i class="fas fa-plus"></i>
-            <span>Tambah Buku</span>
-        </a>
+        <div class="flex items-center gap-3">
+            {{-- Branch Filter for Super Admin --}}
+            @if($isSuperAdmin)
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-building text-violet-600 text-sm"></i>
+                </div>
+                <select wire:model.live="filterBranch" class="px-3 py-2 bg-violet-50 border border-violet-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/20 font-medium text-violet-700">
+                    <option value="">Semua Cabang</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
+            <a href="{{ route('staff.biblio.create') }}" 
+               class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/25 transition text-sm">
+                <i class="fas fa-plus"></i>
+                <span>Tambah Buku</span>
+            </a>
+        </div>
     </div>
 
     {{-- Stats Cards --}}

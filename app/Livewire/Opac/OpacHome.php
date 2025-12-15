@@ -75,14 +75,16 @@ class OpacHome extends Component
         $this->latestEtheses = Ethesis::latest()->take(4)->get();
 
         $this->news = News::published()
+            ->with('category')
             ->latest('published_at')
-            ->take(4)
+            ->take(8)
             ->get()
             ->map(fn($n) => [
                 'slug' => $n->slug,
                 'title' => $n->title,
                 'excerpt' => $n->excerpt,
                 'image' => $n->image_url,
+                'category' => $n->category?->name,
                 'published_at' => $n->published_at?->format('d M Y'),
             ]);
 

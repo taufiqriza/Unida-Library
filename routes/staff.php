@@ -68,6 +68,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         // Statistics
         Route::get('/statistics', \App\Livewire\Staff\Statistics\LibraryStatistics::class)->name('statistics.index');
 
+        // Analytics (Google Analytics)
+        Route::get('/analytics', \App\Livewire\Staff\Analytics\AnalyticsDashboard::class)->name('analytics.index');
+
         // Profile
         Route::get('/profile', \App\Livewire\Staff\Profile\StaffProfile::class)->name('profile');
 

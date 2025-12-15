@@ -99,8 +99,8 @@
                 <div class="flex gap-4">
                     {{-- Image --}}
                     <div class="w-24 h-24 sm:w-32 sm:h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
-                        @if($item->featured_image)
-                        <img src="{{ asset('storage/'.$item->featured_image) }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
+                        @if($item->image_url)
+                        <img src="{{ $item->image_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover">
                         @else
                         <div class="w-full h-full flex items-center justify-center text-gray-300">
                             <i class="fas fa-image text-2xl"></i>

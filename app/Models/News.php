@@ -36,12 +36,12 @@ class News extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        // Check external image first (from WordPress import)
-        if ($this->external_image) {
-            return $this->external_image;
+        // Prioritize local storage first (downloaded images)
+        if ($this->featured_image) {
+            return asset('storage/' . $this->featured_image);
         }
-        // Then check local storage
-        return $this->featured_image ? asset('storage/' . $this->featured_image) : null;
+        // Fallback to external image (WordPress URL) if no local copy
+        return $this->external_image ?: null;
     }
 
     public function getIsPublishedAttribute(): bool

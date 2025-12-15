@@ -81,6 +81,22 @@
             box-shadow: none !important;
         }
     </style>
+    
+    {{-- Google Analytics GA4 --}}
+    @php
+        $gaEnabled = \App\Models\Setting::get('ga_enabled', false);
+        $gaMeasurementId = \App\Models\Setting::get('ga_measurement_id', '');
+    @endphp
+    @if($gaEnabled && $gaMeasurementId)
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $gaMeasurementId }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $gaMeasurementId }}');
+    </script>
+    @endif
+    
     @livewireStyles
 </head>
 <body class="pattern-bg min-h-screen" x-data="{ sidebarOpen: false, searchOpen: false }">
