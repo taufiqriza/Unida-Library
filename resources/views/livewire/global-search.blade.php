@@ -64,6 +64,13 @@
                         'external' => ['icon' => 'fa-globe', 'label' => 'Open Library'],
                         'shamela' => ['icon' => 'fa-book-quran', 'label' => 'Shamela'],
                     ];
+                    
+                    // Compact number formatting function
+                    $formatCompact = function($num) {
+                        if ($num >= 1000000) return round($num / 1000000, 1) . 'M';
+                        if ($num >= 1000) return round($num / 1000, 1) . 'K';
+                        return number_format($num);
+                    };
                 @endphp
                 @foreach($tabs as $key => $tab)
                     <button 
@@ -76,7 +83,7 @@
                         <i class="fas {{ $tab['icon'] }}"></i>
                         <span>{{ $tab['label'] }}</span>
                         <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
-                            {{ number_format($counts[$key] ?? 0) }}
+                            {{ $formatCompact($counts[$key] ?? 0) }}
                         </span>
                     </button>
                 @endforeach

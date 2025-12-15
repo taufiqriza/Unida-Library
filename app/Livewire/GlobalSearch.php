@@ -656,31 +656,40 @@ class GlobalSearch extends Component
     }
 
     protected function getExternalCount(?string $search): int
-    {
-        if (empty($search)) {
-            return 0;
-        }
-        
-        $openLibrary = app(OpenLibraryService::class);
-        if (!$openLibrary->isEnabled()) {
-            return 0;
-        }
-        
-        // Get actual count from API (cached)
-        return $openLibrary->getSearchCount($search);
+{
+    $openLibrary = app(OpenLibraryService::class);
+    if (!$openLibrary->isEnabled()) {
+        return 0;
     }
+    
+    // If no search query, return estimated total (Open Library has millions)
+    if (empty($search)) {
+        return 2000000; // Estimated 2M+ public domain books
+    }
+    
+    // Get actual count from API (cached)
+    return $openLibrary->getSearchCount($search);
+}
 
     protected function getShamelaCount(?string $search): int
-    {
-        if (empty($search)) {
-            return 0;
-        }
-        
-        // Since Shamela search is keyword-based matching to categories,
-        // return estimated count based on search
-        $shamela = app(ShamelaService::class);
-        return $shamela->search($search, 20)->count();
+{
+    // Use local database for accurate count
+    $localService = new \App\Services\ShamelaLocalService();
+    
+    if (!$localService->isAvailable()) {
+        return 0;
     }
+    
+    // If no search query, return total books from local database
+    if (empty($search)) {
+        $stats = $localService->getStats();
+        return $stats['total_books'] ?? 0;
+    }
+    
+    // Search and return actual result count
+    $result = $localService->search($search, 100);
+    return $result['total'] ?? 0;
+}
 
     // Computed: Filter Options
     public function getBranchesProperty()
