@@ -87,27 +87,61 @@
         width: calc(100vw - 80px) !important;
     }
 
-    /* Custom scrollbar - main */
+    /* ============================================ */
+    /* Elegant Transparent Scrollbar */
+    /* ============================================ */
+
+    /* Global scrollbar - applies to all elements */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        transition: background 0.2s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(148, 163, 184, 0.6);
+    }
+
+    ::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    /* Main content area - slightly more visible */
     main::-webkit-scrollbar {
         width: 8px;
     }
 
     main::-webkit-scrollbar-track {
-        background: #f1f5f9;
+        background: transparent;
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
 
     main::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
+        background: rgba(100, 116, 139, 0.25);
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
 
     main::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        background: rgba(100, 116, 139, 0.5);
+        border: 2px solid transparent;
+        background-clip: padding-box;
     }
 
-    /* Custom scrollbar - sidebar */
+    /* Sidebar scrollbar - subtle on dark background */
     aside::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
     }
 
     aside::-webkit-scrollbar-track {
@@ -115,8 +149,28 @@
     }
 
     aside::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    aside::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Firefox scrollbar support */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+    }
+
+    main {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(100, 116, 139, 0.25) transparent;
+    }
+
+    aside {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     }
 
     /* GPU acceleration */
