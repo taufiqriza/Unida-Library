@@ -77,24 +77,37 @@ class ShamelaContentService
      */
     public function cleanContent(string $text): string
     {
-        // Remove HTML tags like <span data-type="title" ...>
-        $text = preg_replace('/<[^>]+>/', '', $text);
+        // First pass: use strip_tags to remove most HTML
+        $text = strip_tags($text);
         
-        // Remove leftover closing tags
-        $text = preg_replace('/<\/[^>]+>/', '', $text);
+        // Second pass: remove any remaining HTML-like patterns
+        $text = preg_replace('/<[^>]*>?/', '', $text);
+        $text = preg_replace('/<\/[^>]*>?/', '', $text);
+        
+        // Remove incomplete tags at start/end
+        $text = preg_replace('/^[^<]*>/', '', $text);
+        $text = preg_replace('/<[^>]*$/', '', $text);
         
         // Clean up Shamela-specific markup patterns
         $text = preg_replace('/\[span[^\]]*\]/', '', $text);
         $text = preg_replace('/\[\/span\]/', '', $text);
+        $text = preg_replace('/data-type="[^"]*"/', '', $text);
+        $text = preg_replace('/id=toc-\d+/', '', $text);
         
         // Remove Unicode replacement characters (encoding issues)
         $text = preg_replace('/\x{FFFD}/u', '', $text);
+        
+        // Remove Unicode Private Use Area characters (display as boxes)
+        $text = preg_replace('/[\x{E000}-\x{F8FF}]/u', '', $text);
         
         // Clean up reference markers like (¬١) 
         $text = preg_replace('/\(¬[٠-٩]+\)/', '', $text);
         
         // Remove multiple consecutive newlines
         $text = preg_replace('/\n{3,}/', "\n\n", $text);
+        
+        // Remove multiple spaces
+        $text = preg_replace('/  +/', ' ', $text);
         
         // Trim whitespace
         $text = trim($text);
@@ -279,6 +292,40 @@ class ShamelaContentService
             
             return ['min' => 1, 'max' => 1];
         });
+    }
+    
+    /**
+     * Get the next available page number for a book
+     */
+    public function getNextPage(int $bookId, int $currentPage): ?int
+    {
+        $db = $this->getDb();
+        if (!$db) {
+            return null;
+        }
+        
+        $result = $db->querySingle(
+            "SELECT page_num FROM pages WHERE book_id = $bookId AND page_num > $currentPage ORDER BY page_num ASC LIMIT 1"
+        );
+        
+        return $result ?: null;
+    }
+    
+    /**
+     * Get the previous available page number for a book
+     */
+    public function getPrevPage(int $bookId, int $currentPage): ?int
+    {
+        $db = $this->getDb();
+        if (!$db) {
+            return null;
+        }
+        
+        $result = $db->querySingle(
+            "SELECT page_num FROM pages WHERE book_id = $bookId AND page_num < $currentPage ORDER BY page_num DESC LIMIT 1"
+        );
+        
+        return $result ?: null;
     }
     
     public function __destruct()

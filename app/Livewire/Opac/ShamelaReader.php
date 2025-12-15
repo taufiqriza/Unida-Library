@@ -81,16 +81,22 @@ class ShamelaReader extends Component
     
     public function nextPage()
     {
-        if ($this->currentPage < $this->totalPages) {
-            $this->currentPage++;
+        $contentService = new ShamelaContentService();
+        $nextPage = $contentService->getNextPage($this->bookId, $this->currentPage);
+        
+        if ($nextPage) {
+            $this->currentPage = $nextPage;
             $this->loadPage();
         }
     }
     
     public function prevPage()
     {
-        if ($this->currentPage > 1) {
-            $this->currentPage--;
+        $contentService = new ShamelaContentService();
+        $prevPage = $contentService->getPrevPage($this->bookId, $this->currentPage);
+        
+        if ($prevPage) {
+            $this->currentPage = $prevPage;
             $this->loadPage();
         }
     }
