@@ -30,7 +30,7 @@ class ShamelaContentService
     }
     
     /**
-     * Get database connection
+     * Get database connection with optimizations
      */
     protected function getDb(): ?SQLite3
     {
@@ -41,6 +41,12 @@ class ShamelaContentService
         if ($this->db === null) {
             $this->db = new SQLite3($this->dbPath, SQLITE3_OPEN_READONLY);
             $this->db->busyTimeout(5000);
+            
+            // PRAGMA optimizations for large read-only database
+            $this->db->exec('PRAGMA mmap_size = 2147483648'); // 2GB memory map
+            $this->db->exec('PRAGMA cache_size = -100000');   // 100MB cache
+            $this->db->exec('PRAGMA temp_store = MEMORY');
+            $this->db->exec('PRAGMA query_only = ON');
         }
         
         return $this->db;
