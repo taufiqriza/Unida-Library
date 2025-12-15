@@ -491,68 +491,44 @@
     </section>
     @endif
 
-    <!-- Library Locations & Contact -->
-    <section class="bg-gradient-to-br from-slate-50 to-white py-10 lg:py-14">
+    <!-- Library Info Footer -->
+    <section class="bg-slate-100 py-6 lg:py-8">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Branches -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <!-- Branches - Compact Inline -->
                 @if(count($branches) > 0)
-                <div class="lg:col-span-2">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-map-marker-alt text-blue-500"></i> Lokasi Perpustakaan
-                    </h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-map-marker-alt text-blue-500"></i>
+                        <span class="font-semibold text-gray-900 text-sm">Lokasi:</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
                         @foreach($branches as $branch)
-                        <div class="bg-white rounded-xl p-4 shadow-lg shadow-gray-200/50 flex items-center gap-4 hover:shadow-xl transition">
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/30">
-                                <i class="fas fa-building text-white"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">{{ $branch['name'] }}</h3>
-                                @if($branch['address'])
-                                <p class="text-xs text-gray-500 line-clamp-1">{{ $branch['address'] }}</p>
-                                @endif
-                            </div>
-                        </div>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full text-xs text-gray-700 shadow-sm">
+                            <i class="fas fa-building text-blue-400 text-[10px]"></i>
+                            {{ $branch['name'] }}
+                        </span>
                         @endforeach
                     </div>
                 </div>
                 @endif
                 
-                <!-- Contact -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-headset text-emerald-500"></i> Hubungi Kami
-                    </h2>
-                    <div class="space-y-3">
-                        <a href="mailto:library@unida.gontor.ac.id" class="flex items-center gap-3 p-4 bg-white rounded-xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition">
-                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-envelope text-blue-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Email</p>
-                                <p class="text-sm font-medium text-gray-900">library@unida.gontor.ac.id</p>
-                            </div>
-                        </a>
-                        <a href="https://wa.me/6285183053934" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition">
-                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                <i class="fab fa-whatsapp text-green-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">WhatsApp</p>
-                                <p class="text-sm font-medium text-gray-900">0851-8305-3934</p>
-                            </div>
-                        </a>
-                        <a href="https://library.unida.gontor.ac.id" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-xl shadow-lg shadow-gray-200/50 hover:shadow-xl transition">
-                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-globe text-purple-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-xs text-gray-500">Website</p>
-                                <p class="text-sm font-medium text-gray-900">library.unida.gontor.ac.id</p>
-                            </div>
-                        </a>
-                    </div>
+                <!-- Contact - Compact Inline -->
+                <div class="flex flex-wrap items-center gap-3 lg:gap-4">
+                    <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
+                        <i class="fas fa-envelope text-blue-500"></i>
+                        <span class="hidden sm:inline">library@unida.gontor.ac.id</span>
+                        <span class="sm:hidden">Email</span>
+                    </a>
+                    <a href="https://wa.me/6285183053934" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
+                        <i class="fab fa-whatsapp text-green-500"></i>
+                        <span>0851-8305-3934</span>
+                    </a>
+                    <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:shadow-md transition">
+                        <i class="fab fa-instagram text-pink-500"></i>
+                        <span class="hidden sm:inline">@libraryunidagontor</span>
+                        <span class="sm:hidden">IG</span>
+                    </a>
                 </div>
             </div>
         </div>
