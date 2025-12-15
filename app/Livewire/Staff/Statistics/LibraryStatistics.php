@@ -66,9 +66,9 @@ class LibraryStatistics extends Component
             'on_loan_items' => $this->queryWithBranch(Item::query(), $branchId)
                 ->whereHas('loans', fn($q) => $q->where('is_returned', false))->count(),
             
-            // Digital Collection
-            'total_ebooks' => Ebook::count(),
-            'total_ethesis' => Ethesis::where('status', 'published')->count(),
+            // Digital Collection (no branch filter - shared across all)
+            'total_ebooks' => Ebook::where('is_active', true)->count(),
+            'total_ethesis' => Ethesis::where('is_public', true)->count(),
             
             // Member Stats
             'total_members' => $this->queryWithBranch(Member::query(), $branchId)->count(),
@@ -92,12 +92,11 @@ class LibraryStatistics extends Component
                 ->where('is_returned', false)
                 ->where('due_date', '<', now())->count(),
             
-            // Fine Stats
-            'total_fines' => $this->queryWithBranch(Fine::query()->whereHas('loan'), $branchId, 'loan.branch_id')
-                ->sum('amount'),
-            'unpaid_fines' => $this->queryWithBranch(Fine::query()->whereHas('loan'), $branchId, 'loan.branch_id')
+            // Fine Stats (fines has branch_id directly)
+            'total_fines' => $this->queryWithBranch(Fine::query(), $branchId)->sum('amount'),
+            'unpaid_fines' => $this->queryWithBranch(Fine::query(), $branchId)
                 ->where('is_paid', false)->sum('amount'),
-            'paid_fines' => $this->queryWithBranch(Fine::query()->whereHas('loan'), $branchId, 'loan.branch_id')
+            'paid_fines' => $this->queryWithBranch(Fine::query(), $branchId)
                 ->where('is_paid', true)->sum('amount'),
         ];
 
