@@ -53,44 +53,52 @@
         </div>
     </section>
 
-    <!-- Stats Bar - Floating -->
+    <!-- Stats Bar - Individual Cards -->
     <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-6 lg:-mt-10 relative z-10">
-        <div class="bg-white rounded-2xl shadow-xl p-4 lg:p-6">
-            <div class="grid grid-cols-5 gap-4 lg:gap-6">
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-2">
-                        <i class="fas fa-book text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div class="text-xl lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
+        <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-3">
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book text-blue-600 text-sm lg:text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
                     <div class="text-[10px] lg:text-xs text-gray-500">Judul Buku</div>
                 </div>
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 mx-auto bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30 mb-2">
-                        <i class="fas fa-copy text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div class="text-xl lg:text-2xl font-bold text-gray-900">{{ number_format($stats['items']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Eksemplar</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-graduation-cap text-purple-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 mx-auto bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 mb-2">
-                        <i class="fas fa-graduation-cap text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div class="text-xl lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
                     <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
                 </div>
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 mx-auto bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-orange-500/30 mb-2">
-                        <i class="fas fa-file-pdf text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div class="text-xl lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book-quran text-emerald-600 text-sm lg:text-lg"></i>
                 </div>
-                <div class="text-center">
-                    <div class="w-12 h-12 lg:w-14 lg:h-14 mx-auto bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30 mb-2">
-                        <i class="fas fa-newspaper text-white text-lg lg:text-xl"></i>
-                    </div>
-                    <div class="text-xl lg:text-2xl font-bold text-gray-900">{{ number_format($stats['journals']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Jurnal</div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">8,425</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Kitab Shamela</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-newspaper text-red-600 text-sm lg:text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['journals']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">Jurnal UNIDA</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
+                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-pdf text-orange-600 text-sm lg:text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
                 </div>
             </div>
         </div>
@@ -103,8 +111,8 @@
             <div class="lg:col-span-2">
                 <div class="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 lg:p-8 border border-gray-100 h-full">
                     <div class="flex items-start gap-4 mb-6">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
-                            <i class="fas fa-book-open-reader text-white text-2xl"></i>
+                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 flex-shrink-0 p-2">
+                            <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-1">Selamat Datang di Perpustakaan UNIDA</h2>
@@ -176,15 +184,16 @@
     </section>
 
     <!-- Premium Digital Collections -->
-    <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-10 lg:py-14 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48ZyBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDMiPjxwYXRoIGQ9Ik0zNiAzNHYtNGgtMnY0aC00djJoNHY0aDJ2LTRoNHYtMmgtNHptMC0zMFYwaC0ydjRoLTR2Mmg0djRoMlY2aDRWNGgtNHpNNiAzNHYtNEg0djRIMHYyaDR2NGgydi00aDR2LTJINnpNNiA0VjBINHY0SDB2Mmg0djRoMlY2aDRWNEg2eiIvPjwvZz48L2c+PC9zdmc+')] opacity-50"></div>
+    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-10 lg:py-14 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
         <div class="max-w-7xl mx-auto px-3 lg:px-4 relative">
             <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 rounded-full text-amber-400 text-sm font-medium mb-4">
-                    <i class="fas fa-crown"></i> Koleksi Premium
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-4">
+                    <i class="fas fa-crown text-amber-300"></i> Koleksi Premium
                 </div>
                 <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2">Koleksi Digital Eksklusif</h2>
-                <p class="text-slate-400">Akses perpustakaan digital klasik dan warisan sejarah</p>
+                <p class="text-blue-200">Akses perpustakaan digital klasik dan warisan sejarah</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
