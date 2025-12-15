@@ -76,6 +76,6 @@ class NewsList extends Component
             'featuredNews' => News::published()->featured()->latest('published_at')->take(3)->get(),
             'pinnedNews' => News::published()->pinned()->latest('published_at')->first(),
             'totalNews' => News::published()->count(),
-        ]);
+        ])->layout('components.opac.layout', ['title' => 'Berita & Pengumuman']);
     }
 }
