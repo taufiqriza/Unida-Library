@@ -212,6 +212,10 @@
                                                 <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center"><i class="fas fa-mobile-alt text-teal-600"></i></div>
                                                 <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Digilib Apps</p><p class="text-xs text-gray-500">Mobile & Desktop</p></div>
                                             </a>
+                                            <a href="{{ route('opac.shamela.index') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
+                                                <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-book-quran text-white"></i></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Shamela <span class="ml-1 px-1.5 py-0.5 bg-emerald-400 text-white text-[8px] font-bold rounded">8K+</span></p><p class="text-xs text-gray-500">Kitab Islam Klasik</p></div>
+                                            </a>
                                         </div>
                                     </div>
                                     <!-- External Sources -->
@@ -604,6 +608,10 @@
                             <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-file-pdf text-xs text-gray-400"></i> E-Book</a>
                             <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> E-Thesis</a>
                             <a href="{{ route('opac.page', 'digilib-apps') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition"><i class="fas fa-mobile-alt text-xs text-gray-400"></i> Digilib Apps</a>
+                            <a href="{{ route('opac.shamela.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100">
+                                <i class="fas fa-book-quran text-xs text-emerald-500"></i> Shamela Library 
+                                <span class="ml-auto px-1.5 py-0.5 bg-emerald-500 text-white text-[8px] font-bold rounded">8K+</span>
+                            </a>
                             <p class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider px-3 py-1.5 mt-2">Sumber External</p>
                             <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-white rounded-lg transition bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100">
                                 <i class="fas fa-database text-xs text-indigo-500"></i> Database Jurnal 

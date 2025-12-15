@@ -19,6 +19,7 @@ Route::get('/news/{slug}', \App\Livewire\Opac\NewsShow::class)->name('opac.news.
 Route::get('/journals', \App\Livewire\Opac\Journal\JournalIndex::class)->name('opac.journals.index');
 Route::get('/journals/{article}', \App\Livewire\Opac\Journal\JournalShow::class)->name('opac.journals.show');
 Route::get('/external/{source}/{id}', \App\Livewire\Opac\ExternalBookShow::class)->name('opac.external.show')->where('id', '.*');
+Route::get('/shamela', \App\Livewire\Opac\ShamelaBrowse::class)->name('opac.shamela.index');
 Route::get('/shamela/{id}', \App\Livewire\Opac\ShamelaShow::class)->name('opac.shamela.show')->where('id', '[0-9]+');
 Route::get('/database-access', \App\Livewire\Opac\DatabaseAccess::class)->name('opac.database-access');
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');

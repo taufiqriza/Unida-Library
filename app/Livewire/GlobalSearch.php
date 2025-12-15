@@ -511,33 +511,35 @@ class GlobalSearch extends Component
     }
 
     protected function searchShamela(): Collection
-    {
-        if (empty($this->query)) {
-            return collect();
-        }
-        
-        $shamela = app(ShamelaService::class);
-        $books = $shamela->search($this->query, 20);
-        
-        return $books->map(fn($book) => [
-            'type' => 'shamela',
-            'id' => $book['id'],
-            'title' => $book['title'],
-            'author' => 'المكتبة الشاملة',
-            'cover' => $book['cover'],
-            'year' => null,
-            'publisher' => 'Shamela.ws',
-            'badge' => 'كتاب إسلامي',
-            'badgeColor' => 'emerald',
-            'icon' => 'fa-book-quran',
-            'url' => route('opac.shamela.show', $book['id']),
-            'description' => null,
-            'meta' => [
-                'source' => 'shamela',
-                'external_url' => $book['url'],
-            ],
-        ]);
+{
+    if (empty($this->query)) {
+        return collect();
     }
+    
+    $shamela = app(ShamelaService::class);
+    $books = $shamela->search($this->query, 24);
+    
+    return $books->map(fn($book) => [
+        'type' => 'shamela',
+        'id' => $book['id'],
+        'title' => $book['title'],
+        'author' => $book['author'] ?? 'المكتبة الشاملة',
+        'cover' => $book['cover'],
+        'year' => $book['hijri_year'] ?? null,
+        'publisher' => $book['category'] ?? 'Shamela',
+        'badge' => ($book['has_pdf'] ?? false) ? 'PDF متاح' : 'كتاب إسلامي',
+        'badgeColor' => ($book['has_pdf'] ?? false) ? 'rose' : 'emerald',
+        'icon' => 'fa-book-quran',
+        'url' => route('opac.shamela.show', $book['id']),
+        'description' => $book['author'] ? 'وفاة: ' . ($book['author_death'] ?? '-') . ' هـ' : null,
+        'meta' => [
+            'source' => $book['source'] ?? 'shamela',
+            'external_url' => $book['url'],
+            'has_pdf' => $book['has_pdf'] ?? false,
+            'pdf_links' => $book['pdf_links'] ?? [],
+        ],
+    ]);
+}
 
     protected function applySorting(Collection $results): Collection
     {

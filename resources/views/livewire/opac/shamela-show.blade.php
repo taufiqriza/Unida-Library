@@ -74,14 +74,39 @@
                         </p>
                         @endif
                         
-                        @if($book['category'])
-                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm mb-6">
+                            @if($book['category'])
+                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-sm mb-3">
                             <i class="fas fa-folder"></i>
                             {{ $book['category'] }}
                         </span>
                         @endif
                         
+                        {{-- Year Badge --}}
+                        @if($book['hijri_year'] ?? null)
+                        <span class="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/30 backdrop-blur rounded-full text-white text-sm mr-2 mb-3">
+                            <i class="fas fa-calendar"></i>
+                            {{ $book['hijri_year'] }}
+                        </span>
+                        @endif
+                        
+                        {{-- Author Death Year --}}
+                        @if($book['author_death'] ?? null)
+                        <p class="text-emerald-200 text-sm mb-4">
+                            <i class="fas fa-skull mr-1"></i> وفاة المؤلف: {{ $book['author_death'] }} هـ
+                        </p>
+                        @endif
+                        
                         <div class="flex flex-wrap justify-center lg:justify-end gap-3 mt-6" dir="ltr">
+                            {{-- PDF Download if available --}}
+                            @if(!empty($book['pdf_links']))
+                            <a href="{{ $book['pdf_links'][0] }}" 
+                               target="_blank"
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-rose-500 text-white font-semibold rounded-xl hover:bg-rose-600 transition shadow-lg">
+                                <i class="fas fa-file-pdf text-lg"></i>
+                                تحميل PDF
+                            </a>
+                            @endif
+                            
                             <a href="{{ $book['url'] }}" 
                                target="_blank"
                                class="inline-flex items-center gap-2 px-6 py-3 bg-white text-emerald-600 font-semibold rounded-xl hover:bg-emerald-50 transition shadow-lg">
@@ -96,6 +121,13 @@
                                 Buka di Shamela.ws
                             </a>
                         </div>
+                        
+                        @if($isLocalDatabase)
+                        <div class="mt-4 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg inline-flex items-center gap-2 text-sm text-white/80">
+                            <i class="fas fa-database text-emerald-300"></i>
+                            <span>Data dari database lokal (8,425 kitab)</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -198,23 +230,57 @@
                         Aksi
                     </h3>
                     <div class="space-y-3">
+                        @if(!empty($book['pdf_links']))
+                        <a href="{{ $book['pdf_links'][0] }}" target="_blank"
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition font-medium">
+                            <i class="fas fa-file-pdf"></i>
+                            Download PDF
+                        </a>
+                        @endif
                         <a href="{{ $book['url'] }}" target="_blank"
                            class="flex items-center justify-center gap-2 w-full py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition font-medium">
                             <i class="fas fa-book-open"></i>
                             Baca Kitab
                         </a>
-                        <a href="https://shamela.ws/author/{{ $book['author_id'] }}" target="_blank"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition {{ !$book['author_id'] ? 'opacity-50 pointer-events-none' : '' }}">
-                            <i class="fas fa-user"></i>
-                            Lihat Penulis Lain
-                        </a>
-                        <a href="https://shamela.ws/category/{{ $book['category_id'] }}" target="_blank"
-                           class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition {{ !$book['category_id'] ? 'opacity-50 pointer-events-none' : '' }}">
+                        <a href="https://shamela.ws/category/{{ $book['category_id'] ?? '' }}" target="_blank"
+                           class="flex items-center justify-center gap-2 w-full py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition {{ !($book['category_id'] ?? null) ? 'opacity-50 pointer-events-none' : '' }}">
                             <i class="fas fa-folder"></i>
                             Kitab Kategori Ini
                         </a>
                     </div>
                 </div>
+                
+                {{-- Related Books --}}
+                @if(!empty($relatedBooks))
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <i class="fas fa-books text-emerald-600"></i>
+                        كتب ذات صلة
+                    </h3>
+                    <div class="space-y-3">
+                        @foreach($relatedBooks as $related)
+                        <a href="{{ route('opac.shamela.show', $related['id']) }}" 
+                           class="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50 transition group">
+                            <img src="{{ $related['cover'] }}" 
+                                 alt="{{ $related['title'] }}"
+                                 class="w-10 h-14 object-cover rounded-lg shadow-sm border border-gray-100"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=ك&background=059669&color=fff&size=80'">
+                            <div class="flex-1 min-w-0" dir="rtl">
+                                <p class="text-sm font-medium text-gray-900 group-hover:text-emerald-600 truncate">
+                                    {{ $related['title'] }}
+                                </p>
+                                <p class="text-xs text-gray-500 truncate">{{ $related['author'] ?? '-' }}</p>
+                                @if($related['has_pdf'] ?? false)
+                                <span class="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 text-[10px] rounded">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </span>
+                                @endif
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
