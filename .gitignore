@@ -27,3 +27,6 @@ Thumbs.db
 doc/MIGRATION/*.sql
 doc/MIGRATION/cover_*/
 storage/database/
+
+# Shamela Content Database (22GB)
+storage/database/shamela_content.db

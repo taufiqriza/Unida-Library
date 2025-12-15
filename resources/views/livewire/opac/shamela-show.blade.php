@@ -97,6 +97,16 @@
                         @endif
                         
                         <div class="flex flex-wrap justify-center lg:justify-end gap-3 mt-6" dir="ltr">
+                            {{-- Local Reader Button (Primary) --}}
+                            @if($this->hasContent)
+                            <button onclick="Livewire.dispatch('openReader', { bookId: {{ $book['id'] }} })"
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-500 hover:to-orange-600 transition shadow-lg shadow-amber-500/30">
+                                <i class="fas fa-book-open-reader text-lg"></i>
+                                اقرأ الآن
+                                <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full">مجاني</span>
+                            </button>
+                            @endif
+                            
                             {{-- PDF Download if available --}}
                             @if(!empty($book['pdf_links']))
                             <a href="{{ $book['pdf_links'][0] }}" 
@@ -107,18 +117,12 @@
                             </a>
                             @endif
                             
-                            <a href="{{ $book['url'] }}" 
-                               target="_blank"
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-white text-emerald-600 font-semibold rounded-xl hover:bg-emerald-50 transition shadow-lg">
-                                <i class="fas fa-book-open"></i>
-                                اقرأ الكتاب
-                                <i class="fas fa-external-link-alt text-sm"></i>
-                            </a>
+                            {{-- Shamela.ws Link --}}
                             <a href="{{ $book['url'] }}" 
                                target="_blank"
                                class="inline-flex items-center gap-2 px-6 py-3 bg-white/20 text-white font-semibold rounded-xl hover:bg-white/30 transition backdrop-blur">
-                                <i class="fas fa-globe"></i>
-                                Buka di Shamela.ws
+                                <i class="fas fa-external-link-alt"></i>
+                                Shamela.ws
                             </a>
                         </div>
                         
@@ -285,4 +289,7 @@
         </div>
     </div>
     @endif
+    
+    {{-- Shamela Reader Modal Component --}}
+    @livewire('opac.shamela-reader', ['bookId' => $bookId])
 </div>

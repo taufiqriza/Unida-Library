@@ -76,6 +76,18 @@ class ShamelaShow extends Component
             $this->categories = array_slice($localService->getCategories(), 0, 20);
         }
     }
+    
+    /**
+     * Check if book has content in SQLite database (for reader)
+     */
+    public function getHasContentProperty(): bool
+    {
+        $contentService = new \App\Services\ShamelaContentService();
+        if (!$contentService->isAvailable()) {
+            return false;
+        }
+        return $contentService->getBookPageCount($this->bookId) > 0;
+    }
 
     public function render()
     {
