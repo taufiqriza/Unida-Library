@@ -220,13 +220,18 @@ class OpacController extends Controller
 
     public function page($slug)
     {
+        // Redirect old journal-subscription to new e-resources
+        if ($slug === 'journal-subscription') {
+            return redirect()->route('opac.page', 'e-resources');
+        }
+
         // Pages with dedicated views
         $dedicatedViews = [
             // HOME
             'visi-misi', 'sejarah', 'struktur-organisasi', 'mou',
             'tata-tertib', 'jam-layanan', 'fasilitas', 'karir',
             // E-RESOURCES
-            'digilib-apps', 'journal-subscription',
+            'digilib-apps', 'e-resources',
             // DISCOVER
             'event-library', 'virtual-tour', 'e-learning',
             'prosa-kreatif', 'survey', 'research-tools',

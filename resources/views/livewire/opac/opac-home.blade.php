@@ -199,16 +199,16 @@
                 </div>
             </a>
 
-            <!-- E-Book & Resources Eksternal -->
-            <a href="{{ route('opac.page', 'journal-subscription') }}" class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-emerald-200 transition group relative overflow-hidden">
+            <!-- E-Resources -->
+            <a href="{{ route('opac.page', 'e-resources') }}" class="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-4 lg:p-5 text-white hover:shadow-lg hover:shadow-emerald-200 transition group relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="relative flex items-start gap-3">
                     <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-book-open text-lg"></i>
+                        <i class="fas fa-globe text-lg"></i>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-sm lg:text-base">E-Book Eksternal</h3>
-                        <p class="text-emerald-200 text-[11px] mt-0.5">100K+ sumber terbuka</p>
+                        <h3 class="font-bold text-sm lg:text-base">E-Resources</h3>
+                        <p class="text-emerald-200 text-[11px] mt-0.5">E-Book & Jurnal Digital</p>
                     </div>
                 </div>
             </a>
