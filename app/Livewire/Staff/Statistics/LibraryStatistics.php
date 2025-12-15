@@ -61,8 +61,10 @@ class LibraryStatistics extends Component
             // Collection Stats
             'total_titles' => $this->queryWithBranch(Book::query(), $branchId)->count(),
             'total_items' => $this->queryWithBranch(Item::query(), $branchId)->count(),
-            'available_items' => $this->queryWithBranch(Item::query(), $branchId)->where('status', 'available')->count(),
-            'on_loan_items' => $this->queryWithBranch(Item::query(), $branchId)->where('status', 'on_loan')->count(),
+            'available_items' => $this->queryWithBranch(Item::query(), $branchId)
+                ->whereDoesntHave('loans', fn($q) => $q->where('is_returned', false))->count(),
+            'on_loan_items' => $this->queryWithBranch(Item::query(), $branchId)
+                ->whereHas('loans', fn($q) => $q->where('is_returned', false))->count(),
             
             // Digital Collection
             'total_ebooks' => Ebook::count(),
