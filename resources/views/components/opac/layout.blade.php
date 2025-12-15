@@ -189,87 +189,87 @@
                         <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
                             <i class="fas fa-layer-group text-xs"></i> KOLEKSI <i class="fas fa-chevron-down text-[10px] ml-1"></i>
                         </button>
-                        <div class="mega-menu left-0 w-[800px] -ml-32">
+                        <div class="mega-menu left-0 w-[920px] -ml-40">
                             <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
                                 {{-- Header --}}
-                                <div class="bg-gradient-to-r from-primary-600 to-blue-600 px-6 py-3 flex items-center justify-between">
-                                    <div class="flex items-center gap-2 text-white">
-                                        <i class="fas fa-search"></i>
-                                        <span class="font-semibold">Jelajahi Koleksi Perpustakaan</span>
+                                <div class="bg-gradient-to-r from-primary-600 to-blue-600 px-6 py-4 flex items-center justify-between">
+                                    <div class="flex items-center gap-3 text-white">
+                                        <i class="fas fa-search text-lg"></i>
+                                        <span class="font-bold text-base">Jelajahi Koleksi Perpustakaan</span>
                                     </div>
-                                    <a href="{{ route('opac.search') }}" class="text-xs text-blue-200 hover:text-white transition">
+                                    <a href="{{ route('opac.search') }}" class="text-sm text-blue-200 hover:text-white transition">
                                         Pencarian Global <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
                                 
-                                <div class="p-5">
-                                    <div class="grid grid-cols-4 gap-4">
+                                <div class="p-6">
+                                    <div class="grid grid-cols-4 gap-6">
                                         
                                         {{-- Column 1: Cari di Global Search --}}
                                         <div class="flex flex-col">
-                                            <h3 class="font-bold text-gray-900 mb-3 text-xs uppercase tracking-wide flex items-center gap-2">
-                                                <span class="w-5 h-5 bg-primary-100 rounded flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas fa-search text-primary-600 text-[10px]"></i>
+                                            <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center gap-2">
+                                                <span class="w-6 h-6 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-search text-primary-600 text-xs"></i>
                                                 </span>
-                                                <span class="whitespace-nowrap">Cari Koleksi</span>
+                                                <span>Cari Koleksi</span>
                                             </h3>
                                             <div class="space-y-1 flex-1">
-                                                <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <div class="w-6 h-6 bg-primary-100 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-book text-primary-600 text-[10px]"></i></div>
-                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Buku</span>
+                                                <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book text-primary-600 text-sm"></i></div>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">Buku</span>
                                                 </a>
-                                                <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <div class="w-6 h-6 bg-orange-100 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-file-pdf text-orange-600 text-[10px]"></i></div>
-                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600">E-Book</span>
+                                                <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-file-pdf text-orange-600 text-sm"></i></div>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">E-Book</span>
                                                 </a>
-                                                <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <div class="w-6 h-6 bg-pink-100 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-graduation-cap text-pink-600 text-[10px]"></i></div>
-                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600">E-Thesis</span>
+                                                <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-graduation-cap text-pink-600 text-sm"></i></div>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">E-Thesis</span>
                                                 </a>
-                                                <a href="{{ route('opac.search') }}?type=shamela" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <div class="w-6 h-6 bg-emerald-100 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-book-quran text-emerald-600 text-[10px]"></i></div>
-                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Shamela</span>
+                                                <a href="{{ route('opac.search') }}?type=shamela" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book-quran text-emerald-600 text-sm"></i></div>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">Shamela</span>
                                                 </a>
-                                                <a href="{{ route('opac.search') }}?type=external" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <div class="w-6 h-6 bg-blue-100 rounded flex items-center justify-center flex-shrink-0"><i class="fas fa-globe text-blue-600 text-[10px]"></i></div>
-                                                    <span class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Open Library</span>
+                                                <a href="{{ route('opac.search') }}?type=external" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-globe text-blue-600 text-sm"></i></div>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">Open Library</span>
                                                 </a>
                                             </div>
                                         </div>
                                         
                                         {{-- Column 2: Koleksi Khusus (Premium) --}}
                                         <div class="flex flex-col">
-                                            <h3 class="font-bold text-gray-900 mb-3 text-xs uppercase tracking-wide flex items-center gap-2">
-                                                <span class="w-5 h-5 bg-amber-100 rounded flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas fa-crown text-amber-600 text-[10px]"></i>
+                                            <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center gap-2">
+                                                <span class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-crown text-amber-600 text-xs"></i>
                                                 </span>
-                                                <span class="whitespace-nowrap">Koleksi Khusus</span>
+                                                <span>Koleksi Khusus</span>
                                             </h3>
                                             <div class="space-y-2 flex-1">
-                                                <a href="{{ route('opac.shamela.index') }}" class="block p-2 rounded-lg bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 hover:shadow-md transition">
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book-quran text-white text-xs"></i></div>
+                                                <a href="{{ route('opac.shamela.index') }}" class="block p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 hover:shadow-md transition">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book-quran text-white text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-xs font-bold text-gray-900 truncate">Shamela</p>
-                                                            <p class="text-[9px] text-gray-500">8,425 Kitab</p>
+                                                            <p class="text-sm font-bold text-gray-900">Maktabah Shamela</p>
+                                                            <p class="text-xs text-gray-500">8,425 Kitab Islam Klasik</p>
                                                         </div>
                                                     </div>
                                                 </a>
-                                                <a href="{{ route('opac.universitaria.index') }}" class="block p-2 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 hover:shadow-md transition">
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="w-7 h-7 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-landmark text-white text-xs"></i></div>
+                                                <a href="{{ route('opac.universitaria.index') }}" class="block p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 hover:shadow-md transition">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-landmark text-white text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-xs font-bold text-gray-900 truncate">Universitaria</p>
-                                                            <p class="text-[9px] text-gray-500">Sejarah PMDG</p>
+                                                            <p class="text-sm font-bold text-gray-900">Universitaria</p>
+                                                            <p class="text-xs text-gray-500">Warisan Sejarah PMDG</p>
                                                         </div>
                                                     </div>
                                                 </a>
-                                                <a href="{{ route('opac.page', 'digilib-apps') }}" class="block p-2 rounded-lg bg-gray-50 border border-gray-100 hover:shadow-md transition">
-                                                    <div class="flex items-center gap-2">
-                                                        <div class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-mobile-alt text-teal-600 text-xs"></i></div>
+                                                <a href="{{ route('opac.page', 'digilib-apps') }}" class="block p-3 rounded-xl bg-gray-50 border border-gray-100 hover:shadow-md transition">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-mobile-alt text-teal-600 text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-xs font-bold text-gray-900 truncate">Digilib Apps</p>
-                                                            <p class="text-[9px] text-gray-500">Mobile & Desktop</p>
+                                                            <p class="text-sm font-bold text-gray-900">Digilib Apps</p>
+                                                            <p class="text-xs text-gray-500">Mobile & Desktop</p>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -278,39 +278,39 @@
                                         
                                         {{-- Column 3: Jurnal Ilmiah --}}
                                         <div class="flex flex-col">
-                                            <h3 class="font-bold text-gray-900 mb-3 text-xs uppercase tracking-wide flex items-center gap-2">
-                                                <span class="w-5 h-5 bg-red-100 rounded flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas fa-journal-whills text-red-600 text-[10px]"></i>
+                                            <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center gap-2">
+                                                <span class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-journal-whills text-red-600 text-xs"></i>
                                                 </span>
-                                                <span class="whitespace-nowrap">Jurnal</span>
+                                                <span>Jurnal Ilmiah</span>
                                             </h3>
-                                            <div class="space-y-2 flex-1">
+                                            <div class="space-y-3 flex-1">
                                                 {{-- Jurnal UNIDA --}}
-                                                <div class="p-2 bg-gray-50 rounded-lg">
-                                                    <p class="text-[9px] font-semibold text-gray-500 mb-1">JURNAL UNIDA</p>
-                                                    <a href="{{ route('opac.journals.index') }}" class="flex items-center gap-2 py-1 rounded hover:bg-white group">
-                                                        <i class="fas fa-newspaper text-red-500 text-[10px]"></i>
-                                                        <span class="text-xs text-gray-700 group-hover:text-primary-600">E-Journal</span>
+                                                <div class="p-3 bg-gray-50 rounded-xl">
+                                                    <p class="text-xs font-bold text-gray-500 mb-2">JURNAL UNIDA</p>
+                                                    <a href="{{ route('opac.journals.index') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
+                                                        <i class="fas fa-newspaper text-red-500 text-sm"></i>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">E-Journal UNIDA</span>
                                                     </a>
-                                                    <a href="https://ejournal.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 py-1 rounded hover:bg-white group">
-                                                        <i class="fas fa-external-link-alt text-gray-400 text-[10px]"></i>
-                                                        <span class="text-xs text-gray-700 group-hover:text-primary-600">Portal OJS</span>
+                                                    <a href="https://ejournal.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
+                                                        <i class="fas fa-external-link-alt text-gray-400 text-sm"></i>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">Portal OJS</span>
                                                     </a>
                                                 </div>
                                                 {{-- Jurnal Konsorsium --}}
-                                                <div class="p-2 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg border border-indigo-100">
-                                                    <p class="text-[9px] font-semibold text-indigo-600 mb-1 flex items-center gap-1">
-                                                        <i class="fas fa-key text-[8px]"></i> KONSORSIUM
+                                                <div class="p-3 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-100">
+                                                    <p class="text-xs font-bold text-indigo-600 mb-2 flex items-center gap-1">
+                                                        <i class="fas fa-key text-xs"></i> KONSORSIUM FPPTI
                                                     </p>
-                                                    <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1 rounded hover:bg-white group">
-                                                        <i class="fas fa-database text-indigo-500 text-[10px]"></i>
-                                                        <span class="text-xs text-gray-700 group-hover:text-primary-600">Gale</span>
-                                                        <span class="ml-auto px-1 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded">120K</span>
+                                                    <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
+                                                        <i class="fas fa-database text-indigo-500 text-sm"></i>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">Gale Academic</span>
+                                                        <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">120K+</span>
                                                     </a>
-                                                    <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1 rounded hover:bg-white group">
-                                                        <i class="fas fa-database text-blue-500 text-[10px]"></i>
-                                                        <span class="text-xs text-gray-700 group-hover:text-primary-600">ProQuest</span>
-                                                        <span class="ml-auto px-1 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold rounded">90K</span>
+                                                    <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
+                                                        <i class="fas fa-database text-blue-500 text-sm"></i>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">ProQuest</span>
+                                                        <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">90K+</span>
                                                     </a>
                                                 </div>
                                             </div>
@@ -318,38 +318,38 @@
                                         
                                         {{-- Column 4: Sumber Terbuka --}}
                                         <div class="flex flex-col">
-                                            <h3 class="font-bold text-gray-900 mb-3 text-xs uppercase tracking-wide flex items-center gap-2">
-                                                <span class="w-5 h-5 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-                                                    <i class="fas fa-unlock text-green-600 text-[10px]"></i>
+                                            <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide flex items-center gap-2">
+                                                <span class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <i class="fas fa-unlock text-green-600 text-xs"></i>
                                                 </span>
-                                                <span class="whitespace-nowrap">Akses Terbuka</span>
+                                                <span>Akses Terbuka</span>
                                             </h3>
                                             <div class="space-y-1 flex-1">
-                                                <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <i class="fas fa-database text-indigo-500 text-[10px] w-4"></i>
-                                                    <span class="text-xs text-gray-700 group-hover:text-primary-600">Repository</span>
-                                                    <i class="fas fa-external-link-alt text-gray-300 text-[8px] ml-auto"></i>
+                                                <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <i class="fas fa-database text-indigo-500 text-sm w-5"></i>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">Repository UNIDA</span>
+                                                    <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
-                                                <a href="https://ipusnas.id" target="_blank" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <i class="fas fa-book-reader text-blue-500 text-[10px] w-4"></i>
-                                                    <span class="text-xs text-gray-700 group-hover:text-primary-600">iPusnas</span>
-                                                    <i class="fas fa-external-link-alt text-gray-300 text-[8px] ml-auto"></i>
+                                                <a href="https://ipusnas.id" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <i class="fas fa-book-reader text-blue-500 text-sm w-5"></i>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">iPusnas</span>
+                                                    <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
-                                                <a href="https://openlibrary.org" target="_blank" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <i class="fas fa-globe text-teal-500 text-[10px] w-4"></i>
-                                                    <span class="text-xs text-gray-700 group-hover:text-primary-600">Open Library</span>
-                                                    <i class="fas fa-external-link-alt text-gray-300 text-[8px] ml-auto"></i>
+                                                <a href="https://openlibrary.org" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <i class="fas fa-globe text-teal-500 text-sm w-5"></i>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">Open Library</span>
+                                                    <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
-                                                <a href="https://www.pdfdrive.com" target="_blank" class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 group">
-                                                    <i class="fas fa-file-pdf text-rose-500 text-[10px] w-4"></i>
-                                                    <span class="text-xs text-gray-700 group-hover:text-primary-600">PDF Drive</span>
-                                                    <i class="fas fa-external-link-alt text-gray-300 text-[8px] ml-auto"></i>
+                                                <a href="https://www.pdfdrive.com" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
+                                                    <i class="fas fa-file-pdf text-rose-500 text-sm w-5"></i>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">PDF Drive</span>
+                                                    <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
                                             </div>
                                             {{-- Quick Link --}}
-                                            <a href="{{ route('opac.page', 'e-resources') }}" class="mt-auto flex items-center justify-center gap-1 px-2 py-1.5 bg-gradient-to-r from-primary-500 to-blue-600 text-white text-[10px] font-medium rounded-lg hover:shadow-md transition">
-                                                <i class="fas fa-th-large text-[8px]"></i>
-                                                Semua E-Resources
+                                            <a href="{{ route('opac.page', 'e-resources') }}" class="mt-auto flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-primary-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:shadow-md transition">
+                                                <i class="fas fa-th-large text-xs"></i>
+                                                Lihat Semua E-Resources
                                             </a>
                                         </div>
                                         
