@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gradient-to-b from-slate-50 to-white" 
      x-data="universitariaReader()"
-     @keydown.escape.window="closeReader()">
+     x-on:keydown.escape.window="closeReader()">
 
     {{-- Hero Section --}}
     <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white relative overflow-hidden">
@@ -265,8 +265,8 @@
                 <iframe 
                     x-ref="pdfFrame"
                     x-show="!error"
-                    @load="onFrameLoad()"
-                    @error="onFrameError()"
+                    x-on:load="onFrameLoad()"
+                    x-on:error="onFrameError()"
                     class="w-full h-full"
                     frameborder="0"
                     allowfullscreen>
