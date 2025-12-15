@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 class ShamelaService
 {
     protected string $baseUrl = 'https://shamela.ws';
+    protected ?ShamelaLocalService $localService = null;
     
     // Shamela categories mapping
     protected array $categories = [
@@ -291,11 +292,31 @@ class ShamelaService
     ];
 
     /**
-     * Search books by category - tries live scraping first, falls back to hardcoded
+     * Get local service instance
+     */
+    protected function getLocalService(): ShamelaLocalService
+    {
+        if (!$this->localService) {
+            $this->localService = new ShamelaLocalService();
+        }
+        return $this->localService;
+    }
+
+    /**
+     * Search books by category - tries local database first, then web scraping
      */
     public function searchByCategory(int $categoryId, int $limit = 20): Collection
     {
-        // Try live scraping first (cached for 24 hours)
+        // Try local database first (8,425 books offline)
+        $localService = $this->getLocalService();
+        if ($localService->isAvailable()) {
+            $result = $localService->getBooksByCategory($categoryId, $limit);
+            if (!empty($result['results'])) {
+                return collect($result['results']);
+            }
+        }
+
+        // Try live scraping (cached for 24 hours)
         $liveBooks = $this->scrapeCategoryFromWeb($categoryId);
         
         if ($liveBooks->isNotEmpty()) {
@@ -475,14 +496,37 @@ class ShamelaService
      */
     public function getCategories(): array
     {
+        // Try local database first for real category data
+        $localService = $this->getLocalService();
+        if ($localService->isAvailable()) {
+            $localCategories = $localService->getCategories();
+            if (!empty($localCategories)) {
+                $result = [];
+                foreach ($localCategories as $cat) {
+                    $result[$cat['id']] = $cat['name'];
+                }
+                return $result;
+            }
+        }
+        
         return $this->categories;
     }
 
     /**
-     * Search books by keyword
+     * Search books by keyword - uses local database (8,425 books) first
      */
     public function search(string $query, int $limit = 50): Collection
     {
+        // Try local database first (direct search through 8,425 books)
+        $localService = $this->getLocalService();
+        if ($localService->isAvailable()) {
+            $result = $localService->search($query, $limit);
+            if (!empty($result['results'])) {
+                return collect($result['results']);
+            }
+        }
+
+        // Fallback to category-based search
         $results = collect();
         $query = mb_strtolower($query);
         

@@ -26,3 +26,4 @@ Thumbs.db
 # Migration files (large SQL dumps)
 doc/MIGRATION/*.sql
 doc/MIGRATION/cover_*/
+storage/database/
