@@ -340,7 +340,7 @@ class GlobalSearch extends Component
             'badge' => strtoupper($ebook->file_format ?? 'PDF'),
             'badgeColor' => 'orange',
             'icon' => 'fa-file-pdf',
-            'url' => route('opac.ebooks') . '?view=' . $ebook->id,
+            'url' => route('opac.ebook.show', $ebook->id),
             'description' => $ebook->abstract ? \Str::limit(strip_tags($ebook->abstract), 120) : null,
             'meta' => [
                 'format' => $ebook->file_format,
