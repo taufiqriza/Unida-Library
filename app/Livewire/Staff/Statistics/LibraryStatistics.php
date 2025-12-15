@@ -100,18 +100,18 @@ class LibraryStatistics extends Component
                 ->where('is_paid', true)->sum('amount'),
         ];
 
-        // Branch Comparison (only for all view)
+        // Branch Comparison (only for all view) - use withCount to avoid loading all relations
         if ($this->viewMode === 'all') {
-            $this->branchStats = Branch::with(['books', 'items', 'members'])
+            $this->branchStats = Branch::withCount(['books', 'items', 'members'])
                 ->get()
                 ->map(function ($branch) {
                     return [
                         'id' => $branch->id,
                         'name' => $branch->name,
                         'code' => $branch->code,
-                        'titles' => $branch->books->count(),
-                        'items' => $branch->items->count(),
-                        'members' => $branch->members->count(),
+                        'titles' => $branch->books_count,
+                        'items' => $branch->items_count,
+                        'members' => $branch->members_count,
                         'loans_month' => Loan::where('branch_id', $branch->id)
                             ->whereMonth('loan_date', now()->month)
                             ->whereYear('loan_date', now()->year)->count(),
