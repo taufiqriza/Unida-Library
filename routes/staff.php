@@ -65,6 +65,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{task}/edit', \App\Livewire\Staff\Task\TaskForm::class)->name('edit');
         });
 
+        // Attendance
+        Route::get('/attendance', \App\Livewire\Staff\Attendance\AttendancePortal::class)->name('attendance.index');
+
         // Notifications
         Route::prefix('notification')->name('notification.')->group(function () {
             Route::get('/', \App\Livewire\Staff\Notification\NotificationCenter::class)->name('index');
