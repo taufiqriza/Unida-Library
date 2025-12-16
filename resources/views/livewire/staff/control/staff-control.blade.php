@@ -473,11 +473,68 @@
         </div>
     </template>
 
+    {{-- Elegant Toast Notifications --}}
+    <div x-data="toastNotification()" 
+         x-on:notify.window="show($event.detail)"
+         class="fixed bottom-4 right-4 z-[999999] flex flex-col gap-2">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-show="toast.visible"
+                 x-transition:enter="transform transition ease-out duration-300"
+                 x-transition:enter-start="translate-x-full opacity-0"
+                 x-transition:enter-end="translate-x-0 opacity-100"
+                 x-transition:leave="transform transition ease-in duration-200"
+                 x-transition:leave-start="translate-x-0 opacity-100"
+                 x-transition:leave-end="translate-x-full opacity-0"
+                 class="flex items-center gap-3 min-w-[320px] max-w-md px-4 py-3 rounded-xl shadow-2xl backdrop-blur-sm border"
+                 :class="{
+                     'bg-gradient-to-r from-emerald-500 to-green-600 text-white border-emerald-400': toast.type === 'success',
+                     'bg-gradient-to-r from-red-500 to-rose-600 text-white border-red-400': toast.type === 'error',
+                     'bg-gradient-to-r from-amber-500 to-orange-600 text-white border-amber-400': toast.type === 'warning',
+                     'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400': toast.type === 'info'
+                 }">
+                <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                    <i class="fas text-lg"
+                       :class="{
+                           'fa-check-circle': toast.type === 'success',
+                           'fa-times-circle': toast.type === 'error',
+                           'fa-exclamation-triangle': toast.type === 'warning',
+                           'fa-info-circle': toast.type === 'info'
+                       }"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-sm" x-text="toast.type === 'success' ? 'Berhasil!' : (toast.type === 'error' ? 'Error!' : (toast.type === 'warning' ? 'Perhatian!' : 'Info'))"></p>
+                    <p class="text-sm text-white/90" x-text="toast.message"></p>
+                </div>
+                <button @click="dismiss(toast.id)" class="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </template>
+    </div>
+
     <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('notify', (data) => {
-                alert((data[0].type === 'success' ? '✓ ' : '⚠ ') + data[0].message);
-            });
-        });
+        function toastNotification() {
+            return {
+                toasts: [],
+                show(data) {
+                    const id = Date.now();
+                    const toast = { id, type: data[0]?.type || 'info', message: data[0]?.message || '', visible: true };
+                    this.toasts.push(toast);
+                    
+                    // Auto dismiss after 4 seconds
+                    setTimeout(() => this.dismiss(id), 4000);
+                },
+                dismiss(id) {
+                    const toast = this.toasts.find(t => t.id === id);
+                    if (toast) {
+                        toast.visible = false;
+                        setTimeout(() => {
+                            this.toasts = this.toasts.filter(t => t.id !== id);
+                        }, 300);
+                    }
+                }
+            }
+        }
     </script>
 </div>
+
