@@ -68,12 +68,11 @@
             ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
             ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
         ];
-        // Add Control menu for admin only (before Profil at the bottom)
+        // Add Control menu for admin only
         if (in_array($user->role, ['super_admin', 'admin'])) {
             $navItems[] = ['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']];
         }
-        // Profil always at the end
-        $navItems[] = ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']];
+        // Note: Profil removed from sidebar, now in header dropdown
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
@@ -275,12 +274,89 @@
                 @livewire('staff.notification.notification-bell')
                 
                 <div class="h-8 w-px bg-slate-200"></div>
-                <div class="text-right">
-                    <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
-                    <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
-                </div>
-                <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" class="w-full h-full object-cover">
+                
+                {{-- Profile Dropdown --}}
+                <div x-data="{ profileOpen: false }" class="relative">
+                    <button @click="profileOpen = !profileOpen" class="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2 py-1.5 transition">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
+                            <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-400 text-xs transition" :class="profileOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    
+                    {{-- Dropdown Menu --}}
+                    <div x-show="profileOpen" 
+                         x-cloak
+                         @click.away="profileOpen = false"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+                        
+                        {{-- User Info Header --}}
+                        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 rounded-xl border-2 border-white/30 overflow-hidden shadow-lg">
+                                    <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-bold truncate">{{ $user->name }}</p>
+                                    <p class="text-blue-200 text-sm truncate">{{ $user->email }}</p>
+                                    <span class="inline-block mt-1 px-2 py-0.5 bg-white/20 text-white text-xs rounded-lg">
+                                        {{ \App\Models\User::getRoles()[$user->role] ?? ucfirst($user->role) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Menu Items --}}
+                        <div class="py-2">
+                            <a href="{{ route('staff.profile') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition">
+                                <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Profil Saya</p>
+                                    <p class="text-xs text-slate-400">Edit informasi akun</p>
+                                </div>
+                            </a>
+                            
+                            @if(in_array($user->role, ['super_admin', 'admin']))
+                            <a href="{{ route('staff.control.index') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition">
+                                <div class="w-9 h-9 bg-violet-100 rounded-lg flex items-center justify-center text-violet-600">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Pengaturan</p>
+                                    <p class="text-xs text-slate-400">Kelola staff & sistem</p>
+                                </div>
+                            </a>
+                            @endif
+                        </div>
+                        
+                        {{-- Logout --}}
+                        <div class="border-t border-slate-100 p-2">
+                            <form method="POST" action="{{ route('staff.logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition group">
+                                    <div class="w-9 h-9 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </div>
+                                    <div class="text-left">
+                                        <p class="text-sm font-semibold text-red-600">Logout</p>
+                                        <p class="text-xs text-slate-400">Keluar dari sistem</p>
+                                    </div>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>

@@ -504,10 +504,12 @@
         </div>
     </template>
 
-    {{-- Elegant Toast Notifications - TOP RIGHT --}}
-    <div x-data="toastNotification()" 
-         x-on:notify.window="show($event.detail)"
-         class="fixed top-4 right-4 z-[999999] flex flex-col gap-2">
+    {{-- Elegant Toast Notifications - Teleported to body for highest z-index --}}
+    <template x-teleport="body">
+        <div x-data="toastNotification()" 
+             x-on:notify.window="show($event.detail)"
+             style="position: fixed; top: 20px; right: 20px; z-index: 2147483647;"
+             class="flex flex-col gap-2">
         <template x-for="toast in toasts" :key="toast.id">
             <div x-show="toast.visible"
                  x-transition:enter="transform transition ease-out duration-300"
@@ -541,7 +543,8 @@
                 </button>
             </div>
         </template>
-    </div>
+        </div>
+    </template>
 
     <script>
         function toastNotification() {
