@@ -116,6 +116,7 @@ class NotificationCenter extends Component
         
         // Category counts
         $categories = [
+            'chat' => ['label' => 'Chat', 'icon' => 'fa-comments', 'color' => 'indigo'],
             'loan' => ['label' => 'Sirkulasi', 'icon' => 'fa-book-reader', 'color' => 'blue'],
             'task' => ['label' => 'Tugas', 'icon' => 'fa-clipboard-list', 'color' => 'violet'],
             'member' => ['label' => 'Anggota', 'icon' => 'fa-user-check', 'color' => 'emerald'],

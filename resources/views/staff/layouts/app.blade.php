@@ -323,6 +323,24 @@
     </script>
     @stack('scripts')
     @livewireScripts
+    
+    {{-- Handle session expired (419 error) --}}
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.hook('request', ({ fail }) => {
+                fail(({ status, preventDefault }) => {
+                    if (status === 419) {
+                        // Session expired - refresh the page
+                        preventDefault();
+                        if (confirm('Sesi Anda telah berakhir. Klik OK untuk refresh halaman.')) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    
     @filamentScripts
 
     {{-- Filament Notifications --}}

@@ -102,6 +102,7 @@ class StaffNotification extends Model
     public function getIconClass(): string
     {
         $icons = [
+            'chat' => 'fa-comments',
             'loan' => 'fa-book-reader',
             'task' => 'fa-clipboard-list',
             'member' => 'fa-user-check',
@@ -127,6 +128,7 @@ class StaffNotification extends Model
     public function getCategoryLabel(): string
     {
         $labels = [
+            'chat' => 'Chat',
             'loan' => 'Sirkulasi',
             'task' => 'Tugas',
             'member' => 'Anggota',
