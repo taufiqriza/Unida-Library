@@ -2,83 +2,111 @@
 
 namespace App\Livewire\Staff\Statistics;
 
+use App\Models\Author;
 use App\Models\Book;
 use App\Models\Branch;
+use App\Models\CollectionType;
 use App\Models\Ebook;
 use App\Models\Ethesis;
 use App\Models\Fine;
 use App\Models\Item;
 use App\Models\Loan;
+use App\Models\MediaType;
 use App\Models\Member;
-use Illuminate\Support\Carbon;
+use App\Models\Publisher;
+use App\Models\Subject;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class LibraryStatistics extends Component
 {
     public ?int $selectedBranch = null;
-    public string $viewMode = 'all'; // all, branch
+    public string $viewMode = 'all';
+    public string $activeTab = 'overview'; // overview, collection, circulation, digital
     public array $stats = [];
     public array $branchStats = [];
     public array $chartData = [];
     public array $topCategories = [];
     public array $monthlyTrend = [];
+    
+    // Collection Classification Data
+    public array $byMediaType = [];
+    public array $byCollectionType = [];
+    public array $byClassification = [];
+    public array $byLanguage = [];
+    public array $byPublisher = [];
+    public array $byYear = [];
+    public array $bySubject = [];
+    public array $byAuthor = [];
+
+    protected $queryString = ['selectedBranch', 'activeTab'];
 
     public function mount()
     {
         $user = auth()->user();
-        
-        // Default to user's branch if not super_admin
         if (!in_array($user->role, ['super_admin', 'admin'])) {
             $this->selectedBranch = $user->branch_id;
             $this->viewMode = 'branch';
         }
-        
         $this->loadStatistics();
+    }
+
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
     }
 
     public function updatedSelectedBranch()
     {
         $this->viewMode = $this->selectedBranch ? 'branch' : 'all';
-        $this->loadStatistics();
-    }
-
-    public function setViewMode($mode)
-    {
-        $this->viewMode = $mode;
-        if ($mode === 'all') {
-            $this->selectedBranch = null;
-        }
+        Cache::forget('staff_statistics_' . ($this->selectedBranch ?? 'all'));
         $this->loadStatistics();
     }
 
     public function loadStatistics()
     {
         $branchId = $this->selectedBranch;
+        $cacheKey = 'staff_statistics_' . ($branchId ?? 'all');
+        
+        // Cache for 5 minutes
+        $data = Cache::remember($cacheKey, 300, function () use ($branchId) {
+            return $this->fetchAllStatistics($branchId);
+        });
+        
+        $this->stats = $data['stats'];
+        $this->branchStats = $data['branchStats'];
+        $this->topCategories = $data['topCategories'];
+        $this->monthlyTrend = $data['monthlyTrend'];
+        $this->chartData = $data['chartData'];
+        $this->byMediaType = $data['byMediaType'];
+        $this->byCollectionType = $data['byCollectionType'];
+        $this->byClassification = $data['byClassification'];
+        $this->byLanguage = $data['byLanguage'];
+        $this->byPublisher = $data['byPublisher'];
+        $this->byYear = $data['byYear'];
+        $this->bySubject = $data['bySubject'];
+        $this->byAuthor = $data['byAuthor'];
+    }
 
+    protected function fetchAllStatistics(?int $branchId): array
+    {
         // Main Stats
-        $this->stats = [
-            // Collection Stats
+        $stats = [
             'total_titles' => $this->queryWithBranch(Book::query(), $branchId)->count(),
             'total_items' => $this->queryWithBranch(Item::query(), $branchId)->count(),
             'available_items' => $this->queryWithBranch(Item::query(), $branchId)
                 ->whereDoesntHave('loans', fn($q) => $q->where('is_returned', false))->count(),
             'on_loan_items' => $this->queryWithBranch(Item::query(), $branchId)
                 ->whereHas('loans', fn($q) => $q->where('is_returned', false))->count(),
-            
-            // Digital Collection (no branch filter - shared across all)
             'total_ebooks' => Ebook::where('is_active', true)->count(),
             'total_ethesis' => Ethesis::where('is_public', true)->count(),
-            
-            // Member Stats
             'total_members' => $this->queryWithBranch(Member::query(), $branchId)->count(),
             'active_members' => $this->queryWithBranch(Member::query(), $branchId)
                 ->where('expire_date', '>=', now())->count(),
             'new_members_month' => $this->queryWithBranch(Member::query(), $branchId)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)->count(),
-            
-            // Circulation Stats
             'loans_today' => $this->queryWithBranch(Loan::query(), $branchId)
                 ->whereDate('loan_date', today())->count(),
             'loans_this_month' => $this->queryWithBranch(Loan::query(), $branchId)
@@ -91,50 +119,52 @@ class LibraryStatistics extends Component
             'overdue_loans' => $this->queryWithBranch(Loan::query(), $branchId)
                 ->where('is_returned', false)
                 ->where('due_date', '<', now())->count(),
-            
-            // Fine Stats (fines has branch_id directly)
             'total_fines' => $this->queryWithBranch(Fine::query(), $branchId)->sum('amount'),
             'unpaid_fines' => $this->queryWithBranch(Fine::query(), $branchId)
                 ->where('is_paid', false)->sum('amount'),
             'paid_fines' => $this->queryWithBranch(Fine::query(), $branchId)
                 ->where('is_paid', true)->sum('amount'),
+            'total_authors' => Author::whereHas('books', fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q)->count(),
+            'total_publishers' => Publisher::whereHas('books', fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q)->count(),
+            'total_subjects' => Subject::whereHas('books', fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q)->count(),
         ];
 
-        // Branch Comparison (only for all view) - use withCount to avoid loading all relations
-        if ($this->viewMode === 'all') {
-            $this->branchStats = Branch::withCount(['books', 'items', 'members'])
+        // Branch Stats
+        $branchStats = [];
+        if (!$branchId) {
+            $branchStats = Branch::withCount(['books', 'items', 'members'])
                 ->get()
-                ->map(function ($branch) {
-                    return [
-                        'id' => $branch->id,
-                        'name' => $branch->name,
-                        'code' => $branch->code,
-                        'titles' => $branch->books_count,
-                        'items' => $branch->items_count,
-                        'members' => $branch->members_count,
-                        'loans_month' => Loan::where('branch_id', $branch->id)
-                            ->whereMonth('loan_date', now()->month)
-                            ->whereYear('loan_date', now()->year)->count(),
-                    ];
-                })->toArray();
+                ->map(fn($branch) => [
+                    'id' => $branch->id,
+                    'name' => $branch->name,
+                    'code' => $branch->code,
+                    'titles' => $branch->books_count,
+                    'items' => $branch->items_count,
+                    'members' => $branch->members_count,
+                    'loans_month' => Loan::where('branch_id', $branch->id)
+                        ->whereMonth('loan_date', now()->month)
+                        ->whereYear('loan_date', now()->year)->count(),
+                ])->toArray();
         }
 
-        // Top Categories
-        $this->topCategories = $this->queryWithBranch(Book::query(), $branchId)
+        // Top Categories (Classification)
+        $topCategories = $this->queryWithBranch(Book::query(), $branchId)
             ->select('classification', DB::raw('count(*) as total'))
             ->whereNotNull('classification')
+            ->where('classification', '!=', '')
             ->groupBy('classification')
             ->orderByDesc('total')
             ->limit(10)
             ->get()
             ->toArray();
 
-        // Monthly Trend (12 months)
-        $this->monthlyTrend = [];
+        // Monthly Trend
+        $monthlyTrend = [];
         for ($i = 11; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $this->monthlyTrend[] = [
+            $monthlyTrend[] = [
                 'month' => $date->format('M Y'),
+                'short' => $date->format('M'),
                 'loans' => $this->queryWithBranch(Loan::query(), $branchId)
                     ->whereMonth('loan_date', $date->month)
                     ->whereYear('loan_date', $date->year)->count(),
@@ -147,18 +177,100 @@ class LibraryStatistics extends Component
             ];
         }
 
-        // Chart Data
-        $this->chartData = [
-            'monthly' => [
-                'labels' => array_column($this->monthlyTrend, 'month'),
-                'loans' => array_column($this->monthlyTrend, 'loans'),
-                'returns' => array_column($this->monthlyTrend, 'returns'),
-                'members' => array_column($this->monthlyTrend, 'new_members'),
+        // Collection Classification Stats
+        $byMediaType = MediaType::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
+            ->having('books_count', '>', 0)
+            ->orderByDesc('books_count')
+            ->get()
+            ->map(fn($m) => ['id' => $m->id, 'name' => $m->name, 'count' => $m->books_count])
+            ->toArray();
+
+        $byCollectionType = CollectionType::withCount(['items' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
+            ->having('items_count', '>', 0)
+            ->orderByDesc('items_count')
+            ->get()
+            ->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'count' => $c->items_count])
+            ->toArray();
+
+        $byClassification = $this->queryWithBranch(Book::query(), $branchId)
+            ->select('classification', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('classification')
+            ->where('classification', '!=', '')
+            ->groupBy('classification')
+            ->orderByDesc('count')
+            ->limit(15)
+            ->get()
+            ->toArray();
+
+        $byLanguage = $this->queryWithBranch(Book::query(), $branchId)
+            ->select('language', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('language')
+            ->where('language', '!=', '')
+            ->groupBy('language')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get()
+            ->toArray();
+
+        $byPublisher = Publisher::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
+            ->having('books_count', '>', 0)
+            ->orderByDesc('books_count')
+            ->limit(10)
+            ->get()
+            ->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'count' => $p->books_count])
+            ->toArray();
+
+        $byYear = $this->queryWithBranch(Book::query(), $branchId)
+            ->select('publish_year', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('publish_year')
+            ->where('publish_year', '!=', '')
+            ->groupBy('publish_year')
+            ->orderByDesc('publish_year')
+            ->limit(15)
+            ->get()
+            ->toArray();
+
+        $bySubject = Subject::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
+            ->having('books_count', '>', 0)
+            ->orderByDesc('books_count')
+            ->limit(12)
+            ->get()
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'count' => $s->books_count])
+            ->toArray();
+
+        $byAuthor = Author::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
+            ->having('books_count', '>', 0)
+            ->orderByDesc('books_count')
+            ->limit(12)
+            ->get()
+            ->map(fn($a) => ['id' => $a->id, 'name' => $a->name, 'count' => $a->books_count])
+            ->toArray();
+
+        return [
+            'stats' => $stats,
+            'branchStats' => $branchStats,
+            'topCategories' => $topCategories,
+            'monthlyTrend' => $monthlyTrend,
+            'chartData' => [
+                'monthly' => [
+                    'labels' => array_column($monthlyTrend, 'short'),
+                    'loans' => array_column($monthlyTrend, 'loans'),
+                    'returns' => array_column($monthlyTrend, 'returns'),
+                    'members' => array_column($monthlyTrend, 'new_members'),
+                ],
+                'categories' => [
+                    'labels' => array_column($topCategories, 'classification'),
+                    'values' => array_column($topCategories, 'total'),
+                ],
             ],
-            'categories' => [
-                'labels' => array_column($this->topCategories, 'classification'),
-                'values' => array_column($this->topCategories, 'total'),
-            ],
+            'byMediaType' => $byMediaType,
+            'byCollectionType' => $byCollectionType,
+            'byClassification' => $byClassification,
+            'byLanguage' => $byLanguage,
+            'byPublisher' => $byPublisher,
+            'byYear' => $byYear,
+            'bySubject' => $bySubject,
+            'byAuthor' => $byAuthor,
         ];
     }
 
@@ -172,7 +284,7 @@ class LibraryStatistics extends Component
 
     public function getBranchesProperty()
     {
-        return Branch::orderBy('name')->get();
+        return Branch::orderBy('name')->get(['id', 'name', 'code']);
     }
 
     public function render()
