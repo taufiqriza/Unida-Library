@@ -655,17 +655,20 @@ function attendanceApp() {
         scanning: false,
 
         initGeolocation() {
+            console.log('Initializing GPS...');
             this.gpsStatus = 'loading';
             this.gpsText = 'Memuat lokasi GPS...';
             
             if (!navigator.geolocation) {
                 this.gpsStatus = 'error';
                 this.gpsText = 'Geolocation tidak didukung browser ini';
+                console.error('Geolocation not supported');
                 return;
             }
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    console.log('GPS position received:', position.coords);
                     this.gpsLat = position.coords.latitude;
                     this.gpsLng = position.coords.longitude;
                     this.gpsAccuracy = position.coords.accuracy;
@@ -673,9 +676,12 @@ function attendanceApp() {
                     this.gpsText = `GPS Aktif (${this.gpsLat.toFixed(6)}, ${this.gpsLng.toFixed(6)})`;
                     
                     // Update Livewire
-                    @this.updateGps(this.gpsLat, this.gpsLng, this.gpsAccuracy);
+                    if (typeof Livewire !== 'undefined') {
+                        @this.updateGps(this.gpsLat, this.gpsLng, this.gpsAccuracy);
+                    }
                 },
                 (error) => {
+                    console.error('GPS Error:', error);
                     this.gpsStatus = 'error';
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
@@ -691,38 +697,56 @@ function attendanceApp() {
                             this.gpsText = 'Error mendapatkan lokasi';
                     }
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
             );
         },
 
         startQrScanner() {
+            const qrElement = document.getElementById('qr-reader');
+            if (!qrElement) {
+                console.error('QR reader element not found');
+                return;
+            }
+
             if (this.scanning) {
                 if (this.html5QrCode) {
                     this.html5QrCode.stop().then(() => {
                         this.scanning = false;
-                    });
+                        qrElement.innerHTML = '';
+                    }).catch(err => console.error('Stop error:', err));
                 }
                 return;
             }
+
+            // Clear previous content
+            qrElement.innerHTML = '';
 
             this.html5QrCode = new Html5Qrcode("qr-reader");
             this.html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
+                    console.log('QR Decoded:', decodedText);
                     @this.handleQrScan(decodedText);
-                    this.html5QrCode.stop();
-                    this.scanning = false;
+                    this.html5QrCode.stop().then(() => {
+                        this.scanning = false;
+                    });
                 },
-                (errorMessage) => {}
+                (errorMessage) => { /* ignore scan errors */ }
             ).then(() => {
                 this.scanning = true;
+                console.log('QR Scanner started');
             }).catch((err) => {
                 console.error('QR Scanner error:', err);
+                this.scanning = false;
+                alert('Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.');
             });
         },
 
         initMap(locations) {
+            const mapElement = document.getElementById('attendance-map');
+            if (!mapElement) return;
+            
             if (this.map) {
                 this.map.remove();
             }
@@ -731,7 +755,7 @@ function attendanceApp() {
             let center = [-7.5, 110.4];
             let zoom = 8;
 
-            if (locations.length > 0) {
+            if (locations && locations.length > 0) {
                 center = [locations[0].lat, locations[0].lng];
                 zoom = 12;
             }
@@ -741,6 +765,8 @@ function attendanceApp() {
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(this.map);
+
+            if (!locations || locations.length === 0) return;
 
             locations.forEach(loc => {
                 // Circle for radius
@@ -753,7 +779,7 @@ function attendanceApp() {
 
                 // Marker
                 const icon = L.divIcon({
-                    html: `<div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg border-2 border-white">${loc.today_count}</div>`,
+                    html: `<div style="width:40px;height:40px;background:linear-gradient(135deg,#10b981,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;box-shadow:0 4px 6px rgba(0,0,0,0.3);border:2px solid white;">${loc.today_count}</div>`,
                     className: '',
                     iconSize: [40, 40],
                     iconAnchor: [20, 20]
@@ -763,17 +789,17 @@ function attendanceApp() {
                 
                 // Popup content
                 let staffList = loc.staff.map(s => 
-                    `<div class="flex items-center justify-between py-1">
+                    `<div style="display:flex;justify-content:space-between;padding:4px 0;">
                         <span>${s.name}</span>
-                        <span class="${s.is_late ? 'text-amber-600' : 'text-emerald-600'}">${s.time}</span>
+                        <span style="color:${s.is_late ? '#d97706' : '#10b981'}">${s.time}</span>
                     </div>`
-                ).join('') || '<p class="text-gray-400">Belum ada kehadiran</p>';
+                ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
 
                 marker.bindPopup(`
-                    <div class="min-w-[200px]">
-                        <h4 class="font-bold text-gray-900">${loc.name}</h4>
-                        <p class="text-sm text-gray-500 mb-2">${loc.branch}</p>
-                        <div class="text-sm">${staffList}</div>
+                    <div style="min-width:200px">
+                        <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
+                        <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
+                        <div style="font-size:13px;">${staffList}</div>
                     </div>
                 `);
             });
@@ -790,9 +816,13 @@ function attendanceApp() {
 function toastNotification() {
     return {
         toasts: [],
-        show(data) {
+        show(detail) {
+            console.log('Toast received:', detail);
             const id = Date.now();
-            const toast = { id, type: data[0]?.type || 'info', message: data[0]?.message || '', visible: true };
+            // Livewire 3 sends named parameters as object properties
+            const type = detail.type || 'info';
+            const message = detail.message || '';
+            const toast = { id, type, message, visible: true };
             this.toasts.push(toast);
             setTimeout(() => this.dismiss(id), 4000);
         },
