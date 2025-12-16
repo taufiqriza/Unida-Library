@@ -129,22 +129,23 @@ class LibraryStatistics extends Component
             'total_subjects' => Subject::whereHas('books', fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q)->count(),
         ];
 
-        // Branch Stats
+        // Branch Stats - Always fetch for 'all' view
         $branchStats = [];
         if (!$branchId) {
-            $branchStats = Branch::withCount(['books', 'items', 'members'])
-                ->get()
-                ->map(fn($branch) => [
+            $branches = Branch::orderBy('name')->get();
+            foreach ($branches as $branch) {
+                $branchStats[] = [
                     'id' => $branch->id,
                     'name' => $branch->name,
-                    'code' => $branch->code,
-                    'titles' => $branch->books_count,
-                    'items' => $branch->items_count,
-                    'members' => $branch->members_count,
+                    'code' => $branch->code ?? substr($branch->name, 0, 3),
+                    'titles' => Book::where('branch_id', $branch->id)->count(),
+                    'items' => Item::where('branch_id', $branch->id)->count(),
+                    'members' => Member::where('branch_id', $branch->id)->count(),
                     'loans_month' => Loan::where('branch_id', $branch->id)
                         ->whereMonth('loan_date', now()->month)
                         ->whereYear('loan_date', now()->year)->count(),
-                ])->toArray();
+                ];
+            }
         }
 
         // Top Categories (Classification)
@@ -179,16 +180,18 @@ class LibraryStatistics extends Component
 
         // Collection Classification Stats
         $byMediaType = MediaType::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
-            ->having('books_count', '>', 0)
-            ->orderByDesc('books_count')
             ->get()
+            ->filter(fn($m) => $m->books_count > 0)
+            ->sortByDesc('books_count')
+            ->values()
             ->map(fn($m) => ['id' => $m->id, 'name' => $m->name, 'count' => $m->books_count])
             ->toArray();
 
         $byCollectionType = CollectionType::withCount(['items' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
-            ->having('items_count', '>', 0)
-            ->orderByDesc('items_count')
             ->get()
+            ->filter(fn($c) => $c->items_count > 0)
+            ->sortByDesc('items_count')
+            ->values()
             ->map(fn($c) => ['id' => $c->id, 'name' => $c->name, 'count' => $c->items_count])
             ->toArray();
 
@@ -213,10 +216,11 @@ class LibraryStatistics extends Component
             ->toArray();
 
         $byPublisher = Publisher::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
-            ->having('books_count', '>', 0)
-            ->orderByDesc('books_count')
-            ->limit(10)
             ->get()
+            ->filter(fn($p) => $p->books_count > 0)
+            ->sortByDesc('books_count')
+            ->take(10)
+            ->values()
             ->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'count' => $p->books_count])
             ->toArray();
 
@@ -231,18 +235,20 @@ class LibraryStatistics extends Component
             ->toArray();
 
         $bySubject = Subject::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
-            ->having('books_count', '>', 0)
-            ->orderByDesc('books_count')
-            ->limit(12)
             ->get()
+            ->filter(fn($s) => $s->books_count > 0)
+            ->sortByDesc('books_count')
+            ->take(12)
+            ->values()
             ->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'count' => $s->books_count])
             ->toArray();
 
         $byAuthor = Author::withCount(['books' => fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q])
-            ->having('books_count', '>', 0)
-            ->orderByDesc('books_count')
-            ->limit(12)
             ->get()
+            ->filter(fn($a) => $a->books_count > 0)
+            ->sortByDesc('books_count')
+            ->take(12)
+            ->values()
             ->map(fn($a) => ['id' => $a->id, 'name' => $a->name, 'count' => $a->books_count])
             ->toArray();
 
