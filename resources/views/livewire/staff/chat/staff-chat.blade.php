@@ -46,7 +46,7 @@
                                     {{ $otherUser->getInitials() }}
                                 </div>
                             @endif
-                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-blue-700 {{ $otherUser->is_online ? 'bg-emerald-400' : 'bg-gray-400' }}"></span>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-blue-700 {{ $otherUser->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-400' }}"></span>
                         </div>
                         <div>
                             <p class="text-white font-semibold text-sm">{{ $otherUser->name }}</p>
@@ -559,7 +559,7 @@
                             {{ $user->getInitials() }}
                         </div>
                     @endif
-                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $user->is_online ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $user->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
                 </div>
                 <div class="flex-1 min-w-0 text-left">
                     <p class="font-semibold text-gray-900 text-sm">{{ $user->name }}</p>
@@ -578,10 +578,10 @@
                             };
                         @endphp
                         <span class="px-1.5 py-0.5 {{ $roleColor }} rounded text-[10px] font-medium">{{ $roleLabel }}</span>
-                        @if($user->is_online)
+                        @if($user->isReallyOnline())
                         <span class="text-emerald-500 text-[10px]">● Online</span>
-                        @elseif($user->last_seen_at)
-                        <span class="text-[10px]">{{ $user->last_seen_at->diffForHumans() }}</span>
+                        @else
+                        <span class="text-[10px] text-gray-400">{{ $user->getOnlineStatusText() }}</span>
                         @endif
                     </p>
                 </div>
@@ -663,7 +663,7 @@
                             {{ $otherUser->getInitials() }}
                         </div>
                     @endif
-                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $otherUser->is_online ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $otherUser->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
                 </div>
                 <div class="flex-1 min-w-0 text-left">
                     <div class="flex items-center justify-between">
@@ -782,43 +782,129 @@
 
             @elseif($activeTab === 'branches')
             {{-- =================================================== --}}
-            {{-- BRANCHES TAB --}}
+            {{-- BRANCHES TAB - Premium Compact Design --}}
             {{-- =================================================== --}}
-            <div class="p-3">
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($this->branches as $branch)
-                    <button wire:click="selectBranch({{ $branch->id }})" 
-                            class="p-4 bg-gradient-to-br from-slate-50 to-white border border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-md transition-all text-left group">
-                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition shadow-lg shadow-blue-500/20">
-                            <i class="fas fa-building text-white"></i>
-                        </div>
-                        <p class="font-semibold text-gray-900 text-sm line-clamp-2 leading-tight">{{ $branch->name }}</p>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <i class="fas fa-users mr-1"></i>{{ $branch->users_count }} staff
-                        </p>
-                    </button>
-                    @endforeach
-                    
-                    {{-- No Branch Staff --}}
-                    @php
-                        $noBranchCount = \App\Models\User::whereNull('branch_id')
-                            ->where('id', '!=', auth()->id())
-                            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff'])
-                            ->count();
-                    @endphp
-                    @if($noBranchCount > 0)
-                    <button wire:click="$set('activeTab', 'contacts')" 
-                            class="p-4 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-xl hover:border-amber-300 hover:shadow-md transition-all text-left group">
-                        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-2 group-hover:scale-110 transition shadow-lg shadow-amber-500/20">
-                            <i class="fas fa-user-shield text-white"></i>
-                        </div>
-                        <p class="font-semibold text-gray-900 text-sm">Super Admin</p>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <i class="fas fa-users mr-1"></i>{{ $noBranchCount }} staff
-                        </p>
-                    </button>
-                    @endif
+            <div class="p-3 space-y-2">
+                {{-- Search Branch --}}
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input wire:model.live.debounce.300ms="branchSearch" type="text" placeholder="Cari cabang..." 
+                           class="w-full pl-8 pr-4 py-2 bg-gray-100 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/30">
                 </div>
+
+                {{-- Featured Branch Cards with Nav Arrows --}}
+                <div x-data="{ 
+                    scroll: null,
+                    scrollLeft() { this.scroll.scrollBy({ left: -200, behavior: 'smooth' }) },
+                    scrollRight() { this.scroll.scrollBy({ left: 200, behavior: 'smooth' }) }
+                }" class="relative group/slider">
+                    {{-- Left Arrow --}}
+                    <button @click="scrollLeft()" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white/90 hover:bg-white shadow-lg rounded-full flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity border">
+                        <i class="fas fa-chevron-left text-gray-600 text-xs"></i>
+                    </button>
+                    
+                    {{-- Cards Container --}}
+                    <div x-ref="scroll" x-init="scroll = $refs.scroll" 
+                         class="flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-hide scroll-smooth" style="-webkit-overflow-scrolling: touch;">
+                        @php
+                            $filteredBranches = $this->branches;
+                            if (!empty($branchSearch)) {
+                                $filteredBranches = $filteredBranches->filter(fn($b) => str_contains(strtolower($b->name), strtolower($branchSearch)));
+                            }
+                        @endphp
+                        @forelse($filteredBranches as $index => $branch)
+                        @php
+                            $gradients = [
+                                'from-blue-500 to-indigo-600',
+                                'from-emerald-500 to-teal-600',
+                                'from-violet-500 to-purple-600',
+                                'from-rose-500 to-pink-600',
+                                'from-amber-500 to-orange-600',
+                                'from-cyan-500 to-blue-600',
+                            ];
+                            $gradient = $gradients[$index % count($gradients)];
+                            $onlineCount = $branch->users->filter(fn($u) => $u->isReallyOnline())->count();
+                        @endphp
+                        <button wire:click="selectBranch({{ $branch->id }})" 
+                                class="flex-shrink-0 w-24 group">
+                            <div class="bg-gradient-to-br {{ $gradient }} rounded-xl p-2.5 h-24 flex flex-col justify-between shadow-md group-hover:shadow-lg group-hover:scale-[1.03] transition-all duration-200">
+                                {{-- Icon --}}
+                                <div class="w-7 h-7 bg-white/25 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-building text-white text-xs"></i>
+                                </div>
+                                {{-- Info --}}
+                                <div>
+                                    <p class="font-semibold text-white text-[11px] leading-tight line-clamp-2">{{ $branch->name }}</p>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        <span class="text-white/80 text-[9px]">
+                                            <i class="fas fa-users"></i> {{ $branch->users_count }}
+                                        </span>
+                                        @if($onlineCount > 0)
+                                        <span class="text-emerald-300 text-[9px] flex items-center gap-0.5">
+                                            <span class="w-1 h-1 rounded-full bg-emerald-400"></span>{{ $onlineCount }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </button>
+                        @empty
+                        <div class="flex-1 text-center py-4 text-gray-400 text-sm">
+                            <i class="fas fa-building-circle-xmark text-xl mb-1"></i>
+                            <p>Cabang tidak ditemukan</p>
+                        </div>
+                        @endforelse
+                    </div>
+                    
+                    {{-- Right Arrow --}}
+                    <button @click="scrollRight()" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 bg-white/90 hover:bg-white shadow-lg rounded-full flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity border">
+                        <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                    </button>
+                </div>
+                
+                {{-- Quick Access List --}}
+                <div class="bg-gradient-to-br from-slate-50 to-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="px-3 py-1.5 border-b border-gray-100 bg-slate-50/50 flex items-center justify-between">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Akses Cepat</p>
+                        <span class="text-[10px] text-gray-400">{{ $this->branches->count() }} cabang</span>
+                    </div>
+                    <div class="divide-y divide-gray-50 max-h-36 overflow-y-auto">
+                        @foreach($filteredBranches->take(5) as $branch)
+                        <button wire:click="selectBranch({{ $branch->id }})" 
+                                class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50/50 transition group">
+                            <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <i class="fas fa-building text-white text-[10px]"></i>
+                            </div>
+                            <div class="flex-1 min-w-0 text-left">
+                                <p class="text-xs font-medium text-gray-800 truncate">{{ $branch->name }}</p>
+                            </div>
+                            <span class="text-[10px] text-gray-400">{{ $branch->users_count }}</span>
+                            <i class="fas fa-chevron-right text-gray-300 text-[10px] group-hover:text-blue-500 transition"></i>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+                
+                {{-- Super Admin / No Branch --}}
+                @php
+                    $noBranchCount = \App\Models\User::whereNull('branch_id')
+                        ->where('id', '!=', auth()->id())
+                        ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff'])
+                        ->count();
+                @endphp
+                @if($noBranchCount > 0)
+                <button wire:click="$set('activeTab', 'contacts')" 
+                        class="w-full p-2.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-xl hover:border-amber-300 hover:shadow transition-all group flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow">
+                        <i class="fas fa-crown text-white text-xs"></i>
+                    </div>
+                    <div class="flex-1 text-left">
+                        <p class="font-medium text-gray-800 text-xs">Super Admin & Pusat</p>
+                        <p class="text-[10px] text-amber-600">{{ $noBranchCount }} staff</p>
+                    </div>
+                    <i class="fas fa-chevron-right text-amber-400 text-xs"></i>
+                </button>
+                @endif
             </div>
 
             @else
@@ -850,7 +936,7 @@
                                     {{ $user->getInitials() }}
                                 </div>
                             @endif
-                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white {{ $user->is_online ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white {{ $user->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
                         </div>
                         <div class="flex-1 min-w-0 text-left">
                             <p class="font-medium text-gray-900 text-sm">{{ $user->name }}</p>
@@ -869,10 +955,10 @@
                                     };
                                 @endphp
                                 <span class="px-1.5 py-0.5 {{ $roleColor }} rounded text-[10px] font-medium">{{ $roleLabel }}</span>
-                                @if($user->is_online)
-                                <span class="text-emerald-500">Online</span>
-                                @elseif($user->last_seen_at)
-                                <span>{{ $user->last_seen_at->diffForHumans() }}</span>
+                                @if($user->isReallyOnline())
+                                <span class="text-emerald-500 text-[10px]">● Online</span>
+                                @else
+                                <span class="text-[10px] text-gray-400">{{ $user->getOnlineStatusText() }}</span>
                                 @endif
                             </p>
                         </div>

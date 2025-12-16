@@ -52,6 +52,9 @@ class StaffChat extends Component
     // Sound & Notification
     public $lastMessageCount = 0;
     public $soundEnabled = true;
+    
+    // Branch Search
+    public $branchSearch = '';
 
     protected ChatService $chatService;
 

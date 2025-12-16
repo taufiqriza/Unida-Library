@@ -120,6 +120,34 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Check if user is really online (last seen within 5 minutes)
+     */
+    public function isReallyOnline(): bool
+    {
+        if (!$this->last_seen_at) {
+            return false;
+        }
+        
+        return $this->last_seen_at->diffInMinutes(now()) < 5;
+    }
+
+    /**
+     * Get online status text
+     */
+    public function getOnlineStatusText(): string
+    {
+        if ($this->isReallyOnline()) {
+            return 'Online';
+        }
+        
+        if ($this->last_seen_at) {
+            return $this->last_seen_at->diffForHumans();
+        }
+        
+        return 'Tidak aktif';
+    }
+
+    /**
      * Get the user's avatar URL
      * Returns real photo if available, otherwise generates initials-based avatar
      */
