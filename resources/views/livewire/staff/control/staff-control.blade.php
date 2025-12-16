@@ -365,7 +365,15 @@
                     </button>
                 </div>
                 @else
-                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-between">
+                    @if($selectedUser->id !== auth()->id())
+                    <button wire:click="confirmDeleteUser({{ $selectedUser->id }})" 
+                            class="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 font-medium rounded-xl transition flex items-center gap-2">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                    @else
+                    <div></div>
+                    @endif
                     <button wire:click="closeModal" class="px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-xl transition">
                         Tutup
                     </button>
@@ -470,13 +478,36 @@
         </div>
     </div>
     @endif
+
+    {{-- Delete Confirmation Modal --}}
+    @if($showDeleteConfirm && $userToDelete)
+    <div class="fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-trash text-red-500 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus User?</h3>
+            <p class="text-gray-500 text-sm mb-1">User berikut akan dihapus permanen:</p>
+            <p class="font-semibold text-gray-900 mb-4">{{ $userToDelete->name }}</p>
+            <p class="text-xs text-gray-400 mb-4">{{ $userToDelete->email }}</p>
+            <div class="flex gap-3">
+                <button wire:click="cancelDelete" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">
+                    Batal
+                </button>
+                <button wire:click="deleteUser" class="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition flex items-center justify-center gap-2">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
         </div>
     </template>
 
-    {{-- Elegant Toast Notifications --}}
+    {{-- Elegant Toast Notifications - TOP RIGHT --}}
     <div x-data="toastNotification()" 
          x-on:notify.window="show($event.detail)"
-         class="fixed bottom-4 right-4 z-[999999] flex flex-col gap-2">
+         class="fixed top-4 right-4 z-[999999] flex flex-col gap-2">
         <template x-for="toast in toasts" :key="toast.id">
             <div x-show="toast.visible"
                  x-transition:enter="transform transition ease-out duration-300"

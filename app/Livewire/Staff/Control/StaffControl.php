@@ -201,6 +201,48 @@ class StaffControl extends Component
         $this->dispatch('notify', type: 'success', message: 'Status user diperbarui');
     }
 
+    public $showDeleteConfirm = false;
+    public $userToDelete = null;
+
+    public function confirmDeleteUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) return;
+        
+        // Cannot delete yourself
+        if ($user->id === auth()->id()) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak dapat menghapus akun sendiri');
+            return;
+        }
+        
+        // Authorization check
+        if (auth()->user()->role !== 'super_admin' && $user->branch_id !== auth()->user()->branch_id) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses untuk menghapus user ini');
+            return;
+        }
+        
+        $this->userToDelete = $user;
+        $this->showDeleteConfirm = true;
+    }
+
+    public function cancelDelete()
+    {
+        $this->showDeleteConfirm = false;
+        $this->userToDelete = null;
+    }
+
+    public function deleteUser()
+    {
+        if (!$this->userToDelete) return;
+        
+        $name = $this->userToDelete->name;
+        $this->userToDelete->delete();
+        
+        $this->dispatch('notify', type: 'success', message: "User {$name} berhasil dihapus");
+        $this->cancelDelete();
+        $this->closeModal();
+    }
+
     public function getStatsProperty()
     {
         $isSuperAdmin = auth()->user()->role === 'super_admin';
