@@ -47,101 +47,105 @@
     </div>
 
     @if($mainTab === 'staff')
-    {{-- Staff Management --}}
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    {{-- Staff Management - Compact Stats --}}
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-2">
         <button wire:click="setTab('all')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'all' ? 'border-violet-500 ring-2 ring-violet-500/20' : 'border-gray-100' }}">
-            <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center mb-2">
-                <i class="fas fa-users text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-users text-white text-sm"></i>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['staff']['total'] }}</p>
-            <p class="text-xs text-gray-500">Semua</p>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['staff']['total'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Semua</p>
+            </div>
         </button>
         
         @if($isSuperAdmin)
         <button wire:click="setTab('super_admin')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'super_admin' ? 'border-red-500 ring-2 ring-red-500/20' : 'border-gray-100' }}">
-            <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center mb-2">
-                <i class="fas fa-crown text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-red-500 to-rose-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-crown text-white text-sm"></i>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['staff']['super_admin'] }}</p>
-            <p class="text-xs text-gray-500">Super Admin</p>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['staff']['super_admin'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Super Admin</p>
+            </div>
         </button>
         @endif
         
         <button wire:click="setTab('admin')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'admin' ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-gray-100' }}">
-            <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center mb-2">
-                <i class="fas fa-user-shield text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user-shield text-white text-sm"></i>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['staff']['admin'] }}</p>
-            <p class="text-xs text-gray-500">Admin</p>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['staff']['admin'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Admin</p>
+            </div>
         </button>
         
         <button wire:click="setTab('librarian')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'librarian' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-gray-100' }}">
-            <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center mb-2">
-                <i class="fas fa-book-reader text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-book-reader text-white text-sm"></i>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['staff']['librarian'] }}</p>
-            <p class="text-xs text-gray-500">Pustakawan</p>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['staff']['librarian'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Pustakawan</p>
+            </div>
         </button>
         
         <button wire:click="setTab('staff')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'staff' ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-100' }}">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-2">
-                <i class="fas fa-user text-white"></i>
+            <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user text-white text-sm"></i>
             </div>
-            <p class="text-2xl font-bold text-gray-900">{{ $stats['staff']['staff'] }}</p>
-            <p class="text-xs text-gray-500">Staff</p>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['staff']['staff'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Staff</p>
+            </div>
         </button>
     </div>
 
     @else
-    {{-- Approval Stats --}}
-    <div class="grid grid-cols-3 gap-4">
+    {{-- Approval Stats - Compact --}}
+    <div class="grid grid-cols-3 gap-2">
         <button wire:click="setTab('pending')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'pending' ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-gray-100' }}">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-clock text-white text-lg"></i>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $stats['approval']['pending'] }}</p>
-                    <p class="text-sm text-gray-500">Menunggu</p>
-                </div>
+            <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-clock text-white"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['approval']['pending'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Menunggu</p>
             </div>
         </button>
         <button wire:click="setTab('approved')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'approved' ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-gray-100' }}">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-check-circle text-white text-lg"></i>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $stats['approval']['approved'] }}</p>
-                    <p class="text-sm text-gray-500">Disetujui</p>
-                </div>
+            <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check-circle text-white"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['approval']['approved'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Disetujui</p>
             </div>
         </button>
         <button wire:click="setTab('rejected')" 
-                class="bg-white rounded-xl p-4 border-2 transition hover:shadow-md text-left
+                class="bg-white rounded-xl px-3 py-2.5 border-2 transition hover:shadow-md flex items-center justify-between
                 {{ $activeTab === 'rejected' ? 'border-red-500 ring-2 ring-red-500/20' : 'border-gray-100' }}">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-rose-500 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-times-circle text-white text-lg"></i>
-                </div>
-                <div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $stats['approval']['rejected'] }}</p>
-                    <p class="text-sm text-gray-500">Ditolak</p>
-                </div>
+            <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-times-circle text-white"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-xl font-bold text-gray-900">{{ $stats['approval']['rejected'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase">Ditolak</p>
             </div>
         </button>
     </div>
@@ -267,9 +271,12 @@
         @endif
     </div>
 
-    {{-- Detail Modal --}}
-    @if($showModal && $selectedUser)
-    <div class="fixed inset-0 z-[99999] overflow-hidden" x-data x-transition>
+    {{-- Modals teleported to body for proper z-index --}}
+    <template x-teleport="body">
+        <div style="position: relative; z-index: 99999;">
+            {{-- Detail Modal --}}
+            @if($showModal && $selectedUser)
+            <div class="fixed inset-0 overflow-hidden" x-data x-transition>
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeModal"></div>
         <div class="fixed inset-0 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
@@ -463,6 +470,8 @@
         </div>
     </div>
     @endif
+        </div>
+    </template>
 
     <script>
         document.addEventListener('livewire:initialized', () => {
