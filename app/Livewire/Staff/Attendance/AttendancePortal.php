@@ -547,7 +547,19 @@ class AttendancePortal extends Component
 
     public function render()
     {
-        return view('livewire.staff.attendance.attendance-portal')
+        return view('livewire.staff.attendance.attendance-portal', [
+            'isSuperAdmin' => $this->isSuperAdmin,
+            'isAdmin' => $this->isAdmin,
+            'branches' => $this->branches,
+            'locations' => $this->locations,
+            'allLocations' => $this->allLocations,
+            'todayStatus' => $this->todayStatus,
+            'weekSummary' => $this->weekSummary,
+            'history' => $this->history,
+            'stats' => $this->stats,
+            'users' => $this->users,
+            'mapData' => $this->mapData,
+        ])
             ->extends('staff.layouts.app')
             ->section('content');
     }
