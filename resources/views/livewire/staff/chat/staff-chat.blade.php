@@ -50,7 +50,14 @@
                         </div>
                         <div>
                             <p class="text-white font-semibold text-sm">{{ $otherUser->name }}</p>
-                            <p class="text-blue-200 text-xs">{{ $otherUser->branch?->name ?? 'Admin' }}</p>
+                            <p class="text-blue-200 text-xs flex items-center gap-1">
+                                @if($otherUser->isReallyOnline())
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                <span class="text-emerald-300">Online</span>
+                                @else
+                                <span>{{ $otherUser->getOnlineStatusText() }}</span>
+                                @endif
+                            </p>
                         </div>
                         @endif
                     @endif
@@ -806,13 +813,7 @@
                     {{-- Cards Container --}}
                     <div x-ref="scroll" x-init="scroll = $refs.scroll" 
                          class="flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-hide scroll-smooth" style="-webkit-overflow-scrolling: touch;">
-                        @php
-                            $filteredBranches = $this->branches;
-                            if (!empty($branchSearch)) {
-                                $filteredBranches = $filteredBranches->filter(fn($b) => str_contains(strtolower($b->name), strtolower($branchSearch)));
-                            }
-                        @endphp
-                        @forelse($filteredBranches as $index => $branch)
+                        @forelse($this->branches as $index => $branch)
                         @php
                             $gradients = [
                                 'from-blue-500 to-indigo-600',
@@ -869,7 +870,7 @@
                         <span class="text-[10px] text-gray-400">{{ $this->branches->count() }} cabang</span>
                     </div>
                     <div class="divide-y divide-gray-50 max-h-36 overflow-y-auto">
-                        @foreach($filteredBranches->take(5) as $branch)
+                        @foreach($this->branches->take(5) as $branch)
                         <button wire:click="selectBranch({{ $branch->id }})" 
                                 class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50/50 transition group">
                             <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">

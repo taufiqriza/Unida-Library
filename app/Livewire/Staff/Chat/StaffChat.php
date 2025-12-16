@@ -532,10 +532,19 @@ class StaffChat extends Component
 
     public function getBranchesProperty()
     {
-        return Branch::withCount(['users' => function($q) {
+        return Branch::with(['users' => function($q) {
+            $q->where('id', '!=', auth()->id())
+              ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+              ->select(['id', 'branch_id', 'last_seen_at']);
+        }])
+        ->withCount(['users' => function($q) {
             $q->where('id', '!=', auth()->id())
               ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan']);
-        }])->orderByDesc('is_main')->orderBy('name')->get();
+        }])
+        ->when($this->branchSearch, fn($q) => $q->where('name', 'like', "%{$this->branchSearch}%"))
+        ->orderByDesc('is_main')
+        ->orderBy('name')
+        ->get();
     }
 
     public function getBranchContactsProperty()

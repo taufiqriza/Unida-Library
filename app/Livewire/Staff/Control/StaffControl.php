@@ -3,22 +3,60 @@
 namespace App\Livewire\Staff\Control;
 
 use App\Models\User;
+use App\Models\Branch;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Hash;
 
 class StaffControl extends Component
 {
     use WithPagination;
 
-    public $activeTab = 'pending';
+    public $mainTab = 'staff'; // 'staff' or 'approval'
+    public $activeTab = 'all'; // for staff: all, super_admin, admin, librarian, staff
     public $search = '';
     public $selectedUser = null;
     public $showModal = false;
     public $rejectionReason = '';
+    
+    // Create User Form
+    public $showCreateModal = false;
+    public $createForm = [
+        'name' => '',
+        'email' => '',
+        'password' => '',
+        'branch_id' => '',
+        'role' => 'staff',
+        'is_active' => true,
+    ];
 
-    protected $queryString = ['activeTab', 'search'];
+    protected $queryString = ['mainTab', 'activeTab', 'search'];
+
+    protected $rules = [
+        'createForm.name' => 'required|string|max:255',
+        'createForm.email' => 'required|email|unique:users,email',
+        'createForm.password' => 'required|min:8',
+        'createForm.branch_id' => 'nullable|exists:branches,id',
+        'createForm.role' => 'required|in:super_admin,admin,librarian,staff,pustakawan',
+    ];
+
+    protected $messages = [
+        'createForm.name.required' => 'Nama wajib diisi',
+        'createForm.email.required' => 'Email wajib diisi',
+        'createForm.email.email' => 'Format email tidak valid',
+        'createForm.email.unique' => 'Email sudah terdaftar',
+        'createForm.password.required' => 'Password wajib diisi',
+        'createForm.password.min' => 'Password minimal 8 karakter',
+    ];
 
     public function updatingSearch() { $this->resetPage(); }
+
+    public function setMainTab($tab)
+    {
+        $this->mainTab = $tab;
+        $this->activeTab = $tab === 'staff' ? 'all' : 'pending';
+        $this->resetPage();
+    }
 
     public function setTab($tab)
     {
@@ -26,11 +64,62 @@ class StaffControl extends Component
         $this->resetPage();
     }
 
+    public function openCreateModal()
+    {
+        $this->createForm = [
+            'name' => '',
+            'email' => '',
+            'password' => '',
+            'branch_id' => auth()->user()->branch_id ?? '',
+            'role' => 'staff',
+            'is_active' => true,
+        ];
+        $this->showCreateModal = true;
+    }
+
+    public function closeCreateModal()
+    {
+        $this->showCreateModal = false;
+        $this->resetValidation();
+    }
+
+    public function createUser()
+    {
+        $this->validate();
+        
+        $currentUser = auth()->user();
+
+        // Authorization check
+        if ($currentUser->role !== 'super_admin') {
+            // Admin cabang hanya bisa membuat staff saja
+            if (!in_array($this->createForm['role'], ['librarian', 'staff', 'pustakawan'])) {
+                $this->dispatch('notify', type: 'error', message: 'Anda hanya dapat membuat role Staff atau Pustakawan');
+                return;
+            }
+            // Wajib branch_id sama dengan admin
+            $this->createForm['branch_id'] = $currentUser->branch_id;
+        }
+
+        User::create([
+            'name' => $this->createForm['name'],
+            'email' => $this->createForm['email'],
+            'password' => Hash::make($this->createForm['password']),
+            'branch_id' => $this->createForm['branch_id'] ?: null,
+            'role' => $this->createForm['role'],
+            'is_active' => $this->createForm['is_active'],
+            'status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+        ]);
+
+        $this->dispatch('notify', type: 'success', message: 'User berhasil dibuat');
+        $this->closeCreateModal();
+    }
+
     public function viewUser($id)
     {
         $query = User::with('branch');
         
-        // Authorization: Non-super admin can only view users from their branch
         if (auth()->user()->role !== 'super_admin') {
             $query->where('branch_id', auth()->user()->branch_id);
         }
@@ -57,7 +146,6 @@ class StaffControl extends Component
     {
         if (!$this->selectedUser) return;
         
-        // Authorization check: Non-super admin can only approve users from their branch
         if (auth()->user()->role !== 'super_admin' && 
             $this->selectedUser->branch_id !== auth()->user()->branch_id) {
             $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses untuk menyetujui staff ini');
@@ -79,7 +167,6 @@ class StaffControl extends Component
     {
         if (!$this->selectedUser) return;
         
-        // Authorization check: Non-super admin can only reject users from their branch
         if (auth()->user()->role !== 'super_admin' && 
             $this->selectedUser->branch_id !== auth()->user()->branch_id) {
             $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses untuk menolak staff ini');
@@ -100,37 +187,119 @@ class StaffControl extends Component
         $this->closeModal();
     }
 
-    public function getStatsProperty()
+    public function toggleUserActive($id)
     {
-        $query = User::whereIn('role', ['staff', 'librarian']);
+        $user = User::find($id);
+        if (!$user) return;
         
-        // Filter by branch for non-super admin
-        if (auth()->user()->role !== 'super_admin') {
-            $query->where('branch_id', auth()->user()->branch_id);
+        if (auth()->user()->role !== 'super_admin' && $user->branch_id !== auth()->user()->branch_id) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak memiliki akses');
+            return;
         }
 
+        $user->update(['is_active' => !$user->is_active]);
+        $this->dispatch('notify', type: 'success', message: 'Status user diperbarui');
+    }
+
+    public function getStatsProperty()
+    {
+        $isSuperAdmin = auth()->user()->role === 'super_admin';
+        $branchId = auth()->user()->branch_id;
+
+        // Staff stats
+        $staffQuery = User::whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan']);
+        if (!$isSuperAdmin) {
+            $staffQuery->where('branch_id', $branchId);
+        }
+        
+        $staffStats = [
+            'total' => (clone $staffQuery)->count(),
+            'super_admin' => $isSuperAdmin ? User::where('role', 'super_admin')->count() : 0,
+            'admin' => (clone $staffQuery)->where('role', 'admin')->count(),
+            'librarian' => (clone $staffQuery)->whereIn('role', ['librarian', 'pustakawan'])->count(),
+            'staff' => (clone $staffQuery)->where('role', 'staff')->count(),
+        ];
+
+        // Approval stats
+        $approvalQuery = User::whereIn('role', ['staff', 'librarian', 'pustakawan']);
+        if (!$isSuperAdmin) {
+            $approvalQuery->where('branch_id', $branchId);
+        }
+
+        $approvalStats = [
+            'pending' => (clone $approvalQuery)->where('status', 'pending')->count(),
+            'approved' => (clone $approvalQuery)->where('status', 'approved')->count(),
+            'rejected' => (clone $approvalQuery)->where('status', 'rejected')->count(),
+        ];
+
         return [
-            'pending' => (clone $query)->where('status', 'pending')->count(),
-            'approved' => (clone $query)->where('status', 'approved')->count(),
-            'rejected' => (clone $query)->where('status', 'rejected')->count(),
+            'staff' => $staffStats,
+            'approval' => $approvalStats,
+        ];
+    }
+
+    public function getBranchesProperty()
+    {
+        return Branch::orderBy('name')->get(['id', 'name']);
+    }
+
+    public function getRolesProperty()
+    {
+        $currentUser = auth()->user();
+        
+        if ($currentUser->role === 'super_admin') {
+            return [
+                'super_admin' => 'Super Admin',
+                'admin' => 'Admin Cabang',
+                'librarian' => 'Pustakawan',
+                'staff' => 'Staff',
+            ];
+        }
+        
+        // Admin cabang hanya bisa buat staff level bawah
+        return [
+            'librarian' => 'Pustakawan',
+            'staff' => 'Staff',
         ];
     }
 
     public function render()
     {
-        $query = User::with('branch')
-            ->whereIn('role', ['staff', 'librarian'])
-            ->where('status', $this->activeTab)
-            ->when($this->search, fn($q) => $q->where('name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%"));
+        $isSuperAdmin = auth()->user()->role === 'super_admin';
+        $branchId = auth()->user()->branch_id;
 
-        // Filter by branch for non-super admin
-        if (auth()->user()->role !== 'super_admin') {
-            $query->where('branch_id', auth()->user()->branch_id);
+        if ($this->mainTab === 'staff') {
+            // Staff list
+            $query = User::with('branch')
+                ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+                ->when(!$isSuperAdmin, fn($q) => $q->where('branch_id', $branchId))
+                ->when($this->activeTab !== 'all', fn($q) => 
+                    $this->activeTab === 'librarian' 
+                        ? $q->whereIn('role', ['librarian', 'pustakawan'])
+                        : $q->where('role', $this->activeTab)
+                )
+                ->when($this->search, fn($q) => 
+                    $q->where(fn($q) => $q->where('name', 'like', "%{$this->search}%")
+                        ->orWhere('email', 'like', "%{$this->search}%"))
+                );
+        } else {
+            // Approval list
+            $query = User::with('branch')
+                ->whereIn('role', ['staff', 'librarian', 'pustakawan'])
+                ->where('status', $this->activeTab)
+                ->when(!$isSuperAdmin, fn($q) => $q->where('branch_id', $branchId))
+                ->when($this->search, fn($q) => 
+                    $q->where(fn($q) => $q->where('name', 'like', "%{$this->search}%")
+                        ->orWhere('email', 'like', "%{$this->search}%"))
+                );
         }
 
         return view('livewire.staff.control.staff-control', [
-            'users' => $query->latest()->paginate(10),
+            'users' => $query->latest()->paginate(12),
             'stats' => $this->stats,
+            'branches' => $this->branches,
+            'roles' => $this->roles,
+            'isSuperAdmin' => $isSuperAdmin,
         ])->extends('staff.layouts.app')->section('content');
     }
 }

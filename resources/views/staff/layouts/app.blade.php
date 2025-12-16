@@ -67,12 +67,13 @@
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
             ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
-            ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']],
         ];
-        // Add Control menu for admin only
+        // Add Control menu for admin only (before Profil at the bottom)
         if (in_array($user->role, ['super_admin', 'admin'])) {
-            array_splice($navItems, 9, 0, [['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']]]);
+            $navItems[] = ['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']];
         }
+        // Profil always at the end
+        $navItems[] = ['label' => 'Profil', 'icon' => 'fa-user-circle', 'route' => 'staff.profile', 'patterns' => ['staff.profile*']];
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
