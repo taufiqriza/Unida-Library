@@ -30,73 +30,123 @@ class StaffDashboard extends Component
     {
         $branchId = $this->getBranchId();
 
-        $this->stats = [
-            'loans_today' => Loan::where('branch_id', $branchId)->whereDate('loan_date', today())->count(),
-            'returns_today' => Loan::where('branch_id', $branchId)->whereDate('return_date', today())->count(),
-            'overdue' => Loan::where('branch_id', $branchId)->where('is_returned', false)->where('due_date', '<', now())->count(),
-            'unpaid_fines' => Fine::whereHas('loan', fn($q) => $q->where('branch_id', $branchId))->where('is_paid', false)->sum('amount'),
-            'total_books' => Book::where('branch_id', $branchId)->count(),
-            'total_items' => Item::where('branch_id', $branchId)->count(),
-            'total_members' => Member::where('branch_id', $branchId)->count(),
-            'active_loans' => Loan::where('branch_id', $branchId)->where('is_returned', false)->count(),
-        ];
+        // Cache stats for 2 minutes
+        $this->stats = cache()->remember("dashboard_stats_{$branchId}", 120, function () use ($branchId) {
+            return [
+                'loans_today' => Loan::where('branch_id', $branchId)->whereDate('loan_date', today())->count(),
+                'returns_today' => Loan::where('branch_id', $branchId)->whereDate('return_date', today())->count(),
+                'overdue' => Loan::where('branch_id', $branchId)->where('is_returned', false)->where('due_date', '<', now())->count(),
+                'unpaid_fines' => Fine::whereHas('loan', fn($q) => $q->where('branch_id', $branchId))->where('is_paid', false)->sum('amount'),
+                'total_books' => Book::where('branch_id', $branchId)->count(),
+                'total_items' => Item::where('branch_id', $branchId)->count(),
+                'total_members' => Member::where('branch_id', $branchId)->count(),
+                'active_loans' => Loan::where('branch_id', $branchId)->where('is_returned', false)->count(),
+            ];
+        });
 
-        $this->chartData = $this->getChartData($branchId);
+        // Cache chart data for 10 minutes
+        $this->chartData = cache()->remember("dashboard_chart_{$branchId}", 600, function () use ($branchId) {
+            return $this->getChartData($branchId);
+        });
     }
 
     public function getRecentLoansProperty()
     {
-        return Loan::with(['member', 'item.book'])
-            ->where('branch_id', $this->getBranchId())
-            ->latest('loan_date')
-            ->limit(10)
-            ->get();
+        $branchId = $this->getBranchId();
+        
+        return cache()->remember("recent_loans_{$branchId}", 60, function () use ($branchId) {
+            return Loan::query()
+                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date', 'is_returned'])
+                ->with([
+                    'member:id,name',
+                    'item:id,book_id,barcode',
+                    'item.book:id,title'
+                ])
+                ->where('branch_id', $branchId)
+                ->latest('loan_date')
+                ->limit(10)
+                ->get();
+        });
     }
 
     public function getOverdueLoansProperty()
     {
-        return Loan::with(['member', 'item.book'])
-            ->where('branch_id', $this->getBranchId())
-            ->where('is_returned', false)
-            ->where('due_date', '<', now())
-            ->orderBy('due_date')
-            ->limit(5)
-            ->get();
+        $branchId = $this->getBranchId();
+        
+        return cache()->remember("overdue_loans_{$branchId}", 60, function () use ($branchId) {
+            return Loan::query()
+                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date'])
+                ->with([
+                    'member:id,name',
+                    'item:id,book_id,barcode',
+                    'item.book:id,title'
+                ])
+                ->where('branch_id', $branchId)
+                ->where('is_returned', false)
+                ->where('due_date', '<', now())
+                ->orderBy('due_date')
+                ->limit(5)
+                ->get();
+        });
     }
 
     protected function getChartData($branchId): array
     {
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+        
+        // Single query for daily data
+        $dailyLoans = Loan::where('branch_id', $branchId)
+            ->whereBetween('loan_date', [$startDate, $endDate])
+            ->selectRaw('DATE(loan_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+            
+        $dailyReturns = Loan::where('branch_id', $branchId)
+            ->whereBetween('return_date', [$startDate, $endDate])
+            ->selectRaw('DATE(return_date) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+
         $dailyLabels = [];
-        $dailyLoans = [];
-        $dailyReturns = [];
+        $dailyLoanCounts = [];
+        $dailyReturnCounts = [];
 
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
+            $dateKey = $date->format('Y-m-d');
             $dailyLabels[] = $date->format('d M');
-            $dailyLoans[] = Loan::where('branch_id', $branchId)->whereDate('loan_date', $date)->count();
-            $dailyReturns[] = Loan::where('branch_id', $branchId)->whereDate('return_date', $date)->count();
+            $dailyLoanCounts[] = $dailyLoans[$dateKey] ?? 0;
+            $dailyReturnCounts[] = $dailyReturns[$dateKey] ?? 0;
         }
 
+        // Single query for monthly data
+        $monthlyLoans = Loan::where('branch_id', $branchId)
+            ->whereYear('loan_date', now()->year)
+            ->selectRaw('MONTH(loan_date) as month, COUNT(*) as count')
+            ->groupBy('month')
+            ->pluck('count', 'month')
+            ->toArray();
+
         $monthlyLabels = [];
-        $monthlyLoans = [];
+        $monthlyData = [];
 
         for ($i = 1; $i <= 12; $i++) {
             $monthlyLabels[] = Carbon::create(null, $i, 1)->format('M');
-            $monthlyLoans[] = Loan::where('branch_id', $branchId)
-                ->whereYear('loan_date', now()->year)
-                ->whereMonth('loan_date', $i)
-                ->count();
+            $monthlyData[] = $monthlyLoans[$i] ?? 0;
         }
 
         return [
             'daily' => [
                 'labels' => $dailyLabels,
-                'loans' => $dailyLoans,
-                'returns' => $dailyReturns,
+                'loans' => $dailyLoanCounts,
+                'returns' => $dailyReturnCounts,
             ],
             'monthly' => [
                 'labels' => $monthlyLabels,
-                'totals' => $monthlyLoans,
+                'totals' => $monthlyData,
             ],
         ];
     }

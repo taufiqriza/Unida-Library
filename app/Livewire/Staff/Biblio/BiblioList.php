@@ -110,15 +110,26 @@ class BiblioList extends Component
     {
         $branchFilter = $this->getBranchFilter();
         
-        return Item::with(['book', 'collectionType', 'location', 'itemStatus'])
+        return Item::query()
+            ->select(['id', 'book_id', 'barcode', 'inventory_code', 'call_number', 'branch_id', 'collection_type_id', 'location_id', 'item_status_id', 'created_at'])
+            ->with([
+                'book:id,title,isbn',
+                'collectionType:id,name',
+                'location:id,name',
+                'itemStatus:id,name,color'
+            ])
             ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
-            ->when($this->search, function (Builder $query) {
-                $query->where(function($q) {
-                    $q->where('barcode', 'like', '%' . $this->search . '%')
-                      ->orWhere('inventory_code', 'like', '%' . $this->search . '%')
-                      ->orWhere('call_number', 'like', '%' . $this->search . '%')
-                      ->orWhereHas('book', fn($q) => $q->where('title', 'like', '%' . $this->search . '%'));
+            ->when($this->search, function ($query) {
+                $search = $this->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('barcode', 'like', "%{$search}%")
+                      ->orWhere('inventory_code', 'like', "%{$search}%")
+                      ->orWhere('call_number', 'like', "%{$search}%");
                 });
+                // Only search book title if search length >= 3
+                if (strlen($search) >= 3) {
+                    $query->orWhereHas('book', fn($q) => $q->where('title', 'like', "%{$search}%"));
+                }
             })
             ->latest();
     }
@@ -129,39 +140,55 @@ class BiblioList extends Component
         $isSuperAdmin = $user->role === 'super_admin';
         $branchFilter = $this->getBranchFilter();
         
-        // Base query with branch filter
-        $baseQuery = Book::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
-        $itemBaseQuery = Item::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
-        
-        $stats = [
-            'total_books' => (clone $baseQuery)->count(),
-            'total_items' => (clone $itemBaseQuery)->count(),
-            'recent_additions' => (clone $baseQuery)->where('created_at', '>=', now()->subDays(7))->count(),
-            'books_without_items' => (clone $baseQuery)->doesntHave('items')->count(),
-        ];
+        // Cache stats for 5 minutes to reduce COUNT queries
+        $cacheKey = "biblio_stats_{$branchFilter}";
+        $stats = cache()->remember($cacheKey, 300, function () use ($branchFilter) {
+            $baseQuery = Book::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
+            $itemBaseQuery = Item::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
+            
+            return [
+                'total_books' => (clone $baseQuery)->count(),
+                'total_items' => (clone $itemBaseQuery)->count(),
+                'recent_additions' => (clone $baseQuery)->where('created_at', '>=', now()->subDays(7))->count(),
+                'books_without_items' => (clone $baseQuery)->whereDoesntHave('items')->count(),
+            ];
+        });
         
         if ($this->activeTab === 'items') {
             $items = $this->getItemsQuery()->paginate(15);
             $books = collect();
         } else {
             $books = Book::query()
-                ->with(['branch', 'publisher', 'authors', 'items', 'user'])
+                ->select(['id', 'branch_id', 'title', 'isbn', 'image', 'call_number', 'publisher_id', 'publish_year', 'created_at', 'updated_at', 'user_id'])
+                ->with([
+                    'branch:id,name',
+                    'publisher:id,name',
+                    'authors:id,name',
+                    'user:id,name'
+                ])
+                ->withCount('items')
                 ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
                 ->when($this->search, function (Builder $query) {
-                    $query->where(function($q) {
-                        $q->where('title', 'like', '%' . $this->search . '%')
-                          ->orWhere('isbn', 'like', '%' . $this->search . '%')
-                          ->orWhere('call_number', 'like', '%' . $this->search . '%')
-                          ->orWhereHas('authors', fn($q) => $q->where('name', 'like', '%' . $this->search . '%'));
+                    $search = $this->search;
+                    $query->where(function($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                          ->orWhere('isbn', 'like', "%{$search}%")
+                          ->orWhere('call_number', 'like', "%{$search}%");
                     });
+                    // Author search is slow - only do if specific search pattern
+                    if (strlen($this->search) >= 3) {
+                        $query->orWhereHas('authors', fn($q) => $q->where('name', 'like', "%{$search}%"));
+                    }
                 })
                 ->latest('updated_at')
                 ->paginate(12);
             $items = collect();
         }
 
-        // Get branches for filter (super_admin only)
-        $branches = $isSuperAdmin ? Branch::orderBy('name')->get() : collect();
+        // Cache branches list
+        $branches = $isSuperAdmin 
+            ? cache()->remember('all_branches', 3600, fn() => Branch::select(['id', 'name'])->orderBy('name')->get()) 
+            : collect();
 
         return view('livewire.staff.biblio.biblio-list', [
             'books' => $books,

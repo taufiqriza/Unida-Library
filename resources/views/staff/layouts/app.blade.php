@@ -102,7 +102,11 @@
     <script>
         (function() {
             const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
-            if (collapsed) document.documentElement.classList.add('sidebar-collapsed');
+            if (collapsed) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+            // Pre-set sidebar state for Alpine
+            window.__sidebarCollapsed = collapsed;
         })();
     </script>
     @livewireStyles
@@ -131,8 +135,7 @@
     <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
         {{-- Desktop Sidebar - FIXED --}}
         <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40"
-               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'"
-               x-cloak>
+               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'">
             
             {{-- Logo --}}
             <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
@@ -312,7 +315,8 @@
     <script>
         function staffPortal() {
             return {
-                sidebarCollapsed: localStorage.getItem('staffSidebarCollapsed') === 'true',
+                // Use pre-set value from inline script for instant state
+                sidebarCollapsed: window.__sidebarCollapsed ?? localStorage.getItem('staffSidebarCollapsed') === 'true',
                 toggleSidebar() {
                     this.sidebarCollapsed = !this.sidebarCollapsed;
                     localStorage.setItem('staffSidebarCollapsed', this.sidebarCollapsed);
