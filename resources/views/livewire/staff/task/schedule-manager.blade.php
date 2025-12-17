@@ -274,10 +274,16 @@
         </div>
     </div>
 
-    {{-- Create/Edit Modal --}}
-    @if($showModal)
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    {{-- Create/Edit Modal - Teleported to body for proper z-index --}}
+    <template x-teleport="body">
+        <div style="position: relative; z-index: 9999;">
+            @if($showModal)
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                     @click.away="$wire.closeModal()">
             <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50">
                 <h2 class="text-lg font-bold text-gray-900">
                     <i class="fas {{ $editingId ? 'fa-edit' : 'fa-plus-circle' }} text-emerald-600 mr-2"></i>
@@ -424,8 +430,10 @@
                     </button>
                 </div>
             </form>
+                </div>
+            </div>
+            @endif
         </div>
-    </div>
-    @endif
+    </template>
 </div>
 
