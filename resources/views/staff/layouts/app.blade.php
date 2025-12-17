@@ -548,12 +548,30 @@
     <script>
         function staffPortal() {
             return {
-                // Use pre-set value from inline script for instant state
-                sidebarCollapsed: window.__sidebarCollapsed ?? localStorage.getItem('staffSidebarCollapsed') === 'true',
+                // Get initial state from localStorage
+                sidebarCollapsed: localStorage.getItem('staffSidebarCollapsed') === 'true',
+                
+                init() {
+                    // Sync HTML class with Alpine state on init
+                    this.syncSidebarClass();
+                    
+                    // Watch for changes
+                    this.$watch('sidebarCollapsed', () => {
+                        this.syncSidebarClass();
+                    });
+                },
+                
+                syncSidebarClass() {
+                    if (this.sidebarCollapsed) {
+                        document.documentElement.classList.add('sidebar-collapsed');
+                    } else {
+                        document.documentElement.classList.remove('sidebar-collapsed');
+                    }
+                },
+                
                 toggleSidebar() {
                     this.sidebarCollapsed = !this.sidebarCollapsed;
                     localStorage.setItem('staffSidebarCollapsed', this.sidebarCollapsed);
-                    document.documentElement.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
                 }
             }
         }
