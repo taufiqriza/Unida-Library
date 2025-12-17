@@ -441,7 +441,14 @@
     
     {{-- Handle session expired (419 error) --}}
     <script>
+        // Flag to prevent multiple triggers
+        let sessionExpiredTriggered = false;
+        
         function showSessionExpiredModal() {
+            // Prevent multiple triggers
+            if (sessionExpiredTriggered) return;
+            sessionExpiredTriggered = true;
+            
             const modal = document.getElementById('session-expired-modal');
             const content = document.getElementById('session-modal-content');
             if (modal && content) {
@@ -457,8 +464,8 @@
         document.addEventListener('livewire:init', () => {
             Livewire.hook('request', ({ fail }) => {
                 fail(({ status, preventDefault }) => {
-                    if (status === 419) {
-                        // Session expired - show custom modal (no auto-click)
+                    if (status === 419 && !sessionExpiredTriggered) {
+                        // Session expired - show custom modal
                         preventDefault();
                         showSessionExpiredModal();
                     }
