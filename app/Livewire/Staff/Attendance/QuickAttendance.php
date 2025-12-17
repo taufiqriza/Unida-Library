@@ -68,7 +68,7 @@ class QuickAttendance extends Component
         Attendance::create([
             'user_id' => $user->id,
             'branch_id' => $user->branch_id,
-            'attendance_location_id' => $location->id,
+            'location_id' => $location->id,
             'type' => 'check_in',
             'scanned_at' => $now,
             'latitude' => $this->currentLat,
@@ -139,7 +139,7 @@ class QuickAttendance extends Component
         Attendance::create([
             'user_id' => $user->id,
             'branch_id' => $user->branch_id,
-            'attendance_location_id' => $checkIn->attendance_location_id,
+            'location_id' => $checkIn->location_id,
             'type' => 'check_out',
             'scanned_at' => now(),
             'latitude' => $this->currentLat,
