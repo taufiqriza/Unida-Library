@@ -119,13 +119,16 @@
 
             {{-- QR Scanner --}}
             <div x-show="mode === 'qr'" class="mb-3">
-                <div id="quick-qr-reader" class="w-full aspect-video bg-gray-900 rounded-lg overflow-hidden relative">
-                    <div x-show="!scanning" class="absolute inset-0 flex items-center justify-center text-white">
+                <div class="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
+                    {{-- Loading Overlay (shown when not scanning) --}}
+                    <div x-show="!scanning" x-cloak class="absolute inset-0 z-10 flex items-center justify-center text-white bg-gray-900">
                         <div class="text-center">
                             <i class="fas fa-spinner fa-spin text-2xl mb-1 opacity-75"></i>
                             <p class="text-[10px] opacity-75">Membuka kamera...</p>
                         </div>
                     </div>
+                    {{-- QR Reader Container (Html5Qrcode will inject video here) --}}
+                    <div id="quick-qr-reader" class="w-full h-full"></div>
                 </div>
                 <div x-show="qrDetected" class="mt-2 p-2 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2">
                     <i class="fas fa-check-circle text-emerald-500"></i>
