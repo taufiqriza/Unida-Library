@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Akses Ditolak</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #DC2626 0%, #7C3AED 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: blob 8s infinite;
+        }
+        
+        @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -30px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(30px, 10px) scale(1.05); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            75% { transform: translateX(5px) rotate(5deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-red-50 overflow-hidden">
+    {{-- Decorative Blobs --}}
+    <div class="blob w-72 h-72 bg-purple-400 top-20 -left-20"></div>
+    <div class="blob w-96 h-96 bg-red-400 -bottom-32 right-20" style="animation-delay: -4s;"></div>
+
+    <div class="relative min-h-screen flex flex-col items-center justify-center px-4">
+        {{-- Lock Animation --}}
+        <div class="floating mb-8">
+            <div class="relative">
+                {{-- Lock Icon --}}
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-32 h-32 bg-gradient-to-br from-red-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                        <i class="fas fa-lock text-5xl text-white shake"></i>
+                    </div>
+                </div>
+                
+                {{-- 403 Number --}}
+                <h1 class="text-[150px] md:text-[200px] font-extrabold gradient-text leading-none tracking-tighter">
+                    403
+                </h1>
+                
+                {{-- Shield icon --}}
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-purple-100">
+                    <i class="fas fa-shield-halved text-3xl text-purple-500"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- Message --}}
+        <div class="text-center max-w-lg mx-auto mb-10">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+                Akses Ditolak
+            </h2>
+            <p class="text-gray-500 text-lg mb-2">
+                Maaf, Anda tidak memiliki izin untuk mengakses halaman ini. Pastikan Anda sudah login dengan akun yang benar.
+            </p>
+            <p class="text-gray-400 text-sm">
+                Jika Anda merasa ini adalah kesalahan, hubungi administrator.
+            </p>
+        </div>
+
+        {{-- Action Buttons --}}
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="/" 
+               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                <i class="fas fa-home text-lg group-hover:scale-110 transition-transform"></i>
+                <span>Kembali ke Beranda</span>
+            </a>
+            
+            <a href="/login" 
+               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-gray-200 transform hover:-translate-y-1 transition-all duration-300">
+                <i class="fas fa-sign-in-alt text-lg group-hover:translate-x-1 transition-transform"></i>
+                <span>Login</span>
+            </a>
+        </div>
+
+        {{-- Footer --}}
+        <div class="absolute bottom-8 text-center">
+            <p class="text-gray-400 text-xs">
+                © {{ date('Y') }} {{ config('app.name', 'Perpustakaan') }}. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
