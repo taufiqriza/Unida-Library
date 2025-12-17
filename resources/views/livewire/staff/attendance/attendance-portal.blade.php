@@ -467,7 +467,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @forelse($allLocations as $location)
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" wire:key="location-card-{{ $location->id }}-{{ $location->qr_code }}">
                 <div class="p-4">
                     <div class="flex items-start justify-between">
                         <div class="flex items-center gap-3">
@@ -493,16 +493,27 @@
                     {{-- QR Code --}}
                     <div class="mt-3 p-3 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl text-center">
                         <p class="text-xs text-violet-600 font-medium mb-2">QR Code</p>
-                        <div class="bg-white p-3 rounded-lg inline-block">
-                            <div id="qr-{{ $location->id }}" x-data x-init="
-                                new QRCode(document.getElementById('qr-{{ $location->id }}'), {
-                                    text: '{{ $location->qr_data }}',
-                                    width: 100,
-                                    height: 100,
-                                    colorDark: '#4f46e5',
-                                    colorLight: '#ffffff'
-                                });
-                            "></div>
+                        <div class="bg-white p-3 rounded-lg inline-block" wire:key="qr-wrapper-{{ $location->id }}-{{ $location->qr_code }}">
+                            <div 
+                                id="qr-{{ $location->id }}" 
+                                x-data="{ initialized: false }"
+                                x-init="
+                                    $nextTick(() => {
+                                        const el = document.getElementById('qr-{{ $location->id }}');
+                                        if (el && !initialized) {
+                                            el.innerHTML = '';
+                                            new QRCode(el, {
+                                                text: @js($location->qr_data),
+                                                width: 100,
+                                                height: 100,
+                                                colorDark: '#4f46e5',
+                                                colorLight: '#ffffff'
+                                            });
+                                            initialized = true;
+                                        }
+                                    });
+                                "
+                            ></div>
                         </div>
                         <p class="text-[10px] text-gray-400 mt-1">{{ $location->qr_code }}</p>
                     </div>
