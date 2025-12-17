@@ -96,14 +96,22 @@
     <style>
         [x-cloak] { display: none !important; }
         
+        /* Sidebar width controlled by CSS class on html element */
         .staff-sidebar { width: 14rem; }
         html.sidebar-collapsed .staff-sidebar { width: 5rem; }
+        
+        /* Main content margin */
         .main-content-wrapper { margin-left: 14rem; }
         html.sidebar-collapsed .main-content-wrapper { margin-left: 5rem; }
+        
+        /* Desktop header positioning - must match sidebar width */
+        .desktop-header { left: 14rem; width: calc(100vw - 14rem); }
+        html.sidebar-collapsed .desktop-header { left: 5rem; width: calc(100vw - 5rem); }
         
         @media (max-width: 1023px) {
             .staff-sidebar { display: none !important; }
             .main-content-wrapper { margin-left: 0 !important; }
+            .desktop-header { left: 0 !important; width: 100% !important; }
         }
         
         /* Ensure modals with high z-index appear above everything */
@@ -157,9 +165,8 @@
     </header>
 
     <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
-        {{-- Desktop Sidebar - FIXED --}}
-        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40"
-               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'">
+        {{-- Desktop Sidebar - FIXED, width controlled by CSS via html.sidebar-collapsed --}}
+        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40">
             
             {{-- Logo --}}
             <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
@@ -277,9 +284,8 @@
             </div>
         </aside>
 
-        {{-- Desktop Header - FIXED --}}
-        <header class="desktop-header hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm fixed top-0 z-30 h-[72px]"
-                :class="sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]'">
+        {{-- Desktop Header - FIXED, positioning controlled by CSS via html.sidebar-collapsed --}}
+        <header class="desktop-header hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm fixed top-0 z-30 h-[72px] transition-all duration-300">
             <div class="flex items-center gap-4">
                 <button @click="toggleSidebar()" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400 flex items-center justify-center transition-all">
                     <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
@@ -383,9 +389,8 @@
             </div>
         </header>
 
-        {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden"
-             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
+        {{-- Main Content Wrapper - margin controlled by CSS via html.sidebar-collapsed --}}
+        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden transition-all duration-300">
             <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
                 {{-- Queue Status Alert for Admins --}}
                 <x-queue-status-alert />
