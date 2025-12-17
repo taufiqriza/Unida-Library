@@ -391,15 +391,158 @@
     {{-- Staff Chat Widget --}}
     @livewire('staff.chat.staff-chat')
 
-    {{-- Mobile Bottom Nav --}}
-    <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-r from-blue-700 to-indigo-800 flex items-center justify-around px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
-        @foreach(array_slice($navItems, 0, 5) as $item)
-            @php $active = request()->routeIs($item['patterns']); @endphp
-            <a href="{{ route($item['route']) }}" wire:navigate class="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all {{ $active ? 'text-amber-400' : 'text-white/70' }}">
-                <i class="fas {{ $item['icon'] }} text-lg"></i>
-                <span class="text-[10px] font-medium">{{ $item['label'] }}</span>
-            </a>
-        @endforeach
+    {{-- Mobile Bottom Nav - Native App Style --}}
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-50" x-data="{ menuOpen: false }">
+        {{-- Bottom Bar --}}
+        <div class="relative bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+            {{-- Safe area for notch devices --}}
+            <div class="flex items-end justify-around px-2 pt-2 pb-safe" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+                
+                {{-- Dashboard --}}
+                @php $dashActive = request()->routeIs('staff.dashboard*'); @endphp
+                <a href="{{ route('staff.dashboard') }}" class="flex flex-col items-center gap-0.5 py-1 px-3 min-w-[60px] transition-all duration-200 {{ $dashActive ? 'text-blue-600' : 'text-gray-400' }}">
+                    <div class="relative">
+                        <i class="fas fa-house text-xl"></i>
+                        @if($dashActive)
+                        <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] font-medium">Home</span>
+                </a>
+                
+                {{-- Tasks --}}
+                @php $taskActive = request()->routeIs('staff.task*'); @endphp
+                <a href="{{ route('staff.task.index') }}" class="flex flex-col items-center gap-0.5 py-1 px-3 min-w-[60px] transition-all duration-200 {{ $taskActive ? 'text-blue-600' : 'text-gray-400' }}">
+                    <div class="relative">
+                        <i class="fas fa-clipboard-list text-xl"></i>
+                        @if($taskActive)
+                        <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] font-medium">Tasks</span>
+                </a>
+                
+                {{-- Kehadiran - Special Center Button --}}
+                @php $attendActive = request()->routeIs('staff.attendance*'); @endphp
+                <div class="relative -mt-6">
+                    <a href="{{ route('staff.attendance.index') }}" 
+                       class="flex items-center justify-center w-16 h-16 rounded-full shadow-xl transition-all duration-300 active:scale-95
+                              {{ $attendActive 
+                                 ? 'bg-gradient-to-br from-emerald-500 to-teal-600 ring-4 ring-emerald-100' 
+                                 : 'bg-gradient-to-br from-blue-600 to-indigo-700 ring-4 ring-blue-100' }}">
+                        <div class="text-white text-center">
+                            <i class="fas fa-fingerprint text-2xl"></i>
+                        </div>
+                    </a>
+                    {{-- Glow effect --}}
+                    <div class="absolute inset-0 rounded-full bg-blue-500 opacity-20 blur-xl -z-10 animate-pulse"></div>
+                </div>
+                
+                {{-- Sirkulasi --}}
+                @php $circActive = request()->routeIs('staff.circulation*'); @endphp
+                <a href="{{ route('staff.circulation.index') }}" class="flex flex-col items-center gap-0.5 py-1 px-3 min-w-[60px] transition-all duration-200 {{ $circActive ? 'text-blue-600' : 'text-gray-400' }}">
+                    <div class="relative">
+                        <i class="fas fa-arrows-rotate text-xl"></i>
+                        @if($circActive)
+                        <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-blue-600 rounded-full"></span>
+                        @endif
+                    </div>
+                    <span class="text-[10px] font-medium">Sirkulasi</span>
+                </a>
+                
+                {{-- Menu --}}
+                <button @click="menuOpen = true" class="flex flex-col items-center gap-0.5 py-1 px-3 min-w-[60px] text-gray-400 transition-all duration-200 hover:text-blue-600">
+                    <i class="fas fa-bars text-xl"></i>
+                    <span class="text-[10px] font-medium">Menu</span>
+                </button>
+            </div>
+        </div>
+        
+        {{-- Full Screen Menu Drawer --}}
+        <div x-show="menuOpen" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+             @click="menuOpen = false"
+             style="display: none;">
+        </div>
+        
+        <div x-show="menuOpen"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="translate-y-full"
+             x-transition:enter-end="translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="translate-y-0"
+             x-transition:leave-end="translate-y-full"
+             class="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[85vh] overflow-hidden"
+             style="display: none;">
+            
+            {{-- Handle Bar --}}
+            <div class="flex justify-center py-3">
+                <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+            </div>
+            
+            {{-- User Profile Header --}}
+            <div class="px-5 pb-4 border-b border-gray-100">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center overflow-hidden shadow-lg">
+                        <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-gray-900 truncate">{{ $user->name }}</p>
+                        <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg">
+                            {{ \App\Models\User::getRoles()[$user->role] ?? ucfirst($user->role) }}
+                        </span>
+                    </div>
+                    <button @click="menuOpen = false" class="p-2 hover:bg-gray-100 rounded-xl transition">
+                        <i class="fas fa-times text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+            
+            {{-- Menu Items Grid --}}
+            <div class="p-4 overflow-y-auto max-h-[50vh]">
+                <div class="grid grid-cols-4 gap-3">
+                    @foreach($navItems as $item)
+                        @php $active = request()->routeIs($item['patterns']); @endphp
+                        <a href="{{ route($item['route']) }}" 
+                           @click="menuOpen = false"
+                           class="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-200 
+                                  {{ $active ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-600' }}">
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all
+                                        {{ $active ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-100' }}">
+                                <i class="fas {{ $item['icon'] }} text-lg"></i>
+                            </div>
+                            <span class="text-[11px] font-medium text-center leading-tight">{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+            
+            {{-- Quick Actions --}}
+            <div class="px-4 pb-4">
+                <div class="flex gap-3">
+                    <a href="{{ route('staff.profile') }}" @click="menuOpen = false"
+                       class="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition">
+                        <i class="fas fa-user text-gray-600"></i>
+                        <span class="text-sm font-medium text-gray-700">Profil</span>
+                    </a>
+                    <a href="{{ route('staff.logout') }}" 
+                       class="flex-1 flex items-center justify-center gap-2 py-3 bg-red-50 hover:bg-red-100 rounded-xl transition">
+                        <i class="fas fa-sign-out-alt text-red-600"></i>
+                        <span class="text-sm font-medium text-red-600">Logout</span>
+                    </a>
+                </div>
+            </div>
+            
+            {{-- Safe area spacer --}}
+            <div style="height: env(safe-area-inset-bottom);"></div>
+        </div>
     </nav>
 
     <script>
