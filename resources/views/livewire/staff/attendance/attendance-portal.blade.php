@@ -1,8 +1,6 @@
 @section('title', 'Kehadiran')
 
 <div class="space-y-5" x-data="attendanceApp()" x-init="initGeolocation()"
-     @auto-checkin.window="$nextTick(() => $wire.checkIn())"
-     @auto-checkout.window="$nextTick(() => $wire.checkOut())"
      @beforeunload.window="cleanupScanner()"
      x-on:livewire:navigating.window="cleanupScanner()"
      x-on:visibilitychange.window="if (document.hidden) cleanupScanner()"
