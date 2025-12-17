@@ -215,21 +215,26 @@
 
             <div class="p-5">
                 @if($scanMode === 'qr')
-                {{-- QR Scanner --}}
-                <div x-data="{ scanning: false }" class="space-y-4">
-                    <div id="qr-reader" class="w-full aspect-video bg-gray-900 rounded-xl overflow-hidden flex items-center justify-center">
-                        <template x-if="!scanning">
-                            <div class="text-center text-white">
-                                <i class="fas fa-qrcode text-4xl mb-3 opacity-50"></i>
-                                <p class="text-sm opacity-75">Klik tombol di bawah untuk mulai scan</p>
+                {{-- QR Scanner - Auto Start --}}
+                <div x-data="qrScannerComponent()" x-init="autoStart()" class="space-y-4">
+                    <div id="qr-reader" class="w-full aspect-video bg-gray-900 rounded-xl overflow-hidden relative">
+                        <div x-show="!scanning" class="absolute inset-0 flex items-center justify-center text-white">
+                            <div class="text-center">
+                                <i class="fas fa-spinner fa-spin text-4xl mb-3 opacity-75"></i>
+                                <p class="text-sm opacity-75">Membuka kamera...</p>
                             </div>
-                        </template>
+                        </div>
                     </div>
-                    <button @click="startQrScanner()" 
-                            class="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fas fa-camera"></i>
-                        <span x-text="scanning ? 'Stop Scanner' : 'Mulai Scan'"></span>
-                    </button>
+                    <div class="flex gap-2">
+                        <button @click="toggleScanner()" 
+                                class="flex-1 py-3 font-semibold rounded-xl transition flex items-center justify-center gap-2"
+                                :class="scanning 
+                                    ? 'bg-red-100 hover:bg-red-200 text-red-700' 
+                                    : 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white'">
+                            <i class="fas" :class="scanning ? 'fa-stop' : 'fa-camera'"></i>
+                            <span x-text="scanning ? 'Stop Scanner' : 'Mulai Ulang'"></span>
+                        </button>
+                    </div>
                     @if($scannedQrCode && $selectedLocationId)
                     <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
                         <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
@@ -843,6 +848,73 @@ function attendanceApp() {
             if (locations.length > 1) {
                 const bounds = L.latLngBounds(locations.map(l => [l.lat, l.lng]));
                 this.map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+    }
+}
+
+// Separate QR Scanner component for auto-start
+function qrScannerComponent() {
+    return {
+        scanning: false,
+        html5QrCode: null,
+
+        autoStart() {
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                this.startScanner();
+            }, 500);
+        },
+
+        toggleScanner() {
+            if (this.scanning) {
+                this.stopScanner();
+            } else {
+                this.startScanner();
+            }
+        },
+
+        startScanner() {
+            const qrElement = document.getElementById('qr-reader');
+            if (!qrElement) {
+                console.error('QR reader element not found');
+                return;
+            }
+
+            // Clear previous content
+            qrElement.innerHTML = '';
+
+            if (typeof Html5Qrcode === 'undefined') {
+                console.error('Html5Qrcode library not loaded');
+                return;
+            }
+
+            this.html5QrCode = new Html5Qrcode("qr-reader");
+            this.html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    console.log('QR Decoded:', decodedText);
+                    @this.handleQrScan(decodedText);
+                    this.stopScanner();
+                },
+                (errorMessage) => { /* ignore scan errors */ }
+            ).then(() => {
+                this.scanning = true;
+                console.log('QR Scanner auto-started');
+            }).catch((err) => {
+                console.error('QR Scanner error:', err);
+                this.scanning = false;
+            });
+        },
+
+        stopScanner() {
+            if (this.html5QrCode && this.scanning) {
+                this.html5QrCode.stop().then(() => {
+                    this.scanning = false;
+                    const qrElement = document.getElementById('qr-reader');
+                    if (qrElement) qrElement.innerHTML = '';
+                }).catch(err => console.error('Stop error:', err));
             }
         }
     }
