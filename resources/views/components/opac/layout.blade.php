@@ -7,6 +7,14 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
+    
+    {{-- Critical CSS - loads before everything, prevents FOUC --}}
+    <style>
+        html, body { margin: 0; padding: 0; background: #eff6ff; }
+        body { opacity: 0; }
+        body.ready { opacity: 1; transition: opacity 0.15s; }
+    </style>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,6 +29,10 @@
                 }
             }
         }
+        // Show body when Tailwind is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('ready');
+        });
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
