@@ -115,16 +115,24 @@ class QuickAttendance extends Component
             return;
         }
 
+        // Must checkout from same location as check-in
         $location = $checkIn->location;
-        $distance = 0;
-        $isWithinRadius = true;
+        if (!$location) {
+            $this->dispatch('notify', type: 'error', message: 'Lokasi check-in tidak ditemukan');
+            return;
+        }
 
-        if ($location) {
-            $distance = $this->calculateDistance(
-                $this->currentLat, $this->currentLng,
-                $location->latitude, $location->longitude
-            );
-            $isWithinRadius = $distance <= $location->radius_meters;
+        // Calculate distance to check-in location
+        $distance = $this->calculateDistance(
+            $this->currentLat, $this->currentLng,
+            $location->latitude, $location->longitude
+        );
+
+        // Validate radius - must be within check-in location radius
+        if ($distance > $location->radius_meters) {
+            $distanceKm = number_format($distance / 1000, 2);
+            $this->dispatch('notify', type: 'error', message: "Anda di luar radius lokasi {$location->name}! Jarak: {$distanceKm}km (max: {$location->radius_meters}m)");
+            return;
         }
 
         // Create checkout
@@ -137,7 +145,7 @@ class QuickAttendance extends Component
             'latitude' => $this->currentLat,
             'longitude' => $this->currentLng,
             'distance_meters' => min((int) round($distance), 2147483647),
-            'is_within_radius' => $isWithinRadius,
+            'is_within_radius' => true,
             'is_verified' => true,
         ]);
 
@@ -145,12 +153,12 @@ class QuickAttendance extends Component
         ActivityLog::log(
             'create',
             'attendance',
-            "Check-out" . ($location ? " di {$location->name}" : ""),
+            "Check-out di {$location->name} (jarak: " . round($distance) . "m)",
             null,
-            ['location' => $location?->name]
+            ['location' => $location->name, 'distance' => round($distance)]
         );
 
-        $this->dispatch('notify', type: 'success', message: '✅ Check-out berhasil!');
+        $this->dispatch('notify', type: 'success', message: '✅ Check-out berhasil! Jarak: ' . round($distance) . 'm');
         $this->dispatch('attendance-updated');
     }
 

@@ -226,9 +226,24 @@ class AttendancePortal extends Component
             return;
         }
         
+        // Get check-in location
         $location = $checkIn->location;
-        $distance = $location ? $location->calculateDistance($this->currentLat, $this->currentLng) : null;
-        $isVerified = $location ? $location->isWithinRadius($this->currentLat, $this->currentLng) : true;
+        if (!$location) {
+            $this->dispatch('notify', type: 'error', message: 'Lokasi check-in tidak ditemukan');
+            return;
+        }
+        
+        // Calculate distance
+        $distance = (int) min($location->calculateDistance($this->currentLat, $this->currentLng), 2147483647);
+        $isWithinRadius = $location->isWithinRadius($this->currentLat, $this->currentLng);
+        
+        // Block checkout if outside radius
+        if (!$isWithinRadius) {
+            $distanceKm = number_format($distance / 1000, 2);
+            $radiusM = $location->radius_meters;
+            $this->dispatch('notify', type: 'error', message: "Anda berada di luar area {$location->name}! Jarak: {$distanceKm}km (radius: {$radiusM}m). Silakan mendekat ke lokasi check-in.");
+            return;
+        }
         
         // Create checkout
         Attendance::create([
@@ -237,13 +252,12 @@ class AttendancePortal extends Component
             'branch_id' => $checkIn->branch_id,
             'type' => 'check_out',
             'scanned_at' => now(),
-            'scheduled_time' => $location?->work_end_time,
+            'scheduled_time' => $location->work_end_time,
             'latitude' => $this->currentLat,
             'longitude' => $this->currentLng,
             'distance_meters' => $distance,
-            'verification_method' => $this->selectedLocationId ? 
-                ($this->scanMode === 'qr' ? 'qr_scan' : 'location_select') : 'manual',
-            'is_verified' => $isVerified,
+            'verification_method' => $this->scanMode === 'qr' ? 'qr_scan' : 'location_select',
+            'is_verified' => true,
             'device_info' => [
                 'user_agent' => request()->userAgent(),
                 'ip' => request()->ip(),
@@ -251,7 +265,16 @@ class AttendancePortal extends Component
             ],
         ]);
         
-        $this->dispatch('notify', type: 'success', message: 'Check-out berhasil!');
+        // Log activity
+        ActivityLog::log(
+            'create',
+            'attendance',
+            "Check-out di {$location->name} (jarak: {$distance}m)",
+            null,
+            ['location' => $location->name, 'distance' => $distance]
+        );
+        
+        $this->dispatch('notify', type: 'success', message: "Check-out berhasil! Jarak: {$distance}m");
     }
 
     // ===== Location CRUD (Admin) =====
