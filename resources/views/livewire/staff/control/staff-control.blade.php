@@ -36,12 +36,18 @@
                     class="flex-1 px-5 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
                     {{ $mainTab === 'approval' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-check"></i>
-                <span>Persetujuan Akun</span>
+                <span>Persetujuan</span>
                 @if($stats['approval']['pending'] > 0)
                 <span class="px-2.5 py-0.5 bg-red-500 text-white rounded-full text-xs animate-pulse">
                     {{ $stats['approval']['pending'] }}
                 </span>
                 @endif
+            </button>
+            <button wire:click="setMainTab('activity')" 
+                    class="flex-1 px-5 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    {{ $mainTab === 'activity' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-history"></i>
+                <span>Log Aktivitas</span>
             </button>
         </div>
     </div>
@@ -112,7 +118,7 @@
         </button>
     </div>
 
-    @else
+    @elseif($mainTab === 'approval')
     {{-- Approval Stats - Compact --}}
     <div class="grid grid-cols-3 gap-2">
         <button wire:click="setTab('pending')" 
@@ -151,6 +157,7 @@
     </div>
     @endif
 
+    @if($mainTab === 'staff' || $mainTab === 'approval')
     {{-- Search --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3">
         <div class="relative">
@@ -270,6 +277,152 @@
         </div>
         @endif
     </div>
+    @endif
+
+    {{-- Activity Log Tab --}}
+    @if($mainTab === 'activity')
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {{-- Filters --}}
+        <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-slate-50">
+            <div class="flex flex-wrap gap-3 items-center">
+                {{-- Date Range --}}
+                <div class="flex items-center gap-2">
+                    <input type="date" wire:model.live="activityDateStart" 
+                           class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                    <span class="text-gray-400 text-sm">s/d</span>
+                    <input type="date" wire:model.live="activityDateEnd" 
+                           class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                </div>
+                
+                {{-- Branch Filter (Super Admin only) --}}
+                @if($isSuperAdmin)
+                <select wire:model.live="activityBranchId" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                    <option value="">🌐 Semua Cabang</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+                @endif
+                
+                {{-- Module Filter --}}
+                <select wire:model.live="activityModule" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                    <option value="">📦 Semua Modul</option>
+                    @foreach($modules as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+                
+                {{-- Action Filter --}}
+                <select wire:model.live="activityAction" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                    <option value="">⚡ Semua Aksi</option>
+                    @foreach($actions as $key => $label)
+                        <option value="{{ $key }}">{{ $label }}</option>
+                    @endforeach
+                </select>
+                
+                {{-- User Filter --}}
+                <select wire:model.live="activityUserId" class="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                    <option value="">👤 Semua User</option>
+                    @foreach($staffUsers as $staffUser)
+                        <option value="{{ $staffUser->id }}">{{ $staffUser->name }}</option>
+                    @endforeach
+                </select>
+                
+                {{-- Search --}}
+                <div class="flex-1 min-w-[200px]">
+                    <input type="text" wire:model.live.debounce.300ms="search" 
+                           placeholder="Cari deskripsi..." 
+                           class="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500">
+                </div>
+                
+                {{-- Clear Button --}}
+                <button wire:click="clearActivityFilters" 
+                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-sm font-medium transition">
+                    <i class="fas fa-times mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+        
+        {{-- Activity Timeline --}}
+        @if($activityLogs && $activityLogs->count() > 0)
+        <div class="divide-y divide-gray-100">
+            @foreach($activityLogs as $log)
+            <div class="p-4 hover:bg-gray-50 transition flex gap-4">
+                {{-- Icon --}}
+                @php
+                    $actionColors = [
+                        'create' => 'bg-emerald-100 text-emerald-600',
+                        'update' => 'bg-blue-100 text-blue-600',
+                        'delete' => 'bg-red-100 text-red-600',
+                        'login' => 'bg-violet-100 text-violet-600',
+                        'logout' => 'bg-gray-100 text-gray-600',
+                        'view' => 'bg-cyan-100 text-cyan-600',
+                        'approve' => 'bg-green-100 text-green-600',
+                        'reject' => 'bg-rose-100 text-rose-600',
+                        'export' => 'bg-amber-100 text-amber-600',
+                        'import' => 'bg-orange-100 text-orange-600',
+                    ];
+                    $actionColor = $actionColors[$log->action] ?? 'bg-gray-100 text-gray-600';
+                @endphp
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 {{ $actionColor }} rounded-xl flex items-center justify-center">
+                        <i class="fas {{ $log->getActionIcon() }}"></i>
+                    </div>
+                </div>
+                
+                {{-- Content --}}
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <p class="text-sm text-gray-900 font-medium">{{ $log->description }}</p>
+                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md text-xs">
+                                    <i class="fas {{ $log->getModuleIcon() }} text-[10px]"></i>
+                                    {{ $modules[$log->module] ?? ucfirst($log->module) }}
+                                </span>
+                                <span class="px-2 py-0.5 {{ $actionColor }} rounded-md text-xs font-medium">
+                                    {{ $actions[$log->action] ?? ucfirst($log->action) }}
+                                </span>
+                                @if($log->branch)
+                                <span class="px-2 py-0.5 bg-violet-100 text-violet-600 rounded-md text-xs">
+                                    {{ $log->branch->name }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <p class="text-xs text-gray-400">{{ $log->created_at->format('d M, H:i') }}</p>
+                            <p class="text-xs text-gray-500 font-medium mt-0.5">{{ $log->user?->name ?? 'System' }}</p>
+                        </div>
+                    </div>
+                    
+                    {{-- Properties (if any) --}}
+                    @if($log->properties && count($log->properties) > 0)
+                    <div class="mt-2 p-2 bg-gray-50 rounded-lg text-xs font-mono text-gray-600 max-h-20 overflow-y-auto">
+                        @foreach($log->properties as $key => $value)
+                            <div><span class="text-gray-400">{{ $key }}:</span> {{ is_array($value) ? json_encode($value) : $value }}</div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        @if($activityLogs->hasPages())
+        <div class="p-4 border-t border-gray-100 bg-gray-50">{{ $activityLogs->links() }}</div>
+        @endif
+        @else
+        <div class="p-12 text-center">
+            <div class="w-20 h-20 bg-cyan-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-history text-cyan-300 text-3xl"></i>
+            </div>
+            <p class="text-gray-500 font-medium">Belum ada aktivitas</p>
+            <p class="text-sm text-gray-400 mt-1">Log aktivitas akan muncul di sini</p>
+        </div>
+        @endif
+    </div>
+    @endif
 
     {{-- Modals teleported to body for proper z-index --}}
     <template x-teleport="body">

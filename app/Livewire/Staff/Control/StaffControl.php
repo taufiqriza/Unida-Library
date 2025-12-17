@@ -4,6 +4,7 @@ namespace App\Livewire\Staff\Control;
 
 use App\Models\User;
 use App\Models\Branch;
+use App\Models\ActivityLog;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
@@ -12,7 +13,7 @@ class StaffControl extends Component
 {
     use WithPagination;
 
-    public $mainTab = 'staff'; // 'staff' or 'approval'
+    public $mainTab = 'staff'; // 'staff', 'approval', or 'activity'
     public $activeTab = 'all'; // for staff: all, super_admin, admin, librarian, staff
     public $search = '';
     public $selectedUser = null;
@@ -29,6 +30,14 @@ class StaffControl extends Component
         'role' => 'staff',
         'is_active' => true,
     ];
+
+    // Activity Log Filters
+    public $activityBranchId = '';
+    public $activityModule = '';
+    public $activityAction = '';
+    public $activityUserId = '';
+    public $activityDateStart = '';
+    public $activityDateEnd = '';
 
     protected $queryString = ['mainTab', 'activeTab', 'search'];
 
@@ -54,7 +63,17 @@ class StaffControl extends Component
     public function setMainTab($tab)
     {
         $this->mainTab = $tab;
-        $this->activeTab = $tab === 'staff' ? 'all' : 'pending';
+        
+        if ($tab === 'staff') {
+            $this->activeTab = 'all';
+        } elseif ($tab === 'approval') {
+            $this->activeTab = 'pending';
+        } elseif ($tab === 'activity') {
+            // Set default date range (last 7 days)
+            $this->activityDateStart = now()->subDays(7)->format('Y-m-d');
+            $this->activityDateEnd = now()->format('Y-m-d');
+        }
+        
         $this->resetPage();
     }
 
@@ -310,6 +329,9 @@ class StaffControl extends Component
         $isSuperAdmin = auth()->user()->role === 'super_admin';
         $branchId = auth()->user()->branch_id;
 
+        $users = null;
+        $activityLogs = null;
+
         if ($this->mainTab === 'staff') {
             // Staff list
             $query = User::with('branch')
@@ -324,7 +346,8 @@ class StaffControl extends Component
                     $q->where(fn($q) => $q->where('name', 'like', "%{$this->search}%")
                         ->orWhere('email', 'like', "%{$this->search}%"))
                 );
-        } else {
+            $users = $query->latest()->paginate(12);
+        } elseif ($this->mainTab === 'approval') {
             // Approval list
             $query = User::with('branch')
                 ->whereIn('role', ['staff', 'librarian', 'pustakawan'])
@@ -334,14 +357,78 @@ class StaffControl extends Component
                     $q->where(fn($q) => $q->where('name', 'like', "%{$this->search}%")
                         ->orWhere('email', 'like', "%{$this->search}%"))
                 );
+            $users = $query->latest()->paginate(12);
+        } elseif ($this->mainTab === 'activity') {
+            // Activity logs
+            $query = ActivityLog::with(['user', 'branch'])
+                ->when(!$isSuperAdmin, fn($q) => $q->where('branch_id', $branchId))
+                ->when($isSuperAdmin && $this->activityBranchId, fn($q) => 
+                    $q->where('branch_id', $this->activityBranchId)
+                )
+                ->when($this->activityModule, fn($q) => $q->where('module', $this->activityModule))
+                ->when($this->activityAction, fn($q) => $q->where('action', $this->activityAction))
+                ->when($this->activityUserId, fn($q) => $q->where('user_id', $this->activityUserId))
+                ->when($this->activityDateStart, fn($q) => 
+                    $q->whereDate('created_at', '>=', $this->activityDateStart)
+                )
+                ->when($this->activityDateEnd, fn($q) => 
+                    $q->whereDate('created_at', '<=', $this->activityDateEnd)
+                )
+                ->when($this->search, fn($q) => 
+                    $q->where('description', 'like', "%{$this->search}%")
+                );
+            $activityLogs = $query->latest()->paginate(20);
         }
 
+        // Get users for activity filter dropdown
+        $staffUsers = User::select('id', 'name')
+            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+            ->when(!$isSuperAdmin, fn($q) => $q->where('branch_id', $branchId))
+            ->orderBy('name')
+            ->get();
+
         return view('livewire.staff.control.staff-control', [
-            'users' => $query->latest()->paginate(12),
+            'users' => $users,
+            'activityLogs' => $activityLogs,
+            'staffUsers' => $staffUsers,
             'stats' => $this->stats,
             'branches' => $this->branches,
             'roles' => $this->roles,
             'isSuperAdmin' => $isSuperAdmin,
+            'modules' => [
+                'auth' => 'Autentikasi',
+                'user' => 'Pengguna',
+                'biblio' => 'Bibliografi',
+                'member' => 'Anggota',
+                'circulation' => 'Sirkulasi',
+                'attendance' => 'Kehadiran',
+                'elibrary' => 'E-Library',
+                'settings' => 'Pengaturan',
+            ],
+            'actions' => [
+                'create' => 'Buat',
+                'update' => 'Update',
+                'delete' => 'Hapus',
+                'login' => 'Login',
+                'logout' => 'Logout',
+                'view' => 'Lihat',
+                'export' => 'Export',
+                'import' => 'Import',
+                'approve' => 'Setujui',
+                'reject' => 'Tolak',
+            ],
         ])->extends('staff.layouts.app')->section('content');
     }
+
+    public function clearActivityFilters()
+    {
+        $this->activityBranchId = '';
+        $this->activityModule = '';
+        $this->activityAction = '';
+        $this->activityUserId = '';
+        $this->activityDateStart = now()->subDays(7)->format('Y-m-d');
+        $this->activityDateEnd = now()->format('Y-m-d');
+        $this->search = '';
+    }
 }
+
