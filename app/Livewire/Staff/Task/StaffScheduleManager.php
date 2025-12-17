@@ -352,6 +352,6 @@ class StaffScheduleManager extends Component
             'endDate' => $endDate,
             'isAdmin' => $isAdmin,
             'isSuperAdmin' => $isSuperAdmin,
-        ]);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }
