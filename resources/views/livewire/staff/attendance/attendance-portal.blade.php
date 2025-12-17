@@ -1,6 +1,9 @@
 @section('title', 'Kehadiran')
 
-<div class="space-y-5" x-data="attendanceApp()" x-init="initGeolocation()">
+<div class="space-y-5" x-data="attendanceApp()" x-init="initGeolocation()"
+     @auto-checkin.window="$nextTick(() => $wire.checkIn())"
+     @auto-checkout.window="$nextTick(() => $wire.checkOut())"
+>
     {{-- Header --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">

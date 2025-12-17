@@ -269,6 +269,7 @@
             </div>
             <div class="flex items-center gap-4">
                 @include('staff.components.portal-switcher')
+                @include('staff.components.quick-attendance')
                 @include('staff.components.quick-actions')
                 
                 {{-- Notification Bell --}}

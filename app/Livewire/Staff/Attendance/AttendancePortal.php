@@ -56,7 +56,7 @@ class AttendancePortal extends Component
     // Branch filter (for super admin)
     public ?int $selectedBranchId = null;
     
-    protected $queryString = ['activeTab'];
+    protected $queryString = ['activeTab', 'scanMode'];
 
     public function mount()
     {
@@ -70,6 +70,25 @@ class AttendancePortal extends Component
         // Set default date range for history (last 7 days)
         $this->filterDateStart = now()->subDays(7)->format('Y-m-d');
         $this->filterDateEnd = now()->format('Y-m-d');
+        
+        // Handle quick action from header
+        $action = request()->query('action');
+        $locationId = request()->query('location');
+        $lat = request()->query('lat');
+        $lng = request()->query('lng');
+        
+        if ($action && $lat && $lng) {
+            $this->currentLat = (float) $lat;
+            $this->currentLng = (float) $lng;
+            
+            if ($action === 'checkin' && $locationId) {
+                $this->selectedLocationId = (int) $locationId;
+                // Will trigger check-in after GPS is updated from frontend
+                $this->dispatch('auto-checkin');
+            } elseif ($action === 'checkout') {
+                $this->dispatch('auto-checkout');
+            }
+        }
     }
 
     public function setActiveTab($tab)
