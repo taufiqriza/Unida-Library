@@ -38,10 +38,10 @@
             --shadow-color: rgba(0, 0, 0, 0.4);
         }
         
-        html, body { margin: 0; padding: 0; background: var(--bg-primary); }
+        html, body { margin: 0; padding: 0; background: var(--bg-primary); color: var(--text-primary); }
         html.dark { color-scheme: dark; }
-        body { opacity: 0; }
-        body.ready { opacity: 1; transition: opacity 0.15s, background-color 0.3s; }
+        body { opacity: 0; transition: opacity 0.15s, background-color 0.3s, color 0.3s; }
+        body.ready { opacity: 1; }
     </style>
     
     {{-- Instant dark mode detection (before anything renders) + persist on navigation --}}
@@ -172,9 +172,7 @@
     @livewireStyles
     @filamentStyles
 </head>
-<body x-data="staffPortal()" 
-      class="antialiased font-['Inter'] transition-colors duration-300"
-      :class="darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'">
+<body x-data="staffPortal()" class="antialiased font-['Inter']">
 <script>document.body.classList.add('ready');</script>
 
     {{-- Mobile Header --}}
@@ -444,12 +442,9 @@
             </div>
         </header>
 
-        {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden transition-colors duration-300"
-             :class="[
-                 sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56',
-                 darkMode ? 'bg-slate-900' : 'bg-slate-50/70'
-             ]">
+        {{-- Main Content Wrapper - background controlled by CSS dark mode --}}
+        <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden bg-slate-50"
+             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
             <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
                 {{-- Queue Status Alert for Admins --}}
                 <x-queue-status-alert />
