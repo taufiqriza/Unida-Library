@@ -112,17 +112,17 @@
         <div class="mt-16 text-center">
             <p class="text-gray-400 text-sm mb-4">Atau kunjungi halaman populer:</p>
             <div class="flex flex-wrap justify-center gap-4">
-                <a href="/catalog" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-blue-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-blue-200 transition-all">
-                    <i class="fas fa-book mr-2"></i>Katalog
+                <a href="/search" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-blue-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-blue-200 transition-all">
+                    <i class="fas fa-search mr-2"></i>Pencarian
                 </a>
-                <a href="/opac" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-purple-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-purple-200 transition-all">
-                    <i class="fas fa-search mr-2"></i>OPAC
+                <a href="/shamela" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-purple-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-purple-200 transition-all">
+                    <i class="fas fa-book-quran mr-2"></i>Shamela
                 </a>
-                <a href="/login" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-emerald-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-emerald-200 transition-all">
+                <a href="/e-resources" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-emerald-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-emerald-200 transition-all">
+                    <i class="fas fa-globe mr-2"></i>E-Resources
+                </a>
+                <a href="/login" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-amber-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-amber-200 transition-all">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
-                </a>
-                <a href="/staff" class="px-4 py-2 bg-white/80 hover:bg-white text-gray-600 hover:text-amber-600 rounded-xl text-sm font-medium border border-gray-100 hover:border-amber-200 transition-all">
-                    <i class="fas fa-users mr-2"></i>Staff Portal
                 </a>
             </div>
         </div>
