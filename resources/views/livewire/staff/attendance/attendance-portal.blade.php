@@ -330,6 +330,15 @@
             <span class="self-center text-gray-400">s/d</span>
             <input type="date" wire:model.live="filterDateEnd" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
             
+            @if($isSuperAdmin)
+            <select wire:model.live="filterBranchId" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                <option value="">🌐 Semua Cabang</option>
+                @foreach($branches as $branch)
+                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                @endforeach
+            </select>
+            @endif
+            
             @if($isAdmin)
             <select wire:model.live="filterUserId" class="px-3 py-2 border border-gray-200 rounded-lg text-sm">
                 <option value="">Semua Staff</option>

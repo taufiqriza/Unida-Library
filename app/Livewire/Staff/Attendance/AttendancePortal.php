@@ -33,6 +33,7 @@ class AttendancePortal extends Component
     public ?string $filterDateEnd = null;
     public ?int $filterUserId = null;
     public ?int $filterLocationId = null;
+    public ?int $filterBranchId = null; // For super admin
     public string $filterStatus = 'all'; // all, on_time, late
     
     // Lokasi Tab (Admin)
@@ -148,7 +149,15 @@ class AttendancePortal extends Component
         }
         
         $distance = (int) min($location->calculateDistance($this->currentLat, $this->currentLng), 2147483647);
-        $isVerified = $location->isWithinRadius($this->currentLat, $this->currentLng);
+        $isWithinRadius = $location->isWithinRadius($this->currentLat, $this->currentLng);
+        
+        // Block check-in if outside radius
+        if (!$isWithinRadius) {
+            $distanceKm = number_format($distance / 1000, 2);
+            $radiusM = $location->radius_meters;
+            $this->dispatch('notify', type: 'error', message: "Anda berada di luar area absensi! Jarak Anda {$distanceKm} km dari lokasi (radius: {$radiusM}m). Silakan mendekat ke lokasi absensi.");
+            return;
+        }
         
         // Calculate late status - parse work_start_time for today
         $now = Carbon::now();
@@ -175,7 +184,7 @@ class AttendancePortal extends Component
             'verification_method' => $this->scanMode === 'qr' ? 'qr_scan' : 'location_select',
             'is_late' => $isLate,
             'late_minutes' => $lateMinutes,
-            'is_verified' => $isVerified,
+            'is_verified' => true, // Always verified since we block outside radius
             'device_info' => [
                 'user_agent' => request()->userAgent(),
                 'ip' => request()->ip(),
@@ -185,11 +194,7 @@ class AttendancePortal extends Component
         
         $message = $isLate 
             ? "Check-in berhasil (Terlambat {$lateMinutes} menit)" 
-            : "Check-in berhasil!";
-        
-        if (!$isVerified) {
-            $message .= " ⚠️ Di luar radius ({$distance}m dari lokasi)";
-        }
+            : "Check-in berhasil! Jarak: {$distance}m";
         
         $this->dispatch('notify', type: $isLate ? 'warning' : 'success', message: $message);
         $this->selectedLocationId = null;
@@ -435,8 +440,8 @@ class AttendancePortal extends Component
             $query->where('user_id', $user->id);
         } elseif ($user->role === 'admin') {
             $query->where('branch_id', $user->branch_id);
-        } elseif ($this->selectedBranchId) {
-            $query->where('branch_id', $this->selectedBranchId);
+        } elseif ($user->role === 'super_admin' && $this->filterBranchId) {
+            $query->where('branch_id', $this->filterBranchId);
         }
         
         // Date filter
