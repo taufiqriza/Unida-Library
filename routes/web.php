@@ -9,13 +9,6 @@ use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Test Error Pages (only in local environment)
-if (app()->environment('local')) {
-    Route::get('/test-error/{code}', function ($code) {
-        abort((int) $code);
-    })->where('code', '403|404|419|500');
-}
-
 // OPAC Routes (Livewire)
 Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');
