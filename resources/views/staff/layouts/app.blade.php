@@ -13,12 +13,48 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     
-    {{-- Critical CSS - prevents FOUC --}}
+    {{-- Critical CSS - prevents FOUC + Dark Mode Variables --}}
     <style>
-        html, body { margin: 0; padding: 0; background: #f8fafc; }
+        /* CSS Variables for theming */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        html.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        html, body { margin: 0; padding: 0; background: var(--bg-primary); }
+        html.dark { color-scheme: dark; }
         body { opacity: 0; }
-        body.ready { opacity: 1; transition: opacity 0.1s; }
+        body.ready { opacity: 1; transition: opacity 0.15s, background-color 0.3s; }
     </style>
+    
+    {{-- Instant dark mode detection (before anything renders) --}}
+    <script>
+        (function() {
+            const stored = localStorage.getItem('staffPortalDarkMode');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = stored === 'true' || (stored === null && prefersDark);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -126,7 +162,9 @@
     @livewireStyles
     @filamentStyles
 </head>
-<body x-data="staffPortal()" class="antialiased bg-slate-50 font-['Inter']">
+<body x-data="staffPortal()" 
+      class="antialiased font-['Inter'] transition-colors duration-300"
+      :class="darkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'">
 <script>document.body.classList.add('ready');</script>
 
     {{-- Mobile Header --}}
@@ -269,16 +307,21 @@
         </aside>
 
         {{-- Desktop Header - FIXED --}}
-        <header class="desktop-header hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm fixed top-0 z-30 h-[72px]"
-                :class="sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]'">
+        <header class="desktop-header hidden lg:flex items-center justify-between px-8 shadow-sm fixed top-0 z-30 h-[72px] transition-colors duration-300"
+                :class="[
+                    sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]',
+                    darkMode ? 'bg-slate-800 border-b border-slate-700' : 'bg-white border-b border-slate-200'
+                ]">
             <div class="flex items-center gap-4">
-                <button @click="toggleSidebar()" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400 flex items-center justify-center transition-all">
+                <button @click="toggleSidebar()" 
+                        class="w-9 h-9 rounded-lg border flex items-center justify-center transition-all"
+                        :class="darkMode ? 'border-slate-600 text-slate-400 hover:text-slate-200 hover:border-slate-500' : 'border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400'">
                     <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
                 </button>
-                <div class="h-8 w-px bg-slate-200"></div>
+                <div class="h-8 w-px" :class="darkMode ? 'bg-slate-600' : 'bg-slate-200'"></div>
                 <div>
-                    <h2 class="text-lg font-semibold leading-tight text-slate-900">@yield('title', 'Dashboard')</h2>
-                    <p class="text-xs text-slate-500">{{ $currentDate }}</p>
+                    <h2 class="text-lg font-semibold leading-tight" :class="darkMode ? 'text-slate-100' : 'text-slate-900'">@yield('title', 'Dashboard')</h2>
+                    <p class="text-xs" :class="darkMode ? 'text-slate-400' : 'text-slate-500'">{{ $currentDate }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-4">
@@ -289,19 +332,35 @@
                 {{-- Notification Bell --}}
                 @livewire('staff.notification.notification-bell')
                 
-                <div class="h-8 w-px bg-slate-200"></div>
+                {{-- Dark Mode Toggle --}}
+                <button @click="toggleDarkMode()" 
+                        class="relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group"
+                        :class="darkMode ? 'bg-slate-700 hover:bg-slate-600 text-amber-400' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'"
+                        title="Toggle Dark Mode">
+                    {{-- Sun Icon --}}
+                    <i class="fas fa-sun text-lg absolute transition-all duration-300"
+                       :class="darkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'"></i>
+                    {{-- Moon Icon --}}
+                    <i class="fas fa-moon text-lg absolute transition-all duration-300"
+                       :class="darkMode ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'"></i>
+                </button>
+                
+                <div class="h-8 w-px" :class="darkMode ? 'bg-slate-600' : 'bg-slate-200'"></div>
                 
                 {{-- Profile Dropdown --}}
                 <div x-data="{ profileOpen: false }" class="relative">
-                    <button @click="profileOpen = !profileOpen" class="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2 py-1.5 transition">
+                    <button @click="profileOpen = !profileOpen" 
+                            class="flex items-center gap-3 rounded-xl px-2 py-1.5 transition"
+                            :class="darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'">
                         <div class="text-right hidden sm:block">
-                            <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
-                            <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                            <p class="text-xs" :class="darkMode ? 'text-slate-400' : 'text-slate-400'">{{ $branch?->name ?? 'Semua Cabang' }}</p>
+                            <p class="text-sm font-semibold" :class="darkMode ? 'text-slate-100' : 'text-slate-900'">{{ $user->name }}</p>
                         </div>
-                        <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
+                        <div class="w-10 h-10 rounded-full border-2 overflow-hidden" :class="darkMode ? 'border-slate-600' : 'border-slate-200'">
                             <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
                         </div>
-                        <i class="fas fa-chevron-down text-slate-400 text-xs transition" :class="profileOpen ? 'rotate-180' : ''"></i>
+                        <i class="fas fa-chevron-down text-xs transition" 
+                           :class="[profileOpen ? 'rotate-180' : '', darkMode ? 'text-slate-400' : 'text-slate-400']"></i>
                     </button>
                     
                     {{-- Dropdown Menu --}}
@@ -314,7 +373,8 @@
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+                         class="absolute right-0 top-full mt-2 w-72 rounded-2xl shadow-2xl overflow-hidden z-50"
+                         :class="darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'">
                         
                         {{-- User Info Header --}}
                         <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-4">
@@ -375,8 +435,11 @@
         </header>
 
         {{-- Main Content Wrapper --}}
-        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden"
-             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
+        <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden transition-colors duration-300"
+             :class="[
+                 sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56',
+                 darkMode ? 'bg-slate-900' : 'bg-slate-50/70'
+             ]">
             <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
                 {{-- Queue Status Alert for Admins --}}
                 <x-queue-status-alert />
@@ -548,12 +611,22 @@
     <script>
         function staffPortal() {
             return {
-                // Use pre-set value from inline script for instant state
+                // Sidebar state
                 sidebarCollapsed: window.__sidebarCollapsed ?? localStorage.getItem('staffSidebarCollapsed') === 'true',
+                
+                // Dark mode state - read from HTML class (set by inline script)
+                darkMode: document.documentElement.classList.contains('dark'),
+                
                 toggleSidebar() {
                     this.sidebarCollapsed = !this.sidebarCollapsed;
                     localStorage.setItem('staffSidebarCollapsed', this.sidebarCollapsed);
                     document.documentElement.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
+                },
+                
+                toggleDarkMode() {
+                    this.darkMode = !this.darkMode;
+                    localStorage.setItem('staffPortalDarkMode', this.darkMode);
+                    document.documentElement.classList.toggle('dark', this.darkMode);
                 }
             }
         }
