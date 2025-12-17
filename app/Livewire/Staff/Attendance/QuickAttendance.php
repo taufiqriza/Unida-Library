@@ -118,25 +118,20 @@ class QuickAttendance extends Component
         // Get check-in location
         $location = $checkIn->location;
         
-        // If location not found (deleted), allow checkout without radius validation
+        // Debug log
+        \Log::info('QuickAttendance Checkout', [
+            'user_id' => $user->id,
+            'checkIn_id' => $checkIn->id,
+            'checkIn_location_id' => $checkIn->location_id,
+            'location_exists' => $location ? true : false,
+            'location_name' => $location?->name,
+            'currentLat' => $this->currentLat,
+            'currentLng' => $this->currentLng,
+        ]);
+        
+        // If location not found (deleted), still block - don't allow checkout
         if (!$location) {
-            // Create checkout without location validation
-            Attendance::create([
-                'user_id' => $user->id,
-                'branch_id' => $user->branch_id,
-                'location_id' => $checkIn->location_id,
-                'type' => 'check_out',
-                'scanned_at' => now(),
-                'latitude' => $this->currentLat,
-                'longitude' => $this->currentLng,
-                'distance_meters' => 0,
-                'is_verified' => true,
-            ]);
-
-            ActivityLog::log('create', 'attendance', "Check-out (lokasi tidak ditemukan)", null);
-            
-            $this->dispatch('notify', type: 'warning', message: '⚠️ Check-out berhasil (lokasi check-in sudah dihapus)');
-            $this->dispatch('attendance-updated');
+            $this->dispatch('notify', type: 'error', message: 'Lokasi check-in tidak ditemukan. Hubungi admin.');
             return;
         }
 
