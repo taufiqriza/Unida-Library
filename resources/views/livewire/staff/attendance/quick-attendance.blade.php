@@ -337,46 +337,57 @@ Alpine.data('quickAttendanceWidget', () => ({
     },
 
     startScanner() {
-        const el = document.getElementById('quick-qr-reader');
-        if (!el) {
+        const qrElement = document.getElementById('quick-qr-reader');
+        if (!qrElement) {
             console.error('QR reader element not found');
             return;
         }
-        if (typeof Html5Qrcode === 'undefined') {
-            console.error('Html5Qrcode library not loaded');
+
+        // If already scanning, stop first
+        if (this.scanning) {
+            if (this.html5QrCode) {
+                this.html5QrCode.stop().then(() => {
+                    this.scanning = false;
+                    qrElement.innerHTML = '';
+                }).catch(err => console.error('Stop error:', err));
+            }
             return;
         }
 
         // Clear previous content
-        el.innerHTML = '';
-        
-        // Stop previous scanner if exists
-        if (this.html5QrCode && this.scanning) {
-            this.html5QrCode.stop().catch(() => {});
-            this.scanning = false;
-        }
-        
+        qrElement.innerHTML = '';
+
         this.html5QrCode = new Html5Qrcode("quick-qr-reader");
         this.html5QrCode.start(
             { facingMode: "environment" },
             { fps: 10, qrbox: { width: 180, height: 180 } },
-            (text) => {
-                $wire.handleQrScan(text);
+            (decodedText) => {
+                console.log('QR Decoded:', decodedText);
+                $wire.handleQrScan(decodedText);
+                // Don't stop on scan - let user select
             },
-            () => {}
+            (errorMessage) => { /* ignore scan errors */ }
         ).then(() => {
             this.scanning = true;
-            console.log('QR Scanner started');
+            console.log('QR Scanner started successfully');
         }).catch((err) => {
+            console.error('QR Scanner error:', err);
             this.scanning = false;
-            console.error('QR Scanner failed:', err);
+            // Show error toast
+            this.showToast({
+                type: 'error',
+                message: 'Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.'
+            });
         });
     },
 
     stopScanner() {
         if (this.html5QrCode && this.scanning) {
-            this.html5QrCode.stop().catch(() => {});
-            this.scanning = false;
+            this.html5QrCode.stop().then(() => {
+                this.scanning = false;
+                const el = document.getElementById('quick-qr-reader');
+                if (el) el.innerHTML = '';
+            }).catch(() => {});
         }
     }
 }));
