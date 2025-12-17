@@ -12,6 +12,7 @@
 
     {{-- Popup --}}
     <div x-show="open" x-cloak
+         wire:ignore.self
          x-transition:enter="transition ease-out duration-150"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -87,7 +88,7 @@
         </div>
 
         {{-- Mode Switcher --}}
-        <div class="p-3 border-b border-gray-100">
+        <div class="p-3 border-b border-gray-100" wire:ignore>
             <div class="flex bg-gray-100 rounded-lg p-0.5">
                 <button @click="setMode('location')" 
                         class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition"
@@ -118,7 +119,7 @@
             </div>
 
             {{-- QR Scanner --}}
-            <div x-show="mode === 'qr'" class="mb-3">
+            <div x-show="mode === 'qr'" class="mb-3" wire:ignore>
                 <div class="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
                     {{-- Loading Overlay (shown when not scanning) --}}
                     <div x-show="!scanning" x-cloak class="absolute inset-0 z-10 flex items-center justify-center text-white bg-gray-900">
