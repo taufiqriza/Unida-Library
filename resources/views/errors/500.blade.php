@@ -121,7 +121,7 @@
         {{-- Footer --}}
         <div class="absolute bottom-8 text-center">
             <p class="text-gray-400 text-xs">
-                © {{ date('Y') }} Beri IT Perpustakaan UNIDA Gontor. All rights reserved.
+                © {{ date('Y') }} IT Perpustakaan UNIDA Gontor. All rights reserved.
             </p>
         </div>
     </div>
