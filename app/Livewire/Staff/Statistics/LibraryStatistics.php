@@ -165,23 +165,23 @@ class LibraryStatistics extends Component
         
         $loansPerMonth = $this->queryWithBranch(Loan::query(), $branchId)
             ->whereBetween('loan_date', [$startDate, $endDate])
-            ->selectRaw('YEAR(loan_date) as year, MONTH(loan_date) as month, COUNT(*) as count')
-            ->groupBy('year', 'month')
-            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->selectRaw("DATE_FORMAT(loan_date, '%Y-%m') as month_key, COUNT(*) as count")
+            ->groupBy('month_key')
+            ->pluck('count', 'month_key')
             ->toArray();
             
         $returnsPerMonth = $this->queryWithBranch(Loan::query(), $branchId)
             ->whereBetween('return_date', [$startDate, $endDate])
-            ->selectRaw('YEAR(return_date) as year, MONTH(return_date) as month, COUNT(*) as count')
-            ->groupBy('year', 'month')
-            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->selectRaw("DATE_FORMAT(return_date, '%Y-%m') as month_key, COUNT(*) as count")
+            ->groupBy('month_key')
+            ->pluck('count', 'month_key')
             ->toArray();
             
         $membersPerMonth = $this->queryWithBranch(Member::query(), $branchId)
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')
-            ->groupBy('year', 'month')
-            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, COUNT(*) as count")
+            ->groupBy('month_key')
+            ->pluck('count', 'month_key')
             ->toArray();
 
         $monthlyTrend = [];
