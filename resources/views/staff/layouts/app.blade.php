@@ -405,7 +405,7 @@
     @stack('scripts')
     @livewireScripts
     
-    {{-- Handle session expired (419 error) - Direct redirect --}}
+    {{-- Handle session expired (419 error) - Form redirect like logout --}}
     <script>
         (function() {
             let sessionExpired = false;
@@ -416,8 +416,12 @@
                         if (status === 419 && !sessionExpired) {
                             sessionExpired = true;
                             preventDefault();
-                            // Force full page reload to login with cache buster
-                            window.location.replace('/login?session_expired=' + Date.now());
+                            // Use form submission - same as logout navigation
+                            var form = document.createElement('form');
+                            form.method = 'GET';
+                            form.action = '/login';
+                            document.body.appendChild(form);
+                            form.submit();
                         }
                     });
                 });
