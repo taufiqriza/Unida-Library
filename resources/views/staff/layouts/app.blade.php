@@ -178,13 +178,11 @@
                 $currentRoute = request()->route()?->getName() ?? '';
                 $navItems = [
                     ['route' => 'staff.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.circulation', 'icon' => 'fa-exchange-alt', 'label' => 'Sirkulasi', 'roles' => ['super_admin', 'admin', 'librarian']],
-                    ['route' => 'staff.catalog', 'icon' => 'fa-search', 'label' => 'Katalog', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.members', 'icon' => 'fa-users', 'label' => 'Anggota', 'roles' => ['super_admin', 'admin', 'librarian']],
+                    ['route' => 'staff.member.index', 'icon' => 'fa-users', 'label' => 'Anggota', 'roles' => ['super_admin', 'admin', 'librarian']],
                     ['route' => 'staff.attendance', 'icon' => 'fa-calendar-check', 'label' => 'Kehadiran', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.reports', 'icon' => 'fa-chart-bar', 'label' => 'Laporan', 'roles' => ['super_admin', 'admin', 'librarian']],
-                    ['route' => 'staff.tasks', 'icon' => 'fa-tasks', 'label' => 'Tugas', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.settings', 'icon' => 'fa-cog', 'label' => 'Pengaturan', 'roles' => ['super_admin', 'admin']],
+                    ['route' => 'staff.statistics', 'icon' => 'fa-chart-bar', 'label' => 'Statistik', 'roles' => ['super_admin', 'admin', 'librarian']],
+                    ['route' => 'staff.task.index', 'icon' => 'fa-tasks', 'label' => 'Tugas', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
+                    ['route' => 'staff.profile', 'icon' => 'fa-cog', 'label' => 'Profil', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
                 ];
                 $userRole = auth()->user()?->role ?? 'staff';
             @endphp
