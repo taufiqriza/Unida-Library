@@ -346,18 +346,15 @@
                         
                         {{-- Logout --}}
                         <div class="border-t border-slate-100 p-2">
-                            <form method="POST" action="{{ route('staff.logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition group">
-                                    <div class="w-9 h-9 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition">
-                                        <i class="fas fa-sign-out-alt"></i>
-                                    </div>
-                                    <div class="text-left">
-                                        <p class="text-sm font-semibold text-red-600">Logout</p>
-                                        <p class="text-xs text-slate-400">Keluar dari sistem</p>
-                                    </div>
-                                </button>
-                            </form>
+                            <a href="{{ route('staff.logout') }}" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition group">
+                                <div class="w-9 h-9 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-semibold text-red-600">Logout</p>
+                                    <p class="text-xs text-slate-400">Keluar dari sistem</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
