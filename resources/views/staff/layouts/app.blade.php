@@ -1,336 +1,414 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Staff Portal' }} - Perpustakaan UNIDA</title>
+    <title>@yield('title', 'Dashboard') - Staff Portal</title>
 
-    {{-- QR Scanner Library - Global --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-
-    {{-- Fonts & Icons --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    
-    {{-- Tailwind CDN --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' },
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
                     }
                 }
             }
         }
     </script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    {{-- Alpine.js is included in @filamentScripts - do not load CDN version --}}
+
+    @php
+        $user = auth()->user();
+        $branch = $user->branch;
+        $currentDate = now()->locale('id')->isoFormat('dddd, D MMMM Y');
+        $navItems = [
+            ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'staff.dashboard', 'patterns' => ['staff.dashboard*']],
+            ['label' => 'Tasks', 'icon' => 'fa-clipboard-list', 'route' => 'staff.task.index', 'patterns' => ['staff.task*']],
+            ['label' => 'Kehadiran', 'icon' => 'fa-fingerprint', 'route' => 'staff.attendance.index', 'patterns' => ['staff.attendance*']],
+            ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.circulation.index', 'patterns' => ['staff.circulation*']],
+            ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.biblio.index', 'patterns' => ['staff.biblio*']],
+            ['label' => 'E-Library', 'icon' => 'fa-cloud', 'route' => 'staff.elibrary.index', 'patterns' => ['staff.elibrary*']],
+            ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
+            ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
+            ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
+            ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
+            ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
+        ];
+        // Add Control menu for admin only
+        if (in_array($user->role, ['super_admin', 'admin'])) {
+            $navItems[] = ['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']];
+        }
+        // Note: Profil removed from sidebar, now in header dropdown
+    @endphp
+
+    <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css" rel="stylesheet">
+    @stack('styles')
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
         [x-cloak] { display: none !important; }
         
-        /* Sidebar Animation */
-        .sidebar-transition {
-            transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
-        }
+        .staff-sidebar { width: 14rem; }
+        html.sidebar-collapsed .staff-sidebar { width: 5rem; }
+        .main-content-wrapper { margin-left: 14rem; }
+        html.sidebar-collapsed .main-content-wrapper { margin-left: 5rem; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Sidebar collapsed state */
-        .sidebar-collapsed { width: 80px; }
-        .sidebar-collapsed .sidebar-text { display: none; }
-        .sidebar-collapsed .sidebar-icon { margin-right: 0; }
-        .sidebar-collapsed .sidebar-header-text { display: none; }
-        
-        /* Hide collapse button text on collapsed */
-        .sidebar-collapsed .collapse-text { display: none; }
-        
-        /* Mobile sidebar */
         @media (max-width: 1023px) {
-            .sidebar-mobile-hidden { transform: translateX(-100%); }
+            .staff-sidebar { display: none !important; }
+            .main-content-wrapper { margin-left: 0 !important; }
         }
         
-        /* Smooth transitions */
-        .nav-link {
-            transition: all 0.2s ease-in-out;
+        /* Ensure modals with high z-index appear above everything */
+        .fixed[style*="z-index: 9999"],
+        .fixed[style*="z-index: 10000"] {
+            position: fixed !important;
         }
-        
-        /* Top navigation dropdown on hover */
-        .nav-dropdown:hover .nav-dropdown-content {
-            display: block;
-        }
-
-        /* Main content area */
-        .main-content {
-            min-height: calc(100vh - 64px);
-        }
-        
-        /* Popup styling */
-        .popup-enter { animation: popupEnter 0.2s ease-out forwards; }
-        .popup-leave { animation: popupLeave 0.15s ease-in forwards; }
-        @keyframes popupEnter { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes popupLeave { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
-        
-        /* Toast styling for Quick Attendance popup */
-        .qa-toast {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 99999;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            animation: toastPop 0.3s ease-out;
-        }
-        @keyframes toastPop {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        }
-        .qa-toast-success { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-        .qa-toast-error { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
-        .qa-toast-info { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
     </style>
-    
-    @filamentStyles
+
+    <script>
+        (function() {
+            const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
+            if (collapsed) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+            // Pre-set sidebar state for Alpine
+            window.__sidebarCollapsed = collapsed;
+        })();
+    </script>
     @livewireStyles
-    @stack('styles')
+    @filamentStyles
 </head>
-<body class="bg-gray-50 antialiased" 
-      x-data="{ 
-          sidebarOpen: window.innerWidth >= 1024,
-          sidebarCollapsed: localStorage.getItem('sidebarCollapsed') === 'true',
-          mobileMenuOpen: false,
-          activeSubmenu: null,
-          
-          toggleSidebar() {
-              if (window.innerWidth < 1024) {
-                  this.mobileMenuOpen = !this.mobileMenuOpen;
-              } else {
-                  this.sidebarCollapsed = !this.sidebarCollapsed;
-                  localStorage.setItem('sidebarCollapsed', this.sidebarCollapsed);
-              }
-          },
-          
-          closeMobileMenu() {
-              this.mobileMenuOpen = false;
-          }
-      }"
-      @resize.window="sidebarOpen = window.innerWidth >= 1024"
-      @keydown.escape="mobileMenuOpen = false"
->
-    {{-- Mobile Overlay --}}
-    <div x-show="mobileMenuOpen" 
-         x-transition:enter="transition-opacity ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         @click="closeMobileMenu()"
-         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-         style="display: none;"></div>
+<body x-data="staffPortal()" class="antialiased bg-slate-50 font-['Inter']">
 
-    {{-- Sidebar --}}
-    <aside class="fixed top-0 left-0 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white z-50 sidebar-transition overflow-hidden shadow-2xl"
-           :class="{
-               'w-72': !sidebarCollapsed,
-               'sidebar-collapsed': sidebarCollapsed,
-               'sidebar-mobile-hidden': !mobileMenuOpen,
-               'w-72': mobileMenuOpen
-           }"
-           x-show="sidebarOpen || mobileMenuOpen"
-           x-transition:enter="transition ease-out duration-300"
-           x-transition:enter-start="-translate-x-full lg:translate-x-0"
-           x-transition:enter-end="translate-x-0">
-        
-        {{-- Header --}}
-        <div class="flex items-center justify-between h-16 px-4 border-b border-white/10 bg-gradient-to-r from-blue-600/20 to-indigo-600/20">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-book-reader text-white text-lg"></i>
-                </div>
-                <div class="sidebar-text">
-                    <h1 class="font-bold text-white text-sm tracking-wide sidebar-header-text">PERPUSTAKAAN</h1>
-                    <p class="text-[10px] text-blue-300 sidebar-header-text">UNIDA Gontor</p>
-                </div>
+    {{-- Mobile Header --}}
+    <header class="mobile-header lg:hidden fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 shadow-xl">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-book-open text-white text-sm"></i>
             </div>
-            <button @click="toggleSidebar()" class="p-2 hover:bg-white/10 rounded-lg transition lg:block hidden">
-                <i class="fas fa-chevron-left text-gray-400 text-sm transition-transform duration-300" :class="sidebarCollapsed ? 'rotate-180' : ''"></i>
-            </button>
-            <button @click="closeMobileMenu()" class="p-2 hover:bg-white/10 rounded-lg transition lg:hidden">
-                <i class="fas fa-times text-gray-400"></i>
-            </button>
+            <div>
+                <p class="text-white text-sm font-semibold">Staff Portal</p>
+                <p class="text-blue-200 text-[10px]">{{ $branch?->name ?? 'Perpustakaan' }}</p>
+            </div>
         </div>
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-full bg-white/20 overflow-hidden border-2 border-white/30">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </header>
 
-        {{-- Navigation --}}
-        <nav class="p-3 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
-            @php
-                $currentRoute = request()->route()?->getName() ?? '';
-                $navItems = [
-                    ['route' => 'staff.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.member.index', 'icon' => 'fa-users', 'label' => 'Anggota', 'roles' => ['super_admin', 'admin', 'librarian']],
-                    ['route' => 'staff.attendance', 'icon' => 'fa-calendar-check', 'label' => 'Kehadiran', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.statistics', 'icon' => 'fa-chart-bar', 'label' => 'Statistik', 'roles' => ['super_admin', 'admin', 'librarian']],
-                    ['route' => 'staff.task.index', 'icon' => 'fa-tasks', 'label' => 'Tugas', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                    ['route' => 'staff.profile', 'icon' => 'fa-cog', 'label' => 'Profil', 'roles' => ['super_admin', 'admin', 'librarian', 'staff']],
-                ];
-                $userRole = auth()->user()?->role ?? 'staff';
-            @endphp
+    <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
+        {{-- Desktop Sidebar - FIXED --}}
+        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40"
+               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'">
             
-            @foreach($navItems as $item)
-                @if(in_array($userRole, $item['roles']))
-                    <a href="{{ route($item['route']) }}" 
-                       class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                              {{ str_starts_with($currentRoute, $item['route']) 
-                                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30' 
-                                 : 'text-gray-300 hover:bg-white/10 hover:text-white' }}">
-                        <i class="fas {{ $item['icon'] }} w-5 text-center sidebar-icon {{ str_starts_with($currentRoute, $item['route']) ? '' : 'text-gray-400 group-hover:text-white' }}"></i>
-                        <span class="sidebar-text font-medium text-sm">{{ $item['label'] }}</span>
-                    </a>
-                @endif
-            @endforeach
-
-            {{-- Divider --}}
-            <div class="my-4 border-t border-white/10"></div>
-
-            {{-- Admin Panel Link (for super_admin only) --}}
-            @if(auth()->user()?->role === 'super_admin')
-                <a href="/control" 
-                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-amber-500/20 hover:text-amber-400 transition-all duration-200 group">
-                    <i class="fas fa-shield-alt w-5 text-center sidebar-icon text-amber-500"></i>
-                    <span class="sidebar-text font-medium text-sm">Admin Panel</span>
-                </a>
-            @endif
-
-            {{-- OPAC Link --}}
-            <a href="/" target="_blank"
-               class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                <i class="fas fa-globe w-5 text-center sidebar-icon text-gray-400 group-hover:text-white"></i>
-                <span class="sidebar-text font-medium text-sm">Lihat OPAC</span>
-                <i class="fas fa-external-link-alt text-xs ml-auto sidebar-text text-gray-500"></i>
-            </a>
-        </nav>
-    </aside>
-
-    {{-- Main Content Wrapper --}}
-    <div class="lg:transition-all lg:duration-300"
-         :class="{
-             'lg:ml-72': !sidebarCollapsed,
-             'lg:ml-20': sidebarCollapsed
-         }">
-        
-        {{-- Top Navbar --}}
-        <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-gray-100 shadow-sm">
-            <div class="flex items-center justify-between h-16 px-4 lg:px-6">
-                {{-- Left: Hamburger & Title --}}
-                <div class="flex items-center gap-4">
-                    <button @click="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-xl transition lg:hidden">
-                        <i class="fas fa-bars text-gray-600"></i>
-                    </button>
-                    <div class="hidden lg:block">
-                        <h2 class="font-semibold text-gray-800">{{ $pageTitle ?? 'Dashboard' }}</h2>
-                        <p class="text-xs text-gray-500">{{ now()->translatedFormat('l, d F Y') }}</p>
+            {{-- Logo --}}
+            <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
+                <div class="flex items-center gap-3 transition-all duration-300"
+                     :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+                        <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    </div>
+                    <div class="leading-tight whitespace-nowrap">
+                        <p class="text-sm font-bold text-white">UNIDA LIBRARY</p>
+                        <p class="text-[10px] text-blue-200">Admin Portal</p>
                     </div>
                 </div>
+                <div class="transition-all duration-300 mx-auto"
+                     :class="sidebarCollapsed ? 'opacity-100 relative' : 'opacity-0 absolute pointer-events-none'">
+                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
+                        <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                    </div>
+                </div>
+            </div>
 
-                {{-- Right: Actions --}}
-                <div class="flex items-center gap-2">
-                    {{-- Quick Attendance Widget --}}
-                    @livewire('staff.attendance.quick-attendance')
-                    
-                    {{-- Notifications --}}
-                    <button class="relative p-2.5 hover:bg-gray-100 rounded-xl transition">
-                        <i class="fas fa-bell text-gray-600"></i>
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                    </button>
+            {{-- Navigation --}}
+            <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                @foreach($navItems as $item)
+                    @php $active = request()->routeIs($item['patterns']); @endphp
+                    <a href="{{ route($item['route']) }}" wire:navigate title="{{ $item['label'] }}"
+                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-white/15 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}"
+                       :class="sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5'">
+                        @if($active)
+                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
+                        @endif
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-white/20 text-white shadow-lg' : 'bg-white/10 text-blue-200 group-hover:text-white' }} flex-shrink-0 transition-all">
+                            <i class="fas {{ $item['icon'] }} text-sm"></i>
+                        </div>
+                        <span class="text-sm font-medium transition-all duration-300"
+                              :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">{{ $item['label'] }}</span>
+                    </a>
+                @endforeach
+            </nav>
 
-                    {{-- User Menu --}}
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" @click.away="open = false" 
-                                class="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-100 rounded-xl transition">
-                            <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                                @if(auth()->user()?->avatar)
-                                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" class="w-full h-full object-cover rounded-xl">
-                                @else
-                                    <span class="text-white font-semibold text-sm">{{ substr(auth()->user()?->name ?? 'U', 0, 1) }}</span>
-                                @endif
-                            </div>
-                            <div class="hidden sm:block text-left">
-                                <p class="font-medium text-gray-800 text-sm">{{ Str::words(auth()->user()?->name ?? 'User', 2, '') }}</p>
-                                <p class="text-xs text-gray-500 capitalize">{{ str_replace('_', ' ', auth()->user()?->role ?? 'Staff') }}</p>
-                            </div>
-                            <i class="fas fa-chevron-down text-xs text-gray-400 hidden sm:block"></i>
-                        </button>
+            {{-- User Info --}}
+            <div class="border-t border-white/10 p-4" x-data="{ showLogoutModal: false }">
+                <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
+                     :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
+                    <p class="text-xs text-blue-200">{{ ucfirst($user->role) }}</p>
+                    <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
+                </div>
+                <button @click="showLogoutModal = true" 
+                        type="button"
+                        class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-500 text-white transition-all">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="text-sm font-medium transition-all duration-300"
+                          :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
+                </button>
+
+                {{-- Logout Confirmation Modal - Teleported to body --}}
+                <template x-teleport="body">
+                    <div x-show="showLogoutModal" 
+                         x-cloak
+                         class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0">
                         
-                        {{-- Dropdown --}}
-                        <div x-show="open" 
+                        {{-- Backdrop --}}
+                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showLogoutModal = false"></div>
+                        
+                        {{-- Modal Content --}}
+                        <div class="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden"
                              x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 translate-y-2"
-                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                              x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 translate-y-0"
-                             x-transition:leave-end="opacity-0 translate-y-2"
-                             class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50"
-                             style="display: none;">
-                            <div class="px-4 py-3 border-b border-gray-100">
-                                <p class="font-semibold text-gray-800">{{ auth()->user()?->name }}</p>
-                                <p class="text-sm text-gray-500">{{ auth()->user()?->email }}</p>
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                             @click.stop>
+                            
+                            {{-- Icon Header --}}
+                            <div class="pt-8 pb-4 flex justify-center">
+                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-red-100 to-red-50 flex items-center justify-center">
+                                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+                                        <i class="fas fa-sign-out-alt text-white text-2xl"></i>
+                                    </div>
+                                </div>
                             </div>
-                            <a href="{{ route('staff.settings') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
-                                <i class="fas fa-user-cog text-gray-400 w-5"></i>
-                                <span class="text-gray-700">Profil Saya</span>
-                            </a>
-                            <a href="{{ route('staff.settings') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
-                                <i class="fas fa-cog text-gray-400 w-5"></i>
-                                <span class="text-gray-700">Pengaturan</span>
-                            </a>
-                            <div class="border-t border-gray-100 mt-2 pt-2">
-                                <a href="{{ route('staff.logout') }}"
-                                   class="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-600 transition">
-                                    <i class="fas fa-sign-out-alt w-5"></i>
-                                    <span>Keluar</span>
-                                </a>
+                            
+                            {{-- Content --}}
+                            <div class="px-6 pb-6 text-center">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Keluar dari Portal?</h3>
+                                <p class="text-gray-500 text-sm mb-6">
+                                    Anda akan keluar dari akun <span class="font-semibold text-gray-700">{{ $user->name }}</span>. 
+                                    Pastikan semua pekerjaan sudah tersimpan.
+                                </p>
+                                
+                                {{-- Actions --}}
+                                <div class="flex gap-3">
+                                    <button @click="showLogoutModal = false" 
+                                            type="button"
+                                            class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition">
+                                        Batal
+                                    </button>
+                                    <a href="{{ route('staff.logout') }}" 
+                                       class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg shadow-red-500/25 transition flex items-center justify-center gap-2">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Ya, Keluar</span>
+                                    </a>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </aside>
+
+        {{-- Desktop Header - FIXED --}}
+        <header class="desktop-header hidden lg:flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm fixed top-0 z-30 h-[72px]"
+                :class="sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]'">
+            <div class="flex items-center gap-4">
+                <button @click="toggleSidebar()" class="w-9 h-9 rounded-lg border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400 flex items-center justify-center transition-all">
+                    <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
+                </button>
+                <div class="h-8 w-px bg-slate-200"></div>
+                <div>
+                    <h2 class="text-lg font-semibold leading-tight text-slate-900">@yield('title', 'Dashboard')</h2>
+                    <p class="text-xs text-slate-500">{{ $currentDate }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                @include('staff.components.portal-switcher')
+                @livewire('staff.attendance.quick-attendance')
+                @include('staff.components.quick-actions')
+                
+                {{-- Notification Bell --}}
+                @livewire('staff.notification.notification-bell')
+                
+                <div class="h-8 w-px bg-slate-200"></div>
+                
+                {{-- Profile Dropdown --}}
+                <div x-data="{ profileOpen: false }" class="relative">
+                    <button @click="profileOpen = !profileOpen" class="flex items-center gap-3 hover:bg-slate-50 rounded-xl px-2 py-1.5 transition">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-xs text-slate-400">{{ $branch?->name ?? 'Semua Cabang' }}</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-200 overflow-hidden">
+                            <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-400 text-xs transition" :class="profileOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    
+                    {{-- Dropdown Menu --}}
+                    <div x-show="profileOpen" 
+                         x-cloak
+                         @click.away="profileOpen = false"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+                        
+                        {{-- User Info Header --}}
+                        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-14 h-14 rounded-xl border-2 border-white/30 overflow-hidden shadow-lg">
+                                    <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-bold truncate">{{ $user->name }}</p>
+                                    <p class="text-blue-200 text-sm truncate">{{ $user->email }}</p>
+                                    <span class="inline-block mt-1 px-2 py-0.5 bg-white/20 text-white text-xs rounded-lg">
+                                        {{ \App\Models\User::getRoles()[$user->role] ?? ucfirst($user->role) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Menu Items --}}
+                        <div class="py-2">
+                            <a href="{{ route('staff.profile') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition">
+                                <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Profil Saya</p>
+                                    <p class="text-xs text-slate-400">Edit informasi akun</p>
+                                </div>
+                            </a>
+                            
+                            @if(in_array($user->role, ['super_admin', 'admin']))
+                            <a href="{{ route('staff.control.index') }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition">
+                                <div class="w-9 h-9 bg-violet-100 rounded-lg flex items-center justify-center text-violet-600">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-900">Pengaturan</p>
+                                    <p class="text-xs text-slate-400">Kelola staff & sistem</p>
+                                </div>
+                            </a>
+                            @endif
+                        </div>
+                        
+                        {{-- Logout --}}
+                        <div class="border-t border-slate-100 p-2">
+                            <a href="{{ route('staff.logout') }}" class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-red-50 rounded-xl transition group">
+                                <div class="w-9 h-9 bg-red-100 group-hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-semibold text-red-600">Logout</p>
+                                    <p class="text-xs text-slate-400">Keluar dari sistem</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        {{-- Main Content --}}
-        <main class="main-content p-4 lg:p-6">
-            {{ $slot }}
-        </main>
-
-        {{-- Footer --}}
-        <footer class="border-t border-gray-100 bg-white/50 py-4 px-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
-                <p>© {{ date('Y') }} IT Perpustakaan UNIDA Gontor</p>
-                <p class="flex items-center gap-1">
-                    <i class="fas fa-code text-gray-400"></i> 
-                    <span>v1.0.0</span>
-                </p>
-            </div>
-        </footer>
+        {{-- Main Content Wrapper --}}
+        <div class="flex-1 flex flex-col min-h-screen bg-slate-50/70 lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden"
+             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
+            <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
+                {{-- Queue Status Alert for Admins --}}
+                <x-queue-status-alert />
+                
+                @yield('content')
+            </main>
+        </div>
     </div>
 
+    @stack('modals')
+
+    {{-- Staff Chat Widget --}}
+    @livewire('staff.chat.staff-chat')
+
+    {{-- Mobile Bottom Nav --}}
+    <nav class="mobile-nav lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-r from-blue-700 to-indigo-800 flex items-center justify-around px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]">
+        @foreach(array_slice($navItems, 0, 5) as $item)
+            @php $active = request()->routeIs($item['patterns']); @endphp
+            <a href="{{ route($item['route']) }}" wire:navigate class="flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all {{ $active ? 'text-amber-400' : 'text-white/70' }}">
+                <i class="fas {{ $item['icon'] }} text-lg"></i>
+                <span class="text-[10px] font-medium">{{ $item['label'] }}</span>
+            </a>
+        @endforeach
+    </nav>
+
+    <script>
+        function staffPortal() {
+            return {
+                // Use pre-set value from inline script for instant state
+                sidebarCollapsed: window.__sidebarCollapsed ?? localStorage.getItem('staffSidebarCollapsed') === 'true',
+                toggleSidebar() {
+                    this.sidebarCollapsed = !this.sidebarCollapsed;
+                    localStorage.setItem('staffSidebarCollapsed', this.sidebarCollapsed);
+                    document.documentElement.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
+                }
+            }
+        }
+    </script>
     @stack('scripts')
     @livewireScripts
     
     {{-- Session Expired Modal --}}
-    <div id="session-expired-modal" class="fixed inset-0 hidden" style="z-index: 999999 !important;">
-        {{-- Backdrop - blocks everything --}}
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div id="session-expired-modal" class="fixed inset-0 z-[9999] hidden">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
         
         {{-- Modal Content --}}
         <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -346,38 +424,24 @@
                 {{-- Body --}}
                 <div class="p-6 text-center">
                     <p class="text-gray-600 mb-2">Sesi Anda telah berakhir karena tidak ada aktivitas.</p>
-                    <p class="text-sm text-gray-400">Silakan klik tombol di bawah untuk login kembali.</p>
+                    <p class="text-sm text-gray-400">Silakan login kembali untuk melanjutkan.</p>
                 </div>
                 
                 {{-- Footer --}}
                 <div class="px-6 pb-6">
-                    <a href="/login" id="session-redirect-btn"
-                       class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 no-underline block text-center">
+                    <button onclick="window.location.href='/login'" 
+                            class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
                         <i class="fas fa-sign-in-alt"></i>
                         Login Kembali
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
-    {{-- Handle session expired (419 error) - MUST be before filamentScripts --}}
+    {{-- Handle session expired (419 error) --}}
     <script>
-        // Global flag - checked by everything
-        window.sessionExpired = false;
-        
         function showSessionExpiredModal() {
-            // Prevent multiple triggers
-            if (window.sessionExpired) return;
-            window.sessionExpired = true;
-            
-            // Stop all Livewire activity if possible
-            try {
-                if (window.Livewire && window.Livewire.stop) {
-                    window.Livewire.stop();
-                }
-            } catch(e) {}
-            
             const modal = document.getElementById('session-expired-modal');
             const content = document.getElementById('session-modal-content');
             if (modal && content) {
@@ -390,45 +454,11 @@
             }
         }
         
-        // Intercept 419 at XMLHttpRequest level EARLY (catches ALL AJAX including Filament)
-        (function() {
-            const originalXHROpen = XMLHttpRequest.prototype.open;
-            const originalXHRSend = XMLHttpRequest.prototype.send;
-            
-            XMLHttpRequest.prototype.open = function() {
-                this._url = arguments[1];
-                return originalXHROpen.apply(this, arguments);
-            };
-            
-            XMLHttpRequest.prototype.send = function() {
-                const self = this;
-                this.addEventListener('readystatechange', function() {
-                    if (self.readyState === 4 && self.status === 419 && !window.sessionExpired) {
-                        showSessionExpiredModal();
-                    }
-                });
-                return originalXHRSend.apply(this, arguments);
-            };
-        })();
-        
-        // Also intercept fetch API
-        (function() {
-            const originalFetch = window.fetch;
-            window.fetch = function(...args) {
-                return originalFetch.apply(this, args).then(response => {
-                    if (response.status === 419 && !window.sessionExpired) {
-                        showSessionExpiredModal();
-                    }
-                    return response;
-                });
-            };
-        })();
-        
-        // Livewire hook as backup
         document.addEventListener('livewire:init', () => {
             Livewire.hook('request', ({ fail }) => {
                 fail(({ status, preventDefault }) => {
-                    if (status === 419 && !window.sessionExpired) {
+                    if (status === 419) {
+                        // Session expired - show custom modal (no auto-click)
                         preventDefault();
                         showSessionExpiredModal();
                     }
