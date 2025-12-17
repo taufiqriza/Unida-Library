@@ -147,15 +147,19 @@ class AttendancePortal extends Component
             return;
         }
         
-        $distance = $location->calculateDistance($this->currentLat, $this->currentLng);
+        $distance = (int) min($location->calculateDistance($this->currentLat, $this->currentLng), 2147483647);
         $isVerified = $location->isWithinRadius($this->currentLat, $this->currentLng);
         
-        // Calculate late status
+        // Calculate late status - parse work_start_time for today
         $now = Carbon::now();
-        $workStart = Carbon::parse($location->work_start_time);
-        $lateThreshold = $workStart->copy()->addMinutes($location->late_tolerance_minutes);
-        $isLate = $now->format('H:i:s') > $lateThreshold->format('H:i:s');
-        $lateMinutes = $isLate ? $now->diffInMinutes($workStart) : 0;
+        $workStartToday = Carbon::today()->setTimeFromTimeString($location->work_start_time);
+        $lateThreshold = $workStartToday->copy()->addMinutes($location->late_tolerance_minutes);
+        
+        $isLate = $now->greaterThan($lateThreshold);
+        $lateMinutes = 0;
+        if ($isLate) {
+            $lateMinutes = max(0, (int) $now->diffInMinutes($workStartToday));
+        }
         
         // Create attendance
         Attendance::create([
