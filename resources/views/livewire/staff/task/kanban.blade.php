@@ -156,6 +156,57 @@
         </div>
     </div>
 
+    {{-- Today's Schedule Widget (Integration) --}}
+    @if($todaySchedules->count() > 0)
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 p-4">
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white">
+                    <i class="fas fa-calendar-day text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-sm">Jadwal Hari Ini</h3>
+                    <p class="text-[10px] text-gray-500">{{ now()->locale('id')->isoFormat('dddd, D MMMM') }}</p>
+                </div>
+            </div>
+            <a href="{{ route('staff.task.schedule') }}" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+                Lihat Semua <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1">
+            @foreach($todaySchedules as $schedule)
+                @php 
+                    $typeInfo = $schedule->getTypeInfo();
+                    $colorMap = [
+                        'blue' => 'bg-blue-100 text-blue-700 border-blue-200',
+                        'indigo' => 'bg-indigo-100 text-indigo-700 border-indigo-200',
+                        'emerald' => 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                        'violet' => 'bg-violet-100 text-violet-700 border-violet-200',
+                        'amber' => 'bg-amber-100 text-amber-700 border-amber-200',
+                        'cyan' => 'bg-cyan-100 text-cyan-700 border-cyan-200',
+                        'rose' => 'bg-rose-100 text-rose-700 border-rose-200',
+                        'gray' => 'bg-gray-100 text-gray-700 border-gray-200',
+                    ];
+                    $colorClass = $colorMap[$typeInfo['color']] ?? $colorMap['gray'];
+                @endphp
+                <div class="flex-shrink-0 px-3 py-2 rounded-lg border {{ $colorClass }} min-w-[140px]">
+                    <div class="flex items-center gap-1.5 mb-1">
+                        <i class="fas {{ $typeInfo['icon'] }} text-xs"></i>
+                        <span class="font-semibold text-xs truncate">{{ Str::limit($schedule->title, 15) }}</span>
+                    </div>
+                    <p class="text-[10px] opacity-75">
+                        @if($schedule->getTimeRange())
+                            <i class="fas fa-clock mr-0.5"></i>{{ $schedule->getTimeRange() }}
+                        @else
+                            <i class="fas fa-tag mr-0.5"></i>{{ $typeInfo['label'] }}
+                        @endif
+                    </p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     {{-- Filters --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-3">
         <div class="flex flex-wrap items-center gap-3">

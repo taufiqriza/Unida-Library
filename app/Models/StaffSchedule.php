@@ -12,6 +12,7 @@ class StaffSchedule extends Model
         'branch_id',
         'user_id',
         'created_by',
+        'task_id',
         'title',
         'description',
         'type',
@@ -121,6 +122,11 @@ class StaffSchedule extends Model
     public function swapRequests(): HasMany
     {
         return $this->hasMany(ScheduleSwapRequest::class, 'schedule_id');
+    }
+
+    public function task(): BelongsTo
+    {
+        return $this->belongsTo(Task::class);
     }
 
     // Helpers

@@ -8,6 +8,7 @@ use App\Models\TaskChecklist;
 use App\Models\TaskStatus;
 use App\Models\User;
 use App\Models\Branch;
+use App\Models\StaffSchedule;
 use Livewire\Component;
 
 class TaskKanban extends Component
@@ -418,6 +419,14 @@ class TaskKanban extends Component
         // Get branches for filter (only for super_admin)
         $branches = $isSuperAdmin ? Branch::orderBy('name')->get() : collect();
 
+        // Get today's schedules for current user (Integration)
+        $todaySchedules = StaffSchedule::with(['branch'])
+            ->where('user_id', $user->id)
+            ->whereDate('schedule_date', today())
+            ->whereIn('status', ['scheduled', 'ongoing'])
+            ->orderBy('start_time')
+            ->get();
+
         return view('livewire.staff.task.kanban', [
             'statuses' => $statuses,
             'tasksByStatus' => $tasksByStatus,
@@ -425,6 +434,7 @@ class TaskKanban extends Component
             'users' => $users,
             'branches' => $branches,
             'isSuperAdmin' => $isSuperAdmin,
+            'todaySchedules' => $todaySchedules,
         ])->extends('staff.layouts.app')->section('content');
     }
 }
