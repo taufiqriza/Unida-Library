@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
     
-    {{-- Critical CSS - loads before everything, prevents FOUC --}}
+    {{-- Preconnect to CDNs for faster loading --}}
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    {{-- Critical CSS - prevents FOUC --}}
     <style>
         html, body { margin: 0; padding: 0; background: #eff6ff; }
         body { opacity: 0; }
