@@ -405,17 +405,61 @@
     @stack('scripts')
     @livewireScripts
     
+    {{-- Session Expired Modal --}}
+    <div id="session-expired-modal" class="fixed inset-0 z-[9999] hidden">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+        
+        {{-- Modal Content --}}
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="session-modal-content">
+                {{-- Header --}}
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-5 text-center">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-clock text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white">Sesi Berakhir</h3>
+                </div>
+                
+                {{-- Body --}}
+                <div class="p-6 text-center">
+                    <p class="text-gray-600 mb-2">Sesi Anda telah berakhir karena tidak ada aktivitas.</p>
+                    <p class="text-sm text-gray-400">Silakan refresh halaman untuk melanjutkan.</p>
+                </div>
+                
+                {{-- Footer --}}
+                <div class="px-6 pb-6">
+                    <button onclick="window.location.reload()" 
+                            class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fas fa-rotate-right"></i>
+                        Refresh Halaman
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     {{-- Handle session expired (419 error) --}}
     <script>
+        function showSessionExpiredModal() {
+            const modal = document.getElementById('session-expired-modal');
+            const content = document.getElementById('session-modal-content');
+            if (modal && content) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+        }
+        
         document.addEventListener('livewire:init', () => {
             Livewire.hook('request', ({ fail }) => {
                 fail(({ status, preventDefault }) => {
                     if (status === 419) {
-                        // Session expired - refresh the page
+                        // Session expired - show custom modal
                         preventDefault();
-                        if (confirm('Sesi Anda telah berakhir. Klik OK untuk refresh halaman.')) {
-                            window.location.reload();
-                        }
+                        showSessionExpiredModal();
                     }
                 });
             });
