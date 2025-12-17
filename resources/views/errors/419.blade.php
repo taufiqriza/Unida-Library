@@ -22,7 +22,7 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #60A5FA 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -53,10 +53,10 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 overflow-hidden">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 overflow-hidden">
     {{-- Decorative Blobs --}}
-    <div class="blob w-72 h-72 bg-amber-400 top-20 -left-20"></div>
-    <div class="blob w-96 h-96 bg-orange-400 -bottom-32 right-20" style="animation-delay: -4s;"></div>
+    <div class="blob w-72 h-72 bg-blue-500 top-20 -left-20"></div>
+    <div class="blob w-96 h-96 bg-sky-400 -bottom-32 right-20" style="animation-delay: -4s;"></div>
 
     <div class="relative min-h-screen flex flex-col items-center justify-center px-4">
         {{-- Clock Animation --}}
@@ -65,8 +65,8 @@
                 {{-- Clock Icon with Pulse --}}
                 <div class="flex items-center justify-center mb-6">
                     <div class="relative">
-                        <div class="absolute inset-0 w-32 h-32 bg-amber-400 rounded-full pulse-ring"></div>
-                        <div class="relative w-32 h-32 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center shadow-2xl">
+                        <div class="absolute inset-0 w-32 h-32 bg-blue-400 rounded-full pulse-ring"></div>
+                        <div class="relative w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center shadow-2xl">
                             <i class="fas fa-clock text-5xl text-white"></i>
                         </div>
                     </div>
@@ -78,8 +78,8 @@
                 </h1>
                 
                 {{-- Hourglass icon --}}
-                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-amber-100">
-                    <i class="fas fa-hourglass-end text-3xl text-amber-500"></i>
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-blue-100">
+                    <i class="fas fa-hourglass-end text-3xl text-blue-500"></i>
                 </div>
             </div>
         </div>
@@ -100,13 +100,13 @@
         {{-- Action Buttons --}}
         <div class="flex flex-col sm:flex-row gap-4">
             <button onclick="location.reload()" 
-                    class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+                    class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 <i class="fas fa-rotate-right text-lg group-hover:rotate-180 transition-transform duration-500"></i>
                 <span>Refresh Halaman</span>
             </button>
             
             <a href="/login" 
-               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-gray-200 transform hover:-translate-y-1 transition-all duration-300">
+               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-blue-50 text-blue-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-blue-200 transform hover:-translate-y-1 transition-all duration-300">
                 <i class="fas fa-sign-in-alt text-lg group-hover:translate-x-1 transition-transform"></i>
                 <span>Login Kembali</span>
             </a>
@@ -115,7 +115,7 @@
         {{-- Footer --}}
         <div class="absolute bottom-8 text-center">
             <p class="text-gray-400 text-xs">
-                © {{ date('Y') }} {{ config('app.name', 'Perpustakaan') }}. All rights reserved.
+                © {{ date('Y') }} Beri IT Perpustakaan UNIDA Gontor. All rights reserved.
             </p>
         </div>
     </div>

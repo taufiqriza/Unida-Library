@@ -130,7 +130,7 @@
         {{-- Footer --}}
         <div class="absolute bottom-8 text-center">
             <p class="text-gray-400 text-xs">
-                © {{ date('Y') }} {{ config('app.name', 'Perpustakaan') }}. All rights reserved.
+                © {{ date('Y') }} Beri IT Perpustakaan UNIDA Gontor. All rights reserved.
             </p>
         </div>
     </div>

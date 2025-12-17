@@ -22,7 +22,7 @@
         }
         
         .gradient-text {
-            background: linear-gradient(135deg, #DC2626 0%, #7C3AED 100%);
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #60A5FA 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -54,10 +54,10 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-red-50 overflow-hidden">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50 overflow-hidden">
     {{-- Decorative Blobs --}}
-    <div class="blob w-72 h-72 bg-purple-400 top-20 -left-20"></div>
-    <div class="blob w-96 h-96 bg-red-400 -bottom-32 right-20" style="animation-delay: -4s;"></div>
+    <div class="blob w-72 h-72 bg-blue-500 top-20 -left-20"></div>
+    <div class="blob w-96 h-96 bg-sky-400 -bottom-32 right-20" style="animation-delay: -4s;"></div>
 
     <div class="relative min-h-screen flex flex-col items-center justify-center px-4">
         {{-- Lock Animation --}}
@@ -65,7 +65,7 @@
             <div class="relative">
                 {{-- Lock Icon --}}
                 <div class="flex items-center justify-center mb-6">
-                    <div class="w-32 h-32 bg-gradient-to-br from-red-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl">
+                    <div class="w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl">
                         <i class="fas fa-lock text-5xl text-white shake"></i>
                     </div>
                 </div>
@@ -76,8 +76,8 @@
                 </h1>
                 
                 {{-- Shield icon --}}
-                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-purple-100">
-                    <i class="fas fa-shield-halved text-3xl text-purple-500"></i>
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-white rounded-full shadow-xl flex items-center justify-center border-4 border-blue-100">
+                    <i class="fas fa-shield-halved text-3xl text-blue-500"></i>
                 </div>
             </div>
         </div>
@@ -98,13 +98,13 @@
         {{-- Action Buttons --}}
         <div class="flex flex-col sm:flex-row gap-4">
             <a href="/" 
-               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
+               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300">
                 <i class="fas fa-home text-lg group-hover:scale-110 transition-transform"></i>
                 <span>Kembali ke Beranda</span>
             </a>
             
             <a href="/login" 
-               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-gray-200 transform hover:-translate-y-1 transition-all duration-300">
+               class="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-blue-50 text-blue-700 font-semibold rounded-2xl shadow-lg hover:shadow-xl border border-blue-200 transform hover:-translate-y-1 transition-all duration-300">
                 <i class="fas fa-sign-in-alt text-lg group-hover:translate-x-1 transition-transform"></i>
                 <span>Login</span>
             </a>
@@ -113,7 +113,7 @@
         {{-- Footer --}}
         <div class="absolute bottom-8 text-center">
             <p class="text-gray-400 text-xs">
-                © {{ date('Y') }} {{ config('app.name', 'Perpustakaan') }}. All rights reserved.
+                © {{ date('Y') }} Beri IT Perpustakaan UNIDA Gontor. All rights reserved.
             </p>
         </div>
     </div>
