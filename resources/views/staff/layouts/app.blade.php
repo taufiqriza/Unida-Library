@@ -405,30 +405,6 @@
     @stack('scripts')
     @livewireScripts
     
-    {{-- Handle session expired (419 error) - Form redirect like logout --}}
-    <script>
-        (function() {
-            let sessionExpired = false;
-            
-            document.addEventListener('livewire:init', () => {
-                Livewire.hook('request', ({ fail }) => {
-                    fail(({ status, preventDefault }) => {
-                        if (status === 419 && !sessionExpired) {
-                            sessionExpired = true;
-                            preventDefault();
-                            // Use form submission - same as logout navigation
-                            var form = document.createElement('form');
-                            form.method = 'GET';
-                            form.action = '/login';
-                            document.body.appendChild(form);
-                            form.submit();
-                        }
-                    });
-                });
-            });
-        })();
-    </script>
-    
     @filamentScripts
 
     {{-- Filament Notifications --}}
