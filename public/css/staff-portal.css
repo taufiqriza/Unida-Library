@@ -175,6 +175,28 @@ html.dark table th {
     border-color: #334155 !important;
 }
 
+/* Sidebar dark mode - darker gradient for cohesive dark UI */
+html.dark .staff-sidebar,
+html.dark aside.staff-sidebar {
+    background: linear-gradient(to bottom, #0f172a, #1e293b, #0f172a) !important;
+}
+
+/* Sidebar active page indicator - brighter in dark mode */
+html.dark .staff-sidebar .bg-white\/15,
+html.dark aside .bg-white\/15 {
+    background: rgba(59, 130, 246, 0.3) !important;
+}
+
+html.dark .staff-sidebar .bg-white\/20,
+html.dark aside .bg-white\/20 {
+    background: rgba(59, 130, 246, 0.25) !important;
+}
+
+html.dark .staff-sidebar .bg-white\/10,
+html.dark aside .bg-white\/10 {
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
 /* Hover states in dark mode */
 html.dark .hover\:bg-gray-50:hover,
 html.dark .hover\:bg-slate-50:hover {
