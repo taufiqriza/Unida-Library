@@ -429,7 +429,7 @@
                 
                 {{-- Footer --}}
                 <div class="px-6 pb-6">
-                    <button onclick="window.location.href='/login'" 
+                    <button onclick="sessionExpiredRedirect()" 
                             class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
                         <i class="fas fa-sign-in-alt"></i>
                         Login Kembali
@@ -459,6 +459,16 @@
                     content.classList.add('scale-100', 'opacity-100');
                 }, 10);
             }
+        }
+        
+        function sessionExpiredRedirect() {
+            // Clear any cached state and force fresh page load
+            // Using a form submission ensures a clean GET request
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = '/login';
+            document.body.appendChild(form);
+            form.submit();
         }
         
         document.addEventListener('livewire:init', () => {
