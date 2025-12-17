@@ -189,6 +189,7 @@ Alpine.data('quickAttendanceWidget', () => ({
     gpsText: 'Memuat GPS...',
     gpsLat: null,
     gpsLng: null,
+    gpsWatchId: null,
     scanning: false,
     html5QrCode: null,
     qrDetected: false,
@@ -284,8 +285,6 @@ Alpine.data('quickAttendanceWidget', () => ({
             this.$nextTick(() => setTimeout(() => this.startScanner(), 200));
         }
     },
-
-    gpsWatchId: null,
     
     initGps() {
         if (!navigator.geolocation) {
@@ -336,9 +335,24 @@ Alpine.data('quickAttendanceWidget', () => ({
 
     startScanner() {
         const el = document.getElementById('quick-qr-reader');
-        if (!el || typeof Html5Qrcode === 'undefined') return;
+        if (!el) {
+            console.error('QR reader element not found');
+            return;
+        }
+        if (typeof Html5Qrcode === 'undefined') {
+            console.error('Html5Qrcode library not loaded');
+            return;
+        }
 
+        // Clear previous content
         el.innerHTML = '';
+        
+        // Stop previous scanner if exists
+        if (this.html5QrCode && this.scanning) {
+            this.html5QrCode.stop().catch(() => {});
+            this.scanning = false;
+        }
+        
         this.html5QrCode = new Html5Qrcode("quick-qr-reader");
         this.html5QrCode.start(
             { facingMode: "environment" },
@@ -349,8 +363,10 @@ Alpine.data('quickAttendanceWidget', () => ({
             () => {}
         ).then(() => {
             this.scanning = true;
-        }).catch(() => {
+            console.log('QR Scanner started');
+        }).catch((err) => {
             this.scanning = false;
+            console.error('QR Scanner failed:', err);
         });
     },
 
