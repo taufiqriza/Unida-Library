@@ -44,15 +44,25 @@
         body.ready { opacity: 1; transition: opacity 0.15s, background-color 0.3s; }
     </style>
     
-    {{-- Instant dark mode detection (before anything renders) --}}
+    {{-- Instant dark mode detection (before anything renders) + persist on navigation --}}
     <script>
         (function() {
-            const stored = localStorage.getItem('staffPortalDarkMode');
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = stored === 'true' || (stored === null && prefersDark);
-            if (isDark) {
-                document.documentElement.classList.add('dark');
+            function syncDarkMode() {
+                const stored = localStorage.getItem('staffPortalDarkMode');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = stored === 'true' || (stored === null && prefersDark);
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
             }
+            
+            // Sync immediately on page load
+            syncDarkMode();
+            
+            // Sync after Livewire SPA navigation
+            document.addEventListener('livewire:navigated', syncDarkMode);
         })();
     </script>
     
