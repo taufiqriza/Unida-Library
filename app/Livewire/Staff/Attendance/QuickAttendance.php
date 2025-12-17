@@ -7,6 +7,7 @@ use App\Models\AttendanceLocation;
 use App\Models\ActivityLog;
 use Livewire\Component;
 use Carbon\Carbon;
+use Livewire\Attributes\Computed;
 
 class QuickAttendance extends Component
 {
@@ -53,8 +54,8 @@ class QuickAttendance extends Component
 
         // Check radius
         if ($distance > $location->radius_meters) {
-            $distanceKm = number_format($distance / 1000, 2);
-            $this->dispatch('notify', type: 'error', message: "Anda di luar radius! Jarak: {$distanceKm}km (max: {$location->radius_meters}m)");
+            $distanceFormatted = $this->formatDistance($distance);
+            $this->dispatch('notify', type: 'error', message: "Anda di luar radius! Jarak: {$distanceFormatted} (max: {$location->radius_meters}m)");
             return;
         }
 
@@ -96,7 +97,7 @@ class QuickAttendance extends Component
     {
         $user = auth()->user();
         
-        // Check if checked in today
+        // Check if checked in today (with location eager loaded)
         $checkIn = Attendance::checkInToday($user->id);
         if (!$checkIn) {
             $this->dispatch('notify', type: 'error', message: 'Anda belum check-in hari ini');
@@ -118,18 +119,7 @@ class QuickAttendance extends Component
         // Get check-in location
         $location = $checkIn->location;
         
-        // Debug log
-        \Log::info('QuickAttendance Checkout', [
-            'user_id' => $user->id,
-            'checkIn_id' => $checkIn->id,
-            'checkIn_location_id' => $checkIn->location_id,
-            'location_exists' => $location ? true : false,
-            'location_name' => $location?->name,
-            'currentLat' => $this->currentLat,
-            'currentLng' => $this->currentLng,
-        ]);
-        
-        // If location not found (deleted), still block - don't allow checkout
+        // If location not found (deleted), block checkout
         if (!$location) {
             $this->dispatch('notify', type: 'error', message: 'Lokasi check-in tidak ditemukan. Hubungi admin.');
             return;
@@ -141,23 +131,9 @@ class QuickAttendance extends Component
             $location->latitude, $location->longitude
         );
 
-        // Debug log
-        \Log::info('QuickAttendance Checkout Debug', [
-            'user_id' => $user->id,
-            'currentLat' => $this->currentLat,
-            'currentLng' => $this->currentLng,
-            'locationLat' => $location->latitude,
-            'locationLng' => $location->longitude,
-            'distance' => $distance,
-            'radius' => $location->radius_meters,
-            'isOutside' => $distance > $location->radius_meters,
-        ]);
-
         // Validate radius - must be within check-in location radius
         if ($distance > $location->radius_meters) {
-            $distanceFormatted = $distance >= 1000 
-                ? number_format($distance / 1000, 2) . ' km' 
-                : round($distance) . ' m';
+            $distanceFormatted = $this->formatDistance($distance);
             $this->dispatch('notify', type: 'error', message: "Anda di luar area {$location->name}! Jarak: {$distanceFormatted} (max: {$location->radius_meters}m). Silakan mendekat ke lokasi.");
             return;
         }
@@ -191,24 +167,26 @@ class QuickAttendance extends Component
 
     public function handleQrScan($code)
     {
-        // Parse QR data
+        // Parse QR data - support both plain text and JSON format
         $qrCode = $code;
-        try {
+        if (str_starts_with($code, '{')) {
             $data = json_decode($code, true);
             if (isset($data['code'])) {
                 $qrCode = $data['code'];
             }
-        } catch (\Exception $e) {}
+        }
 
-        // Find location
-        $location = AttendanceLocation::where('qr_code', $qrCode)->first();
+        // Find location by QR code
+        $location = AttendanceLocation::where('qr_code', $qrCode)
+            ->active()
+            ->first(['id', 'name']);
         
         if ($location) {
             $this->selectedLocationId = $location->id;
             $this->scannedQrCode = $qrCode;
             $this->dispatch('qr-detected', name: $location->name);
         } else {
-            $this->dispatch('notify', type: 'error', message: 'QR Code tidak valid');
+            $this->dispatch('notify', type: 'error', message: 'QR Code tidak valid atau lokasi tidak aktif');
         }
     }
 
@@ -218,9 +196,12 @@ class QuickAttendance extends Component
         $this->currentLng = (float) $lng;
     }
 
+    /**
+     * Calculate distance between two coordinates using Haversine formula
+     */
     protected function calculateDistance($lat1, $lng1, $lat2, $lng2): float
     {
-        $earthRadius = 6371000;
+        $earthRadius = 6371000; // meters
         $dLat = deg2rad($lat2 - $lat1);
         $dLng = deg2rad($lng2 - $lng1);
         $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
@@ -228,23 +209,34 @@ class QuickAttendance extends Component
         return $earthRadius * $c;
     }
 
-    public function getLocationsProperty()
+    /**
+     * Format distance for display
+     */
+    protected function formatDistance(float $distance): string
+    {
+        return $distance >= 1000 
+            ? number_format($distance / 1000, 2) . ' km' 
+            : round($distance) . ' m';
+    }
+
+    #[Computed(cache: true)]
+    public function locations()
     {
         $user = auth()->user();
-        return AttendanceLocation::active()
-            ->where(function($q) use ($user) {
-                if ($user->role === 'super_admin') {
-                    // See all
-                } else {
-                    $q->where('branch_id', $user->branch_id)
-                      ->orWhereNull('branch_id');
-                }
+        return AttendanceLocation::query()
+            ->active()
+            ->when($user->role !== 'super_admin', function($q) use ($user) {
+                $q->where(fn($sub) => 
+                    $sub->where('branch_id', $user->branch_id)
+                        ->orWhereNull('branch_id')
+                );
             })
             ->orderBy('name')
             ->get(['id', 'name', 'qr_code']);
     }
 
-    public function getTodayStatusProperty()
+    #[Computed]
+    public function todayStatus()
     {
         $userId = auth()->id();
         return [
