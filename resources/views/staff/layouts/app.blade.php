@@ -405,6 +405,20 @@
     @stack('scripts')
     @livewireScripts
     
+    {{-- Skip dialog, go directly to login on session expired --}}
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.hook('request', ({ fail }) => {
+                fail(({ status, preventDefault }) => {
+                    if (status === 419) {
+                        preventDefault();
+                        window.location.href = '/login';
+                    }
+                });
+            });
+        });
+    </script>
+    
     @filamentScripts
 
     {{-- Filament Notifications --}}
