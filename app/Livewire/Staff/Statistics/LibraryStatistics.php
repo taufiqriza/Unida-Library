@@ -129,7 +129,7 @@ class LibraryStatistics extends Component
             'total_subjects' => Subject::whereHas('books', fn($q) => $branchId ? $q->where('branch_id', $branchId) : $q)->count(),
         ];
 
-        // Branch Stats - Always fetch for 'all' view
+        // Branch Stats - Always fetch for 'all' view (bypass global scope)
         $branchStats = [];
         if (!$branchId) {
             $branches = Branch::orderBy('name')->get();
@@ -138,10 +138,10 @@ class LibraryStatistics extends Component
                     'id' => $branch->id,
                     'name' => $branch->name,
                     'code' => $branch->code ?? substr($branch->name, 0, 3),
-                    'titles' => Book::where('branch_id', $branch->id)->count(),
-                    'items' => Item::where('branch_id', $branch->id)->count(),
-                    'members' => Member::where('branch_id', $branch->id)->count(),
-                    'loans_month' => Loan::where('branch_id', $branch->id)
+                    'titles' => Book::withoutGlobalScope('branch')->where('branch_id', $branch->id)->count(),
+                    'items' => Item::withoutGlobalScope('branch')->where('branch_id', $branch->id)->count(),
+                    'members' => Member::withoutGlobalScope('branch')->where('branch_id', $branch->id)->count(),
+                    'loans_month' => Loan::withoutGlobalScope('branch')->where('branch_id', $branch->id)
                         ->whereMonth('loan_date', now()->month)
                         ->whereYear('loan_date', now()->year)->count(),
                 ];
@@ -301,6 +301,9 @@ class LibraryStatistics extends Component
 
     protected function queryWithBranch($query, ?int $branchId, string $column = 'branch_id')
     {
+        // Always bypass global scope for statistics to show accurate data
+        $query = $query->withoutGlobalScope('branch');
+        
         if ($branchId) {
             return $query->where($column, $branchId);
         }
