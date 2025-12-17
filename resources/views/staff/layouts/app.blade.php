@@ -114,13 +114,22 @@
     </style>
 
     <script>
+        // Immediately sync sidebar state to prevent flash
         (function() {
-            const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
-            if (collapsed) {
-                document.documentElement.classList.add('sidebar-collapsed');
+            function syncSidebarState() {
+                const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
+                if (collapsed) {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                } else {
+                    document.documentElement.classList.remove('sidebar-collapsed');
+                }
             }
-            // Pre-set sidebar state for Alpine
-            window.__sidebarCollapsed = collapsed;
+            
+            // Sync immediately on script load
+            syncSidebarState();
+            
+            // Also sync after Livewire navigation
+            document.addEventListener('livewire:navigated', syncSidebarState);
         })();
     </script>
     @livewireStyles
