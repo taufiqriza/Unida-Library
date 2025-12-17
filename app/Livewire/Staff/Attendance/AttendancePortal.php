@@ -41,6 +41,7 @@ class AttendancePortal extends Component
     public bool $editingLocation = false;
     public ?int $editLocationId = null;
     public array $locationForm = [
+        'branch_id' => '', // Super admin can assign to branch
         'name' => '',
         'address' => '',
         'latitude' => '',
@@ -260,6 +261,7 @@ class AttendancePortal extends Component
             $this->editLocationId = $id;
             $location = AttendanceLocation::find($id);
             $this->locationForm = [
+                'branch_id' => $location->branch_id ?? '',
                 'name' => $location->name,
                 'address' => $location->address ?? '',
                 'latitude' => $location->latitude,
@@ -274,6 +276,7 @@ class AttendancePortal extends Component
             $this->editingLocation = false;
             $this->editLocationId = null;
             $this->locationForm = [
+                'branch_id' => '',
                 'name' => '',
                 'address' => '',
                 'latitude' => '',
@@ -313,9 +316,13 @@ class AttendancePortal extends Component
         ]);
 
         $user = auth()->user();
-        $branchId = $user->role === 'super_admin' 
-            ? ($this->selectedBranchId ?? null) 
-            : $user->branch_id;
+        
+        // Super admin can choose branch from form, admin uses their own branch
+        if ($user->role === 'super_admin') {
+            $branchId = !empty($this->locationForm['branch_id']) ? $this->locationForm['branch_id'] : null;
+        } else {
+            $branchId = $user->branch_id;
+        }
 
         $data = [
             'branch_id' => $branchId,
@@ -403,11 +410,19 @@ class AttendancePortal extends Component
         $query = AttendanceLocation::active();
         
         if ($user->role === 'super_admin') {
+            // Super admin sees all or filtered by selected branch
             if ($this->selectedBranchId) {
-                $query->where('branch_id', $this->selectedBranchId);
+                $query->where(function($q) {
+                    $q->where('branch_id', $this->selectedBranchId)
+                      ->orWhereNull('branch_id'); // Also show global locations
+                });
             }
         } else {
-            $query->where('branch_id', $user->branch_id);
+            // Staff sees their branch locations AND global locations (null branch_id)
+            $query->where(function($q) use ($user) {
+                $q->where('branch_id', $user->branch_id)
+                  ->orWhereNull('branch_id');
+            });
         }
         
         return $query->orderBy('name')->get();
@@ -420,10 +435,16 @@ class AttendancePortal extends Component
         
         if ($user->role === 'super_admin') {
             if ($this->selectedBranchId) {
-                $query->where('branch_id', $this->selectedBranchId);
+                $query->where(function($q) {
+                    $q->where('branch_id', $this->selectedBranchId)
+                      ->orWhereNull('branch_id');
+                });
             }
         } else {
-            $query->where('branch_id', $user->branch_id);
+            $query->where(function($q) use ($user) {
+                $q->where('branch_id', $user->branch_id)
+                  ->orWhereNull('branch_id');
+            });
         }
         
         return $query->orderBy('name')->get();

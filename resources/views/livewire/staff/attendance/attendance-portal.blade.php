@@ -533,13 +533,25 @@
     @if($showLocationModal)
     <template x-teleport="body">
         <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" @click.away="$wire.closeLocationModal()">
-                <div class="px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto" @click.away="$wire.closeLocationModal()">
+                <div class="px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 sticky top-0">
                     <h3 class="text-lg font-bold text-white">
                         {{ $editingLocation ? 'Edit Lokasi' : 'Tambah Lokasi Baru' }}
                     </h3>
                 </div>
                 <div class="p-6 space-y-4">
+                    @if($isSuperAdmin)
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cabang / Kampus</label>
+                        <select wire:model="locationForm.branch_id" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500">
+                            <option value="">🌐 Global (Semua Cabang)</option>
+                            @foreach($branches as $branch)
+                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Lokasi global dapat digunakan oleh semua cabang</p>
+                    </div>
+                    @endif
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lokasi</label>
                         <input type="text" wire:model="locationForm.name" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="Contoh: Perpustakaan Pusat">
