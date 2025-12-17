@@ -1,4 +1,6 @@
-<div class="relative" x-data="quickAttendanceWidget()" @attendance-updated.window="refreshStatus()">
+<div class="relative" x-data="quickAttendanceWidget()" 
+     @attendance-updated.window="refreshStatus()"
+     @notify.window="showToast($event.detail)">
     {{-- Trigger Button --}}
     <button @click="togglePopup()"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm shadow hover:shadow-lg hover:-translate-y-0.5 transition-all"
@@ -32,6 +34,31 @@
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
+        </div>
+
+        {{-- Toast Notification (inside popup) --}}
+        <div x-show="toastShow" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             class="px-3 py-2 text-xs font-medium flex items-center gap-2"
+             :class="{
+                 'bg-emerald-50 text-emerald-700 border-b border-emerald-100': toastType === 'success',
+                 'bg-red-50 text-red-700 border-b border-red-100': toastType === 'error',
+                 'bg-amber-50 text-amber-700 border-b border-amber-100': toastType === 'warning'
+             }">
+            <i class="fas" :class="{
+                'fa-check-circle': toastType === 'success',
+                'fa-exclamation-circle': toastType === 'error',
+                'fa-exclamation-triangle': toastType === 'warning'
+            }"></i>
+            <span x-text="toastMessage" class="flex-1"></span>
+            <button @click="toastShow = false" class="opacity-50 hover:opacity-100">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
 
         {{-- Status Today --}}
@@ -168,6 +195,12 @@ Alpine.data('quickAttendanceWidget', () => ({
     qrLocationName: '',
     hasCheckedIn: {{ $todayStatus['checkIn'] ? 'true' : 'false' }},
     hasCheckedOut: {{ $todayStatus['checkOut'] ? 'true' : 'false' }},
+    
+    // Toast notification
+    toastShow: false,
+    toastMessage: '',
+    toastType: 'success',
+    toastTimeout: null,
 
     get buttonText() {
         if (this.hasCheckedIn && this.hasCheckedOut) return 'Selesai';
@@ -196,10 +229,29 @@ Alpine.data('quickAttendanceWidget', () => ({
         });
     },
 
+    showToast(detail) {
+        // Only show toast if popup is open
+        if (!this.open) return;
+        
+        if (this.toastTimeout) clearTimeout(this.toastTimeout);
+        
+        this.toastType = detail.type || 'success';
+        this.toastMessage = detail.message || '';
+        this.toastShow = true;
+        
+        // Auto-hide after 5 seconds
+        this.toastTimeout = setTimeout(() => {
+            this.toastShow = false;
+        }, 5000);
+    },
+
     refreshStatus() {
+        // Update status but DON'T close popup - let user see the result
         this.hasCheckedIn = true;
-        // Close popup after successful action
-        setTimeout(() => this.closePopup(), 1500);
+        // Checkout success will also trigger this
+        if (this.hasCheckedIn && !this.hasCheckedOut) {
+            this.hasCheckedOut = true;
+        }
     },
 
     togglePopup() {
