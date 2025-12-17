@@ -111,14 +111,32 @@ class QuickAttendance extends Component
 
         // Validate GPS
         if (!$this->currentLat || !$this->currentLng) {
-            $this->dispatch('notify', type: 'error', message: 'GPS tidak tersedia');
+            $this->dispatch('notify', type: 'error', message: 'GPS tidak tersedia. Aktifkan lokasi di browser.');
             return;
         }
 
-        // Must checkout from same location as check-in
+        // Get check-in location
         $location = $checkIn->location;
+        
+        // If location not found (deleted), allow checkout without radius validation
         if (!$location) {
-            $this->dispatch('notify', type: 'error', message: 'Lokasi check-in tidak ditemukan');
+            // Create checkout without location validation
+            Attendance::create([
+                'user_id' => $user->id,
+                'branch_id' => $user->branch_id,
+                'location_id' => $checkIn->location_id,
+                'type' => 'check_out',
+                'scanned_at' => now(),
+                'latitude' => $this->currentLat,
+                'longitude' => $this->currentLng,
+                'distance_meters' => 0,
+                'is_verified' => true,
+            ]);
+
+            ActivityLog::log('create', 'attendance', "Check-out (lokasi tidak ditemukan)", null);
+            
+            $this->dispatch('notify', type: 'warning', message: '⚠️ Check-out berhasil (lokasi check-in sudah dihapus)');
+            $this->dispatch('attendance-updated');
             return;
         }
 
@@ -130,8 +148,10 @@ class QuickAttendance extends Component
 
         // Validate radius - must be within check-in location radius
         if ($distance > $location->radius_meters) {
-            $distanceKm = number_format($distance / 1000, 2);
-            $this->dispatch('notify', type: 'error', message: "Anda di luar radius lokasi {$location->name}! Jarak: {$distanceKm}km (max: {$location->radius_meters}m)");
+            $distanceFormatted = $distance >= 1000 
+                ? number_format($distance / 1000, 2) . ' km' 
+                : round($distance) . ' m';
+            $this->dispatch('notify', type: 'error', message: "Anda di luar area {$location->name}! Jarak: {$distanceFormatted} (max: {$location->radius_meters}m). Silakan mendekat ke lokasi.");
             return;
         }
 

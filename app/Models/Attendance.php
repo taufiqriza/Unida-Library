@@ -105,7 +105,8 @@ class Attendance extends Model
     // Helpers
     public static function checkInToday($userId): ?self
     {
-        return static::where('user_id', $userId)
+        return static::with('location')
+            ->where('user_id', $userId)
             ->whereDate('date', today())
             ->where('type', 'check_in')
             ->first();
