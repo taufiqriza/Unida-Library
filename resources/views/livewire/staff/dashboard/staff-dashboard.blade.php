@@ -1,9 +1,48 @@
 @section('title', 'Dashboard')
 
-<div class="space-y-6" wire:init="loadData">
+<div class="space-y-4 lg:space-y-6" wire:init="loadData">
 
-    {{-- Header --}}
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    {{-- Mobile Header - App Style (hidden on desktop) --}}
+    <div class="lg:hidden -mx-4 -mt-4 px-4 pt-4 pb-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-b-3xl shadow-lg">
+        {{-- Greeting --}}
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <p class="text-blue-200 text-sm">Selamat {{ now()->hour < 12 ? 'Pagi' : (now()->hour < 15 ? 'Siang' : (now()->hour < 18 ? 'Sore' : 'Malam')) }} 👋</p>
+                <h1 class="text-white text-xl font-bold">{{ explode(' ', auth()->user()->name)[0] }}</h1>
+            </div>
+            <button wire:click="loadData" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white">
+                <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i>
+            </button>
+        </div>
+        
+        {{-- Today's Stats Row --}}
+        <div class="flex gap-3">
+            <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-arrow-right-from-bracket text-sm opacity-80"></i>
+                    <span class="text-xs opacity-80">Pinjam</span>
+                </div>
+                <p class="text-2xl font-bold">{{ $stats['loans_today'] ?? 0 }}</p>
+            </div>
+            <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-arrow-right-to-bracket text-sm opacity-80"></i>
+                    <span class="text-xs opacity-80">Kembali</span>
+                </div>
+                <p class="text-2xl font-bold">{{ $stats['returns_today'] ?? 0 }}</p>
+            </div>
+            <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white {{ ($stats['overdue'] ?? 0) > 0 ? 'ring-2 ring-red-400' : '' }}">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fas fa-clock text-sm {{ ($stats['overdue'] ?? 0) > 0 ? 'text-red-300' : 'opacity-80' }}"></i>
+                    <span class="text-xs opacity-80">Terlambat</span>
+                </div>
+                <p class="text-2xl font-bold {{ ($stats['overdue'] ?? 0) > 0 ? 'text-red-200' : '' }}">{{ $stats['overdue'] ?? 0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Desktop Header (hidden on mobile) --}}
+    <div class="hidden lg:flex lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
                 <i class="fas fa-chart-line text-2xl"></i>
@@ -22,8 +61,8 @@
         </button>
     </div>
 
-    {{-- Quick Stats - Today --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {{-- Desktop Quick Stats - Today (hidden on mobile) --}}
+    <div class="hidden lg:grid lg:grid-cols-4 gap-4">
         <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -70,8 +109,110 @@
         </div>
     </div>
 
-    {{-- Collection Stats --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    {{-- Mobile Quick Actions Grid --}}
+    <div class="lg:hidden">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-900">Aksi Cepat</h3>
+        </div>
+        <div class="grid grid-cols-4 gap-2">
+            <a href="{{ route('staff.circulation.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <span class="text-[11px] font-medium text-gray-700 text-center">Scan</span>
+            </a>
+            <a href="{{ route('staff.attendance.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
+                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <span class="text-[11px] font-medium text-gray-700 text-center">Absen</span>
+            </a>
+            <a href="{{ route('staff.member.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
+                <div class="w-11 h-11 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="text-[11px] font-medium text-gray-700 text-center">Anggota</span>
+            </a>
+            <a href="{{ route('staff.biblio.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
+                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-book"></i>
+                </div>
+                <span class="text-[11px] font-medium text-gray-700 text-center">Katalog</span>
+            </a>
+        </div>
+    </div>
+
+    {{-- Mobile Stats Cards --}}
+    <div class="lg:hidden">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-900">Koleksi</h3>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-book text-violet-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-gray-900">{{ number_format($stats['total_books'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Judul Buku</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-layer-group text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-gray-900">{{ number_format($stats['total_items'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Eksemplar</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-users text-emerald-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-gray-900">{{ number_format($stats['total_members'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Anggota</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-book-open-reader text-amber-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-bold text-gray-900">{{ number_format($stats['active_loans'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Dipinjam</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {{-- Unpaid Fines Alert (Mobile) --}}
+        @if(($stats['unpaid_fines'] ?? 0) > 0)
+        <div class="mt-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div>
+                    <p class="text-xs opacity-90">Denda Belum Dibayar</p>
+                    <p class="text-xl font-bold">Rp {{ number_format($stats['unpaid_fines'] ?? 0) }}</p>
+                </div>
+            </div>
+            <i class="fas fa-chevron-right opacity-50"></i>
+        </div>
+        @endif
+    </div>
+
+    {{-- Desktop Collection Stats (hidden on mobile) --}}
+    <div class="hidden lg:grid lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 bg-gradient-to-br from-violet-100 to-purple-100 rounded-xl flex items-center justify-center">
                 <i class="fas fa-book text-violet-600 text-lg"></i>
@@ -110,8 +251,8 @@
         </div>
     </div>
 
-    {{-- Charts --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5" wire:ignore>
+    {{-- Charts - Hidden on mobile, shown on desktop --}}
+    <div class="hidden lg:grid lg:grid-cols-3 gap-5" wire:ignore>
         <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div>
@@ -139,8 +280,44 @@
         </div>
     </div>
 
-    {{-- Tables --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+    {{-- Mobile Activity Feed --}}
+    <div class="lg:hidden">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-gray-900">Aktivitas Terbaru</h3>
+            <a href="{{ route('staff.circulation.index') }}" class="text-blue-600 text-sm font-medium">Lihat Semua</a>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            @forelse($recentLoans->take(5) as $loan)
+            <div class="px-4 py-3 flex items-center gap-3 {{ !$loop->last ? 'border-b border-gray-50' : '' }}">
+                <div class="w-10 h-10 bg-gradient-to-br {{ $loan->is_returned ? 'from-emerald-500 to-teal-600' : ($loan->due_date < now() && !$loan->is_returned ? 'from-red-500 to-orange-500' : 'from-blue-500 to-indigo-600') }} rounded-xl flex items-center justify-center text-white text-sm font-bold">
+                    <i class="fas {{ $loan->is_returned ? 'fa-arrow-right-to-bracket' : ($loan->due_date < now() ? 'fa-exclamation' : 'fa-arrow-right-from-bracket') }}"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-900 text-sm truncate">{{ $loan->member?->name }}</p>
+                    <p class="text-xs text-gray-500 truncate">{{ Str::limit($loan->item?->book?->title, 30) }}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                    @if($loan->is_returned)
+                    <span class="px-2 py-1 text-[10px] font-semibold bg-emerald-100 text-emerald-700 rounded-lg">Kembali</span>
+                    @elseif($loan->due_date < now())
+                    <span class="px-2 py-1 text-[10px] font-semibold bg-red-100 text-red-700 rounded-lg">Terlambat</span>
+                    @else
+                    <span class="px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-lg">Dipinjam</span>
+                    @endif
+                    <p class="text-[10px] text-gray-400 mt-1">{{ $loan->loan_date?->diffForHumans(short: true) }}</p>
+                </div>
+            </div>
+            @empty
+            <div class="p-6 text-center text-gray-400">
+                <i class="fas fa-inbox text-2xl mb-2"></i>
+                <p class="text-sm">Belum ada transaksi</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- Desktop Tables (hidden on mobile) --}}
+    <div class="hidden lg:grid lg:grid-cols-2 gap-5">
         {{-- Recent Loans --}}
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-5 py-4 border-b border-gray-100">
