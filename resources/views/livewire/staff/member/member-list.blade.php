@@ -34,7 +34,15 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold text-gray-900">Data Anggota</h1>
-                <p class="text-sm text-gray-500">{{ auth()->user()->branch->name ?? 'Cabang' }} • {{ $stats['total'] }} anggota</p>
+                <p class="text-sm text-gray-500">
+                    @if($isSuperAdmin && !$filterBranchId)
+                        Semua Kampus • {{ $stats['total'] }} anggota
+                    @elseif($isSuperAdmin && $filterBranchId)
+                        {{ $branches->firstWhere('id', $filterBranchId)?->name ?? 'Cabang' }} • {{ $stats['total'] }} anggota
+                    @else
+                        {{ auth()->user()->branch->name ?? 'Cabang' }} • {{ $stats['total'] }} anggota
+                    @endif
+                </p>
             </div>
         </div>
 
@@ -106,7 +114,17 @@
             </div>
             
             {{-- Filters --}}
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
+                {{-- Branch Filter (Super Admin only) --}}
+                @if($isSuperAdmin)
+                <select wire:model.live="filterBranchId" class="px-3 py-2.5 bg-violet-50 border-violet-200 text-violet-700 rounded-lg text-sm font-medium">
+                    <option value="">🌐 Semua Kampus</option>
+                    @foreach($branches as $branch)
+                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                    @endforeach
+                </select>
+                @endif
+                
                 <select wire:model.live="filterType" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
                     <option value="">Semua Tipe</option>
                     @foreach($memberTypes as $type)

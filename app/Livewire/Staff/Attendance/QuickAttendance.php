@@ -4,6 +4,7 @@ namespace App\Livewire\Staff\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendanceLocation;
+use App\Models\ActivityLog;
 use Livewire\Component;
 use Carbon\Carbon;
 
@@ -78,6 +79,15 @@ class QuickAttendance extends Component
             'late_minutes' => $lateMinutes,
         ]);
 
+        // Log activity
+        ActivityLog::log(
+            'create',
+            'attendance',
+            "Check-in di {$location->name} (jarak: " . round($distance) . "m)",
+            null,
+            ['location' => $location->name, 'distance' => round($distance), 'late_minutes' => $lateMinutes]
+        );
+
         $this->dispatch('notify', type: 'success', message: '✅ Check-in berhasil! Jarak: ' . round($distance) . 'm');
         $this->dispatch('attendance-updated');
     }
@@ -130,6 +140,15 @@ class QuickAttendance extends Component
             'is_within_radius' => $isWithinRadius,
             'is_verified' => true,
         ]);
+
+        // Log activity
+        ActivityLog::log(
+            'create',
+            'attendance',
+            "Check-out" . ($location ? " di {$location->name}" : ""),
+            null,
+            ['location' => $location?->name]
+        );
 
         $this->dispatch('notify', type: 'success', message: '✅ Check-out berhasil!');
         $this->dispatch('attendance-updated');

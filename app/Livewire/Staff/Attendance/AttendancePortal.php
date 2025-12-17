@@ -4,6 +4,7 @@ namespace App\Livewire\Staff\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendanceLocation;
+use App\Models\ActivityLog;
 use App\Models\Branch;
 use App\Models\User;
 use Carbon\Carbon;
