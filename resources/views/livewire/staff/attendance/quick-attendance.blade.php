@@ -219,8 +219,6 @@ Alpine.data('quickAttendanceWidget', () => ({
     },
 
     init() {
-        this.initGps();
-        
         // Listen for QR detection from Livewire
         Livewire.on('qr-detected', (data) => {
             this.qrDetected = true;
@@ -256,7 +254,12 @@ Alpine.data('quickAttendanceWidget', () => ({
 
     togglePopup() {
         this.open = !this.open;
-        if (!this.open) this.cleanup();
+        if (this.open) {
+            // Refresh GPS when popup opens
+            this.initGps();
+        } else {
+            this.cleanup();
+        }
     },
 
     closePopup() {
@@ -266,6 +269,11 @@ Alpine.data('quickAttendanceWidget', () => ({
 
     cleanup() {
         this.stopScanner();
+        // Stop GPS watch if active
+        if (this.gpsWatchId) {
+            navigator.geolocation.clearWatch(this.gpsWatchId);
+            this.gpsWatchId = null;
+        }
     },
 
     setMode(newMode) {
@@ -277,6 +285,8 @@ Alpine.data('quickAttendanceWidget', () => ({
         }
     },
 
+    gpsWatchId: null,
+    
     initGps() {
         if (!navigator.geolocation) {
             this.gpsStatus = 'error';
@@ -284,20 +294,44 @@ Alpine.data('quickAttendanceWidget', () => ({
             return;
         }
 
+        this.gpsStatus = 'loading';
+        this.gpsText = 'Memuat GPS...';
+
+        // Clear previous watch
+        if (this.gpsWatchId) {
+            navigator.geolocation.clearWatch(this.gpsWatchId);
+        }
+
+        // Get current position first
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                this.gpsLat = pos.coords.latitude;
-                this.gpsLng = pos.coords.longitude;
-                this.gpsStatus = 'active';
-                this.gpsText = `GPS OK (±${Math.round(pos.coords.accuracy)}m)`;
-                $wire.updateGps(this.gpsLat, this.gpsLng);
+                this.updateGpsPosition(pos);
             },
-            () => {
+            (err) => {
                 this.gpsStatus = 'error';
                 this.gpsText = 'Izinkan akses lokasi';
+                console.error('GPS Error:', err);
             },
-            { enableHighAccuracy: true, timeout: 10000 }
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
         );
+
+        // Then watch for updates
+        this.gpsWatchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                this.updateGpsPosition(pos);
+            },
+            () => {},
+            { enableHighAccuracy: true, maximumAge: 5000 }
+        );
+    },
+
+    updateGpsPosition(pos) {
+        this.gpsLat = pos.coords.latitude;
+        this.gpsLng = pos.coords.longitude;
+        this.gpsStatus = 'active';
+        this.gpsText = `GPS OK (±${Math.round(pos.coords.accuracy)}m)`;
+        // Send to Livewire backend
+        $wire.updateGps(this.gpsLat, this.gpsLng);
     },
 
     startScanner() {

@@ -146,6 +146,18 @@ class QuickAttendance extends Component
             $location->latitude, $location->longitude
         );
 
+        // Debug log
+        \Log::info('QuickAttendance Checkout Debug', [
+            'user_id' => $user->id,
+            'currentLat' => $this->currentLat,
+            'currentLng' => $this->currentLng,
+            'locationLat' => $location->latitude,
+            'locationLng' => $location->longitude,
+            'distance' => $distance,
+            'radius' => $location->radius_meters,
+            'isOutside' => $distance > $location->radius_meters,
+        ]);
+
         // Validate radius - must be within check-in location radius
         if ($distance > $location->radius_meters) {
             $distanceFormatted = $distance >= 1000 
