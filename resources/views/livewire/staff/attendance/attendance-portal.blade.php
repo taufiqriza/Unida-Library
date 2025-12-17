@@ -210,6 +210,7 @@
                         <i class="fas fa-qrcode mr-1"></i> QR
                     </button>
                     <button wire:click="setScanMode('select')" 
+                            @click="cleanupScanner()"
                             class="px-3 py-1.5 rounded-md text-sm font-medium transition {{ $scanMode === 'select' ? 'bg-white shadow text-emerald-600' : 'text-gray-500' }}">
                         <i class="fas fa-map-marker-alt mr-1"></i> Lokasi
                     </button>
@@ -697,11 +698,21 @@ function attendanceApp() {
         html5QrCode: null,
         scanning: false,
 
-        // Cleanup scanner on page close/navigate
+        // Cleanup scanner on page close/navigate/mode switch
         cleanupScanner() {
+            // Cleanup own scanner
             if (this.html5QrCode && this.scanning) {
                 this.html5QrCode.stop().catch(() => {});
                 this.scanning = false;
+            }
+            
+            // Also cleanup global scanner from qrScannerComponent
+            if (window.activeQrScanner && window.qrScannerActive) {
+                window.activeQrScanner.stop().catch(() => {});
+                window.qrScannerActive = false;
+                window.activeQrScanner = null;
+                const qrElement = document.getElementById('qr-reader');
+                if (qrElement) qrElement.innerHTML = '';
             }
         },
 
@@ -901,6 +912,9 @@ function qrScannerComponent() {
             }
 
             this.html5QrCode = new Html5Qrcode("qr-reader");
+            // Store globally for cleanup from other scopes
+            window.activeQrScanner = this.html5QrCode;
+            
             this.html5QrCode.start(
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
@@ -912,6 +926,7 @@ function qrScannerComponent() {
                 (errorMessage) => { /* ignore scan errors */ }
             ).then(() => {
                 this.scanning = true;
+                window.qrScannerActive = true;
                 console.log('QR Scanner auto-started');
             }).catch((err) => {
                 console.error('QR Scanner error:', err);
@@ -923,6 +938,8 @@ function qrScannerComponent() {
             if (this.html5QrCode && this.scanning) {
                 this.html5QrCode.stop().then(() => {
                     this.scanning = false;
+                    window.qrScannerActive = false;
+                    window.activeQrScanner = null;
                     const qrElement = document.getElementById('qr-reader');
                     if (qrElement) qrElement.innerHTML = '';
                 }).catch(err => console.error('Stop error:', err));
