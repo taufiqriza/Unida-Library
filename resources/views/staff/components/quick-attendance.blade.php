@@ -16,9 +16,12 @@
         ->get();
 @endphp
 
-<div class="relative" x-data="quickAttendance()">
+<div class="relative" x-data="quickAttendance()" 
+     @beforeunload.window="stopScanner()"
+     x-on:livewire:navigating.window="stopScanner()"
+     x-on:visibilitychange.window="if (document.hidden) stopScanner()">
     {{-- Trigger Button --}}
-    <button @click="open = !open"
+    <button @click="togglePopup()"
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm shadow hover:shadow-lg hover:-translate-y-0.5 transition-all"
             :class="hasCheckedIn && hasCheckedOut 
                 ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white' 
@@ -38,8 +41,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
-         @click.away="open = false"
-         @keydown.escape.window="open = false"
+         @click.away="closePopup()"
+         @keydown.escape.window="closePopup()"
          class="absolute right-0 top-full mt-2 w-[360px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-50"
          x-cloak>
         
@@ -51,7 +54,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <span class="text-xs text-emerald-100">{{ now()->format('H:i') }}</span>
-                <button @click="open = false" class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition">
+                <button @click="closePopup()" class="w-6 h-6 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center text-white transition">
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
@@ -90,13 +93,13 @@
         <div class="p-4 border-b border-gray-100">
             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Metode Absensi</p>
             <div class="flex bg-gray-100 rounded-xl p-1">
-                <button @click="mode = 'location'" 
+                <button @click="setMode('location')" 
                         class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition"
                         :class="mode === 'location' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'">
                     <i class="fas fa-map-marker-alt"></i>
                     Pilih Lokasi
                 </button>
-                <button @click="mode = 'qr'" 
+                <button @click="setMode('qr')" 
                         class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition"
                         :class="mode === 'qr' ? 'bg-white shadow text-violet-600' : 'text-gray-500 hover:text-gray-700'">
                     <i class="fas fa-qrcode"></i>
@@ -124,19 +127,35 @@
                 @endif
             </div>
 
-            {{-- QR Scan Mode --}}
+            {{-- QR Scan Mode - Auto Start Camera --}}
             <div x-show="mode === 'qr'" class="space-y-3">
-                <div class="bg-gray-900 rounded-xl aspect-video flex items-center justify-center text-white">
-                    <div class="text-center">
-                        <i class="fas fa-qrcode text-3xl mb-2 opacity-50"></i>
-                        <p class="text-xs opacity-75">Buka halaman Kehadiran untuk scan QR</p>
+                <div id="quick-qr-reader" class="w-full aspect-video bg-gray-900 rounded-xl overflow-hidden relative">
+                    <div x-show="!scanning" class="absolute inset-0 flex items-center justify-center text-white">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-2 opacity-75"></i>
+                            <p class="text-xs opacity-75">Membuka kamera...</p>
+                        </div>
                     </div>
                 </div>
-                <a href="{{ route('staff.attendance.index', ['scanMode' => 'qr']) }}" 
-                   class="block w-full py-3 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-semibold rounded-xl text-center transition">
-                    <i class="fas fa-external-link-alt mr-2"></i>
-                    Buka Scanner
-                </a>
+                
+                {{-- QR Detected --}}
+                <div x-show="qrDetected" class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3">
+                    <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    <div>
+                        <p class="font-medium text-emerald-800">QR Terdeteksi!</p>
+                        <p class="text-sm text-emerald-600" x-text="qrLocationName"></p>
+                    </div>
+                </div>
+                
+                {{-- Scanner Controls --}}
+                <div class="flex gap-2">
+                    <button @click="toggleScanner()" 
+                            class="flex-1 py-2.5 font-semibold rounded-xl transition flex items-center justify-center gap-2 text-sm"
+                            :class="scanning ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-violet-100 hover:bg-violet-200 text-violet-700'">
+                        <i class="fas" :class="scanning ? 'fa-stop' : 'fa-camera'"></i>
+                        <span x-text="scanning ? 'Stop' : 'Mulai Ulang'"></span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -150,10 +169,10 @@
         </div>
 
         {{-- Action Button --}}
-        <div class="px-4 pb-4" x-show="mode === 'location'">
+        <div class="px-4 pb-4">
             @if(!$todayCheckIn)
                 <button @click="doCheckIn()" 
-                        :disabled="!selectedLocation || gpsStatus !== 'active'"
+                        :disabled="(!selectedLocation && !qrDetected) || gpsStatus !== 'active'"
                         class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right-to-bracket"></i>
                     CHECK IN
@@ -184,6 +203,7 @@
 </div>
 
 @push('scripts')
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
 function quickAttendance() {
     return {
@@ -197,6 +217,13 @@ function quickAttendance() {
         hasCheckedIn: {{ $todayCheckIn ? 'true' : 'false' }},
         hasCheckedOut: {{ $todayCheckOut ? 'true' : 'false' }},
         
+        // QR Scanner
+        html5QrCode: null,
+        scanning: false,
+        qrDetected: false,
+        qrLocationName: '',
+        qrLocationId: null,
+        
         get buttonText() {
             if (this.hasCheckedIn && this.hasCheckedOut) return 'Selesai';
             if (this.hasCheckedIn) return 'Check Out';
@@ -205,6 +232,38 @@ function quickAttendance() {
 
         init() {
             this.initGps();
+        },
+
+        togglePopup() {
+            this.open = !this.open;
+            if (!this.open) {
+                this.stopScanner();
+            }
+        },
+
+        closePopup() {
+            this.open = false;
+            this.stopScanner();
+        },
+
+        setMode(newMode) {
+            if (this.mode === newMode) return;
+            
+            // Stop scanner when switching away from QR
+            if (this.mode === 'qr') {
+                this.stopScanner();
+            }
+            
+            this.mode = newMode;
+            
+            // Auto-start scanner when switching to QR
+            if (newMode === 'qr') {
+                this.$nextTick(() => {
+                    setTimeout(() => {
+                        this.startScanner();
+                    }, 300);
+                });
+            }
         },
 
         initGps() {
@@ -229,13 +288,81 @@ function quickAttendance() {
             );
         },
 
-        doCheckIn() {
-            if (!this.selectedLocation || this.gpsStatus !== 'active') return;
+        startScanner() {
+            const qrElement = document.getElementById('quick-qr-reader');
+            if (!qrElement) return;
+
+            qrElement.innerHTML = '';
+
+            if (typeof Html5Qrcode === 'undefined') {
+                console.error('Html5Qrcode not loaded');
+                return;
+            }
+
+            this.html5QrCode = new Html5Qrcode("quick-qr-reader");
+            this.html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 200, height: 200 } },
+                (decodedText) => {
+                    console.log('Quick QR Decoded:', decodedText);
+                    this.handleQrResult(decodedText);
+                },
+                (errorMessage) => { }
+            ).then(() => {
+                this.scanning = true;
+            }).catch((err) => {
+                console.error('Quick QR Scanner error:', err);
+                this.scanning = false;
+            });
+        },
+
+        stopScanner() {
+            if (this.html5QrCode && this.scanning) {
+                this.html5QrCode.stop().then(() => {
+                    this.scanning = false;
+                    const qrElement = document.getElementById('quick-qr-reader');
+                    if (qrElement) qrElement.innerHTML = '';
+                }).catch(() => {});
+            }
+        },
+
+        toggleScanner() {
+            if (this.scanning) {
+                this.stopScanner();
+            } else {
+                this.startScanner();
+            }
+        },
+
+        handleQrResult(code) {
+            // Try to parse QR code and find location
+            let qrCode = code;
+            try {
+                const data = JSON.parse(code);
+                if (data.code) qrCode = data.code;
+            } catch (e) {}
+
+            // Find location by QR code 
+            const locations = @json($locations->map(fn($l) => ['id' => $l->id, 'name' => $l->name, 'qr' => $l->qr_code]));
+            const location = locations.find(l => l.qr === qrCode);
             
-            // Redirect to attendance page with parameters
-            const url = new URL('{{ route('staff.attendance.index') }}', window.location.origin);
+            if (location) {
+                this.qrDetected = true;
+                this.qrLocationName = location.name;
+                this.qrLocationId = location.id;
+                this.selectedLocation = location.id;
+                this.stopScanner();
+            }
+        },
+
+        doCheckIn() {
+            const locId = this.selectedLocation || this.qrLocationId;
+            if (!locId || this.gpsStatus !== 'active') return;
+            
+            this.stopScanner();
+            const url = new URL('{{ route("staff.attendance.index") }}', window.location.origin);
             url.searchParams.set('action', 'checkin');
-            url.searchParams.set('location', this.selectedLocation);
+            url.searchParams.set('location', locId);
             url.searchParams.set('lat', this.gpsLat);
             url.searchParams.set('lng', this.gpsLng);
             window.location.href = url.toString();
@@ -244,7 +371,8 @@ function quickAttendance() {
         doCheckOut() {
             if (this.gpsStatus !== 'active') return;
             
-            const url = new URL('{{ route('staff.attendance.index') }}', window.location.origin);
+            this.stopScanner();
+            const url = new URL('{{ route("staff.attendance.index") }}', window.location.origin);
             url.searchParams.set('action', 'checkout');
             url.searchParams.set('lat', this.gpsLat);
             url.searchParams.set('lng', this.gpsLng);

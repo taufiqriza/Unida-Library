@@ -3,6 +3,9 @@
 <div class="space-y-5" x-data="attendanceApp()" x-init="initGeolocation()"
      @auto-checkin.window="$nextTick(() => $wire.checkIn())"
      @auto-checkout.window="$nextTick(() => $wire.checkOut())"
+     @beforeunload.window="cleanupScanner()"
+     x-on:livewire:navigating.window="cleanupScanner()"
+     x-on:visibilitychange.window="if (document.hidden) cleanupScanner()"
 >
     {{-- Header --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -693,6 +696,14 @@ function attendanceApp() {
         map: null,
         html5QrCode: null,
         scanning: false,
+
+        // Cleanup scanner on page close/navigate
+        cleanupScanner() {
+            if (this.html5QrCode && this.scanning) {
+                this.html5QrCode.stop().catch(() => {});
+                this.scanning = false;
+            }
+        },
 
         initGeolocation() {
             console.log('Initializing GPS...');
