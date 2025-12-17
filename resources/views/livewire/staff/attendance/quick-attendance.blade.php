@@ -228,6 +228,14 @@ Alpine.data('quickAttendanceWidget', () => ({
             this.qrDetected = true;
             this.qrLocationName = data.name;
             this.stopScanner();
+            
+            // Auto check-in after QR scan if GPS is ready and not checked in yet
+            if (this.gpsStatus === 'active' && !this.hasCheckedIn) {
+                // Small delay for UX feedback
+                setTimeout(() => {
+                    $wire.checkIn();
+                }, 500);
+            }
         });
     },
 
@@ -261,6 +269,9 @@ Alpine.data('quickAttendanceWidget', () => ({
         if (this.open) {
             // Refresh GPS when popup opens
             this.initGps();
+            // Reset QR state
+            this.qrDetected = false;
+            this.qrLocationName = '';
         } else {
             this.cleanup();
         }
@@ -282,8 +293,19 @@ Alpine.data('quickAttendanceWidget', () => ({
 
     setMode(newMode) {
         if (this.mode === newMode) return;
-        if (this.mode === 'qr') this.stopScanner();
+        
+        // Stop scanner if leaving QR mode
+        if (this.mode === 'qr') {
+            this.stopScanner();
+        }
+        
+        // Reset QR detected state when switching modes
+        this.qrDetected = false;
+        this.qrLocationName = '';
+        
         this.mode = newMode;
+        
+        // Start scanner if entering QR mode
         if (newMode === 'qr') {
             this.$nextTick(() => setTimeout(() => this.startScanner(), 200));
         }
