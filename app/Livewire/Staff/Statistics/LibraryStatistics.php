@@ -69,8 +69,8 @@ class LibraryStatistics extends Component
         $branchId = $this->selectedBranch;
         $cacheKey = 'staff_statistics_' . ($branchId ?? 'all');
         
-        // Cache for 5 minutes
-        $data = Cache::remember($cacheKey, 300, function () use ($branchId) {
+        // Cache for 15 minutes (heavy queries)
+        $data = Cache::remember($cacheKey, 900, function () use ($branchId) {
             return $this->fetchAllStatistics($branchId);
         });
         
@@ -159,22 +159,41 @@ class LibraryStatistics extends Component
             ->get()
             ->toArray();
 
-        // Monthly Trend
+        // Monthly Trend - Optimized: 3 queries instead of 36
+        $startDate = now()->subMonths(11)->startOfMonth();
+        $endDate = now()->endOfMonth();
+        
+        $loansPerMonth = $this->queryWithBranch(Loan::query(), $branchId)
+            ->whereBetween('loan_date', [$startDate, $endDate])
+            ->selectRaw('YEAR(loan_date) as year, MONTH(loan_date) as month, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->toArray();
+            
+        $returnsPerMonth = $this->queryWithBranch(Loan::query(), $branchId)
+            ->whereBetween('return_date', [$startDate, $endDate])
+            ->selectRaw('YEAR(return_date) as year, MONTH(return_date) as month, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->toArray();
+            
+        $membersPerMonth = $this->queryWithBranch(Member::query(), $branchId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->pluck('count', DB::raw("CONCAT(year, '-', LPAD(month, 2, '0'))"))
+            ->toArray();
+
         $monthlyTrend = [];
         for ($i = 11; $i >= 0; $i--) {
             $date = now()->subMonths($i);
+            $key = $date->format('Y-m');
             $monthlyTrend[] = [
                 'month' => $date->format('M Y'),
                 'short' => $date->format('M'),
-                'loans' => $this->queryWithBranch(Loan::query(), $branchId)
-                    ->whereMonth('loan_date', $date->month)
-                    ->whereYear('loan_date', $date->year)->count(),
-                'returns' => $this->queryWithBranch(Loan::query(), $branchId)
-                    ->whereMonth('return_date', $date->month)
-                    ->whereYear('return_date', $date->year)->count(),
-                'new_members' => $this->queryWithBranch(Member::query(), $branchId)
-                    ->whereMonth('created_at', $date->month)
-                    ->whereYear('created_at', $date->year)->count(),
+                'loans' => $loansPerMonth[$key] ?? 0,
+                'returns' => $returnsPerMonth[$key] ?? 0,
+                'new_members' => $membersPerMonth[$key] ?? 0,
             ];
         }
 
