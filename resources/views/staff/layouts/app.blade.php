@@ -187,13 +187,13 @@
 
     {{-- Mobile Header --}}
     <header class="mobile-header lg:hidden fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 shadow-xl">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <i class="fas fa-book-open text-white text-sm"></i>
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+                <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-7 h-7 object-contain">
             </div>
-            <div>
-                <p class="text-white text-sm font-semibold">Staff Portal</p>
-                <p class="text-blue-200 text-[10px]">{{ $branch?->name ?? 'Perpustakaan' }}</p>
+            <div class="leading-tight">
+                <p class="text-white text-sm font-bold">UNIDA LIBRARY</p>
+                <p class="text-blue-200 text-[10px]">Admin Portal</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
