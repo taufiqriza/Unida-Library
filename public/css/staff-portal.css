@@ -215,6 +215,43 @@ html.dark select:focus {
 
 /* Gradient stat cards - keep them vibrant in dark mode (no changes needed) */
 
+/* Kanban scroll indicators - hide gradients in dark mode or use dark colors */
+html.dark [class*="from-slate-50"][class*="to-transparent"],
+html.dark [class*="bg-gradient-to-l"][class*="from-slate-50"],
+html.dark [class*="bg-gradient-to-r"][class*="from-slate-50"] {
+    background: linear-gradient(to left, rgba(15, 23, 42, 0.9), transparent) !important;
+}
+
+/* Sidebar inactive items - no box background in dark mode */
+html.dark .staff-sidebar .bg-white\/10:not(.bg-white\/15):not(.bg-white\/20) {
+    background: transparent !important;
+}
+
+/* Sidebar nav item icons without active bg */
+html.dark aside nav a:not([class*="bg-white\\/15"]) .bg-white\/10 {
+    background: transparent !important;
+}
+
+/* But keep active items with brighter bg */
+html.dark aside nav a[class*="bg-white\\/15"] .bg-white\/20 {
+    background: rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Circulation page specific cards */
+html.dark .scan-input {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #f1f5f9 !important;
+}
+
+html.dark .loan-row {
+    border-color: #334155 !important;
+}
+
+html.dark .loan-row:hover {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%) !important;
+}
+
 /* Badges in dark mode */
 html.dark .badge-success {
     background: rgba(34, 197, 94, 0.2) !important;
