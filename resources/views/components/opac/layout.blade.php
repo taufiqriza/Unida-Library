@@ -855,7 +855,7 @@
 
             <!-- Contact Info -->
             <div class="p-4 border-t bg-gradient-to-br from-gray-50 to-slate-100">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Hubungi Kami</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">{{ __('opac.contact_us') }}</p>
                 <div class="space-y-2">
                     <a href="tel:085183053934" class="flex items-center gap-3 p-2.5 bg-white rounded-xl text-sm text-gray-600 hover:text-primary-600 shadow-sm hover:shadow transition">
                         <span class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center"><i class="fas fa-phone text-primary-600 text-xs"></i></span>
@@ -892,7 +892,7 @@
                     <div class="flex items-center gap-3 mb-4">
                         <img src="{{ url('storage/logo.png') }}" alt="UNIDA Library" class="h-12 w-auto brightness-0 invert">
                     </div>
-                    <p class="text-sm text-primary-200">Perpustakaan Universitas Darussalam Gontor melayani civitas akademika dalam akses koleksi dan layanan informasi.</p>
+                    <p class="text-sm text-primary-200">{{ __('opac.footer.about') }}</p>
                     <div class="flex gap-3 mt-4">
                         <a href="https://youtube.com/@perpustakaanunidagontor" target="_blank" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-white hover:bg-red-500 transition"><i class="fab fa-youtube"></i></a>
                         <a href="https://instagram.com/perpustakaanunida" target="_blank" class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-white hover:bg-pink-500 transition"><i class="fab fa-instagram"></i></a>
@@ -900,7 +900,7 @@
                     </div>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">E-Resources</h4>
+                    <h4 class="font-semibold text-white mb-4">{{ __('opac.footer.eresources') }}</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
                         <li><a href="{{ route('opac.search') . '?type=book' }}" class="hover:text-white transition"><i class="fas fa-search mr-2"></i>OPAC</a></li>
                         <li><a href="{{ route('opac.search') . '?type=ebook' }}" class="hover:text-white transition"><i class="fas fa-file-pdf mr-2"></i>E-Book</a></li>
@@ -909,14 +909,14 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">Jam Layanan</h4>
+                    <h4 class="font-semibold text-white mb-4">{{ __('opac.home_menu.hours') }}</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
                         <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>Senin - Jumat<br>08.00 - 16.00 WIB</span></li>
                         <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>Sabtu<br>08.00 - 12.00 WIB</span></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-white mb-4">Kontak</h4>
+                    <h4 class="font-semibold text-white mb-4">{{ __('opac.footer.contact') }}</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
                         <li><a href="mailto:library@unida.gontor.ac.id" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-envelope"></i>library@unida.gontor.ac.id</a></li>
                         <li><a href="https://wa.me/6285183053934" target="_blank" class="hover:text-white transition flex items-center gap-2"><i class="fab fa-whatsapp"></i>0851-8305-3934</a></li>
@@ -925,7 +925,7 @@
                 </div>
             </div>
             <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-primary-300">
-                &copy; {{ date('Y') }} Perpustakaan Universitas Darussalam Gontor. All rights reserved.
+                &copy; {{ date('Y') }} {{ __('opac.site_name') }}. {{ __('opac.footer.all_rights') }}.
             </div>
         </div>
     </footer>
@@ -949,8 +949,8 @@
 
             <!-- Search container -->
             <div class="text-center mb-6">
-                <h3 class="text-white text-xl lg:text-2xl font-bold mb-2">Pencarian Global</h3>
-                <p class="text-primary-200 text-sm">Temukan buku, e-book, tugas akhir, dan berita</p>
+                <h3 class="text-white text-xl lg:text-2xl font-bold mb-2">{{ __('opac.collection_menu.search_global') }}</h3>
+                <p class="text-primary-200 text-sm">{{ __('opac.search_placeholder') }}</p>
             </div>
 
             <form action="{{ route('opac.search') }}" method="GET">
@@ -966,7 +966,7 @@
                                x-ref="searchInput"
                                @keydown.enter="$el.form.submit()">
                         <button type="submit" class="m-1.5 px-6 lg:px-8 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white font-semibold rounded-full transition-all duration-300 shadow-lg flex items-center gap-2">
-                            <span class="hidden sm:inline">Cari</span>
+                            <span class="hidden sm:inline">{{ __('opac.search') }}</span>
                             <i class="fas fa-arrow-right text-sm"></i>
                         </button>
                     </div>
@@ -976,7 +976,7 @@
                 <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
                     <span class="text-primary-200 text-xs">Filter:</span>
                     <a href="{{ route('opac.search') }}?type=book" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
-                        <i class="fas fa-book text-[10px]"></i> Buku
+                        <i class="fas fa-book text-[10px]"></i> {{ __('opac.homepage.books') }}
                     </a>
                     <a href="{{ route('opac.search') }}?type=ebook" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
                         <i class="fas fa-file-pdf text-[10px]"></i> E-Book
@@ -985,16 +985,16 @@
                         <i class="fas fa-graduation-cap text-[10px]"></i> E-Thesis
                     </a>
                     <a href="{{ route('opac.journals.index') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
-                        <i class="fas fa-file-lines text-[10px]"></i> Jurnal
+                        <i class="fas fa-file-lines text-[10px]"></i> {{ __('opac.homepage.journals') }}
                     </a>
                     <a href="{{ route('opac.news.index') }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-full transition flex items-center gap-1.5">
-                        <i class="fas fa-newspaper text-[10px]"></i> Berita
+                        <i class="fas fa-newspaper text-[10px]"></i> {{ __('opac.menu.news') }}
                     </a>
                 </div>
 
                 <!-- Popular searches -->
                 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
-                    <span class="text-primary-300 text-xs">Populer:</span>
+                    <span class="text-primary-300 text-xs">{{ __('opac.popular') }}:</span>
                     <a href="{{ route('opac.search') }}?q=islam" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Islam</a>
                     <a href="{{ route('opac.search') }}?q=ekonomi" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Ekonomi</a>
                     <a href="{{ route('opac.search') }}?q=pendidikan" class="px-3 py-1 bg-white/5 hover:bg-white/10 text-primary-200 text-xs rounded-full transition">Pendidikan</a>
@@ -1014,7 +1014,7 @@
                 <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request()->routeIs('opac.home') ? 'bg-white/20' : '' }}">
                     <i class="fas fa-home text-lg"></i>
                 </span>
-                <span class="text-[10px] mt-0.5 font-medium">Beranda</span>
+                <span class="text-[10px] mt-0.5 font-medium">{{ __('opac.menu.home') }}</span>
             </a>
             <a href="{{ route('opac.search') }}?type=ebook" class="flex flex-col items-center py-1.5 px-3 {{ request('type') == 'ebook' ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
                 <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request('type') == 'ebook' ? 'bg-white/20' : '' }}">
@@ -1026,7 +1026,7 @@
                 <span class="w-14 h-14 bg-gradient-to-br from-accent-400 to-accent-500 text-gray-900 rounded-2xl shadow-lg shadow-accent-500/40 flex items-center justify-center ring-4 ring-primary-800">
                     <i class="fas fa-search text-xl"></i>
                 </span>
-                <span class="text-[10px] mt-1 font-medium text-white">Cari</span>
+                <span class="text-[10px] mt-1 font-medium text-white">{{ __('opac.search') }}</span>
             </button>
             <a href="{{ route('opac.search') }}?type=ethesis" class="flex flex-col items-center py-1.5 px-3 {{ request('type') == 'ethesis' ? 'text-white' : 'text-primary-300' }} hover:text-white transition">
                 <span class="w-10 h-10 rounded-xl flex items-center justify-center {{ request('type') == 'ethesis' ? 'bg-white/20' : '' }}">
