@@ -238,7 +238,9 @@
                         @if($active)
                             <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
                         @endif
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center {{ $active ? 'bg-white/20 text-white shadow-lg' : 'bg-white/10 text-blue-200 group-hover:text-white' }} flex-shrink-0 transition-all">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all
+                            {{ $active ? 'bg-white/20 text-white shadow-lg' : 'text-blue-200 group-hover:text-white' }}"
+                            :class="!{{ $active ? 'true' : 'false' }} && !darkMode ? 'bg-white/10' : ''">
                             <i class="fas {{ $item['icon'] }} text-sm"></i>
                         </div>
                         <span class="text-sm font-medium transition-all duration-300"
