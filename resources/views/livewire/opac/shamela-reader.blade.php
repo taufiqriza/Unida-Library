@@ -45,35 +45,69 @@
             </div>
             
             {{-- Page Navigation Top --}}
-            <div class="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200 flex-shrink-0">
+            <div class="flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200 flex-shrink-0"
+                 x-data="{ jumpPage: @entangle('currentPage'), showJump: false }">
                 <button wire:click="prevPage" 
-                        class="px-3 py-1.5 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center gap-2 text-sm {{ $currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                        {{ $currentPage <= 1 ? 'disabled' : '' }}>
+                        wire:loading.attr="disabled"
+                        class="px-3 py-1.5 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        @if($currentPage <= 1) disabled @endif>
                     <i class="fas fa-chevron-right"></i>
                     <span class="hidden sm:inline">السابق</span>
                 </button>
                 
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">صفحة</span>
-                    <input type="number" 
-                           wire:model.defer="currentPage"
-                           wire:keydown.enter="loadPage"
-                           min="1" 
-                           max="{{ $totalPages }}"
-                           class="w-16 px-2 py-1 text-center border rounded-lg text-sm">
+                    
+                    {{-- Current Page Display / Jump Input --}}
+                    <div class="relative" x-data="{ editing: false }">
+                        {{-- Display Mode --}}
+                        <button @click="editing = true; $nextTick(() => $refs.jumpInput.focus().select())"
+                                x-show="!editing"
+                                class="min-w-[50px] px-3 py-1 bg-white border border-gray-300 rounded-lg text-sm text-center hover:bg-blue-50 hover:border-blue-300 transition cursor-pointer font-semibold text-blue-700">
+                            {{ number_format($currentPage) }}
+                        </button>
+                        
+                        {{-- Edit Mode --}}
+                        <div x-show="editing" x-cloak class="flex items-center gap-1">
+                            <input type="number" 
+                                   x-ref="jumpInput"
+                                   x-model="jumpPage"
+                                   @keydown.enter="$wire.goToPage(parseInt(jumpPage)); editing = false"
+                                   @keydown.escape="jumpPage = {{ $currentPage }}; editing = false"
+                                   @blur="setTimeout(() => editing = false, 200)"
+                                   min="1" 
+                                   max="{{ $totalPages }}"
+                                   class="w-20 px-2 py-1 text-center border border-blue-400 rounded-lg text-sm focus:ring-2 focus:ring-blue-300 focus:outline-none">
+                            <button @click="$wire.goToPage(parseInt(jumpPage)); editing = false"
+                                    class="px-2 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <span class="text-sm text-gray-600">من {{ number_format($totalPages) }}</span>
                 </div>
                 
                 <button wire:click="nextPage" 
-                        class="px-3 py-1.5 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center gap-2 text-sm {{ $currentPage >= $totalPages ? 'opacity-50 cursor-not-allowed' : '' }}"
-                        {{ $currentPage >= $totalPages ? 'disabled' : '' }}>
+                        wire:loading.attr="disabled"
+                        class="px-3 py-1.5 bg-white rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        @if($currentPage >= $totalPages) disabled @endif>
                     <span class="hidden sm:inline">التالي</span>
                     <i class="fas fa-chevron-left"></i>
                 </button>
             </div>
             
             {{-- Content Area --}}
-            <div class="flex-1 overflow-y-auto bg-amber-50/30" dir="rtl">
+            <div class="flex-1 overflow-y-auto bg-amber-50/30 relative" dir="rtl">
+                {{-- Loading Overlay during navigation --}}
+                <div wire:loading.flex wire:target="nextPage, prevPage, goToPage, loadPage" 
+                     class="absolute inset-0 bg-white/80 items-center justify-center z-10">
+                    <div class="text-center">
+                        <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                        <p class="text-gray-600 text-sm">جارٍ الانتقال...</p>
+                    </div>
+                </div>
+                
                 @if($loading)
                 {{-- Loading --}}
                 <div class="flex items-center justify-center h-full">
