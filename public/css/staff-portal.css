@@ -223,20 +223,11 @@ html.dark [class*="bg-gradient-to-r"][class*="from-slate-50"] {
 }
 
 /* ================================================ */
-/* SIDEBAR DARK MODE - Active item styling         */
+/* SIDEBAR DARK MODE - Active item styling only    */
 /* ================================================ */
 
-/* Active nav item background - blue highlight */
-html.dark .staff-sidebar nav a[class*="bg-white"],
-html.dark aside.staff-sidebar nav a[class*="bg-white"] {
-    background: rgba(59, 130, 246, 0.25) !important;
-}
-
-/* Active icon box - brighter blue */
-html.dark .staff-sidebar nav a .bg-white\/20,
-html.dark aside.staff-sidebar nav a .bg-white\/20 {
-    background: rgba(59, 130, 246, 0.4) !important;
-}
+/* Note: Inactive item icon boxes are handled by Alpine in HTML */
+/* This CSS only styles the active item's icon box */
 
 /* ================================================ */
 /* CIRCULATION PAGE DARK MODE                       */
