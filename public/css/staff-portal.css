@@ -222,20 +222,37 @@ html.dark [class*="bg-gradient-to-r"][class*="from-slate-50"] {
     background: linear-gradient(to left, rgba(15, 23, 42, 0.9), transparent) !important;
 }
 
-/* Sidebar inactive items - no box background in dark mode */
-html.dark .staff-sidebar .bg-white\/10:not(.bg-white\/15):not(.bg-white\/20) {
+/* ================================================ */
+/* SIDEBAR DARK MODE - Match light mode behavior    */
+/* ================================================ */
+
+/* Hide ALL bg-white/10 backgrounds in sidebar (icon boxes for inactive items) */
+html.dark .staff-sidebar .bg-white\/10,
+html.dark aside.staff-sidebar .bg-white\/10 {
     background: transparent !important;
 }
 
-/* Sidebar nav item icons without active bg */
-html.dark aside nav a:not([class*="bg-white\\/15"]) .bg-white\/10 {
-    background: transparent !important;
+/* Keep bg-white/20 for active items only */
+html.dark .staff-sidebar .bg-white\/20,
+html.dark aside.staff-sidebar .bg-white\/20 {
+    background: rgba(59, 130, 246, 0.35) !important;
 }
 
-/* But keep active items with brighter bg */
-html.dark aside nav a[class*="bg-white\\/15"] .bg-white\/20 {
+/* Keep bg-white/15 for active nav link background */
+html.dark .staff-sidebar .bg-white\/15,
+html.dark aside.staff-sidebar .bg-white\/15 {
     background: rgba(59, 130, 246, 0.25) !important;
 }
+
+/* User info box in sidebar */
+html.dark .staff-sidebar>div .bg-white\/10,
+html.dark aside.staff-sidebar>div .bg-white\/10 {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ================================================ */
+/* CIRCULATION PAGE DARK MODE                       */
+/* ================================================ */
 
 /* Circulation page specific cards */
 html.dark .scan-input {
@@ -250,6 +267,34 @@ html.dark .loan-row {
 
 html.dark .loan-row:hover {
     background: linear-gradient(90deg, rgba(59, 130, 246, 0.1) 0%, transparent 100%) !important;
+}
+
+/* Blue/Emerald/Purple background boxes in circulation */
+html.dark .bg-blue-50,
+html.dark .bg-indigo-50 {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+html.dark .bg-emerald-50,
+html.dark .bg-teal-50,
+html.dark .bg-green-50 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+html.dark .bg-purple-50,
+html.dark .bg-violet-50 {
+    background-color: rgba(139, 92, 246, 0.15) !important;
+}
+
+html.dark .bg-red-50,
+html.dark .bg-rose-50 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-orange-50,
+html.dark .bg-yellow-50 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
 }
 
 /* Badges in dark mode */
