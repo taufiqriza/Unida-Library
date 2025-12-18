@@ -9,7 +9,9 @@ return [
     // General
     'site_name' => 'Perpustakaan UNIDA Gontor',
     'tagline' => 'Jendela Ilmu Dunia & Akhirat',
+    'university' => 'Universitas Darussalam Gontor',
     'welcome' => 'Selamat Datang',
+    'welcome_to_library' => 'Selamat Datang di Perpustakaan UNIDA',
     'back' => 'Kembali',
     'search' => 'Cari',
     'login' => 'Masuk',
@@ -33,13 +35,16 @@ return [
     'previous' => 'Sebelumnya',
     'page' => 'Halaman',
     'of' => 'dari',
+    'new' => 'Baru',
+    'popular' => 'Populer',
+    'available' => 'Tersedia',
     
     // Top Bar
     'npp' => 'NPP',
     'contact_us' => 'Hubungi Kami',
     
     // Search
-    'search_placeholder' => 'Cari buku, e-book, tugas akhir...',
+    'search_placeholder' => 'Cari buku, e-book, tugas akhir, berita...',
     'search_all' => 'Semua Koleksi',
     'search_book' => 'Buku',
     'search_ebook' => 'E-Book',
@@ -56,6 +61,78 @@ return [
         'discover' => 'DISCOVER',
         'guide' => 'GUIDE',
         'news' => 'NEWS',
+    ],
+    
+    // Homepage
+    'homepage' => [
+        // Hero
+        'search_placeholder' => 'Cari buku, e-book, tugas akhir, berita...',
+        'popular_tags' => 'Populer',
+        
+        // Stats
+        'book_titles' => 'Judul Buku',
+        'ethesis' => 'E-Thesis',
+        'shamela_books' => 'Kitab Shamela',
+        'unida_journals' => 'Jurnal UNIDA',
+        'ebook' => 'E-Book',
+        
+        // Welcome
+        'welcome_description' => 'Perpustakaan Universitas Darussalam Gontor hadir sebagai pusat sumber belajar dan penelitian yang modern. Kami menyediakan akses ke ribuan koleksi buku, jurnal ilmiah, e-book, dan sumber daya digital lainnya untuk mendukung kegiatan akademik sivitas akademika UNIDA Gontor.',
+        
+        // Quick Services
+        'quick_services' => 'Layanan Cepat',
+        'thesis_upload' => 'Unggah Tugas Akhir',
+        'thesis_upload_desc' => 'Upload skripsi, tesis & disertasi',
+        'plagiarism_check' => 'Cek Plagiasi',
+        'plagiarism_desc' => 'Scan dengan iThenticate',
+        'member_guide' => 'Panduan Member',
+        'member_guide_desc' => 'Login & fitur perpustakaan',
+        
+        // Premium Collection
+        'premium_collection' => 'Koleksi Premium',
+        'exclusive_digital' => 'Koleksi Digital Eksklusif',
+        'access_digital' => 'Akses perpustakaan digital klasik dan warisan sejarah',
+        'shamela_title' => 'Maktabah Shamela',
+        'shamela_desc' => 'Perpustakaan digital kitab-kitab Islam klasik lengkap',
+        'shamela_count' => '8,425 Kitab',
+        'universitaria_title' => 'Universitaria',
+        'universitaria_desc' => 'Koleksi warisan sejarah Pondok Modern Gontor',
+        'heritage' => 'Heritage',
+        'journal_database' => 'Database Jurnal',
+        'journal_desc' => 'Akses Gale Academic & ProQuest via FPPTI',
+        'journal_count' => '120K+ Jurnal',
+        'eresources_title' => 'E-Resources',
+        'eresources_desc' => 'Open Library, iPusnas, PDF Drive & lainnya',
+        'free_access' => 'Akses Gratis',
+        
+        // Discovery
+        'explore_collection' => 'Jelajahi Koleksi',
+        'discover_latest' => 'Temukan koleksi terbaru perpustakaan',
+        'books' => 'Buku',
+        'journals' => 'Jurnal',
+        'view_all_books' => 'Lihat Semua Buku',
+        'view_all_ethesis' => 'Lihat Semua E-Thesis',
+        'view_all_ebook' => 'Lihat Semua E-Book',
+        'view_all_journals' => 'Lihat Semua Jurnal',
+        'no_books' => 'Belum ada buku terbaru',
+        'no_ethesis' => 'Belum ada e-thesis terbaru',
+        'no_ebook' => 'Belum ada e-book terbaru',
+        'no_journals' => 'Belum ada jurnal terbaru',
+        
+        // Recommendations
+        'recommendations' => 'Rekomendasi untuk Anda',
+        
+        // News
+        'news_announcements' => 'Berita & Pengumuman',
+        
+        // Branches
+        'library_network' => 'Jaringan Perpustakaan',
+        'visit_branches' => 'Kunjungi Cabang Kami',
+        'branch_locations' => ':count lokasi perpustakaan di seluruh kampus',
+        
+        // Contact
+        'need_help' => 'Butuh Bantuan?',
+        'contact_desc' => 'Hubungi kami untuk informasi lebih lanjut',
     ],
     
     // Home Submenu

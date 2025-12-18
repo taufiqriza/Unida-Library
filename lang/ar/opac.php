@@ -9,7 +9,9 @@ return [
     // General
     'site_name' => 'مكتبة جامعة دار السلام كونتور',
     'tagline' => 'نافذة العلم للدنيا والآخرة',
+    'university' => 'جامعة دار السلام كونتور',
     'welcome' => 'مرحباً',
+    'welcome_to_library' => 'مرحباً بكم في مكتبة جامعة دار السلام',
     'back' => 'رجوع',
     'search' => 'بحث',
     'login' => 'تسجيل الدخول',
@@ -33,13 +35,16 @@ return [
     'previous' => 'السابق',
     'page' => 'صفحة',
     'of' => 'من',
+    'new' => 'جديد',
+    'popular' => 'شائع',
+    'available' => 'متاح',
     
     // Top Bar
     'npp' => 'رقم التسجيل',
     'contact_us' => 'اتصل بنا',
     
     // Search
-    'search_placeholder' => 'ابحث عن الكتب والرسائل الجامعية...',
+    'search_placeholder' => 'ابحث عن الكتب والرسائل والأخبار...',
     'search_all' => 'جميع المجموعات',
     'search_book' => 'الكتب',
     'search_ebook' => 'الكتب الإلكترونية',
@@ -56,6 +61,78 @@ return [
         'discover' => 'اكتشف',
         'guide' => 'الدليل',
         'news' => 'الأخبار',
+    ],
+    
+    // Homepage
+    'homepage' => [
+        // Hero
+        'search_placeholder' => 'ابحث عن الكتب والرسائل والأخبار...',
+        'popular_tags' => 'شائع',
+        
+        // Stats
+        'book_titles' => 'عناوين الكتب',
+        'ethesis' => 'الرسائل الجامعية',
+        'shamela_books' => 'كتب الشاملة',
+        'unida_journals' => 'مجلات الجامعة',
+        'ebook' => 'كتب إلكترونية',
+        
+        // Welcome
+        'welcome_description' => 'مكتبة جامعة دار السلام كونتور هي مركز حديث للتعلم والبحث. نوفر الوصول إلى آلاف الكتب والمجلات العلمية والكتب الإلكترونية والموارد الرقمية الأخرى لدعم الأنشطة الأكاديمية لمجتمع الجامعة.',
+        
+        // Quick Services
+        'quick_services' => 'خدمات سريعة',
+        'thesis_upload' => 'رفع الرسالة الجامعية',
+        'thesis_upload_desc' => 'رفع الرسائل والأطروحات',
+        'plagiarism_check' => 'فحص الانتحال',
+        'plagiarism_desc' => 'الفحص باستخدام iThenticate',
+        'member_guide' => 'دليل العضوية',
+        'member_guide_desc' => 'تسجيل الدخول وميزات المكتبة',
+        
+        // Premium Collection
+        'premium_collection' => 'مجموعات مميزة',
+        'exclusive_digital' => 'المجموعة الرقمية الحصرية',
+        'access_digital' => 'الوصول إلى المكتبة الرقمية الكلاسيكية والتراث التاريخي',
+        'shamela_title' => 'المكتبة الشاملة',
+        'shamela_desc' => 'مكتبة رقمية كاملة للكتب الإسلامية الكلاسيكية',
+        'shamela_count' => '٨٬٤٢٥ كتاباً',
+        'universitaria_title' => 'يونيفرسيتاريا',
+        'universitaria_desc' => 'مجموعة التراث التاريخي لمعهد كونتور الحديث',
+        'heritage' => 'تراث',
+        'journal_database' => 'قاعدة بيانات المجلات',
+        'journal_desc' => 'الوصول إلى Gale Academic وProQuest عبر FPPTI',
+        'journal_count' => '+١٢٠ ألف مجلة',
+        'eresources_title' => 'الموارد الإلكترونية',
+        'eresources_desc' => 'Open Library وiPusnas وPDF Drive والمزيد',
+        'free_access' => 'وصول مجاني',
+        
+        // Discovery
+        'explore_collection' => 'استكشف المجموعات',
+        'discover_latest' => 'اكتشف أحدث مجموعات المكتبة',
+        'books' => 'الكتب',
+        'journals' => 'المجلات',
+        'view_all_books' => 'عرض جميع الكتب',
+        'view_all_ethesis' => 'عرض جميع الرسائل',
+        'view_all_ebook' => 'عرض جميع الكتب الإلكترونية',
+        'view_all_journals' => 'عرض جميع المجلات',
+        'no_books' => 'لا توجد كتب جديدة بعد',
+        'no_ethesis' => 'لا توجد رسائل جديدة بعد',
+        'no_ebook' => 'لا توجد كتب إلكترونية جديدة بعد',
+        'no_journals' => 'لا توجد مجلات جديدة بعد',
+        
+        // Recommendations
+        'recommendations' => 'توصيات لك',
+        
+        // News
+        'news_announcements' => 'الأخبار والإعلانات',
+        
+        // Branches
+        'library_network' => 'شبكة المكتبات',
+        'visit_branches' => 'زيارة فروعنا',
+        'branch_locations' => ':count موقع للمكتبة في الحرم الجامعي',
+        
+        // Contact
+        'need_help' => 'تحتاج مساعدة؟',
+        'contact_desc' => 'تواصل معنا للمزيد من المعلومات',
     ],
     
     // Home Submenu

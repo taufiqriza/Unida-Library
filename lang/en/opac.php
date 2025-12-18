@@ -9,7 +9,9 @@ return [
     // General
     'site_name' => 'UNIDA Gontor Library',
     'tagline' => 'Gateway to Knowledge for This World & Hereafter',
+    'university' => 'Darussalam Gontor University',
     'welcome' => 'Welcome',
+    'welcome_to_library' => 'Welcome to UNIDA Library',
     'back' => 'Back',
     'search' => 'Search',
     'login' => 'Login',
@@ -33,13 +35,16 @@ return [
     'previous' => 'Previous',
     'page' => 'Page',
     'of' => 'of',
+    'new' => 'New',
+    'popular' => 'Popular',
+    'available' => 'Available',
     
     // Top Bar
     'npp' => 'NPP',
     'contact_us' => 'Contact Us',
     
     // Search
-    'search_placeholder' => 'Search books, e-books, thesis...',
+    'search_placeholder' => 'Search books, e-books, thesis, news...',
     'search_all' => 'All Collections',
     'search_book' => 'Books',
     'search_ebook' => 'E-Books',
@@ -56,6 +61,78 @@ return [
         'discover' => 'DISCOVER',
         'guide' => 'GUIDE',
         'news' => 'NEWS',
+    ],
+    
+    // Homepage
+    'homepage' => [
+        // Hero
+        'search_placeholder' => 'Search books, e-books, thesis, news...',
+        'popular_tags' => 'Popular',
+        
+        // Stats
+        'book_titles' => 'Book Titles',
+        'ethesis' => 'E-Thesis',
+        'shamela_books' => 'Shamela Books',
+        'unida_journals' => 'UNIDA Journals',
+        'ebook' => 'E-Book',
+        
+        // Welcome
+        'welcome_description' => 'Darussalam Gontor University Library is a modern learning and research center. We provide access to thousands of books, scientific journals, e-books, and other digital resources to support the academic activities of UNIDA Gontor community.',
+        
+        // Quick Services
+        'quick_services' => 'Quick Services',
+        'thesis_upload' => 'Thesis Submission',
+        'thesis_upload_desc' => 'Upload thesis & dissertation',
+        'plagiarism_check' => 'Plagiarism Check',
+        'plagiarism_desc' => 'Scan with iThenticate',
+        'member_guide' => 'Member Guide',
+        'member_guide_desc' => 'Login & library features',
+        
+        // Premium Collection
+        'premium_collection' => 'Premium Collection',
+        'exclusive_digital' => 'Exclusive Digital Collection',
+        'access_digital' => 'Access classical digital library and historical heritage',
+        'shamela_title' => 'Maktabah Shamela',
+        'shamela_desc' => 'Complete classical Islamic books digital library',
+        'shamela_count' => '8,425 Books',
+        'universitaria_title' => 'Universitaria',
+        'universitaria_desc' => 'Historical heritage collection of Gontor Modern Islamic Boarding School',
+        'heritage' => 'Heritage',
+        'journal_database' => 'Journal Database',
+        'journal_desc' => 'Gale Academic & ProQuest access via FPPTI',
+        'journal_count' => '120K+ Journals',
+        'eresources_title' => 'E-Resources',
+        'eresources_desc' => 'Open Library, iPusnas, PDF Drive & more',
+        'free_access' => 'Free Access',
+        
+        // Discovery
+        'explore_collection' => 'Explore Collection',
+        'discover_latest' => 'Discover the latest library collections',
+        'books' => 'Books',
+        'journals' => 'Journals',
+        'view_all_books' => 'View All Books',
+        'view_all_ethesis' => 'View All E-Thesis',
+        'view_all_ebook' => 'View All E-Books',
+        'view_all_journals' => 'View All Journals',
+        'no_books' => 'No new books yet',
+        'no_ethesis' => 'No new e-thesis yet',
+        'no_ebook' => 'No new e-books yet',
+        'no_journals' => 'No new journals yet',
+        
+        // Recommendations
+        'recommendations' => 'Recommendations for You',
+        
+        // News
+        'news_announcements' => 'News & Announcements',
+        
+        // Branches
+        'library_network' => 'Library Network',
+        'visit_branches' => 'Visit Our Branches',
+        'branch_locations' => ':count library locations across campus',
+        
+        // Contact
+        'need_help' => 'Need Help?',
+        'contact_desc' => 'Contact us for more information',
     ],
     
     // Home Submenu

@@ -6,8 +6,8 @@
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
         
         <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
-            <h1 class="text-2xl lg:text-4xl font-bold mb-2">Perpustakaan UNIDA Gontor</h1>
-            <p class="text-blue-200 text-sm lg:text-base mb-6">Universitas Darussalam Gontor</p>
+            <h1 class="text-2xl lg:text-4xl font-bold mb-2">{{ __('opac.site_name') }}</h1>
+            <p class="text-blue-200 text-sm lg:text-base mb-6">{{ __('opac.university') }}</p>
             
             <!-- Search Box - Powerful Rounded Full Design -->
             <form id="searchForm" action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto">
@@ -24,7 +24,7 @@
                             type="search" 
                             name="q" 
                             id="searchInput"
-                            placeholder="Cari buku, e-book, tugas akhir, berita..." 
+                            placeholder="{{ __('opac.homepage.search_placeholder') }}" 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                             autocomplete="off"
                         >
@@ -32,7 +32,7 @@
                         <div class="m-1.5 flex items-center bg-gray-100 rounded-full p-1 gap-1">
                             <button type="submit" class="px-5 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-blue-600/30 text-sm flex items-center gap-2">
                                 <i class="fas fa-search"></i>
-                                <span class="hidden sm:inline">Cari</span>
+                                <span class="hidden sm:inline">{{ __('opac.search') }}</span>
                             </button>
                             <button type="button" id="advancedBtn" onclick="openAdvancedSearch()" class="w-10 h-10 lg:w-11 lg:h-11 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-white rounded-full transition-all duration-300">
                                 <i class="fas fa-sliders-h"></i>
@@ -43,7 +43,7 @@
                 
                 <!-- Quick search tags -->
                 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
-                    <span class="text-blue-200 text-xs">Populer:</span>
+                    <span class="text-blue-200 text-xs">{{ __('opac.homepage.popular_tags') }}:</span>
                     <a href="{{ route('opac.search') }}?q=islam" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
                     <a href="{{ route('opac.search') }}?q=ekonomi" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
                     <a href="{{ route('opac.search') }}?q=pendidikan" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
@@ -62,7 +62,7 @@
                 </div>
                 <div>
                     <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Judul Buku</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.book_titles') }}</div>
                 </div>
             </div>
             <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
@@ -80,7 +80,7 @@
                 </div>
                 <div>
                     <div class="text-lg lg:text-2xl font-bold text-gray-900">8,425</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Kitab Shamela</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.shamela_books') }}</div>
                 </div>
             </div>
             <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
@@ -89,7 +89,7 @@
                 </div>
                 <div>
                     <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['journals']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">Jurnal UNIDA</div>
+                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.unida_journals') }}</div>
                 </div>
             </div>
             <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
@@ -115,24 +115,22 @@
                             <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-1">Selamat Datang di Perpustakaan UNIDA</h2>
-                            <p class="text-gray-500 text-sm">Universitas Darussalam Gontor</p>
+                            <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-1">{{ __('opac.welcome_to_library') }}</h2>
+                            <p class="text-gray-500 text-sm">{{ __('opac.university') }}</p>
                         </div>
                     </div>
                     <p class="text-gray-600 leading-relaxed mb-6">
-                        Perpustakaan Universitas Darussalam Gontor hadir sebagai pusat sumber belajar dan penelitian yang modern. 
-                        Kami menyediakan akses ke ribuan koleksi buku, jurnal ilmiah, e-book, dan sumber daya digital lainnya 
-                        untuk mendukung kegiatan akademik sivitas akademika UNIDA Gontor.
+                        {{ __('opac.homepage.welcome_description') }}
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <a href="{{ route('opac.page', 'visi-misi') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition">
-                            <i class="fas fa-bullseye"></i> Visi & Misi
+                            <i class="fas fa-bullseye"></i> {{ __('opac.home_menu.vision_mission') }}
                         </a>
                         <a href="{{ route('opac.page', 'jam-layanan') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200 transition">
-                            <i class="fas fa-clock"></i> Jam Layanan
+                            <i class="fas fa-clock"></i> {{ __('opac.home_menu.hours') }}
                         </a>
                         <a href="{{ route('opac.page', 'fasilitas') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition">
-                            <i class="fas fa-building"></i> Fasilitas
+                            <i class="fas fa-building"></i> {{ __('opac.home_menu.facilities') }}
                         </a>
                     </div>
                 </div>
@@ -141,7 +139,7 @@
             <!-- Quick Services -->
             <div class="space-y-3">
                 <h3 class="font-bold text-gray-900 flex items-center gap-2 mb-4">
-                    <i class="fas fa-bolt text-amber-500"></i> Layanan Cepat
+                    <i class="fas fa-bolt text-amber-500"></i> {{ __('opac.homepage.quick_services') }}
                 </h3>
                 <a href="{{ route('opac.panduan.thesis') }}" class="block bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-4 text-white hover:shadow-lg hover:shadow-purple-200 transition group">
                     <div class="flex items-center gap-3">
@@ -149,8 +147,8 @@
                             <i class="fas fa-cloud-upload-alt text-lg"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-sm">Unggah Tugas Akhir</h4>
-                            <p class="text-purple-200 text-xs">Upload skripsi, tesis & disertasi</p>
+                            <h4 class="font-bold text-sm">{{ __('opac.homepage.thesis_upload') }}</h4>
+                            <p class="text-purple-200 text-xs">{{ __('opac.homepage.thesis_upload_desc') }}</p>
                         </div>
                         <i class="fas fa-chevron-right text-purple-200 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -161,8 +159,8 @@
                             <i class="fas fa-shield-alt text-lg"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-sm">Cek Plagiasi</h4>
-                            <p class="text-teal-200 text-xs">Scan dengan iThenticate</p>
+                            <h4 class="font-bold text-sm">{{ __('opac.homepage.plagiarism_check') }}</h4>
+                            <p class="text-teal-200 text-xs">{{ __('opac.homepage.plagiarism_desc') }}</p>
                         </div>
                         <i class="fas fa-chevron-right text-teal-200 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -173,8 +171,8 @@
                             <i class="fas fa-id-card text-lg"></i>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-sm">Panduan Member</h4>
-                            <p class="text-blue-200 text-xs">Login & fitur perpustakaan</p>
+                            <h4 class="font-bold text-sm">{{ __('opac.homepage.member_guide') }}</h4>
+                            <p class="text-blue-200 text-xs">{{ __('opac.homepage.member_guide_desc') }}</p>
                         </div>
                         <i class="fas fa-chevron-right text-blue-200 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -190,10 +188,10 @@
         <div class="max-w-7xl mx-auto px-3 lg:px-4 relative">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-4">
-                    <i class="fas fa-crown text-amber-300"></i> Koleksi Premium
+                    <i class="fas fa-crown text-amber-300"></i> {{ __('opac.homepage.premium_collection') }}
                 </div>
-                <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2">Koleksi Digital Eksklusif</h2>
-                <p class="text-blue-200">Akses perpustakaan digital klasik dan warisan sejarah</p>
+                <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2">{{ __('opac.homepage.exclusive_digital') }}</h2>
+                <p class="text-blue-200">{{ __('opac.homepage.access_digital') }}</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -204,10 +202,10 @@
                         <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                             <i class="fas fa-book-quran text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Maktabah Shamela</h3>
-                        <p class="text-emerald-200 text-sm mb-4">Perpustakaan digital kitab-kitab Islam klasik lengkap</p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.shamela_title') }}</h3>
+                        <p class="text-emerald-200 text-sm mb-4">{{ __('opac.homepage.shamela_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">8,425 Kitab</span>
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.shamela_count') }}</span>
                             <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
                         </div>
                     </div>
@@ -223,10 +221,10 @@
                         <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                             <i class="fas fa-landmark text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Universitaria</h3>
-                        <p class="text-amber-100 text-sm mb-4">Koleksi warisan sejarah Pondok Modern Gontor</p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.universitaria_title') }}</h3>
+                        <p class="text-amber-100 text-sm mb-4">{{ __('opac.homepage.universitaria_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">Heritage</span>
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.heritage') }}</span>
                             <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
                         </div>
                     </div>
@@ -239,10 +237,10 @@
                         <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                             <i class="fas fa-database text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Database Jurnal</h3>
-                        <p class="text-indigo-200 text-sm mb-4">Akses Gale Academic & ProQuest via FPPTI</p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.journal_database') }}</h3>
+                        <p class="text-indigo-200 text-sm mb-4">{{ __('opac.homepage.journal_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">120K+ Jurnal</span>
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.journal_count') }}</span>
                             <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
                         </div>
                     </div>
@@ -255,10 +253,10 @@
                         <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
                             <i class="fas fa-globe text-white text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">E-Resources</h3>
-                        <p class="text-violet-200 text-sm mb-4">Open Library, iPusnas, PDF Drive & lainnya</p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.eresources_title') }}</h3>
+                        <p class="text-violet-200 text-sm mb-4">{{ __('opac.homepage.eresources_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">Akses Gratis</span>
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.free_access') }}</span>
                             <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
                         </div>
                     </div>
@@ -272,24 +270,24 @@
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
             <div>
                 <h2 class="text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <i class="fas fa-sparkles text-blue-500"></i> Jelajahi Koleksi
+                    <i class="fas fa-sparkles text-blue-500"></i> {{ __('opac.homepage.explore_collection') }}
                 </h2>
-                <p class="text-gray-500 text-sm mt-1">Temukan koleksi terbaru perpustakaan</p>
+                <p class="text-gray-500 text-sm mt-1">{{ __('opac.homepage.discover_latest') }}</p>
             </div>
             
             <!-- Tab Navigation -->
             <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto">
                 <button @click="activeTab = 'books'" :class="activeTab === 'books' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
-                    <i class="fas fa-book mr-1.5"></i>Buku
+                    <i class="fas fa-book mr-1.5"></i>{{ __('opac.homepage.books') }}
                 </button>
                 <button @click="activeTab = 'ethesis'" :class="activeTab === 'ethesis' ? 'bg-white shadow text-purple-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
-                    <i class="fas fa-graduation-cap mr-1.5"></i>E-Thesis
+                    <i class="fas fa-graduation-cap mr-1.5"></i>{{ __('opac.homepage.ethesis') }}
                 </button>
                 <button @click="activeTab = 'ebooks'" :class="activeTab === 'ebooks' ? 'bg-white shadow text-orange-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
-                    <i class="fas fa-file-pdf mr-1.5"></i>E-Book
+                    <i class="fas fa-file-pdf mr-1.5"></i>{{ __('opac.homepage.ebook') }}
                 </button>
                 <button @click="activeTab = 'journals'" :class="activeTab === 'journals' ? 'bg-white shadow text-emerald-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
-                    <i class="fas fa-newspaper mr-1.5"></i>Jurnal
+                    <i class="fas fa-newspaper mr-1.5"></i>{{ __('opac.homepage.journals') }}
                 </button>
             </div>
         </div>
@@ -322,13 +320,13 @@
             </div>
             <div class="text-center mt-6">
                 <a href="{{ route('opac.search') }}?type=book&sort=latest" class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition">
-                    Lihat Semua Buku <i class="fas fa-arrow-right"></i>
+                    {{ __('opac.homepage.view_all_books') }} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             @else
             <div class="text-center py-12 text-gray-400">
                 <i class="fas fa-book text-4xl mb-3"></i>
-                <p>Belum ada buku terbaru</p>
+                <p>{{ __('opac.homepage.no_books') }}</p>
             </div>
             @endif
         </div>
@@ -353,13 +351,13 @@
             </div>
             <div class="text-center mt-6">
                 <a href="{{ route('opac.search') }}?type=ethesis" class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium transition">
-                    Lihat Semua E-Thesis <i class="fas fa-arrow-right"></i>
+                    {{ __('opac.homepage.view_all_ethesis') }} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             @else
             <div class="text-center py-12 text-gray-400">
                 <i class="fas fa-graduation-cap text-4xl mb-3"></i>
-                <p>Belum ada e-thesis terbaru</p>
+                <p>{{ __('opac.homepage.no_ethesis') }}</p>
             </div>
             @endif
         </div>
@@ -384,13 +382,13 @@
             </div>
             <div class="text-center mt-6">
                 <a href="{{ route('opac.search') }}?type=ebook" class="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-sm font-medium transition">
-                    Lihat Semua E-Book <i class="fas fa-arrow-right"></i>
+                    {{ __('opac.homepage.view_all_ebook') }} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             @else
             <div class="text-center py-12 text-gray-400">
                 <i class="fas fa-file-pdf text-4xl mb-3"></i>
-                <p>Belum ada e-book terbaru</p>
+                <p>{{ __('opac.homepage.no_ebook') }}</p>
             </div>
             @endif
         </div>
@@ -415,13 +413,13 @@
             </div>
             <div class="text-center mt-6">
                 <a href="{{ route('opac.journals.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition">
-                    Lihat Semua Jurnal <i class="fas fa-arrow-right"></i>
+                    {{ __('opac.homepage.view_all_journals') }} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
             @else
             <div class="text-center py-12 text-gray-400">
                 <i class="fas fa-newspaper text-4xl mb-3"></i>
-                <p>Belum ada jurnal terbaru</p>
+                <p>{{ __('opac.homepage.no_journals') }}</p>
             </div>
             @endif
         </div>
@@ -432,8 +430,8 @@
     <section class="bg-gradient-to-b from-amber-50 to-white py-8 lg:py-10">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-star text-amber-500 mr-2"></i>Rekomendasi untuk Anda</h2>
-                <a href="{{ route('opac.search') . '?type=book' }}" class="text-sm text-amber-600 hover:text-amber-700">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></a>
+                <h2 class="text-lg lg:text-xl font-bold text-gray-900"><i class="fas fa-star text-amber-500 mr-2"></i>{{ __('opac.homepage.recommendations') }}</h2>
+                <a href="{{ route('opac.search') . '?type=book' }}" class="text-sm text-amber-600 hover:text-amber-700">{{ __('opac.view_all') }} <i class="fas fa-arrow-right ml-1"></i></a>
             </div>
             <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2 lg:gap-3">
                 @foreach($popularBooks->take(8) as $index => $book)
@@ -469,10 +467,10 @@
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
                 <div class="w-1 h-8 bg-blue-600 rounded-full"></div>
-                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">Berita & Pengumuman</h2>
+                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">{{ __('opac.homepage.news_announcements') }}</h2>
             </div>
             <a href="{{ route('opac.news.index') }}" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium group">
-                <span>Lihat Semua</span>
+                <span>{{ __('opac.view_all') }}</span>
                 <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
@@ -538,7 +536,7 @@
                             <!-- Read More Button -->
                             <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                                 <span class="inline-flex items-center gap-1.5 text-blue-600 text-xs font-medium group-hover:gap-2 transition-all">
-                                    Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i>
+                                    {{ __('opac.read_more') }} <i class="fas fa-arrow-right text-[10px]"></i>
                                 </span>
                             </div>
                         </div>
@@ -557,10 +555,10 @@
             <div class="text-center mb-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full text-blue-600 text-sm font-medium mb-3">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span>Jaringan Perpustakaan</span>
+                    <span>{{ __('opac.homepage.library_network') }}</span>
                 </div>
-                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">Kunjungi Cabang Kami</h2>
-                <p class="text-gray-500 text-sm mt-1">{{ count($branches) }} lokasi perpustakaan di seluruh kampus</p>
+                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">{{ __('opac.homepage.visit_branches') }}</h2>
+                <p class="text-gray-500 text-sm mt-1">{{ __('opac.homepage.branch_locations', ['count' => count($branches)]) }}</p>
             </div>
         </div>
         
@@ -640,8 +638,8 @@
                             <i class="fas fa-headset text-white text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-white font-bold">Butuh Bantuan?</h3>
-                            <p class="text-blue-200 text-sm">Hubungi kami untuk informasi lebih lanjut</p>
+                            <h3 class="text-white font-bold">{{ __('opac.homepage.need_help') }}</h3>
+                            <p class="text-blue-200 text-sm">{{ __('opac.homepage.contact_desc') }}</p>
                         </div>
                     </div>
                     
