@@ -44,6 +44,46 @@ html.dark [class*="bg-slate-100"] {
     /* slate-800 */
 }
 
+/* Gradient backgrounds in dark mode - override to dark */
+html.dark [class*="from-gray-50"],
+html.dark [class*="from-slate-50"],
+html.dark [class*="to-white"],
+html.dark [class*="from-white"] {
+    --tw-gradient-from: #0f172a !important;
+    --tw-gradient-to: #1e293b !important;
+    background: linear-gradient(to right, #0f172a, #1e293b) !important;
+}
+
+/* Kanban scroll container dark mode */
+html.dark .overflow-x-auto,
+html.dark [class*="overflow-x"] {
+    scrollbar-color: #475569 #1e293b;
+}
+
+html.dark .overflow-x-auto::-webkit-scrollbar,
+html.dark [class*="overflow-x"]::-webkit-scrollbar {
+    height: 10px;
+    background-color: #1e293b;
+}
+
+html.dark .overflow-x-auto::-webkit-scrollbar-track,
+html.dark [class*="overflow-x"]::-webkit-scrollbar-track {
+    background: #0f172a;
+    border-radius: 5px;
+}
+
+html.dark .overflow-x-auto::-webkit-scrollbar-thumb,
+html.dark [class*="overflow-x"]::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 5px;
+    border: 2px solid #0f172a;
+}
+
+html.dark .overflow-x-auto::-webkit-scrollbar-thumb:hover,
+html.dark [class*="overflow-x"]::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
 /* Card with shadow in dark mode */
 html.dark .shadow-sm,
 html.dark .shadow,
