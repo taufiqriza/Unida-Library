@@ -9,6 +9,21 @@ use App\Models\StockOpname;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Language Switcher Route
+Route::get('/locale/{locale}', function (string $locale) {
+    $available = ['id', 'en', 'ar'];
+    
+    if (!in_array($locale, $available)) {
+        $locale = 'id';
+    }
+    
+    session()->put('locale', $locale);
+    
+    return redirect()
+        ->back()
+        ->withCookie(cookie('locale', $locale, 60 * 24 * 365)); // 1 year
+})->name('opac.set-locale');
+
 // OPAC Routes (Livewire)
 Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');
