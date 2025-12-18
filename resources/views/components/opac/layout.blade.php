@@ -401,58 +401,58 @@
                     <!-- DISCOVER Menu -->
                     <div class="menu-item">
                         <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
-                            <i class="fas fa-compass text-xs"></i> DISCOVER <i class="fas fa-chevron-down text-[10px] ml-1"></i>
+                            <i class="fas fa-compass text-xs"></i> {{ __('opac.menu.discover') }} <i class="fas fa-chevron-down text-[10px] ml-1"></i>
                         </button>
                         <div class="mega-menu left-0 w-[700px] -ml-48">
                             <div class="bg-white rounded-xl shadow-2xl p-6">
                                 <div class="grid grid-cols-3 gap-6">
                                 <!-- New Experience -->
                                 <div>
-                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">New Experience</h3>
+                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">{{ __('opac.discover_menu.new_experience') }}</h3>
                                     <div class="space-y-2">
                                         <a href="{{ route('opac.page', 'event-library') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-pink-100 rounded-lg flex items-center justify-center"><i class="fas fa-calendar-star text-pink-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Event Library</p><p class="text-xs text-gray-500">Kegiatan Perpustakaan</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.event_library') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.event_library') }}</p></div>
                                         </a>
                                         <a href="{{ route('opac.page', 'virtual-tour') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-cyan-100 rounded-lg flex items-center justify-center"><i class="fas fa-vr-cardboard text-cyan-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Virtual Tour</p><p class="text-xs text-gray-500">Tur Virtual 360°</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.virtual_tour') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.virtual_tour') }}</p></div>
                                         </a>
                                         <a href="{{ route('opac.page', 'e-learning') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-violet-100 rounded-lg flex items-center justify-center"><i class="fas fa-laptop text-violet-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">E-Learning</p><p class="text-xs text-gray-500">Pembelajaran Online</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.elearning') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.elearning') }}</p></div>
                                         </a>
                                     </div>
                                 </div>
                                 <!-- Explore More -->
                                 <div>
-                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">Explore More</h3>
+                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">{{ __('opac.discover_menu.explore') }}</h3>
                                     <div class="space-y-2">
                                         <a href="{{ route('opac.page', 'prosa-kreatif') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-rose-100 rounded-lg flex items-center justify-center"><i class="fas fa-pen-fancy text-rose-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Prosa Kreatif</p><p class="text-xs text-gray-500">Komunitas Menulis</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.creative_prose') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.creative_prose') }}</p></div>
                                         </a>
                                         <a href="{{ route('opac.page', 'survey') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-lime-100 rounded-lg flex items-center justify-center"><i class="fas fa-poll text-lime-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Experience Survey</p><p class="text-xs text-gray-500">Survei Kepuasan</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.survey') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.survey') }}</p></div>
                                         </a>
                                         <a href="{{ route('opac.page', 'research-tools') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                             <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-microscope text-amber-600"></i></div>
-                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Research Tools</p><p class="text-xs text-gray-500">Alat Riset</p></div>
+                                            <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.discover_menu.research_tools') }}</p><p class="text-xs text-gray-500">{{ __('opac.discover_menu.research_tools') }}</p></div>
                                         </a>
                                     </div>
                                 </div>
                                 <!-- Book Recommendation -->
                                 <div>
-                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">Rekomendasi Buku</h3>
+                                    <h3 class="font-bold text-gray-900 mb-3 text-sm">{{ __('opac.discover_menu.recommendation') }}</h3>
                                     <a href="{{ route('opac.search') . '?type=book' }}?sort=latest" class="block bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 hover:shadow-lg transition">
                                         <div class="flex gap-3">
                                             <div class="w-16 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
                                                 <i class="fas fa-book text-white text-xl"></i>
                                             </div>
                                             <div class="flex-1">
-                                                <p class="text-xs text-gray-500">Koleksi Terbaru</p>
-                                                <p class="font-bold text-gray-900 text-sm">Lihat Buku Baru</p>
+                                                <p class="text-xs text-gray-500">{{ __('opac.discover_menu.latest_collection') }}</p>
+                                                <p class="font-bold text-gray-900 text-sm">{{ __('opac.discover_menu.view_new_books') }}</p>
                                                 <span class="inline-block mt-2 px-2 py-0.5 bg-accent-400 text-xs font-medium rounded">NEW</span>
                                             </div>
                                         </div>
@@ -465,18 +465,18 @@
                     <!-- GUIDE Menu -->
                     <div class="menu-item">
                         <button class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition">
-                            <i class="fas fa-book-open text-xs"></i> GUIDE <i class="fas fa-chevron-down text-[10px] ml-1"></i>
+                            <i class="fas fa-book-open text-xs"></i> {{ __('opac.menu.guide') }} <i class="fas fa-chevron-down text-[10px] ml-1"></i>
                         </button>
                         <div class="mega-menu left-0 w-[550px] -ml-48">
                             <div class="bg-white rounded-xl shadow-2xl p-6">
                                 <div class="grid grid-cols-2 gap-6">
                                     <!-- Panduan Pengguna -->
                                     <div>
-                                        <h3 class="font-bold text-gray-900 mb-3 text-sm">Panduan Pengguna</h3>
+                                        <h3 class="font-bold text-gray-900 mb-3 text-sm">{{ __('opac.guide_menu.user_guide') }}</h3>
                                         <div class="space-y-2">
                                             <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-search text-blue-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Panduan OPAC</p><p class="text-xs text-gray-500">Cara menggunakan katalog</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.opac_guide') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.opac_guide_desc') }}</p></div>
                                             </a>
                                             <a href="{{ route('opac.panduan.thesis') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center"><i class="fas fa-upload text-emerald-600"></i></div>
