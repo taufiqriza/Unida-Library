@@ -227,27 +227,23 @@ html.dark [class*="bg-gradient-to-r"][class*="from-slate-50"] {
 /* ================================================ */
 
 /* Hide ALL bg-white/10 backgrounds in sidebar (icon boxes for inactive items) */
-html.dark .staff-sidebar .bg-white\/10,
-html.dark aside.staff-sidebar .bg-white\/10 {
+/* Using attribute selector to match Tailwind's escaped class names */
+html.dark .staff-sidebar [class*="bg-white"][class*="10"]:not([class*="15"]):not([class*="20"]),
+html.dark aside.staff-sidebar [class*="bg-white"][class*="10"]:not([class*="15"]):not([class*="20"]) {
     background: transparent !important;
+    background-color: transparent !important;
 }
 
 /* Keep bg-white/20 for active items only */
-html.dark .staff-sidebar .bg-white\/20,
-html.dark aside.staff-sidebar .bg-white\/20 {
+html.dark .staff-sidebar [class*="bg-white"][class*="20"],
+html.dark aside.staff-sidebar [class*="bg-white"][class*="20"] {
     background: rgba(59, 130, 246, 0.35) !important;
 }
 
 /* Keep bg-white/15 for active nav link background */
-html.dark .staff-sidebar .bg-white\/15,
-html.dark aside.staff-sidebar .bg-white\/15 {
+html.dark .staff-sidebar [class*="bg-white"][class*="15"],
+html.dark aside.staff-sidebar [class*="bg-white"][class*="15"] {
     background: rgba(59, 130, 246, 0.25) !important;
-}
-
-/* User info box in sidebar */
-html.dark .staff-sidebar>div .bg-white\/10,
-html.dark aside.staff-sidebar>div .bg-white\/10 {
-    background: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* ================================================ */
