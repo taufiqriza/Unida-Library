@@ -18,21 +18,98 @@ html.dark * {
 }
 
 /* Common card elements in dark mode */
-html.dark .bg-white {
+html.dark .bg-white,
+html.dark [class*="bg-white"],
+html.dark .rounded-xl.bg-white,
+html.dark .rounded-2xl.bg-white,
+html.dark div[class*="bg-white"] {
     background-color: #1e293b !important;
     /* slate-800 */
 }
 
 html.dark .bg-gray-50,
-html.dark .bg-slate-50 {
+html.dark .bg-slate-50,
+html.dark [class*="bg-gray-50"],
+html.dark [class*="bg-slate-50"],
+html.dark .kanban-column {
     background-color: #0f172a !important;
     /* slate-900 */
 }
 
 html.dark .bg-gray-100,
-html.dark .bg-slate-100 {
+html.dark .bg-slate-100,
+html.dark [class*="bg-gray-100"],
+html.dark [class*="bg-slate-100"] {
     background-color: #1e293b !important;
     /* slate-800 */
+}
+
+/* Card with shadow in dark mode */
+html.dark .shadow-sm,
+html.dark .shadow,
+html.dark [class*="shadow"] {
+    --tw-shadow-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Rounded cards and panels */
+html.dark .rounded-xl,
+html.dark .rounded-2xl,
+html.dark .rounded-lg {
+    border-color: #334155 !important;
+}
+
+/* Task cards specifically */
+html.dark .task-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Stat cards with white bg */
+html.dark .stat-card {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Cards with transparency variations */
+html.dark [class*="bg-white\\/"],
+html.dark .bg-white\/50,
+html.dark .bg-white\/70,
+html.dark .bg-white\/80,
+html.dark .bg-white\/90 {
+    background-color: rgba(30, 41, 59, 0.9) !important;
+}
+
+/* Cards with specific border classes */
+html.dark [class*="border"][class*="gray"],
+html.dark [class*="border"][class*="slate"] {
+    border-color: #334155 !important;
+}
+
+/* Filter/search bars */
+html.dark .bg-gray-50\/50,
+html.dark [class*="bg-slate-50\\/"] {
+    background-color: rgba(15, 23, 42, 0.7) !important;
+}
+
+/* Dropdown menus */
+html.dark [class*="dropdown"],
+html.dark [role="menu"],
+html.dark [role="listbox"] {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* Modal backgrounds */
+html.dark .modal,
+html.dark [class*="modal"] {
+    background-color: #1e293b !important;
+}
+
+/* Form groups and sections */
+html.dark .form-group,
+html.dark fieldset,
+html.dark .space-y-4>div {
+    border-color: #334155 !important;
 }
 
 /* Border colors in dark mode */
@@ -96,11 +173,7 @@ html.dark select:focus {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
 }
 
-/* Gradient stat cards - keep them vibrant in dark mode */
-html.dark [class*="bg-gradient-to-r"],
-html.dark [class*="bg-gradient-to-br"] {
-    /* Gradients are intentionally not modified to keep visual interest */
-}
+/* Gradient stat cards - keep them vibrant in dark mode (no changes needed) */
 
 /* Badges in dark mode */
 html.dark .badge-success {
