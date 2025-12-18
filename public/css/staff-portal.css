@@ -92,10 +92,18 @@ html.dark [class*="shadow"] {
 }
 
 /* Rounded cards and panels */
-html.dark .rounded-xl,
-html.dark .rounded-2xl,
-html.dark .rounded-lg {
+/* Rounded cards and panels - exclude sidebar nav items */
+html.dark .rounded-xl:not(.staff-sidebar *):not(aside.staff-sidebar *),
+html.dark .rounded-2xl:not(.staff-sidebar *):not(aside.staff-sidebar *),
+html.dark .rounded-lg:not(.staff-sidebar *):not(aside.staff-sidebar *) {
     border-color: #334155 !important;
+}
+
+/* Sidebar nav - remove any border on icon boxes */
+html.dark .staff-sidebar nav .rounded-lg,
+html.dark aside.staff-sidebar nav .rounded-lg {
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Task cards specifically */
