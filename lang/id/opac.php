@@ -267,4 +267,29 @@ return [
         '500' => 'Terjadi Kesalahan Server',
         'go_home' => 'Kembali ke Beranda',
     ],
+    
+    // Static Pages
+    'pages' => [
+        // Visi Misi
+        'visi_misi' => [
+            'title' => 'Visi & Misi',
+            'subtitle' => 'Komitmen kami dalam mendukung Tri Dharma Perguruan Tinggi',
+            'breadcrumb_profile' => 'Profil',
+            'vision' => 'Visi',
+            'vision_text' => 'Menjadi perpustakaan yang unggul terutama dalam mendukung pelaksanaan Tri Dharma Perguruan Tinggi dan pengembangan ilmu pengetahuan dan teknologi yang berorientasi pada nilai-nilai keislaman.',
+            'mission' => 'Misi',
+            'mission_1' => 'Menunjang keberhasilan misi UNIDA Gontor dengan memberikan layanan informasi secara efektif dan efisien berbasis ICT.',
+            'mission_2' => 'Menjadi mitra profesional bagi seluruh sivitas akademika UNIDA Gontor dan masyarakat akademik pada umumnya.',
+            'mission_3' => 'Membangun kerjasama dan jejaring dengan berbagai perpustakaan di tingkat nasional, regional maupun internasional dengan tetap berpedoman pada nilai-nilai keislaman.',
+            'values_title' => 'Nilai-Nilai Kami',
+            'value_excellence' => 'Keunggulan',
+            'value_excellence_desc' => 'Layanan terbaik',
+            'value_professional' => 'Profesional',
+            'value_professional_desc' => 'Standar tinggi',
+            'value_islamic' => 'Islami',
+            'value_islamic_desc' => 'Nilai keislaman',
+            'value_innovative' => 'Inovatif',
+            'value_innovative_desc' => 'Terus berkembang',
+        ],
+    ],
 ];

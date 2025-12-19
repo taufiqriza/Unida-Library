@@ -267,4 +267,29 @@ return [
         '500' => 'Server Error',
         'go_home' => 'Go to Homepage',
     ],
+    
+    // Static Pages
+    'pages' => [
+        // Vision Mission
+        'visi_misi' => [
+            'title' => 'Vision & Mission',
+            'subtitle' => 'Our commitment to supporting the Tri Dharma of Higher Education',
+            'breadcrumb_profile' => 'Profile',
+            'vision' => 'Vision',
+            'vision_text' => 'To become an excellent library in supporting the implementation of Tri Dharma of Higher Education and the development of science and technology oriented towards Islamic values.',
+            'mission' => 'Mission',
+            'mission_1' => 'Supporting the success of UNIDA Gontor\'s mission by providing effective and efficient information services based on ICT.',
+            'mission_2' => 'Becoming a professional partner for all UNIDA Gontor academic community and the academic society in general.',
+            'mission_3' => 'Building cooperation and networking with various libraries at national, regional, and international levels while adhering to Islamic values.',
+            'values_title' => 'Our Values',
+            'value_excellence' => 'Excellence',
+            'value_excellence_desc' => 'Best service',
+            'value_professional' => 'Professional',
+            'value_professional_desc' => 'High standards',
+            'value_islamic' => 'Islamic',
+            'value_islamic_desc' => 'Islamic values',
+            'value_innovative' => 'Innovative',
+            'value_innovative_desc' => 'Continuous growth',
+        ],
+    ],
 ];
