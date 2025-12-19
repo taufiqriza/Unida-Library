@@ -84,11 +84,22 @@
         
         /* RTL Support for Mega Menu */
         [dir="rtl"] .mega-menu {
-            /* Reset all positioning */
-            left: 0 !important;
-            right: auto !important;
+            /* Position from right edge, extend to left */
+            left: auto !important;
+            right: 0 !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
+            transform: none !important;
+        }
+        [dir="rtl"] .menu-item {
+            position: static !important;
+        }
+        [dir="rtl"] nav.hidden.lg\\:flex {
+            position: relative;
+        }
+        [dir="rtl"] nav .mega-menu {
+            right: 0 !important;
+            left: auto !important;
         }
         /* Keep direction for flex children */
         [dir="rtl"] .mega-menu .flex {
