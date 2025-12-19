@@ -1,20 +1,20 @@
-<x-opac.layout title="Fasilitas">
+<x-opac.layout :title="__('opac.pages.fasilitas.title')">
     <x-opac.page-header 
-        title="Fasilitas Perpustakaan" 
-        subtitle="Ruang dan layanan untuk mendukung kegiatan akademik"
-        :breadcrumbs="[['label' => 'Panduan'], ['label' => 'Fasilitas']]"
+        :title="__('opac.pages.fasilitas.title')" 
+        :subtitle="__('opac.pages.fasilitas.subtitle')"
+        :breadcrumbs="[['label' => __('opac.pages.fasilitas.breadcrumb_guide')], ['label' => __('opac.pages.fasilitas.title')]]"
     />
 
     <section class="max-w-5xl mx-auto px-4 py-6 lg:py-10">
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mb-6 lg:mb-8">
             @php
             $facilities = [
-                ['icon' => 'fa-book-reader', 'color' => 'blue', 'name' => 'Ruang Baca', 'desc' => 'Kapasitas 100+ tempat duduk dengan AC'],
-                ['icon' => 'fa-users', 'color' => 'emerald', 'name' => 'Ruang Diskusi', 'desc' => 'Ruang diskusi kelompok yang dapat dipesan'],
-                ['icon' => 'fa-desktop', 'color' => 'purple', 'name' => 'Area Komputer', 'desc' => 'Akses internet untuk penelusuran'],
-                ['icon' => 'fa-wifi', 'color' => 'cyan', 'name' => 'WiFi Gratis', 'desc' => 'Internet gratis di seluruh area'],
-                ['icon' => 'fa-lock', 'color' => 'orange', 'name' => 'Loker', 'desc' => 'Penyimpanan barang yang aman'],
-                ['icon' => 'fa-print', 'color' => 'pink', 'name' => 'Fotokopi & Print', 'desc' => 'Layanan cetak dengan harga terjangkau'],
+                ['icon' => 'fa-book-reader', 'color' => 'blue', 'name' => __('opac.pages.fasilitas.reading_room'), 'desc' => __('opac.pages.fasilitas.reading_room_desc')],
+                ['icon' => 'fa-users', 'color' => 'emerald', 'name' => __('opac.pages.fasilitas.discussion_room'), 'desc' => __('opac.pages.fasilitas.discussion_room_desc')],
+                ['icon' => 'fa-desktop', 'color' => 'purple', 'name' => __('opac.pages.fasilitas.computer_area'), 'desc' => __('opac.pages.fasilitas.computer_area_desc')],
+                ['icon' => 'fa-wifi', 'color' => 'cyan', 'name' => __('opac.pages.fasilitas.free_wifi'), 'desc' => __('opac.pages.fasilitas.free_wifi_desc')],
+                ['icon' => 'fa-lock', 'color' => 'orange', 'name' => __('opac.pages.fasilitas.locker'), 'desc' => __('opac.pages.fasilitas.locker_desc')],
+                ['icon' => 'fa-print', 'color' => 'pink', 'name' => __('opac.pages.fasilitas.photocopy'), 'desc' => __('opac.pages.fasilitas.photocopy_desc')],
             ];
             $colors = [
                 'blue' => 'bg-blue-100 text-blue-600',
@@ -41,11 +41,11 @@
         <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-4 lg:p-6 text-white">
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                    <h3 class="font-bold mb-1">Lokasi Perpustakaan</h3>
-                    <p class="text-primary-200 text-sm">Lantai 2, Gedung Pascasarjana, UNIDA Gontor</p>
+                    <h3 class="font-bold mb-1">{{ __('opac.pages.fasilitas.location_title') }}</h3>
+                    <p class="text-primary-200 text-sm">{{ __('opac.pages.fasilitas.location_address') }}</p>
                 </div>
                 <a href="https://maps.google.com" target="_blank" class="px-4 py-2 bg-white text-primary-600 rounded-lg text-sm font-medium hover:bg-primary-50 transition flex-shrink-0">
-                    <i class="fas fa-map-marker-alt mr-1"></i> Google Maps
+                    <i class="fas fa-map-marker-alt mr-1"></i> {{ __('opac.pages.fasilitas.google_maps') }}
                 </a>
             </div>
         </div>

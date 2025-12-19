@@ -7,8 +7,8 @@
                         <i class="fas fa-user-edit text-2xl text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-white">Lengkapi Profil</h1>
-                        <p class="text-primary-200 text-sm">Lengkapi data untuk melanjutkan</p>
+                        <h1 class="text-lg font-bold text-white">{{ __('opac.auth.complete_profile.title') }}</h1>
+                        <p class="text-primary-200 text-sm">{{ __('opac.auth.complete_profile.subtitle') }}</p>
                     </div>
                 </div>
 
@@ -39,31 +39,31 @@
                             <label class="cursor-pointer group">
                                 <div class="w-24 h-24 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center group-hover:border-primary-500 transition overflow-hidden" x-ref="preview">
                                     <i class="fas fa-camera text-gray-400 text-xl group-hover:text-primary-500"></i>
-                                    <span class="text-xs text-gray-400 mt-1">Upload Foto</span>
+                                    <span class="text-xs text-gray-400 mt-1">{{ __('opac.auth.complete_profile.upload_photo') }}</span>
                                 </div>
                                 <input type="file" name="photo" accept="image/*" class="hidden" @change="previewImage($event)">
                             </label>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">NIM</label>
-                            <input type="text" name="nim" value="{{ old('nim') }}" required placeholder="Contoh: 402019611021"
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.nim') }}</label>
+                            <input type="text" name="nim" value="{{ old('nim') }}" required placeholder="{{ __('opac.auth.complete_profile.nim_placeholder') }}"
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Kampus</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.campus') }}</label>
                                 <select name="branch_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">Pilih</option>
+                                    <option value="">{{ __('opac.auth.complete_profile.campus_placeholder') }}</option>
                                     @foreach($branches as $branch)
                                     <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipe Anggota</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.member_type') }}</label>
                                 <select name="member_type_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">Pilih</option>
+                                    <option value="">{{ __('opac.auth.complete_profile.member_type_placeholder') }}</option>
                                     @foreach($memberTypes as $type)
                                     <option value="{{ $type->id }}" {{ old('member_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
                                     @endforeach
@@ -71,18 +71,18 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.faculty') }}</label>
                             <select name="faculty_id" x-model="facultyId" @change="loadDepartments()" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                <option value="">Pilih Fakultas</option>
+                                <option value="">{{ __('opac.auth.complete_profile.faculty_placeholder') }}</option>
                                 @foreach($faculties as $faculty)
                                 <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.department') }}</label>
                             <select name="department_id" x-model="departmentId" required :disabled="!facultyId" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100">
-                                <option value="">Pilih Program Studi</option>
+                                <option value="">{{ __('opac.auth.complete_profile.department_placeholder') }}</option>
                                 <template x-for="dept in departments" :key="dept.id">
                                     <option :value="dept.id" x-text="dept.name"></option>
                                 </template>
@@ -90,21 +90,21 @@
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.gender') }}</label>
                                 <select name="gender" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">Pilih</option>
-                                    <option value="M" {{ old('gender') == 'M' ? 'selected' : '' }}>Laki-laki</option>
-                                    <option value="F" {{ old('gender') == 'F' ? 'selected' : '' }}>Perempuan</option>
+                                    <option value="">{{ __('opac.auth.complete_profile.gender_placeholder') }}</option>
+                                    <option value="M" {{ old('gender') == 'M' ? 'selected' : '' }}>{{ __('opac.auth.complete_profile.male') }}</option>
+                                    <option value="F" {{ old('gender') == 'F' ? 'selected' : '' }}>{{ __('opac.auth.complete_profile.female') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.phone') }}</label>
                                 <input type="text" name="phone" value="{{ old('phone') }}" required 
                                     class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                             </div>
                         </div>
                         <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
-                            <i class="fas fa-check mr-2"></i> Simpan & Lanjutkan
+                            <i class="fas fa-check mr-2"></i> {{ __('opac.auth.complete_profile.submit') }}
                         </button>
                     </form>
                 </div>

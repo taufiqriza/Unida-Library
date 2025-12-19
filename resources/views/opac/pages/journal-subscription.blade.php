@@ -1,8 +1,8 @@
-<x-opac.layout title="Akses E-Resources">
+<x-opac.layout :title="__('opac.additional_pages.journal_subscription.title')">
     <x-opac.page-header 
-        title="Akses E-Resources" 
-        subtitle="E-Book, jurnal, dan database digital"
-        :breadcrumbs="[['label' => 'E-Resources'], ['label' => 'Akses E-Resources']]"
+        :title="__('opac.additional_pages.journal_subscription.title')" 
+        :subtitle="__('opac.additional_pages.journal_subscription.subtitle')"
+        :breadcrumbs="[['label' => 'E-Resources'], ['label' => __('opac.additional_pages.journal_subscription.title')]]"
     />
 
     <section class="max-w-6xl mx-auto px-4 py-6 lg:py-10">
@@ -17,27 +17,27 @@
                         <i class="fas fa-globe text-white text-xl"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl lg:text-2xl font-bold text-white">Akses Ribuan Sumber Referensi</h2>
-                        <p class="text-blue-200 text-sm">E-Book, Jurnal, dan Database Digital</p>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white">{{ __('opac.additional_pages.journal_subscription.hero_title') }}</h2>
+                        <p class="text-blue-200 text-sm">{{ __('opac.additional_pages.journal_subscription.hero_subtitle') }}</p>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mt-6">
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 lg:p-4 text-center">
                         <div class="text-2xl lg:text-3xl font-bold text-white">11+</div>
-                        <div class="text-xs text-blue-200">Sumber E-Book</div>
+                        <div class="text-xs text-blue-200">{{ __('opac.additional_pages.journal_subscription.ebook_sources') }}</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 lg:p-4 text-center">
                         <div class="text-2xl lg:text-3xl font-bold text-white">3</div>
-                        <div class="text-xs text-blue-200">Database Jurnal</div>
+                        <div class="text-xs text-blue-200">{{ __('opac.additional_pages.journal_subscription.journal_databases') }}</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 lg:p-4 text-center">
                         <div class="text-2xl lg:text-3xl font-bold text-white">100K+</div>
-                        <div class="text-xs text-blue-200">Total Koleksi</div>
+                        <div class="text-xs text-blue-200">{{ __('opac.additional_pages.journal_subscription.total_collection') }}</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 lg:p-4 text-center">
                         <div class="text-2xl lg:text-3xl font-bold text-white">24/7</div>
-                        <div class="text-xs text-blue-200">Akses Online</div>
+                        <div class="text-xs text-blue-200">{{ __('opac.additional_pages.journal_subscription.online_access') }}</div>
                     </div>
                 </div>
             </div>
@@ -50,8 +50,8 @@
                     <i class="fas fa-info-circle text-amber-600 text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-gray-900 text-sm mb-1">Informasi Akses</h3>
-                    <p class="text-gray-600 text-xs lg:text-sm">Beberapa sumber memerlukan kredensial khusus. Klik pada card untuk melihat detail dan kategori yang tersedia.</p>
+                    <h3 class="font-bold text-gray-900 text-sm mb-1">{{ __('opac.additional_pages.journal_subscription.access_info') }}</h3>
+                    <p class="text-gray-600 text-xs lg:text-sm">{{ __('opac.additional_pages.journal_subscription.access_info_desc') }}</p>
                 </div>
             </div>
         </div>
@@ -62,7 +62,7 @@
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-book text-emerald-600 text-sm"></i>
             </div>
-            E-Book & Perpustakaan Digital Gratis
+            {{ __('opac.additional_pages.journal_subscription.free_ebooks') }}
         </h3>
         
         @php
@@ -222,11 +222,11 @@
                     {{-- Action Buttons --}}
                     <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <a href="{{ $e['url'] }}" target="_blank" class="flex-1 px-3 py-2 {{ $c['bg'] }} {{ $c['text'] }} text-xs font-semibold rounded-lg hover:opacity-80 transition text-center">
-                            <i class="fas fa-external-link-alt mr-1"></i> Akses
+                            <i class="fas fa-external-link-alt mr-1"></i> {{ __('opac.additional_pages.journal_subscription.access') }}
                         </a>
                         <button @click="open = !open" class="px-3 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition">
                             <i class="fas fa-tags mr-1"></i> 
-                            <span x-text="open ? 'Tutup' : 'Kategori'"></span>
+                            <span x-text="open ? '{{ __('opac.additional_pages.journal_subscription.close') }}' : '{{ __('opac.additional_pages.journal_subscription.category') }}'"></span>
                         </button>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                 {{-- Subjects Dropdown --}}
                 <div x-show="open" x-collapse class="px-4 pb-4">
                     <div class="p-3 bg-gray-50 rounded-lg">
-                        <p class="text-[10px] font-semibold text-gray-500 mb-2">KATEGORI / SUBJEK:</p>
+                        <p class="text-[10px] font-semibold text-gray-500 mb-2">{{ __('opac.additional_pages.journal_subscription.categories_subjects') }}</p>
                         <div class="flex flex-wrap gap-1">
                             @foreach($e['subjects'] as $subject)
                             <span class="px-2 py-0.5 bg-white text-gray-600 text-[10px] rounded border border-gray-200">{{ $subject }}</span>
@@ -254,14 +254,14 @@
                 <div class="flex-1">
                     <h3 class="text-lg font-bold flex items-center gap-2">
                         <i class="fas fa-database"></i>
-                        Database & Jurnal Berlangganan
+                        {{ __('opac.additional_pages.journal_subscription.subscribed_databases') }}
                     </h3>
-                    <p class="text-blue-200 text-sm mt-1">Akses jurnal internasional melalui konsorsium FPPTI Jawa Timur</p>
+                    <p class="text-blue-200 text-sm mt-1">{{ __('opac.additional_pages.journal_subscription.subscribed_desc') }}</p>
                 </div>
                 <a href="{{ route('opac.database-access') }}" 
                    class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg">
                     <i class="fas fa-key"></i>
-                    Akses Portal Database
+                    {{ __('opac.additional_pages.journal_subscription.access_portal') }}
                     <i class="fas fa-arrow-right text-sm"></i>
                 </a>
             </div>
@@ -271,9 +271,9 @@
             <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-database text-blue-600 text-sm"></i>
             </div>
-            Database & Jurnal Berlangganan
+            {{ __('opac.additional_pages.journal_subscription.subscribed_databases') }}
             <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full ml-auto">
-                <i class="fas fa-key mr-1"></i> KREDENSIAL
+                <i class="fas fa-key mr-1"></i> {{ __('opac.additional_pages.journal_subscription.credentials') }}
             </span>
         </h3>
         
@@ -343,11 +343,11 @@
                     {{-- Action Buttons --}}
                     <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <a href="{{ $d['url'] }}" target="_blank" class="flex-1 px-3 py-2 {{ $c['bg'] }} {{ $c['text'] }} text-xs font-semibold rounded-lg hover:opacity-80 transition text-center">
-                            <i class="fas fa-external-link-alt mr-1"></i> Akses
+                            <i class="fas fa-external-link-alt mr-1"></i> {{ __('opac.additional_pages.journal_subscription.access') }}
                         </a>
                         <button @click="open = !open" class="px-3 py-2 bg-gray-100 text-gray-600 text-xs font-medium rounded-lg hover:bg-gray-200 transition">
                             <i class="fas fa-tags mr-1"></i> 
-                            <span x-text="open ? 'Tutup' : 'Kategori'"></span>
+                            <span x-text="open ? '{{ __('opac.additional_pages.journal_subscription.close') }}' : '{{ __('opac.additional_pages.journal_subscription.category') }}'"></span>
                         </button>
                     </div>
                 </div>
@@ -355,7 +355,7 @@
                 {{-- Subjects Dropdown --}}
                 <div x-show="open" x-collapse class="px-4 pb-4">
                     <div class="p-3 bg-gray-50 rounded-lg">
-                        <p class="text-[10px] font-semibold text-gray-500 mb-2">KATEGORI / SUBJEK:</p>
+                        <p class="text-[10px] font-semibold text-gray-500 mb-2">{{ __('opac.additional_pages.journal_subscription.categories_subjects') }}</p>
                         <div class="flex flex-wrap gap-1">
                             @foreach($d['subjects'] as $subject)
                             <span class="px-2 py-0.5 bg-white text-gray-600 text-[10px] rounded border border-gray-200">{{ $subject }}</span>
@@ -374,8 +374,8 @@
                     <i class="fas fa-shield-alt text-amber-400"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold">Kredensial Database</h3>
-                    <p class="text-slate-400 text-xs">Gunakan akun berikut untuk mengakses database berlangganan</p>
+                    <h3 class="font-bold">{{ __('opac.additional_pages.journal_subscription.credentials_title') }}</h3>
+                    <p class="text-slate-400 text-xs">{{ __('opac.additional_pages.journal_subscription.credentials_desc') }}</p>
                 </div>
             </div>
             
@@ -390,11 +390,11 @@
                     </div>
                     <div class="space-y-2 text-sm">
                         <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
-                            <span class="text-slate-400 text-xs">Username</span>
+                            <span class="text-slate-400 text-xs">{{ __('opac.additional_pages.journal_subscription.username') }}</span>
                             <code class="text-emerald-400 font-mono text-sm">UnivKanB</code>
                         </div>
                         <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
-                            <span class="text-slate-400 text-xs">Password</span>
+                            <span class="text-slate-400 text-xs">{{ __('opac.additional_pages.journal_subscription.password') }}</span>
                             <code class="text-emerald-400 font-mono text-sm">FPPTIjatim@1</code>
                         </div>
                     </div>
@@ -410,11 +410,11 @@
                     </div>
                     <div class="space-y-2 text-sm">
                         <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
-                            <span class="text-slate-400 text-xs">Username</span>
+                            <span class="text-slate-400 text-xs">{{ __('opac.additional_pages.journal_subscription.username') }}</span>
                             <code class="text-emerald-400 font-mono text-sm">UDarussalam</code>
                         </div>
                         <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
-                            <span class="text-slate-400 text-xs">Password</span>
+                            <span class="text-slate-400 text-xs">{{ __('opac.additional_pages.journal_subscription.password') }}</span>
                             <code class="text-emerald-400 font-mono text-sm">FPPTIjatim@1</code>
                         </div>
                     </div>
@@ -428,9 +428,9 @@
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-landmark text-purple-600 text-sm"></i>
             </div>
-            Perpustakaan Nasional RI
+            {{ __('opac.additional_pages.journal_subscription.national_library') }}
             <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full ml-auto">
-                <i class="fas fa-check mr-1"></i> GRATIS
+                <i class="fas fa-check mr-1"></i> {{ __('opac.additional_pages.journal_subscription.free') }}
             </span>
         </h3>
         
@@ -441,10 +441,10 @@
                 </div>
                 <div class="flex-1">
                     <h4 class="font-bold text-gray-900 group-hover:text-primary-600 transition">iPusnas</h4>
-                    <p class="text-xs text-gray-500 mt-0.5">Perpustakaan digital Perpusnas RI</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ __('opac.additional_pages.journal_subscription.digital_perpusnas') }}</p>
                     <div class="flex items-center gap-2 mt-2">
                         <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full">500K+ E-Books</span>
-                        <span class="text-[10px] text-emerald-600"><i class="fas fa-id-card mr-1"></i> Gratis WNI</span>
+                        <span class="text-[10px] text-emerald-600"><i class="fas fa-id-card mr-1"></i> {{ __('opac.additional_pages.journal_subscription.free_for_wni') }}</span>
                     </div>
                 </div>
                 <i class="fas fa-chevron-right text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all"></i>
@@ -456,10 +456,10 @@
                 </div>
                 <div class="flex-1">
                     <h4 class="font-bold text-gray-900 group-hover:text-primary-600 transition">Bintang Pusnas</h4>
-                    <p class="text-xs text-gray-500 mt-0.5">Bahan Pustaka Perpusnas</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ __('opac.additional_pages.journal_subscription.pustaka_perpusnas') }}</p>
                     <div class="flex items-center gap-2 mt-2">
-                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">Koleksi Langka</span>
-                        <span class="text-[10px] text-emerald-600"><i class="fas fa-check-circle mr-1"></i> Akses Terbuka</span>
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">{{ __('opac.additional_pages.journal_subscription.rare_collection') }}</span>
+                        <span class="text-[10px] text-emerald-600"><i class="fas fa-check-circle mr-1"></i> {{ __('opac.additional_pages.journal_subscription.open_access') }}</span>
                     </div>
                 </div>
                 <i class="fas fa-chevron-right text-gray-300 group-hover:text-green-500 group-hover:translate-x-1 transition-all"></i>
@@ -473,23 +473,23 @@
                     <i class="fas fa-lightbulb text-primary-600"></i>
                 </div>
                 <div>
-                    <h4 class="font-bold text-gray-900 text-sm mb-2">Tips Mengakses E-Resources</h4>
+                    <h4 class="font-bold text-gray-900 text-sm mb-2">{{ __('opac.additional_pages.journal_subscription.tips_title') }}</h4>
                     <ul class="text-xs text-gray-600 space-y-1.5">
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
-                            <span>Gunakan browser terbaru untuk pengalaman terbaik</span>
+                            <span>{{ __('opac.additional_pages.journal_subscription.tip_1') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
-                            <span>Untuk database berlangganan, pastikan menggunakan kredensial yang benar</span>
+                            <span>{{ __('opac.additional_pages.journal_subscription.tip_2') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
-                            <span>Klik tombol "Kategori" untuk melihat subjek yang tersedia di setiap sumber</span>
+                            <span>{{ __('opac.additional_pages.journal_subscription.tip_3') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
-                            <span>Hubungi pustakawan jika mengalami kendala akses</span>
+                            <span>{{ __('opac.additional_pages.journal_subscription.tip_4') }}</span>
                         </li>
                     </ul>
                 </div>

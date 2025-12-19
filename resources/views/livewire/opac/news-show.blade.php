@@ -19,9 +19,9 @@
                 <a href="{{ route('opac.home') }}" class="hover:text-white transition">
                     <i class="fas fa-home"></i>
                 </a>
-                <i class="fas fa-chevron-right text-xs opacity-50"></i>
-                <a href="{{ route('opac.news.index') }}" class="hover:text-white transition">Berita</a>
-                <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }} text-xs opacity-50"></i>
+                <a href="{{ route('opac.news.index') }}" class="hover:text-white transition">{{ __('opac.news_show.news') }}</a>
+                <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }} text-xs opacity-50"></i>
                 <span class="text-white/80 truncate max-w-[200px]">{{ Str::limit($news->title, 30) }}</span>
             </nav>
             
@@ -36,12 +36,12 @@
                     @endif
                     @if($news->is_featured)
                     <span class="px-3 py-1 bg-amber-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-amber-200">
-                        <i class="fas fa-star mr-1"></i> Featured
+                        <i class="fas fa-star mr-1"></i> {{ __('opac.news_show.featured') }}
                     </span>
                     @endif
                     @if($news->is_pinned)
                     <span class="px-3 py-1 bg-rose-500/30 backdrop-blur-sm rounded-full text-sm font-medium text-rose-200">
-                        <i class="fas fa-thumbtack mr-1"></i> Pinned
+                        <i class="fas fa-thumbtack mr-1"></i> {{ __('opac.news_show.pinned') }}
                     </span>
                     @endif
                 </div>
@@ -62,7 +62,7 @@
                         </div>
                         <div>
                             <p class="text-white font-medium text-sm">{{ $news->author->name }}</p>
-                            <p class="text-xs">Penulis</p>
+                            <p class="text-xs">{{ __('opac.news_show.author') }}</p>
                         </div>
                     </div>
                     @endif
@@ -74,12 +74,12 @@
                     
                     <div class="flex items-center gap-2">
                         <i class="far fa-eye"></i>
-                        <span>{{ number_format($news->views) }} views</span>
+                        <span>{{ number_format($news->views) }} {{ __('opac.news_show.views') }}</span>
                     </div>
                     
                     <div class="flex items-center gap-2">
                         <i class="far fa-clock"></i>
-                        <span>{{ ceil(str_word_count(strip_tags($news->content)) / 200) }} menit baca</span>
+                        <span>{{ ceil(str_word_count(strip_tags($news->content)) / 200) }} {{ __('opac.news_show.min_read') }}</span>
                     </div>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                 
                 <!-- Excerpt -->
                 @if($news->excerpt)
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-r-xl p-5 mb-8">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-{{ app()->getLocale() === 'ar' ? 'r' : 'l' }}-4 border-blue-500 rounded-{{ app()->getLocale() === 'ar' ? 'l' : 'r' }}-xl p-5 mb-8">
                     <p class="text-gray-700 text-lg leading-relaxed italic">{{ $news->excerpt }}</p>
                 </div>
                 @endif
@@ -131,7 +131,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <!-- Tags -->
                         <div class="flex items-center gap-2">
-                            <span class="text-gray-500 text-sm">Tags:</span>
+                            <span class="text-gray-500 text-sm">{{ __('opac.news_show.tags') }}:</span>
                             @if($news->category)
                             <a href="{{ route('opac.news.index') }}?category={{ $news->category->id }}" class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition">
                                 {{ $news->category->name }}
@@ -141,7 +141,7 @@
                         
                         <!-- Share Buttons -->
                         <div class="flex items-center gap-2">
-                            <span class="text-gray-500 text-sm">Share:</span>
+                            <span class="text-gray-500 text-sm">{{ __('opac.news_show.share') }}:</span>
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}" target="_blank" class="w-9 h-9 bg-blue-600 text-white rounded-lg flex items-center justify-center hover:bg-blue-700 transition">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
@@ -151,7 +151,7 @@
                             <a href="https://wa.me/?text={{ urlencode($news->title . ' - ' . request()->url()) }}" target="_blank" class="w-9 h-9 bg-green-500 text-white rounded-lg flex items-center justify-center hover:bg-green-600 transition">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
-                            <button onclick="navigator.clipboard.writeText('{{ request()->url() }}'); alert('Link copied!')" class="w-9 h-9 bg-gray-200 text-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-300 transition">
+                            <button onclick="navigator.clipboard.writeText('{{ request()->url() }}'); alert('{{ __('opac.news_show.link_copied') }}')" class="w-9 h-9 bg-gray-200 text-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-300 transition">
                                 <i class="fas fa-link"></i>
                             </button>
                         </div>
@@ -161,8 +161,8 @@
                 <!-- Navigation -->
                 <div class="mt-8 flex items-center justify-between">
                     <a href="{{ route('opac.news.index') }}" class="inline-flex items-center gap-2 px-5 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium">
-                        <i class="fas fa-arrow-left"></i>
-                        <span>Kembali ke Berita</span>
+                        <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                        <span>{{ __('opac.news_show.back_to_news') }}</span>
                     </a>
                 </div>
             </article>
@@ -173,7 +173,7 @@
                 @if($relatedNews->count() > 0)
                 <div class="bg-white rounded-2xl shadow-lg shadow-gray-200/50 p-5">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-newspaper text-blue-500"></i> Berita Terkait
+                        <i class="fas fa-newspaper text-blue-500"></i> {{ __('opac.news_show.related_news') }}
                     </h3>
                     <div class="space-y-4">
                         @foreach($relatedNews as $related)
@@ -196,7 +196,7 @@
                     </div>
                     
                     <a href="{{ route('opac.news.index') }}" class="block text-center mt-4 py-2 text-blue-600 text-sm font-medium hover:text-blue-700">
-                        Lihat Semua Berita <i class="fas fa-arrow-right ml-1"></i>
+                        {{ __('opac.news_show.view_all_news') }} <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }} {{ app()->getLocale() === 'ar' ? 'mr-1' : 'ml-1' }}"></i>
                     </a>
                 </div>
                 @endif
@@ -204,7 +204,7 @@
                 <!-- E-Resources Promo -->
                 <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white">
                     <h3 class="font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-gem"></i> Jelajahi E-Resources
+                        <i class="fas fa-gem"></i> {{ __('opac.news_show.explore_resources') }}
                     </h3>
                     
                     <div class="space-y-3">
@@ -215,7 +215,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-sm">Maktabah Shamela</h4>
-                                    <p class="text-blue-200 text-xs">8,425 Kitab Klasik</p>
+                                    <p class="text-blue-200 text-xs">8,425 {{ __('opac.news_show.classic_books') }}</p>
                                 </div>
                             </div>
                         </a>
@@ -227,7 +227,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-sm">Jurnal UNIDA</h4>
-                                    <p class="text-blue-200 text-xs">Artikel Ilmiah</p>
+                                    <p class="text-blue-200 text-xs">{{ __('opac.news_show.scientific_articles') }}</p>
                                 </div>
                             </div>
                         </a>
@@ -239,7 +239,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-sm">E-Thesis</h4>
-                                    <p class="text-blue-200 text-xs">Tugas Akhir Mahasiswa</p>
+                                    <p class="text-blue-200 text-xs">{{ __('opac.news_show.student_thesis') }}</p>
                                 </div>
                             </div>
                         </a>
@@ -248,10 +248,10 @@
                 
                 <!-- Contact CTA -->
                 <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
-                    <h3 class="font-bold mb-2">Ada Pertanyaan?</h3>
-                    <p class="text-emerald-100 text-sm mb-4">Hubungi kami untuk informasi lebih lanjut</p>
+                    <h3 class="font-bold mb-2">{{ __('opac.news_show.have_questions') }}</h3>
+                    <p class="text-emerald-100 text-sm mb-4">{{ __('opac.news_show.contact_us') }}</p>
                     <a href="https://wa.me/6285183053934" target="_blank" class="block text-center py-3 bg-white text-emerald-600 rounded-xl font-bold text-sm hover:bg-emerald-50 transition">
-                        <i class="fab fa-whatsapp mr-2"></i>Chat WhatsApp
+                        <i class="fab fa-whatsapp mr-2"></i>{{ __('opac.news_show.chat_whatsapp') }}
                     </a>
                 </div>
             </aside>

@@ -12,7 +12,7 @@
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm text-white mb-4">
                     <i class="fas fa-book-quran"></i>
-                    <span>Perpustakaan Digital Islam</span>
+                    <span>{{ __('opac.shamela_browse.digital_library') }}</span>
                 </div>
                 <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4" dir="rtl">
                     المكتبة الشاملة
@@ -23,15 +23,15 @@
                 <div class="flex flex-wrap justify-center gap-4 mt-6">
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_books'] ?? 0) }}</p>
-                        <p class="text-xs text-blue-200">Kitab</p>
+                        <p class="text-xs text-blue-200">{{ __('opac.shamela_browse.books') }}</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_authors'] ?? 0) }}</p>
-                        <p class="text-xs text-blue-200">Ulama</p>
+                        <p class="text-xs text-blue-200">{{ __('opac.shamela_browse.scholars') }}</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white text-center">
                         <p class="text-2xl font-bold">{{ number_format($stats['total_categories'] ?? 0) }}</p>
-                        <p class="text-xs text-blue-200">Kategori</p>
+                        <p class="text-xs text-blue-200">{{ __('opac.shamela_browse.categories') }}</p>
                     </div>
                 </div>
                 @endif
@@ -72,15 +72,14 @@
         <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i class="fas fa-database text-3xl text-amber-600"></i>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Database Shamela Belum Tersedia</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ __('opac.shamela_browse.database_not_available') }}</h2>
         <p class="text-gray-600 mb-8">
-            Database konten Maktabah Shamela sedang dalam proses instalasi. 
-            Silakan hubungi administrator untuk informasi lebih lanjut.
+            {{ __('opac.shamela_browse.database_installing') }}
         </p>
         <a href="{{ route('opac.search') }}" 
            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition">
             <i class="fas fa-search"></i>
-            Cari Koleksi Lainnya
+            {{ __('opac.shamela_browse.search_other') }}
         </a>
     </div>
     @else
@@ -126,7 +125,7 @@
                 {{-- Active Filters --}}
                 @if($search || $categoryId)
                 <div class="flex items-center gap-2 mb-6 flex-wrap">
-                    <span class="text-sm text-gray-500">Filter aktif:</span>
+                    <span class="text-sm text-gray-500">{{ __('opac.shamela_browse.active_filter') }}:</span>
                     @if($search)
                     <span class="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                         <i class="fas fa-search text-xs"></i>
@@ -142,7 +141,7 @@
                     </span>
                     @endif
                     <button wire:click="clearFilters" class="text-sm text-red-500 hover:text-red-600">
-                        <i class="fas fa-times-circle"></i> Hapus semua
+                        <i class="fas fa-times-circle"></i> {{ __('opac.shamela_browse.clear_all') }}
                     </button>
                 </div>
                 @endif
@@ -159,7 +158,7 @@
                         @endif
                     </h2>
                     <p class="text-sm text-gray-500">
-                        {{ number_format($this->results['total'] ?? 0) }} كتاب
+                        {{ number_format($this->results['total'] ?? 0) }} {{ __('opac.shamela_browse.books') }}
                     </p>
                 </div>
                 

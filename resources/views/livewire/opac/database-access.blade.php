@@ -8,11 +8,11 @@
             <div class="text-center">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/80 text-sm mb-4">
                     <i class="fas fa-university"></i>
-                    <span>Konsorsium FPPTI Jawa Timur</span>
+                    <span>{{ __('opac.database_access.consortium') }}</span>
                 </div>
-                <h1 class="text-2xl lg:text-4xl font-bold text-white mb-3">Database Jurnal Berlangganan</h1>
+                <h1 class="text-2xl lg:text-4xl font-bold text-white mb-3">{{ __('opac.database_access.title') }}</h1>
                 <p class="text-blue-200 max-w-2xl mx-auto">
-                    Akses jurnal internasional peer-reviewed dari Gale Academic dan ProQuest melalui konsorsium FPPTI Jawa Timur.
+                    {{ __('opac.database_access.subtitle') }}
                 </p>
             </div>
         </div>
@@ -26,10 +26,10 @@
                 <i class="fas fa-exclamation-triangle text-amber-600"></i>
             </div>
             <div>
-                <h3 class="font-bold text-gray-900">Login Diperlukan</h3>
-                <p class="text-sm text-gray-600 mb-3">Silakan login sebagai member untuk melihat kredensial dan mengakses database.</p>
+                <h3 class="font-bold text-gray-900">{{ __('opac.database_access.login_required') }}</h3>
+                <p class="text-sm text-gray-600 mb-3">{{ __('opac.database_access.login_required_desc') }}</p>
                 <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-primary-700 transition">
-                    <i class="fas fa-sign-in-alt"></i> Login Sekarang
+                    <i class="fas fa-sign-in-alt"></i> {{ __('opac.database_access.login_now') }}
                 </a>
             </div>
         </div>
@@ -39,28 +39,28 @@
         <div class="mb-8 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
             <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <i class="fas fa-info-circle text-blue-600"></i>
-                Cara Mengakses Database
+                {{ __('opac.database_access.how_to_access') }}
             </h3>
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="flex items-start gap-3">
                     <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
                     <div>
-                        <p class="font-medium text-gray-900 text-sm">Klik "Akses Database"</p>
-                        <p class="text-xs text-gray-500">Buka halaman login vendor</p>
+                        <p class="font-medium text-gray-900 text-sm">{{ __('opac.database_access.step_1') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('opac.database_access.step_1_desc') }}</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-3">
                     <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
                     <div>
-                        <p class="font-medium text-gray-900 text-sm">Copy Kredensial</p>
-                        <p class="text-xs text-gray-500">Klik tombol copy username/password</p>
+                        <p class="font-medium text-gray-900 text-sm">{{ __('opac.database_access.step_2') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('opac.database_access.step_2_desc') }}</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-3">
                     <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0">3</div>
                     <div>
-                        <p class="font-medium text-gray-900 text-sm">Paste & Login</p>
-                        <p class="text-xs text-gray-500">Tempel di form login vendor</p>
+                        <p class="font-medium text-gray-900 text-sm">{{ __('opac.database_access.step_3') }}</p>
+                        <p class="text-xs text-gray-500">{{ __('opac.database_access.step_3_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                             {{-- Subjects --}}
                             <div class="mt-4 flex flex-wrap gap-1.5">
                                 @foreach($db['subjects'] as $subject)
-                                <span class="px-2 py-0.5 {{ $c['bg'] }} {{ $c['text'] }} text-xs rounded-full">{{ $subject }}</span>
+                                <span class="px-2 py-0.5 {{ $c['bg'] }} {{ $c['text'] }} text-xs rounded-full">{{ __('opac.database_access.subjects.' . $subject) }}</span>
                                 @endforeach
                             </div>
                         </div>
@@ -117,20 +117,20 @@
                             {{-- Access Button --}}
                             <button wire:click="accessDatabase('{{ $key }}')" 
                                     class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r {{ $c['gradient'] }} text-white font-semibold rounded-xl hover:opacity-90 transition shadow-lg"
-                                    @guest('member') disabled title="Login diperlukan" @endguest>
+                                    @guest('member') disabled title="{{ __('opac.database_access.login_required') }}" @endguest>
                                 <i class="fas fa-external-link-alt"></i>
-                                Akses Database
+                                {{ __('opac.database_access.access_database') }}
                             </button>
 
                             {{-- Credentials Section --}}
                             @auth('member')
                             <div class="bg-gray-50 rounded-xl p-3 space-y-2" x-data="{ copied: null }">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-xs font-semibold text-gray-500">KREDENSIAL</span>
+                                    <span class="text-xs font-semibold text-gray-500">{{ __('opac.database_access.credentials') }}</span>
                                     <button wire:click="revealCredential('{{ $key }}')" 
                                             class="text-xs {{ $isRevealed ? 'text-red-600' : 'text-primary-600' }} hover:underline">
                                         <i class="fas {{ $isRevealed ? 'fa-eye-slash' : 'fa-eye' }} mr-1"></i>
-                                        {{ $isRevealed ? 'Sembunyikan' : 'Tampilkan' }}
+                                        {{ $isRevealed ? __('opac.database_access.hide') : __('opac.database_access.show') }}
                                     </button>
                                 </div>
                                 
@@ -138,7 +138,7 @@
                                 <div class="space-y-2">
                                     {{-- Username --}}
                                     <div class="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-gray-200">
-                                        <span class="text-xs text-gray-400 w-16">Username</span>
+                                        <span class="text-xs text-gray-400 w-16">{{ __('opac.database_access.username') }}</span>
                                         <code class="flex-1 text-sm font-mono text-gray-900">{{ $db['username'] }}</code>
                                         <button @click="navigator.clipboard.writeText('{{ $db['username'] }}'); copied = 'user-{{ $key }}'; setTimeout(() => copied = null, 2000)"
                                                 class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition"
@@ -148,7 +148,7 @@
                                     </div>
                                     {{-- Password --}}
                                     <div class="flex items-center gap-2 bg-white rounded-lg px-3 py-2 border border-gray-200">
-                                        <span class="text-xs text-gray-400 w-16">Password</span>
+                                        <span class="text-xs text-gray-400 w-16">{{ __('opac.database_access.password') }}</span>
                                         <code class="flex-1 text-sm font-mono text-gray-900">{{ $db['password'] }}</code>
                                         <button @click="navigator.clipboard.writeText('{{ $db['password'] }}'); copied = 'pass-{{ $key }}'; setTimeout(() => copied = null, 2000)"
                                                 class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 transition"
@@ -160,14 +160,14 @@
                                 @else
                                 <div class="text-center py-3 text-gray-400 text-sm">
                                     <i class="fas fa-lock mr-1"></i>
-                                    Klik "Tampilkan" untuk melihat kredensial
+                                    {{ __('opac.database_access.click_to_show') }}
                                 </div>
                                 @endif
                             </div>
                             @else
                             <div class="bg-gray-50 rounded-xl p-4 text-center text-gray-400 text-sm">
                                 <i class="fas fa-lock mr-1"></i>
-                                Login untuk melihat kredensial
+                                {{ __('opac.database_access.login_to_view') }}
                             </div>
                             @endauth
                         </div>
@@ -184,23 +184,23 @@
                     <i class="fas fa-shield-alt text-amber-400 text-xl"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-lg mb-2">Informasi Penting</h3>
+                    <h3 class="font-bold text-lg mb-2">{{ __('opac.database_access.important_info') }}</h3>
                     <ul class="space-y-2 text-sm text-slate-300">
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                            <span>Akses database ini gratis untuk seluruh civitas akademika UNIDA Gontor.</span>
+                            <span>{{ __('opac.database_access.info_1') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-check-circle text-emerald-400 mt-0.5"></i>
-                            <span>Kredensial bersama melalui konsorsium FPPTI Jawa Timur.</span>
+                            <span>{{ __('opac.database_access.info_2') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-exclamation-triangle text-amber-400 mt-0.5"></i>
-                            <span>Jangan bagikan kredensial ke pihak luar. Penggunaan di-track untuk keamanan.</span>
+                            <span>{{ __('opac.database_access.info_3') }}</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fas fa-headset text-blue-400 mt-0.5"></i>
-                            <span>Hubungi pustakawan jika mengalami kendala akses.</span>
+                            <span>{{ __('opac.database_access.info_4') }}</span>
                         </li>
                     </ul>
                 </div>
@@ -210,8 +210,8 @@
         {{-- Back Link --}}
         <div class="mt-6 text-center">
             <a href="{{ route('opac.page', 'journal-subscription') }}" class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium">
-                <i class="fas fa-arrow-left"></i>
-                Kembali ke Daftar E-Resources
+                <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                {{ __('opac.database_access.back_to_resources') }}
             </a>
         </div>
     </div>

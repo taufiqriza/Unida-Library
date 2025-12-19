@@ -1,8 +1,8 @@
-<x-opac.layout title="Jam Layanan">
+<x-opac.layout :title="__('opac.pages.jam_layanan.title')">
     <x-opac.page-header 
-        title="Jam Layanan" 
-        subtitle="Waktu operasional perpustakaan"
-        :breadcrumbs="[['label' => 'Panduan'], ['label' => 'Jam Layanan']]"
+        :title="__('opac.pages.jam_layanan.title')" 
+        :subtitle="__('opac.pages.jam_layanan.subtitle')"
+        :breadcrumbs="[['label' => __('opac.pages.jam_layanan.breadcrumb_guide')], ['label' => __('opac.pages.jam_layanan.title')]]"
     />
 
     <section class="max-w-4xl mx-auto px-4 py-6 lg:py-10">
@@ -14,13 +14,13 @@
                         <i class="fas fa-briefcase text-primary-600"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900">Senin - Jumat</h3>
-                        <p class="text-xs text-gray-500">Hari Kerja</p>
+                        <h3 class="font-bold text-gray-900">{{ __('opac.pages.jam_layanan.weekday') }}</h3>
+                        <p class="text-xs text-gray-500">{{ __('opac.pages.jam_layanan.weekday_label') }}</p>
                     </div>
                 </div>
                 <div class="bg-primary-50 rounded-lg p-4 text-center">
                     <p class="text-2xl lg:text-3xl font-bold text-primary-600">08.00 - 16.00</p>
-                    <p class="text-xs text-gray-500 mt-1">WIB</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('opac.pages.jam_layanan.timezone') }}</p>
                 </div>
             </div>
 
@@ -30,13 +30,13 @@
                         <i class="fas fa-calendar-day text-emerald-600"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-gray-900">Sabtu</h3>
-                        <p class="text-xs text-gray-500">Akhir Pekan</p>
+                        <h3 class="font-bold text-gray-900">{{ __('opac.pages.jam_layanan.saturday') }}</h3>
+                        <p class="text-xs text-gray-500">{{ __('opac.pages.jam_layanan.weekend_label') }}</p>
                     </div>
                 </div>
                 <div class="bg-emerald-50 rounded-lg p-4 text-center">
                     <p class="text-2xl lg:text-3xl font-bold text-emerald-600">08.00 - 12.00</p>
-                    <p class="text-xs text-gray-500 mt-1">WIB</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('opac.pages.jam_layanan.timezone') }}</p>
                 </div>
             </div>
         </div>
@@ -45,12 +45,12 @@
         <div class="bg-red-50 rounded-xl p-4 border border-red-100 mb-6">
             <div class="flex items-center gap-2 mb-2">
                 <i class="fas fa-calendar-times text-red-600"></i>
-                <h3 class="font-bold text-gray-900 text-sm">Hari Libur</h3>
+                <h3 class="font-bold text-gray-900 text-sm">{{ __('opac.pages.jam_layanan.closed_title') }}</h3>
             </div>
             <div class="flex flex-wrap gap-2 text-sm">
-                <span class="px-2 py-1 bg-white rounded text-gray-600">Minggu</span>
-                <span class="px-2 py-1 bg-white rounded text-gray-600">Libur Nasional</span>
-                <span class="px-2 py-1 bg-white rounded text-gray-600">Libur Semester</span>
+                <span class="px-2 py-1 bg-white rounded text-gray-600">{{ __('opac.pages.jam_layanan.closed_sunday') }}</span>
+                <span class="px-2 py-1 bg-white rounded text-gray-600">{{ __('opac.pages.jam_layanan.closed_national') }}</span>
+                <span class="px-2 py-1 bg-white rounded text-gray-600">{{ __('opac.pages.jam_layanan.closed_semester') }}</span>
             </div>
         </div>
 
@@ -58,12 +58,12 @@
         <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
             <div class="flex items-center gap-2 mb-2">
                 <i class="fas fa-info-circle text-amber-600"></i>
-                <h3 class="font-bold text-gray-900 text-sm">Catatan Penting</h3>
+                <h3 class="font-bold text-gray-900 text-sm">{{ __('opac.pages.jam_layanan.notes_title') }}</h3>
             </div>
             <ul class="space-y-1 text-sm text-gray-700">
-                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> Peminjaman maksimal 30 menit sebelum tutup</li>
-                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> Pengembalian via book drop 24 jam</li>
-                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> Akses e-resources tersedia 24/7</li>
+                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> {{ __('opac.pages.jam_layanan.note_1') }}</li>
+                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> {{ __('opac.pages.jam_layanan.note_2') }}</li>
+                <li class="flex items-start gap-2"><i class="fas fa-check text-amber-600 mt-0.5 text-xs"></i> {{ __('opac.pages.jam_layanan.note_3') }}</li>
             </ul>
         </div>
     </section>

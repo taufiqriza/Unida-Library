@@ -1,8 +1,8 @@
-<x-opac.layout title="E-Resources">
+<x-opac.layout :title="__('opac.additional_pages.e_resources.title')">
     <x-opac.page-header 
-        title="E-Resources" 
-        subtitle="Akses digital perpustakaan dan referensi ilmiah"
-        :breadcrumbs="[['label' => 'E-Resources']]"
+        :title="__('opac.additional_pages.e_resources.title')" 
+        :subtitle="__('opac.additional_pages.e_resources.subtitle')"
+        :breadcrumbs="[['label' => __('opac.additional_pages.e_resources.title')]]"
     />
 
     <section class="max-w-6xl mx-auto px-4 py-6 lg:py-10">
@@ -16,22 +16,22 @@
                         <i class="fas fa-globe text-white text-2xl"></i>
                     </div>
                     <div>
-                        <h2 class="text-xl lg:text-2xl font-bold text-white">E-Resources UNIDA Gontor</h2>
-                        <p class="text-blue-200 text-sm">Koleksi digital untuk mendukung pembelajaran dan penelitian</p>
+                        <h2 class="text-xl lg:text-2xl font-bold text-white">{{ __('opac.additional_pages.e_resources.hero_title') }}</h2>
+                        <p class="text-blue-200 text-sm">{{ __('opac.additional_pages.e_resources.hero_desc') }}</p>
                     </div>
                 </div>
                 <div class="flex gap-3">
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-center">
                         <span class="text-xl font-bold text-white">8.5K+</span>
-                        <p class="text-[10px] text-blue-200">Kitab Klasik</p>
+                        <p class="text-[10px] text-blue-200">{{ __('opac.additional_pages.e_resources.classic_books') }}</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-center">
                         <span class="text-xl font-bold text-white">70+</span>
-                        <p class="text-[10px] text-blue-200">Arsip Sejarah</p>
+                        <p class="text-[10px] text-blue-200">{{ __('opac.additional_pages.e_resources.historical_archives') }}</p>
                     </div>
                     <div class="px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-center">
                         <span class="text-xl font-bold text-white">120K+</span>
-                        <p class="text-[10px] text-blue-200">Jurnal Ilmiah</p>
+                        <p class="text-[10px] text-blue-200">{{ __('opac.additional_pages.e_resources.scientific_journals') }}</p>
                     </div>
                 </div>
             </div>
@@ -42,8 +42,8 @@
             <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center shadow">
                 <i class="fas fa-crown text-white text-xs"></i>
             </div>
-            <span>Koleksi Digital Lokal</span>
-            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">TERSEDIA OFFLINE</span>
+            <span>{{ __('opac.additional_pages.e_resources.local_collection') }}</span>
+            <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full">{{ __('opac.additional_pages.e_resources.available_offline') }}</span>
         </h3>
 
         <div class="grid md:grid-cols-2 gap-4 mb-8">
@@ -63,18 +63,17 @@
                                 <p class="text-blue-200 text-sm" dir="rtl">المكتبة الشاملة</p>
                             </div>
                         </div>
-                        <span class="px-2 py-1 bg-white/20 text-[10px] font-bold rounded-full">LOKAL</span>
+                        <span class="px-2 py-1 bg-white/20 text-[10px] font-bold rounded-full">{{ __('opac.additional_pages.e_resources.local') }}</span>
                     </div>
                     
                     <p class="text-blue-100 text-sm mb-4">
-                        Perpustakaan digital Islam terlengkap dengan 8,425 kitab klasik dan 7+ juta halaman. 
-                        Mencakup Tafsir, Hadits, Fiqih, Aqidah, dan berbagai disiplin ilmu Islam lainnya.
+                        {{ __('opac.additional_pages.e_resources.shamela_desc') }}
                     </p>
                     
                     <div class="flex items-center justify-between">
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">8,425 Kitab</span>
-                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">7M+ Halaman</span>
+                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">8,425 {{ __('opac.additional_pages.e_resources.books') }}</span>
+                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">7M+ {{ __('opac.additional_pages.e_resources.pages') }}</span>
                         </div>
                         <i class="fas fa-arrow-right text-blue-300 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -85,7 +84,7 @@
             <a href="{{ route('opac.universitaria.index') }}" class="group relative bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 rounded-2xl p-5 text-white overflow-hidden hover:shadow-xl hover:shadow-amber-500/25 transition-all">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 <div class="absolute top-3 right-3">
-                    <span class="px-2 py-1 bg-white/25 text-[10px] font-bold rounded-full"><i class="fas fa-crown mr-1"></i>PREMIUM</span>
+                    <span class="px-2 py-1 bg-white/25 text-[10px] font-bold rounded-full"><i class="fas fa-crown mr-1"></i>{{ __('opac.additional_pages.e_resources.premium') }}</span>
                 </div>
                 
                 <div class="relative">
@@ -95,19 +94,18 @@
                         </div>
                         <div>
                             <h4 class="font-bold text-lg">Universitaria</h4>
-                            <p class="text-amber-100 text-sm">Warisan Intelektual PMDG</p>
+                            <p class="text-amber-100 text-sm">{{ __('opac.additional_pages.e_resources.universitaria_subtitle') }}</p>
                         </div>
                     </div>
                     
                     <p class="text-amber-50 text-sm mb-4">
-                        Koleksi bersejarah Pondok Modern Darussalam Gontor. Wardun Gontor sejak 1968, 
-                        buku peringatan, dokumentasi sejarah, dan naskah kuno Tarbiyatul Athfal.
+                        {{ __('opac.additional_pages.e_resources.universitaria_desc') }}
                     </p>
                     
                     <div class="flex items-center justify-between">
                         <div class="flex gap-2">
-                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">70+ Dokumen</span>
-                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">Baca Online</span>
+                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">70+ {{ __('opac.additional_pages.e_resources.documents') }}</span>
+                            <span class="px-2 py-1 bg-white/15 text-[10px] rounded">{{ __('opac.additional_pages.e_resources.read_online') }}</span>
                         </div>
                         <i class="fas fa-arrow-right text-amber-200 group-hover:translate-x-1 transition"></i>
                     </div>
@@ -122,14 +120,14 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-2">
                         <i class="fas fa-database"></i>
-                        <h3 class="font-bold text-lg">Database Jurnal Berlangganan</h3>
+                        <h3 class="font-bold text-lg">{{ __('opac.additional_pages.e_resources.subscribed_database') }}</h3>
                     </div>
-                    <p class="text-blue-200 text-sm">Akses Gale Academic & ProQuest via konsorsium FPPTI Jawa Timur. Login diperlukan.</p>
+                    <p class="text-blue-200 text-sm">{{ __('opac.additional_pages.e_resources.subscribed_database_desc') }}</p>
                 </div>
                 <a href="{{ route('opac.database-access') }}" 
                    class="inline-flex items-center gap-2 px-5 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition shadow-lg whitespace-nowrap">
                     <i class="fas fa-key"></i>
-                    Akses Database
+                    {{ __('opac.additional_pages.e_resources.access_database') }}
                     <i class="fas fa-arrow-right text-sm"></i>
                 </a>
             </div>
@@ -140,8 +138,8 @@
             <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-book text-emerald-600 text-sm"></i>
             </div>
-            E-Book & Perpustakaan Digital Terbuka
-            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">GRATIS</span>
+            {{ __('opac.additional_pages.e_resources.free_ebooks') }}
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full">{{ __('opac.additional_pages.e_resources.free') }}</span>
         </h3>
         
         @php
@@ -183,7 +181,7 @@
             <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-landmark text-purple-600 text-sm"></i>
             </div>
-            Perpustakaan Nasional RI
+            {{ __('opac.additional_pages.e_resources.national_library') }}
         </h3>
         
         <div class="grid sm:grid-cols-2 gap-4 mb-8">
@@ -193,7 +191,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition">iPusnas</h4>
-                    <p class="text-xs text-gray-500">Perpustakaan digital nasional</p>
+                    <p class="text-xs text-gray-500">{{ __('opac.additional_pages.e_resources.digital_national_library') }}</p>
                     <span class="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full">500K+ E-Books</span>
                 </div>
                 <i class="fas fa-external-link-alt text-gray-300 group-hover:text-blue-500 transition"></i>
@@ -205,8 +203,8 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <h4 class="font-bold text-gray-900 group-hover:text-green-600 transition">Bintang Pusnas</h4>
-                    <p class="text-xs text-gray-500">Koleksi bahan pustaka langka</p>
-                    <span class="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">Akses Terbuka</span>
+                    <p class="text-xs text-gray-500">{{ __('opac.additional_pages.e_resources.rare_materials') }}</p>
+                    <span class="inline-block mt-1 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">{{ __('opac.additional_pages.e_resources.open_access') }}</span>
                 </div>
                 <i class="fas fa-external-link-alt text-gray-300 group-hover:text-green-500 transition"></i>
             </a>
@@ -216,26 +214,27 @@
         <div class="bg-gradient-to-br from-slate-50 to-gray-100 rounded-xl p-4 border border-gray-200">
             <div class="flex items-center gap-2 mb-3">
                 <i class="fas fa-lightbulb text-amber-500"></i>
-                <h4 class="font-bold text-gray-900 text-sm">Tips Mengakses E-Resources</h4>
+                <h4 class="font-bold text-gray-900 text-sm">{{ __('opac.additional_pages.e_resources.tips_title') }}</h4>
             </div>
             <div class="grid sm:grid-cols-2 gap-2 text-xs text-gray-600">
                 <div class="flex items-start gap-2">
                     <i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i>
-                    <span>Maktabah Shamela & Universitaria tersedia <strong>offline</strong> di jaringan kampus</span>
+                    <span>{!! __('opac.additional_pages.e_resources.tip_1') !!}</span>
                 </div>
                 <div class="flex items-start gap-2">
                     <i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i>
-                    <span>Database berlangganan memerlukan <strong>login</strong> via portal khusus</span>
+                    <span>{!! __('opac.additional_pages.e_resources.tip_2') !!}</span>
                 </div>
                 <div class="flex items-start gap-2">
                     <i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i>
-                    <span>Gunakan browser terbaru untuk pengalaman optimal</span>
+                    <span>{{ __('opac.additional_pages.e_resources.tip_3') }}</span>
                 </div>
                 <div class="flex items-start gap-2">
                     <i class="fas fa-check-circle text-emerald-500 mt-0.5 flex-shrink-0"></i>
-                    <span>Hubungi pustakawan jika mengalami kendala akses</span>
+                    <span>{{ __('opac.additional_pages.e_resources.tip_4') }}</span>
                 </div>
             </div>
         </div>
     </section>
+
 </x-opac.layout>

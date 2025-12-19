@@ -9,23 +9,23 @@
                             <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
                                 <i class="fas fa-user-plus text-3xl"></i>
                             </div>
-                            <h2 class="text-2xl font-bold mb-2">Bergabung Sekarang</h2>
-                            <p class="text-primary-200">Daftar untuk menikmati layanan perpustakaan digital UNIDA Gontor</p>
+                            <h2 class="text-2xl font-bold mb-2">{{ __('opac.auth.register.join_now') }}</h2>
+                            <p class="text-primary-200">{{ __('opac.auth.register.join_desc') }}</p>
                         </div>
                         
                         {{-- Member Benefits --}}
                         <div x-show="registerType === 'member'" class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-check text-lg"></i></div>
-                                <div><p class="font-medium">Pinjam Buku</p><p class="text-primary-200 text-sm">Hingga 3 eksemplar</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.borrow_books') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.borrow_books_desc') }}</p></div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-check text-lg"></i></div>
-                                <div><p class="font-medium">Akses Digital</p><p class="text-primary-200 text-sm">E-Book & E-Thesis 24/7</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.digital_access') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.digital_access_desc') }}</p></div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-upload text-lg"></i></div>
-                                <div><p class="font-medium">Unggah Tugas Akhir</p><p class="text-primary-200 text-sm">Submit skripsi/tesis</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.upload_thesis') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.upload_thesis_desc') }}</p></div>
                             </div>
                         </div>
                         
@@ -33,15 +33,15 @@
                         <div x-show="registerType === 'staff'" class="space-y-4">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-cog text-lg"></i></div>
-                                <div><p class="font-medium">Kelola Perpustakaan</p><p class="text-primary-200 text-sm">Sirkulasi & katalog</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.manage_library') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.manage_library_desc') }}</p></div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-users text-lg"></i></div>
-                                <div><p class="font-medium">Kelola Anggota</p><p class="text-primary-200 text-sm">Data member</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.manage_members') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.manage_members_desc') }}</p></div>
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"><i class="fas fa-chart-bar text-lg"></i></div>
-                                <div><p class="font-medium">Laporan</p><p class="text-primary-200 text-sm">Statistik perpustakaan</p></div>
+                                <div><p class="font-medium">{{ __('opac.auth.register.reports') }}</p><p class="text-primary-200 text-sm">{{ __('opac.auth.register.reports_desc') }}</p></div>
                             </div>
                         </div>
                     </div>
@@ -54,18 +54,18 @@
                                 <button type="button" @click="registerType = 'member'" 
                                         :class="registerType === 'member' ? 'bg-white shadow text-primary-600' : 'text-gray-500 hover:text-gray-700'"
                                         class="flex-1 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2">
-                                    <i class="fas fa-user"></i> Member
+                                    <i class="fas fa-user"></i> {{ __('opac.auth.register.member') }}
                                 </button>
                                 <button type="button" @click="registerType = 'staff'" 
                                         :class="registerType === 'staff' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'"
                                         class="flex-1 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2">
-                                    <i class="fas fa-user-tie"></i> Staff
+                                    <i class="fas fa-user-tie"></i> {{ __('opac.auth.register.staff') }}
                                 </button>
                             </div>
 
                             <div class="mb-6">
-                                <h1 class="text-xl font-bold text-gray-900" x-text="registerType === 'member' ? 'Daftar Member' : 'Daftar Staff'"></h1>
-                                <p class="text-gray-500 text-sm" x-text="registerType === 'member' ? 'Buat akun untuk akses perpustakaan' : 'Daftar sebagai staff perpustakaan'"></p>
+                                <h1 class="text-xl font-bold text-gray-900" x-text="registerType === 'member' ? '{{ __('opac.auth.register.member_title') }}' : '{{ __('opac.auth.register.staff_title') }}'"></h1>
+                                <p class="text-gray-500 text-sm" x-text="registerType === 'member' ? '{{ __('opac.auth.register.member_subtitle') }}' : '{{ __('opac.auth.register.staff_subtitle') }}'"></p>
                             </div>
 
                             {{-- Staff Notice --}}
@@ -73,8 +73,8 @@
                                 <div class="flex gap-3">
                                     <i class="fas fa-info-circle text-amber-500 mt-0.5"></i>
                                     <div class="text-sm text-amber-800">
-                                        <p class="font-medium">Perlu Persetujuan Admin</p>
-                                        <p class="text-amber-600">Akun staff akan aktif setelah disetujui oleh admin cabang perpustakaan.</p>
+                                        <p class="font-medium">{{ __('opac.auth.register.admin_approval') }}</p>
+                                        <p class="text-amber-600">{{ __('opac.auth.register.admin_approval_desc') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -92,51 +92,51 @@
                             {{-- Member Form (Livewire) --}}
                             <form x-show="registerType === 'member'" wire:submit="register" class="space-y-3" x-data="memberForm()">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                    <input type="text" wire:model="name" required placeholder="Masukkan nama lengkap"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.full_name') }}</label>
+                                    <input type="text" wire:model="name" required placeholder="{{ __('opac.auth.register.full_name_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input type="email" wire:model="email" x-model="email" @input="checkEmail()" required placeholder="contoh@email.com"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.email') }}</label>
+                                    <input type="email" wire:model="email" x-model="email" @input="checkEmail()" required placeholder="{{ __('opac.auth.register.email_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
-                                    <p x-show="emailType === 'internal'" class="text-xs text-emerald-600 mt-1"><i class="fas fa-check-circle mr-1"></i>Email UNIDA terdeteksi - verifikasi otomatis</p>
-                                    <p x-show="emailType === 'external'" class="text-xs text-blue-600 mt-1"><i class="fas fa-university mr-1"></i>Email kampus lain terdeteksi</p>
-                                    <p x-show="emailType === 'public'" class="text-xs text-gray-500 mt-1"><i class="fas fa-envelope mr-1"></i>Perlu verifikasi email</p>
+                                    <p x-show="emailType === 'internal'" class="text-xs text-emerald-600 mt-1"><i class="fas fa-check-circle mr-1"></i>{{ __('opac.auth.register.email_unida_detected') }}</p>
+                                    <p x-show="emailType === 'external'" class="text-xs text-blue-600 mt-1"><i class="fas fa-university mr-1"></i>{{ __('opac.auth.register.email_campus_detected') }}</p>
+                                    <p x-show="emailType === 'public'" class="text-xs text-gray-500 mt-1"><i class="fas fa-envelope mr-1"></i>{{ __('opac.auth.register.email_public') }}</p>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">No. HP</label>
-                                    <input type="text" wire:model="phone" placeholder="08xxxxxxxxxx"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.phone') }}</label>
+                                    <input type="text" wire:model="phone" placeholder="{{ __('opac.auth.register.phone_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                 </div>
                                 
                                 {{-- Institution fields for public email --}}
                                 <div x-show="emailType === 'public'" x-collapse class="bg-gray-50 rounded-xl p-3 space-y-3">
-                                    <p class="text-xs text-gray-600 font-medium"><i class="fas fa-building mr-1"></i> Asal Institusi (opsional)</p>
+                                    <p class="text-xs text-gray-600 font-medium"><i class="fas fa-building mr-1"></i> {{ __('opac.auth.register.institution_section') }}</p>
                                     <div class="grid grid-cols-2 gap-3">
-                                        <input type="text" wire:model="institution" placeholder="Nama institusi"
+                                        <input type="text" wire:model="institution" placeholder="{{ __('opac.auth.register.institution') }}"
                                             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 transition">
-                                        <input type="text" wire:model="institution_city" placeholder="Kota"
+                                        <input type="text" wire:model="institution_city" placeholder="{{ __('opac.auth.register.institution_city') }}"
                                             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 transition">
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                                        <input type="password" wire:model="password" required placeholder="Min 8 karakter"
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.password') }}</label>
+                                        <input type="password" wire:model="password" required placeholder="{{ __('opac.auth.register.password_placeholder') }}"
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi</label>
-                                        <input type="password" wire:model="password_confirmation" required placeholder="Ulangi"
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.confirm_password') }}</label>
+                                        <input type="password" wire:model="password_confirmation" required placeholder="{{ __('opac.auth.register.confirm_placeholder') }}"
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                     </div>
                                 </div>
                                 <button type="submit" wire:loading.attr="disabled" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2 mt-2 disabled:opacity-50">
                                     <span wire:loading wire:target="register"><i class="fas fa-spinner fa-spin"></i></span>
                                     <span wire:loading.remove wire:target="register"><i class="fas fa-user-plus"></i></span>
-                                    Daftar Member
+                                    {{ __('opac.auth.register.register_member_btn') }}
                                 </button>
                             </form>
 
@@ -145,19 +145,19 @@
                                 @csrf
                                 <input type="hidden" name="type" value="staff">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                    <input type="text" name="name" value="{{ old('name') }}" required placeholder="Masukkan nama lengkap"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.full_name') }}</label>
+                                    <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('opac.auth.register.full_name_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="contoh@email.com"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.email') }}</label>
+                                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="{{ __('opac.auth.register.email_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cabang Perpustakaan</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.branch') }}</label>
                                     <select name="branch_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition">
-                                        <option value="">Pilih Cabang</option>
+                                        <option value="">{{ __('opac.auth.register.branch_placeholder') }}</option>
                                         @foreach(\App\Models\Branch::where('is_active', true)->orderByDesc('is_main')->orderBy('name')->get() as $branch)
                                         <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                                         @endforeach
@@ -165,25 +165,25 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                                        <input type="password" name="password" required placeholder="Min 8 karakter"
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.password') }}</label>
+                                        <input type="password" name="password" required placeholder="{{ __('opac.auth.register.password_placeholder') }}"
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi</label>
-                                        <input type="password" name="password_confirmation" required placeholder="Ulangi"
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.confirm_password') }}</label>
+                                        <input type="password" name="password_confirmation" required placeholder="{{ __('opac.auth.register.confirm_placeholder') }}"
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition">
                                     </div>
                                 </div>
                                 <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl transition flex items-center justify-center gap-2 mt-2">
-                                    <i class="fas fa-user-tie"></i> Daftar Staff
+                                    <i class="fas fa-user-tie"></i> {{ __('opac.auth.register.register_staff_btn') }}
                                 </button>
                             </form>
 
                             <div class="mt-5 pt-5 border-t border-gray-100 text-center">
                                 <p class="text-sm text-gray-500">
-                                    Sudah punya akun? 
-                                    <a href="{{ route('login') }}" class="text-primary-600 font-semibold hover:text-primary-700">Masuk</a>
+                                    {{ __('opac.auth.register.has_account') }} 
+                                    <a href="{{ route('login') }}" class="text-primary-600 font-semibold hover:text-primary-700">{{ __('opac.auth.register.login') }}</a>
                                 </p>
                             </div>
                         </div>

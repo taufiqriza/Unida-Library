@@ -6,14 +6,14 @@
             {{-- Back Button (Mobile) --}}
             <div class="relative z-10 px-4 pt-4 lg:hidden">
                 <a href="{{ route('opac.search') }}?type=ethesis" class="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Kembali</span>
+                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                    <span>{{ __('opac.ethesis_show.back') }}</span>
                 </a>
             </div>
             
             {{-- Breadcrumb (Desktop) --}}
             <nav class="hidden lg:block relative z-10 px-6 pt-6 text-sm text-white/70">
-                <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                <a href="{{ route('opac.home') }}" class="hover:text-white">{{ __('opac.ethesis_show.home') }}</a>
                 <span class="mx-2">/</span>
                 <a href="{{ route('opac.search') }}?type=ethesis" class="hover:text-white">E-Thesis</a>
                 <span class="mx-2">/</span>
@@ -29,13 +29,13 @@
                         </div>
                     </div>
                     
-                    <div class="text-center lg:text-left flex-1">
+                    <div class="text-center lg:text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} flex-1">
                         <div class="flex items-center justify-center lg:justify-start gap-2 mb-2">
                             <span class="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full">
                                 {{ $thesis->getTypeLabel() }}
                             </span>
                             <span class="inline-block px-3 py-1 bg-indigo-500/50 text-white text-xs font-semibold rounded-full">
-                                <i class="fas fa-university mr-1"></i> Repository
+                                <i class="fas fa-university mr-1"></i> {{ __('opac.ethesis_show.repository') }}
                             </span>
                         </div>
                         <h1 class="text-xl lg:text-3xl font-bold text-white leading-tight">{{ $thesis->title }}</h1>
@@ -44,12 +44,12 @@
                         <div class="flex items-center justify-center lg:justify-start gap-4 mt-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->year }}</div>
-                                <div class="text-xs text-indigo-200">Tahun</div>
+                                <div class="text-xs text-indigo-200">{{ __('opac.ethesis_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->views ?? 0 }}</div>
-                                <div class="text-xs text-indigo-200">Dilihat</div>
+                                <div class="text-xs text-indigo-200">{{ __('opac.ethesis_show.views') }}</div>
                             </div>
                         </div>
                     </div>
@@ -67,19 +67,19 @@
                         <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100">
                             <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-file-alt text-indigo-500"></i>
-                                Abstrak
+                                {{ __('opac.ethesis_show.abstract') }}
                             </h3>
                         </div>
                         <div class="p-4">
                             @if($thesis->abstract)
                                 <p class="text-gray-700 leading-relaxed text-justify">{{ $thesis->abstract }}</p>
                             @else
-                                <p class="text-gray-500 italic">Abstrak tidak tersedia</p>
+                                <p class="text-gray-500 italic">{{ __('opac.ethesis_show.abstract_not_available') }}</p>
                             @endif
                             
                             @if($thesis->abstract_en)
                                 <hr class="my-4">
-                                <h4 class="font-semibold text-gray-800 mb-2">Abstract (English)</h4>
+                                <h4 class="font-semibold text-gray-800 mb-2">{{ __('opac.ethesis_show.abstract_english') }}</h4>
                                 <p class="text-gray-700 leading-relaxed text-justify">{{ $thesis->abstract_en }}</p>
                             @endif
                         </div>
@@ -91,7 +91,7 @@
                         <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100">
                             <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-tags text-indigo-500"></i>
-                                Kata Kunci
+                                {{ __('opac.ethesis_show.keywords') }}
                             </h3>
                         </div>
                         <div class="p-4">
@@ -111,7 +111,7 @@
                         <a href="{{ $thesis->external_url ?? $thesis->url }}" target="_blank" rel="noopener" 
                            class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg shadow-indigo-600/30">
                             <i class="fas fa-external-link-alt"></i>
-                            Buka di Repository UNIDA
+                            {{ __('opac.ethesis_show.open_repository') }}
                         </a>
                     </div>
                 </div>
@@ -123,31 +123,31 @@
                         <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100">
                             <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-info-circle text-indigo-500"></i>
-                                Informasi
+                                {{ __('opac.ethesis_show.information') }}
                             </h3>
                         </div>
                         <div class="p-4">
                             <dl class="space-y-3 text-sm">
                                 <div class="flex justify-between">
-                                    <dt class="text-gray-500">Penulis</dt>
+                                    <dt class="text-gray-500">{{ __('opac.ethesis_show.author') }}</dt>
                                     <dd class="font-medium text-gray-900 text-right">{{ $thesis->author }}</dd>
                                 </div>
                                 <div class="flex justify-between">
-                                    <dt class="text-gray-500">Tahun</dt>
+                                    <dt class="text-gray-500">{{ __('opac.ethesis_show.year') }}</dt>
                                     <dd class="font-medium text-gray-900">{{ $thesis->year }}</dd>
                                 </div>
                                 <div class="flex justify-between">
-                                    <dt class="text-gray-500">Jenis</dt>
+                                    <dt class="text-gray-500">{{ __('opac.ethesis_show.type') }}</dt>
                                     <dd class="font-medium text-gray-900">{{ $thesis->getTypeLabel() }}</dd>
                                 </div>
                                 @if($thesis->nim)
                                 <div class="flex justify-between">
-                                    <dt class="text-gray-500">NIM</dt>
+                                    <dt class="text-gray-500">{{ __('opac.ethesis_show.nim') }}</dt>
                                     <dd class="font-medium text-gray-900">{{ $thesis->nim }}</dd>
                                 </div>
                                 @endif
                                 <div class="flex justify-between pt-2 border-t">
-                                    <dt class="text-gray-500">Dilihat</dt>
+                                    <dt class="text-gray-500">{{ __('opac.ethesis_show.views') }}</dt>
                                     <dd class="font-medium text-gray-900">{{ number_format($thesis->views ?? 0) }}x</dd>
                                 </div>
                             </dl>
@@ -161,12 +161,12 @@
                                 <i class="fas fa-university text-white"></i>
                             </div>
                             <div>
-                                <h3 class="font-bold text-gray-900">Repository UNIDA</h3>
+                                <h3 class="font-bold text-gray-900">{{ __('opac.ethesis_show.repository_unida') }}</h3>
                                 <p class="text-xs text-gray-500">repo.unida.gontor.ac.id</p>
                             </div>
                         </div>
                         <p class="text-sm text-gray-600">
-                            Tugas akhir ini bersumber dari Repository Universitas Darussalam Gontor.
+                            {{ __('opac.ethesis_show.source_info') }}
                         </p>
                     </div>
 
@@ -176,7 +176,7 @@
                         <div class="px-4 py-3 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-100">
                             <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-book text-indigo-500"></i>
-                                Tugas Akhir Lainnya
+                                {{ __('opac.ethesis_show.other_thesis') }}
                             </h3>
                         </div>
                         <div class="p-4 space-y-3">

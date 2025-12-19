@@ -1,4 +1,4 @@
-<x-opac.layout title="Pilih Portal">
+<x-opac.layout :title="__('opac.auth.choose_role.title')">
     <div class="min-h-[70vh] flex items-center justify-center py-8 px-4">
         <div class="w-full max-w-2xl">
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
@@ -7,8 +7,8 @@
                     <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-user-check text-2xl text-white"></i>
                     </div>
-                    <h1 class="text-xl font-bold text-white">Pilih Portal</h1>
-                    <p class="text-primary-200 text-sm mt-1">Akun Anda terdaftar di dua portal</p>
+                    <h1 class="text-xl font-bold text-white">{{ __('opac.auth.choose_role.title') }}</h1>
+                    <p class="text-primary-200 text-sm mt-1">{{ __('opac.auth.choose_role.subtitle') }}</p>
                 </div>
 
                 {{-- Content --}}
@@ -26,8 +26,8 @@
                                 <i class="fas fa-user-tie text-white text-lg"></i>
                             </div>
                             
-                            <h3 class="text-lg font-bold text-gray-900 mb-1">Staff Portal</h3>
-                            <p class="text-gray-500 text-sm mb-4">Akses panel staf perpustakaan</p>
+                            <h3 class="text-lg font-bold text-gray-900 mb-1">{{ __('opac.auth.choose_role.staff_portal') }}</h3>
+                            <p class="text-gray-500 text-sm mb-4">{{ __('opac.auth.choose_role.staff_portal_desc') }}</p>
                             
                             <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">
                                 <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -53,8 +53,8 @@
                                 <i class="fas fa-user-graduate text-white text-lg"></i>
                             </div>
                             
-                            <h3 class="text-lg font-bold text-gray-900 mb-1">Member Portal</h3>
-                            <p class="text-gray-500 text-sm mb-4">Akses layanan anggota perpustakaan</p>
+                            <h3 class="text-lg font-bold text-gray-900 mb-1">{{ __('opac.auth.choose_role.member_portal') }}</h3>
+                            <p class="text-gray-500 text-sm mb-4">{{ __('opac.auth.choose_role.member_portal_desc') }}</p>
                             
                             <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-200">
                                 <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -72,7 +72,7 @@
                     {{-- Back Link --}}
                     <div class="text-center mt-6 pt-4 border-t border-gray-100">
                         <a href="{{ route('login') }}" class="text-gray-500 hover:text-primary-600 text-sm transition inline-flex items-center gap-2">
-                            <i class="fas fa-arrow-left"></i> Kembali ke halaman login
+                            <i class="fas fa-arrow-left"></i> {{ __('opac.auth.choose_role.back_to_login') }}
                         </a>
                     </div>
                 </div>

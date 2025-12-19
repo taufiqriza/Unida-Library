@@ -6,8 +6,8 @@
                     <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <i class="fas fa-envelope-open-text text-3xl"></i>
                     </div>
-                    <h1 class="text-xl font-bold">Verifikasi Email</h1>
-                    <p class="text-primary-200 text-sm mt-1">Masukkan kode yang dikirim ke email Anda</p>
+                    <h1 class="text-xl font-bold">{{ __('opac.auth.verify_email.title') }}</h1>
+                    <p class="text-primary-200 text-sm mt-1">{{ __('opac.auth.verify_email.subtitle') }}</p>
                 </div>
 
                 <div class="p-6">
@@ -15,7 +15,7 @@
                         <div class="flex items-center gap-3">
                             <i class="fas fa-info-circle text-blue-500"></i>
                             <div class="text-sm">
-                                <p class="text-blue-800">Kode verifikasi dikirim ke:</p>
+                                <p class="text-blue-800">{{ __('opac.auth.verify_email.code_sent') }}</p>
                                 <p class="font-semibold text-blue-900">{{ $member->email }}</p>
                             </div>
                         </div>
@@ -32,8 +32,8 @@
                     <form action="{{ route('opac.verify-email') }}" method="POST" x-data="otpForm()">
                         @csrf
                         <div class="mb-5">
-                            <label class="block text-sm font-medium text-gray-700 mb-3 text-center">Masukkan 6 Digit Kode</label>
-                            <div class="flex justify-center gap-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-3 text-center">{{ __('opac.auth.verify_email.enter_code') }}</label>
+                            <div class="flex justify-center gap-2" dir="ltr">
                                 @for($i = 0; $i < 6; $i++)
                                 <input type="text" maxlength="1" 
                                        x-ref="otp{{ $i }}"
@@ -47,25 +47,25 @@
                         </div>
 
                         <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
-                            <i class="fas fa-check-circle"></i> Verifikasi
+                            <i class="fas fa-check-circle"></i> {{ __('opac.auth.verify_email.verify') }}
                         </button>
                     </form>
 
                     <div class="mt-5 pt-5 border-t border-gray-100 text-center" x-data="resendTimer({{ $resendInfo['wait_seconds'] }})">
-                        <p class="text-sm text-gray-500 mb-2">Tidak menerima kode?</p>
+                        <p class="text-sm text-gray-500 mb-2">{{ __('opac.auth.verify_email.not_received') }}</p>
                         <button @click="resendOtp()" 
                                 :disabled="countdown > 0 || loading"
                                 :class="countdown > 0 || loading ? 'text-gray-400 cursor-not-allowed' : 'text-primary-600 hover:text-primary-700'"
                                 class="text-sm font-semibold transition">
-                            <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> Mengirim...</span>
-                            <span x-show="!loading && countdown > 0">Kirim ulang dalam <span x-text="countdown"></span>s</span>
-                            <span x-show="!loading && countdown <= 0"><i class="fas fa-redo mr-1"></i> Kirim Ulang Kode</span>
+                            <span x-show="loading"><i class="fas fa-spinner fa-spin mr-1"></i> {{ __('opac.auth.verify_email.sending') }}</span>
+                            <span x-show="!loading && countdown > 0">{{ __('opac.auth.verify_email.resend_in') }} <span x-text="countdown"></span>s</span>
+                            <span x-show="!loading && countdown <= 0"><i class="fas fa-redo mr-1"></i> {{ __('opac.auth.verify_email.resend_code') }}</span>
                         </button>
                     </div>
 
                     <div class="mt-4 text-center">
                         <a href="{{ route('opac.register') }}" class="text-sm text-gray-500 hover:text-gray-700">
-                            <i class="fas fa-arrow-left mr-1"></i> Kembali ke halaman daftar
+                            <i class="fas fa-arrow-left mr-1"></i> {{ __('opac.auth.verify_email.back_to_register') }}
                         </a>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
                         alert('⚠ ' + data.message);
                     }
                 } catch (e) {
-                    alert('⚠ Gagal mengirim ulang kode');
+                    alert('⚠ {{ __("opac.auth.verify_email.resend_failed") }}');
                 }
                 this.loading = false;
             }

@@ -12,13 +12,13 @@
             {{-- Back Button --}}
             <div class="relative z-10 px-4 pt-4 lg:px-6 lg:pt-6 flex items-center justify-between">
                 <button onclick="window.history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-xl transition backdrop-blur-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Kembali</span>
+                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                    <span>{{ __('opac.ebook_show.back') }}</span>
                 </button>
                 
                 {{-- Breadcrumb (Desktop) --}}
                 <nav class="hidden lg:flex items-center gap-2 text-sm text-white/70">
-                    <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                    <a href="{{ route('opac.home') }}" class="hover:text-white">{{ __('opac.ebook_show.home') }}</a>
                     <span>/</span>
                     <a href="{{ route('opac.search') }}?type=ebook" class="hover:text-white">E-Book</a>
                     <span>/</span>
@@ -41,20 +41,20 @@
                         </div>
                     </div>
                     
-                    <div class="text-center lg:text-left flex-1">
+                    <div class="text-center lg:text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} flex-1">
                         <span class="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full mb-2">{{ strtoupper($ebook->file_format ?? 'PDF') }}</span>
                         <h1 class="text-xl lg:text-3xl font-bold text-white leading-tight">{{ $ebook->title }}</h1>
-                        <p class="text-orange-200 mt-2 text-sm lg:text-base">{{ $ebook->author_names ?: 'Penulis tidak diketahui' }}</p>
+                        <p class="text-orange-200 mt-2 text-sm lg:text-base">{{ $ebook->author_names ?: __('opac.ebook_show.unknown_author') }}</p>
                         
                         <div class="flex items-center justify-center lg:justify-start gap-4 mt-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $ebook->publish_year ?? '-' }}</div>
-                                <div class="text-xs text-orange-200">Tahun</div>
+                                <div class="text-xs text-orange-200">{{ __('opac.ebook_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $ebook->pages ?? '-' }}</div>
-                                <div class="text-xs text-orange-200">Halaman</div>
+                                <div class="text-xs text-orange-200">{{ __('opac.ebook_show.pages') }}</div>
                             </div>
                         </div>
                     </div>
@@ -70,12 +70,12 @@
                 @if($ebook->file_path)
                 <a href="{{ asset('storage/' . $ebook->file_path) }}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2">
                     <i class="fas fa-book-reader"></i>
-                    <span>Baca Sekarang</span>
+                    <span>{{ __('opac.ebook_show.read_now') }}</span>
                 </a>
                 @endif
                 <button class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
                     <i class="fas fa-share-alt"></i>
-                    <span>Bagikan</span>
+                    <span>{{ __('opac.ebook_show.share') }}</span>
                 </button>
             </div>
 
@@ -84,32 +84,32 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-info-circle text-orange-500"></i>
-                        Informasi E-Book
+                        {{ __('opac.ebook_show.ebook_info') }}
                     </h3>
                 </div>
                 <div class="divide-y divide-gray-100">
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Penulis</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.author') }}</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $ebook->author_names ?: '-' }}</span>
                     </div>
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Penerbit</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.publisher') }}</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $ebook->publisher ?? '-' }}</span>
                     </div>
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Tahun</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.year') }}</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $ebook->publish_year ?? '-' }}</span>
                     </div>
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Bahasa</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.language') }}</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $ebook->language ?? '-' }}</span>
                     </div>
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Format</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.format') }}</span>
                         <span class="text-sm text-gray-900 font-medium font-mono bg-orange-100 px-2 py-0.5 rounded">{{ strtoupper($ebook->file_format ?? 'PDF') }}</span>
                     </div>
                     <div class="flex items-center px-4 py-3">
-                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">Halaman</span>
+                        <span class="w-28 text-sm text-gray-500 flex-shrink-0">{{ __('opac.ebook_show.pages') }}</span>
                         <span class="text-sm text-gray-900 font-medium">{{ $ebook->pages ?? '-' }}</span>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-align-left text-orange-500"></i>
-                        Deskripsi
+                        {{ __('opac.ebook_show.description') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -134,7 +134,7 @@
             @if($relatedEbooks->count() > 0)
             <div class="pt-4">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-gray-900">E-Book Lainnya</h2>
+                    <h2 class="text-lg font-bold text-gray-900">{{ __('opac.ebook_show.other_ebooks') }}</h2>
                 </div>
                 <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
                     @foreach($relatedEbooks as $related)

@@ -8,10 +8,10 @@
             <div class="text-center">
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm mb-4">
                     <i class="fas fa-newspaper"></i>
-                    <span>Berita & Pengumuman</span>
+                    <span>{{ __('opac.news_list.news_announcements') }}</span>
                 </div>
-                <h1 class="text-3xl lg:text-4xl font-bold mb-4">Berita Perpustakaan</h1>
-                <p class="text-blue-200 max-w-2xl mx-auto">Ikuti informasi terbaru, kegiatan, dan pengumuman dari Perpustakaan UNIDA Gontor</p>
+                <h1 class="text-3xl lg:text-4xl font-bold mb-4">{{ __('opac.news_list.library_news') }}</h1>
+                <p class="text-blue-200 max-w-2xl mx-auto">{{ __('opac.news_list.subtitle') }}</p>
             </div>
             
             <!-- Search Bar -->
@@ -20,12 +20,12 @@
                     <input 
                         type="text" 
                         wire:model.live.debounce.300ms="search"
-                        placeholder="Cari berita..." 
-                        class="w-full px-5 py-4 pl-12 rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-blue-200 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+                        placeholder="{{ __('opac.news_list.search_news') }}" 
+                        class="w-full px-5 py-4 {{ app()->getLocale() === 'ar' ? 'pr-12' : 'pl-12' }} rounded-xl bg-white/10 backdrop-blur-sm text-white placeholder-blue-200 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
                     >
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-blue-200"></i>
+                    <i class="fas fa-search absolute {{ app()->getLocale() === 'ar' ? 'right-4' : 'left-4' }} top-1/2 -translate-y-1/2 text-blue-200"></i>
                     @if($search)
-                    <button wire:click="$set('search', '')" class="absolute right-4 top-1/2 -translate-y-1/2 text-blue-200 hover:text-white">
+                    <button wire:click="$set('search', '')" class="absolute {{ app()->getLocale() === 'ar' ? 'left-4' : 'right-4' }} top-1/2 -translate-y-1/2 text-blue-200 hover:text-white">
                         <i class="fas fa-times"></i>
                     </button>
                     @endif
@@ -48,7 +48,7 @@
                             wire:click="setCategory(null)"
                             class="px-4 py-2 rounded-full text-sm font-medium transition {{ !$categoryId ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
                         >
-                            Semua <span class="ml-1 opacity-70">({{ $totalNews }})</span>
+                            {{ __('opac.news_list.all') }} <span class="ml-1 opacity-70">({{ $totalNews }})</span>
                         </button>
                         @foreach($categories as $cat)
                         <button 
@@ -65,9 +65,9 @@
                         wire:model.live="sortBy"
                         class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option value="latest">Terbaru</option>
-                        <option value="oldest">Terlama</option>
-                        <option value="popular">Populer</option>
+                        <option value="latest">{{ __('opac.news_list.latest') }}</option>
+                        <option value="oldest">{{ __('opac.news_list.oldest') }}</option>
+                        <option value="popular">{{ __('opac.news_list.popular') }}</option>
                     </select>
                 </div>
 
@@ -85,7 +85,7 @@
                             </div>
                             <div class="md:w-3/5 p-6">
                                 <div class="flex items-center gap-2 mb-3">
-                                    <span class="px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded"><i class="fas fa-thumbtack mr-1"></i>Pinned</span>
+                                    <span class="px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded"><i class="fas fa-thumbtack {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ __('opac.news_show.pinned') }}</span>
                                     @if($pinnedNews->category)
                                     <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">{{ $pinnedNews->category->name }}</span>
                                     @endif
@@ -93,11 +93,11 @@
                                 <h2 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition line-clamp-2">{{ $pinnedNews->title }}</h2>
                                 <p class="text-gray-600 text-sm line-clamp-2 mb-4">{{ $pinnedNews->excerpt }}</p>
                                 <div class="flex items-center text-xs text-gray-500">
-                                    <i class="far fa-calendar mr-1"></i>
+                                    <i class="far fa-calendar {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
                                     {{ $pinnedNews->published_at->format('d M Y') }}
                                     <span class="mx-2">•</span>
-                                    <i class="far fa-eye mr-1"></i>
-                                    {{ number_format($pinnedNews->views) }} views
+                                    <i class="far fa-eye {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                    {{ number_format($pinnedNews->views) }} {{ __('opac.news_show.views') }}
                                 </div>
                             </div>
                         </div>
@@ -129,8 +129,8 @@
                             <h3 class="font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition mb-2">{{ $item->title }}</h3>
                             <p class="text-gray-500 text-sm line-clamp-2 mb-3">{{ $item->excerpt }}</p>
                             <div class="flex items-center justify-between text-xs text-gray-400">
-                                <span><i class="far fa-calendar mr-1"></i>{{ $item->published_at->format('d M Y') }}</span>
-                                <span><i class="far fa-eye mr-1"></i>{{ number_format($item->views) }}</span>
+                                <span><i class="far fa-calendar {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ $item->published_at->format('d M Y') }}</span>
+                                <span><i class="far fa-eye {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ number_format($item->views) }}</span>
                             </div>
                         </div>
                     </a>
@@ -144,17 +144,17 @@
                 @else
                 <div class="text-center py-16 bg-gray-50 rounded-2xl">
                     <i class="fas fa-newspaper text-6xl text-gray-300 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Tidak ada berita</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ __('opac.news_list.no_news') }}</h3>
                     <p class="text-gray-500">
                         @if($search)
-                            Tidak ditemukan berita dengan kata kunci "{{ $search }}"
+                            {{ __('opac.news_list.no_news_search') }} "{{ $search }}"
                         @else
-                            Belum ada berita yang dipublikasikan
+                            {{ __('opac.news_list.no_news_yet') }}
                         @endif
                     </p>
                     @if($search || $categoryId)
                     <button wire:click="$set('search', ''); $set('categoryId', null)" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition">
-                        Reset Filter
+                        {{ __('opac.news_list.reset_filter') }}
                     </button>
                     @endif
                 </div>
@@ -167,7 +167,7 @@
                 @if($featuredNews->count() > 0)
                 <div class="bg-white rounded-2xl p-5 shadow-lg shadow-gray-200/50">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-star text-amber-500"></i> Berita Unggulan
+                        <i class="fas fa-star text-amber-500"></i> {{ __('opac.news_list.featured_news') }}
                     </h3>
                     <div class="space-y-4">
                         @foreach($featuredNews as $item)
@@ -194,7 +194,7 @@
                 <!-- E-Resources Promo -->
                 <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-5 text-white">
                     <h3 class="font-bold mb-4 flex items-center gap-2">
-                        <i class="fas fa-gem"></i> E-Resources Premium
+                        <i class="fas fa-gem"></i> {{ __('opac.news_list.premium_resources') }}
                     </h3>
                     
                     <div class="space-y-3">
@@ -206,7 +206,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-sm">Maktabah Shamela</h4>
-                                    <p class="text-blue-200 text-xs">8,425 Kitab Islam Klasik</p>
+                                    <p class="text-blue-200 text-xs">8,425 {{ __('opac.news_list.classic_islamic_books') }}</p>
                                 </div>
                             </div>
                         </a>
@@ -219,7 +219,7 @@
                                 </div>
                                 <div>
                                     <h4 class="font-semibold text-sm">Universitaria</h4>
-                                    <p class="text-blue-200 text-xs">Warisan Sejarah PMDG</p>
+                                    <p class="text-blue-200 text-xs">{{ __('opac.news_list.pmdg_heritage') }}</p>
                                 </div>
                             </div>
                         </a>
@@ -231,7 +231,7 @@
                                     <i class="fas fa-database text-purple-300"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-semibold text-sm">Database Jurnal</h4>
+                                    <h4 class="font-semibold text-sm">{{ __('opac.news_list.journal_database') }}</h4>
                                     <p class="text-blue-200 text-xs">Gale & ProQuest (120K+)</p>
                                 </div>
                             </div>
@@ -239,20 +239,20 @@
                     </div>
                     
                     <a href="{{ route('opac.page', 'e-resources') }}" class="mt-4 block text-center py-2 bg-white/20 rounded-lg text-sm font-medium hover:bg-white/30 transition">
-                        Semua E-Resources <i class="fas fa-arrow-right ml-1"></i>
+                        {{ __('opac.news_list.all_resources') }} <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }} {{ app()->getLocale() === 'ar' ? 'mr-1' : 'ml-1' }}"></i>
                     </a>
                 </div>
                 
                 <!-- Quick Links -->
                 <div class="bg-white rounded-2xl p-5 shadow-lg shadow-gray-200/50">
                     <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <i class="fas fa-bolt text-blue-500"></i> Akses Cepat
+                        <i class="fas fa-bolt text-blue-500"></i> {{ __('opac.news_list.quick_access') }}
                     </h3>
                     
                     <div class="space-y-2">
                         <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition">
                             <i class="fas fa-book text-blue-500 w-5 text-center"></i>
-                            <span class="text-sm text-gray-700">Cari Buku</span>
+                            <span class="text-sm text-gray-700">{{ __('opac.news_list.search_books') }}</span>
                         </a>
                         <a href="{{ route('opac.search') }}?type=ethesis" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition">
                             <i class="fas fa-graduation-cap text-purple-500 w-5 text-center"></i>
@@ -264,7 +264,7 @@
                         </a>
                         <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition">
                             <i class="fas fa-question-circle text-orange-500 w-5 text-center"></i>
-                            <span class="text-sm text-gray-700">Panduan OPAC</span>
+                            <span class="text-sm text-gray-700">{{ __('opac.news_list.opac_guide') }}</span>
                         </a>
                     </div>
                 </div>
@@ -272,11 +272,11 @@
                 <!-- Follow Us -->
                 <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-2xl p-5 text-white">
                     <h3 class="font-bold mb-4 flex items-center gap-2">
-                        <i class="fab fa-instagram"></i> Ikuti Kami
+                        <i class="fab fa-instagram"></i> {{ __('opac.news_list.follow_us') }}
                     </h3>
-                    <p class="text-pink-100 text-sm mb-4">Dapatkan info terbaru di sosial media kami</p>
+                    <p class="text-pink-100 text-sm mb-4">{{ __('opac.news_list.get_latest_info') }}</p>
                     <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="block text-center py-3 bg-white text-pink-600 rounded-xl font-bold text-sm hover:bg-pink-50 transition">
-                        <i class="fab fa-instagram mr-2"></i>@libraryunidagontor
+                        <i class="fab fa-instagram {{ app()->getLocale() === 'ar' ? 'ml-2' : 'mr-2' }}"></i>@libraryunidagontor
                     </a>
                 </div>
             </div>

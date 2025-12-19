@@ -14,49 +14,49 @@ class DatabaseAccess extends Component
 
     public function mount()
     {
-        // Define consortium databases
+        // Define consortium databases (base data - translations handled in blade)
         $this->databases = [
             'gale_teknik' => [
-                'name' => 'Gale Academic OneFile (Teknik & Sains)',
+                'name' => __('opac.database_access.databases.gale_teknik.name'),
                 'provider' => 'Gale / Cengage',
                 'consortium' => 'FPPTI Jawa Timur',
                 'url' => 'https://link.gale.com/apps/SPJ.SP01?u=idfpptij',
                 'username' => 'UnivKanB',
                 'password' => 'FPPTIjatim@1',
                 'collections' => '17,000+',
-                'type' => 'Journals & Articles',
+                'type' => __('opac.database_access.types.Journals & Articles'),
                 'subjects' => ['Engineering', 'Computer Science', 'Physics', 'Chemistry', 'Mathematics', 'Technology'],
                 'icon' => 'fa-cogs',
                 'color' => 'orange',
-                'description' => 'Jurnal internasional bidang teknik, sains, dan teknologi dari penerbit terkemuka.',
+                'description' => __('opac.database_access.databases.gale_teknik.description'),
             ],
             'gale_humaniora' => [
-                'name' => 'Gale Academic OneFile (Humaniora)',
+                'name' => __('opac.database_access.databases.gale_humaniora.name'),
                 'provider' => 'Gale / Cengage',
                 'consortium' => 'FPPTI Jawa Timur',
                 'url' => 'https://link.gale.com/apps/SPJ.SP02?u=fpptijwt',
                 'username' => 'UnivKanB',
                 'password' => 'FPPTIjatim@1',
                 'collections' => '15,000+',
-                'type' => 'Journals & Articles',
+                'type' => __('opac.database_access.types.Journals & Articles'),
                 'subjects' => ['Social Sciences', 'Humanities', 'Education', 'Psychology', 'History', 'Literature'],
                 'icon' => 'fa-users',
                 'color' => 'purple',
-                'description' => 'Jurnal internasional bidang humaniora, pendidikan, dan ilmu sosial.',
+                'description' => __('opac.database_access.databases.gale_humaniora.description'),
             ],
             'proquest' => [
-                'name' => 'ProQuest Central',
+                'name' => __('opac.database_access.databases.proquest.name'),
                 'provider' => 'ProQuest / Clarivate',
                 'consortium' => 'FPPTI Jawa Timur',
                 'url' => 'https://www.proquest.com/login',
                 'username' => 'UDarussalam',
                 'password' => 'FPPTIjatim@1',
                 'collections' => '90,000+',
-                'type' => 'Journals, Dissertations, Theses',
+                'type' => __('opac.database_access.types.Journals, Dissertations, Theses'),
                 'subjects' => ['Business', 'Economics', 'Health Sciences', 'Social Sciences', 'Dissertations', 'Theses'],
                 'icon' => 'fa-journal-whills',
                 'color' => 'blue',
-                'description' => 'Database jurnal akademik terbesar dengan koleksi disertasi dan tesis internasional.',
+                'description' => __('opac.database_access.databases.proquest.description'),
             ],
         ];
     }
@@ -65,7 +65,7 @@ class DatabaseAccess extends Component
     {
         // Check if user is logged in
         if (!Auth::guard('member')->check()) {
-            session()->flash('error', 'Silakan login terlebih dahulu untuk melihat kredensial.');
+            session()->flash('error', __('opac.database_access.login_required_desc'));
             return redirect()->route('login');
         }
 
@@ -83,7 +83,7 @@ class DatabaseAccess extends Component
     public function accessDatabase($databaseKey)
     {
         if (!Auth::guard('member')->check()) {
-            session()->flash('error', 'Silakan login terlebih dahulu untuk mengakses database.');
+            session()->flash('error', __('opac.database_access.login_required_desc'));
             return redirect()->route('login');
         }
 
@@ -120,6 +120,6 @@ class DatabaseAccess extends Component
     public function render()
     {
         return view('livewire.opac.database-access')
-            ->layout('components.opac.layout', ['title' => 'Akses Database Konsorsium']);
+            ->layout('components.opac.layout', ['title' => __('opac.database_access.page_title')]);
     }
 }
