@@ -89,12 +89,13 @@
             transform: translateX(-50%) !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
+            padding-top: 16px !important; /* Larger bridge for RTL */
+        }
+        [dir="rtl"] .mega-menu::before {
+            height: 16px !important; /* Match padding-top */
         }
         [dir="rtl"] .menu-item {
-            position: static !important;
-        }
-        [dir="rtl"] nav.hidden.lg\\:flex {
-            position: relative;
+            position: relative !important; /* Keep relative for hover detection */
         }
         /* Keep direction for flex children */
         [dir="rtl"] .mega-menu .flex {
