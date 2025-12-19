@@ -82,24 +82,19 @@
         .sidebar-overlay { background: rgba(0,0,0,0.5); }
         [x-cloak] { display: none !important; }
         
-        /* RTL Support for Mega Menu */
+        /* RTL Support for Mega Menu - Center below nav */
         [dir="rtl"] .mega-menu {
-            /* Position from right edge, extend to left */
-            left: auto !important;
-            right: 0 !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
-            transform: none !important;
         }
         [dir="rtl"] .menu-item {
             position: static !important;
         }
         [dir="rtl"] nav.hidden.lg\\:flex {
             position: relative;
-        }
-        [dir="rtl"] nav .mega-menu {
-            right: 0 !important;
-            left: auto !important;
         }
         /* Keep direction for flex children */
         [dir="rtl"] .mega-menu .flex {
