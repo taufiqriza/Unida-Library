@@ -251,6 +251,10 @@ return [
         'all_rights' => 'جميع الحقوق محفوظة',
         'privacy' => 'سياسة الخصوصية',
         'terms' => 'الشروط والأحكام',
+        'opac' => 'الفهرس',
+        'repository' => 'المستودع',
+        'weekday' => 'الإثنين - الجمعة',
+        'saturday' => 'السبت',
     ],
     
     // Language Switcher

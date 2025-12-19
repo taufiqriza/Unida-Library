@@ -251,6 +251,10 @@ return [
         'all_rights' => 'All Rights Reserved',
         'privacy' => 'Privacy Policy',
         'terms' => 'Terms & Conditions',
+        'opac' => 'OPAC',
+        'repository' => 'Repository',
+        'weekday' => 'Monday - Friday',
+        'saturday' => 'Saturday',
     ],
     
     // Language Switcher

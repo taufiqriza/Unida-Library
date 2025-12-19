@@ -921,17 +921,17 @@
                 <div>
                     <h4 class="font-semibold text-white mb-4">{{ __('opac.footer.eresources') }}</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
-                        <li><a href="{{ route('opac.search') . '?type=book' }}" class="hover:text-white transition"><i class="fas fa-search mr-2"></i>OPAC</a></li>
-                        <li><a href="{{ route('opac.search') . '?type=ebook' }}" class="hover:text-white transition"><i class="fas fa-file-pdf mr-2"></i>E-Book</a></li>
-                        <li><a href="{{ route('opac.search') . '?type=ethesis' }}" class="hover:text-white transition"><i class="fas fa-graduation-cap mr-2"></i>E-Thesis</a></li>
-                        <li><a href="https://repo.unida.gontor.ac.id" target="_blank" class="hover:text-white transition"><i class="fas fa-database mr-2"></i>Repository</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=book' }}" class="hover:text-white transition"><i class="fas fa-search mr-2"></i>{{ __('opac.footer.opac') }}</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=ebook' }}" class="hover:text-white transition"><i class="fas fa-file-pdf mr-2"></i>{{ __('opac.collection_menu.ebook') }}</a></li>
+                        <li><a href="{{ route('opac.search') . '?type=ethesis' }}" class="hover:text-white transition"><i class="fas fa-graduation-cap mr-2"></i>{{ __('opac.collection_menu.ethesis') }}</a></li>
+                        <li><a href="https://repo.unida.gontor.ac.id" target="_blank" class="hover:text-white transition"><i class="fas fa-database mr-2"></i>{{ __('opac.footer.repository') }}</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-semibold text-white mb-4">{{ __('opac.home_menu.hours') }}</h4>
                     <ul class="space-y-2 text-sm text-primary-200">
-                        <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>Senin - Jumat<br>08.00 - 16.00 WIB</span></li>
-                        <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>Sabtu<br>08.00 - 12.00 WIB</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>{{ __('opac.footer.weekday') }}<br>08.00 - 16.00 WIB</span></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-clock mt-1"></i><span>{{ __('opac.footer.saturday') }}<br>08.00 - 12.00 WIB</span></li>
                     </ul>
                 </div>
                 <div>

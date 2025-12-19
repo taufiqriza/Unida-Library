@@ -251,6 +251,10 @@ return [
         'all_rights' => 'Semua Hak Dilindungi',
         'privacy' => 'Kebijakan Privasi',
         'terms' => 'Syarat & Ketentuan',
+        'opac' => 'OPAC',
+        'repository' => 'Repository',
+        'weekday' => 'Senin - Jumat',
+        'saturday' => 'Sabtu',
     ],
     
     // Language Switcher
