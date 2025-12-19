@@ -585,7 +585,7 @@
                         @if($branch['address'])
                         <p class="text-gray-400 text-[10px] line-clamp-2"><i class="fas fa-map-pin mr-1"></i>{{ $branch['address'] }}</p>
                         @else
-                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>Tersedia</p>
+                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>{{ __('opac.available') }}</p>
                         @endif
                     </div>
                 </div>
@@ -602,7 +602,7 @@
                         @if($branch['address'])
                         <p class="text-gray-400 text-[10px] line-clamp-2"><i class="fas fa-map-pin mr-1"></i>{{ $branch['address'] }}</p>
                         @else
-                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>Tersedia</p>
+                        <p class="text-gray-400 text-[10px]"><i class="fas fa-check-circle mr-1 text-emerald-400"></i>{{ __('opac.available') }}</p>
                         @endif
                     </div>
                 </div>
