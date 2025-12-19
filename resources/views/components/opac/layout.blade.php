@@ -248,12 +248,12 @@
                                                 <span class="w-6 h-6 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     <i class="fas fa-search text-primary-600 text-xs"></i>
                                                 </span>
-                                                <span>Cari</span>
+                                                <span>{{ __('opac.collection_menu.find') }}</span>
                                             </h3>
                                             <div class="space-y-1 flex-1">
                                                 <a href="{{ route('opac.search') }}?type=book" class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <div class="w-7 h-7 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book text-primary-600 text-xs"></i></div>
-                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">Buku</span>
+                                                    <span class="text-sm font-medium text-gray-800 group-hover:text-primary-600">{{ __('opac.collection_menu.book') }}</span>
                                                 </a>
                                                 <a href="{{ route('opac.search') }}?type=ebook" class="flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <div class="w-7 h-7 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-file-pdf text-orange-600 text-xs"></i></div>
@@ -280,15 +280,15 @@
                                                 <span class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     <i class="fas fa-crown text-amber-600 text-xs"></i>
                                                 </span>
-                                                <span>Koleksi Khusus</span>
+                                                <span>{{ __('opac.collection_menu.special') }}</span>
                                             </h3>
                                             <div class="space-y-2 flex-1">
                                                 <a href="{{ route('opac.shamela.index') }}" class="block p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 hover:shadow-md transition">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-book-quran text-white text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-sm font-bold text-gray-900 whitespace-nowrap">Maktabah Shamela</p>
-                                                            <p class="text-xs text-gray-500 whitespace-nowrap">8,425 Kitab Islam Klasik</p>
+                                                            <p class="text-sm font-bold text-gray-900 whitespace-nowrap">{{ __('opac.collection_menu.maktabah_shamela') }}</p>
+                                                            <p class="text-xs text-gray-500 whitespace-nowrap">{{ __('opac.collection_menu.shamela_desc') }}</p>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -296,8 +296,8 @@
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-landmark text-white text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-sm font-bold text-gray-900 whitespace-nowrap">Universitaria</p>
-                                                            <p class="text-xs text-gray-500 whitespace-nowrap">Warisan Sejarah PMDG</p>
+                                                            <p class="text-sm font-bold text-gray-900 whitespace-nowrap">{{ __('opac.collection_menu.universitaria') }}</p>
+                                                            <p class="text-xs text-gray-500 whitespace-nowrap">{{ __('opac.collection_menu.universitaria_desc') }}</p>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -305,8 +305,8 @@
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0"><i class="fas fa-mobile-alt text-teal-600 text-base"></i></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-sm font-bold text-gray-900">Digilib Apps</p>
-                                                            <p class="text-xs text-gray-500">Mobile & Desktop</p>
+                                                            <p class="text-sm font-bold text-gray-900">{{ __('opac.collection_menu.digilib') }}</p>
+                                                            <p class="text-xs text-gray-500">{{ __('opac.collection_menu.digilib_desc') }}</p>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -319,12 +319,12 @@
                                                 <span class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     <i class="fas fa-journal-whills text-red-600 text-xs"></i>
                                                 </span>
-                                                <span>Jurnal Ilmiah</span>
+                                                <span>{{ __('opac.collection_menu.journal') }}</span>
                                             </h3>
                                             <div class="space-y-3 flex-1">
                                                 {{-- Jurnal UNIDA --}}
                                                 <div class="p-3 bg-gray-50 rounded-xl">
-                                                    <p class="text-xs font-bold text-gray-500 mb-2">JURNAL UNIDA</p>
+                                                    <p class="text-xs font-bold text-gray-500 mb-2">{{ __('opac.collection_menu.ejournal') }}</p>
                                                     <a href="{{ route('opac.journals.index') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-newspaper text-red-500 text-sm"></i>
                                                         <span class="text-sm text-gray-700 group-hover:text-primary-600">E-Journal UNIDA</span>
@@ -337,7 +337,7 @@
                                                 {{-- Jurnal Konsorsium --}}
                                                 <div class="p-3 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-100">
                                                     <p class="text-xs font-bold text-indigo-600 mb-2 flex items-center gap-1">
-                                                        <i class="fas fa-key text-xs"></i> KONSORSIUM FPPTI
+                                                        <i class="fas fa-key text-xs"></i> {{ __('opac.collection_menu.consortium') }}
                                                     </p>
                                                     <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-database text-indigo-500 text-sm"></i>
@@ -359,7 +359,7 @@
                                                 <span class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                     <i class="fas fa-unlock text-green-600 text-xs"></i>
                                                 </span>
-                                                <span>Akses Terbuka</span>
+                                                <span>{{ __('opac.collection_menu.open_access') }}</span>
                                             </h3>
                                             <div class="space-y-1">
                                                 <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
@@ -387,7 +387,7 @@
                                             <a href="{{ route('opac.page', 'e-resources') }}" class="mt-3 group relative overflow-hidden flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary-600 via-blue-600 to-indigo-600 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all">
                                                 <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                                                 <i class="fas fa-th-large text-sm"></i>
-                                                <span>Semua E-Resources</span>
+                                                <span>{{ __('opac.collection_menu.all_eresources') }}</span>
                                                 <i class="fas fa-arrow-right text-xs opacity-70 group-hover:translate-x-1 transition-transform"></i>
                                             </a>
                                         </div>
@@ -453,7 +453,7 @@
                                             <div class="flex-1">
                                                 <p class="text-xs text-gray-500">{{ __('opac.discover_menu.latest_collection') }}</p>
                                                 <p class="font-bold text-gray-900 text-sm">{{ __('opac.discover_menu.view_new_books') }}</p>
-                                                <span class="inline-block mt-2 px-2 py-0.5 bg-accent-400 text-xs font-medium rounded">NEW</span>
+                                                <span class="inline-block mt-2 px-2 py-0.5 bg-accent-400 text-xs font-medium rounded">{{ __('opac.new') }}</span>
                                             </div>
                                         </div>
                                     </a>
@@ -480,39 +480,39 @@
                                             </a>
                                             <a href="{{ route('opac.panduan.thesis') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center"><i class="fas fa-upload text-emerald-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Unggah Tugas Akhir</p><p class="text-xs text-gray-500">Panduan upload skripsi</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.thesis_upload') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.thesis_upload_desc') }}</p></div>
                                             </a>
                                             <a href="{{ route('opac.panduan.plagiarism') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center"><i class="fas fa-shield-alt text-teal-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Cek Plagiasi</p><p class="text-xs text-gray-500">Panduan cek similarity</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.plagiarism') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.plagiarism_desc') }}</p></div>
                                             </a>
                                             <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-user-graduate text-orange-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Panduan Ospek</p><p class="text-xs text-gray-500">Orientasi mahasiswa baru</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.ospek_guide') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.ospek_guide_desc') }}</p></div>
                                             </a>
                                         </div>
                                     </div>
                                     <!-- Materi & Akademik -->
                                     <div>
-                                        <h3 class="font-bold text-gray-900 mb-3 text-sm">Materi & Akademik</h3>
+                                        <h3 class="font-bold text-gray-900 mb-3 text-sm">{{ __('opac.guide_menu.academic') }}</h3>
                                         <div class="space-y-2">
                                             <a href="{{ route('opac.page', 'panduan-akademik') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-graduation-cap text-purple-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Panduan Akademik</p><p class="text-xs text-gray-500">Info akademik perpustakaan</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.academic_guide') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.academic_guide_desc') }}</p></div>
                                             </a>
                                             <a href="{{ route('opac.page', 'materi-perpustakaan') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-pink-100 rounded-lg flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-pink-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Materi Perpustakaan</p><p class="text-xs text-gray-500">Bahan ajar & presentasi</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.library_materials') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.library_materials_desc') }}</p></div>
                                             </a>
                                             <a href="{{ route('opac.page', 'download-eddc') }}" class="flex items-center gap-3 p-2 rounded-lg hover:bg-primary-50 group">
                                                 <div class="w-9 h-9 bg-indigo-100 rounded-lg flex items-center justify-center"><i class="fas fa-download text-indigo-600"></i></div>
-                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">Download E-DDC 23</p><p class="text-xs text-gray-500">Dewey Decimal Classification</p></div>
+                                                <div><p class="text-sm font-medium text-gray-900 group-hover:text-primary-600">{{ __('opac.guide_menu.download_eddc') }}</p><p class="text-xs text-gray-500">{{ __('opac.guide_menu.download_eddc_desc') }}</p></div>
                                             </a>
                                         </div>
                                         <div class="mt-3 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl p-3 text-white">
-                                            <p class="text-xs text-primary-100 mb-2">Butuh bantuan? Hubungi pustakawan kami</p>
+                                            <p class="text-xs text-primary-100 mb-2">{{ __('opac.guide_menu.need_help') }}</p>
                                             <a href="https://wa.me/6285183053934" target="_blank" class="text-xs font-medium hover:underline flex items-center gap-1">
-                                                <i class="fab fa-whatsapp"></i> Chat WhatsApp →
+                                                <i class="fab fa-whatsapp"></i> {{ __('opac.guide_menu.chat_whatsapp') }} →
                                             </a>
                                         </div>
                                     </div>
