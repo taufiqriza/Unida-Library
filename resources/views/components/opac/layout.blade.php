@@ -84,24 +84,15 @@
         
         /* RTL Support for Mega Menu */
         [dir="rtl"] .mega-menu {
-            left: auto !important;
-            right: 0 !important;
+            /* Reset all positioning */
+            left: 0 !important;
+            right: auto !important;
             margin-left: 0 !important;
             margin-right: 0 !important;
         }
-        [dir="rtl"] .mega-menu.left-0 {
-            left: auto !important;
-            right: 0 !important;
-        }
-        [dir="rtl"] nav .menu-item .mega-menu {
-            right: auto !important;
-            left: 0 !important;
-        }
-        [dir="rtl"] .fa-arrow-right::before {
-            content: "\\f060"; /* arrow-left icon */
-        }
-        [dir="rtl"] .fa-chevron-right::before {
-            content: "\\f053"; /* chevron-left icon */
+        /* Keep direction for flex children */
+        [dir="rtl"] .mega-menu .flex {
+            direction: rtl;
         }
         /* Fix input autofill background */
         input:-webkit-autofill,
@@ -349,11 +340,11 @@
                                                     <p class="text-xs font-bold text-gray-500 mb-2">{{ __('opac.collection_menu.ejournal') }}</p>
                                                     <a href="{{ route('opac.journals.index') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-newspaper text-red-500 text-sm"></i>
-                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">E-Journal UNIDA</span>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.ejournal') }}</span>
                                                     </a>
                                                     <a href="https://ejournal.unida.gontor.ac.id" target="_blank" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-external-link-alt text-gray-400 text-sm"></i>
-                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">Portal OJS</span>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.ojs_portal') }}</span>
                                                     </a>
                                                 </div>
                                                 {{-- Jurnal Konsorsium --}}
@@ -363,12 +354,12 @@
                                                     </p>
                                                     <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-database text-indigo-500 text-sm"></i>
-                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">Gale Academic</span>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.gale') }}</span>
                                                         <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">120K+</span>
                                                     </a>
                                                     <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 py-1.5 rounded hover:bg-white group">
                                                         <i class="fas fa-database text-blue-500 text-sm"></i>
-                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">ProQuest</span>
+                                                        <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.proquest') }}</span>
                                                         <span class="ml-auto px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">90K+</span>
                                                     </a>
                                                 </div>
@@ -386,22 +377,22 @@
                                             <div class="space-y-1">
                                                 <a href="https://repo.unida.gontor.ac.id" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <i class="fas fa-database text-indigo-500 text-sm w-5"></i>
-                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">Repository UNIDA</span>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.repository') }}</span>
                                                     <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
                                                 <a href="https://ipusnas.id" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <i class="fas fa-book-reader text-blue-500 text-sm w-5"></i>
-                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">iPusnas</span>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.ipusnas') }}</span>
                                                     <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
                                                 <a href="https://openlibrary.org" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <i class="fas fa-globe text-teal-500 text-sm w-5"></i>
-                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">Open Library</span>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.openlibrary') }}</span>
                                                     <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
                                                 <a href="https://www.pdfdrive.com" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 group">
                                                     <i class="fas fa-file-pdf text-rose-500 text-sm w-5"></i>
-                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">PDF Drive</span>
+                                                    <span class="text-sm text-gray-700 group-hover:text-primary-600">{{ __('opac.collection_menu.pdfdrive') }}</span>
                                                     <i class="fas fa-external-link-alt text-gray-300 text-xs ml-auto"></i>
                                                 </a>
                                             </div>
