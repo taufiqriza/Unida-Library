@@ -668,7 +668,7 @@
                     <div class="flex-1">
                         <p class="font-semibold text-gray-900">{{ auth('member')->user()->name }}</p>
                         <a href="{{ route('opac.member.dashboard') }}" class="text-xs text-primary-600 hover:underline flex items-center gap-1">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                            <i class="fas fa-tachometer-alt"></i> {{ __('opac.member.dashboard') }}
                         </a>
                     </div>
                     <a href="{{ route('opac.member.dashboard') }}" class="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-primary-600 shadow-sm hover:shadow transition">
@@ -678,10 +678,10 @@
             </div>
             @else
             <div class="p-4 bg-gradient-to-r from-gray-50 to-slate-50 border-b">
-                <p class="text-xs text-gray-500 mb-3 text-center">Masuk untuk akses penuh</p>
+                <p class="text-xs text-gray-500 mb-3 text-center">{{ __('opac.auth.full_access') }}</p>
                 <div class="flex gap-2">
-                    <a href="{{ route('login') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-primary-600 bg-white border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition">Masuk</a>
-                    <a href="{{ route('opac.register') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">Daftar</a>
+                    <a href="{{ route('login') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-primary-600 bg-white border-2 border-primary-600 rounded-xl hover:bg-primary-50 transition">{{ __('opac.login') }}</a>
+                    <a href="{{ route('opac.register') }}" class="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">{{ __('opac.register') }}</a>
                 </div>
             </div>
             @endauth
@@ -690,7 +690,7 @@
             <div class="p-4 border-b">
                 <form action="{{ route('opac.search') }}" method="GET">
                     <div class="flex bg-gray-100 rounded-xl overflow-hidden border-2 border-transparent focus-within:border-primary-300 focus-within:bg-white transition">
-                        <input type="text" name="q" placeholder="Cari buku, e-book, tugas akhir..." class="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none">
+                        <input type="text" name="q" placeholder="{{ __('opac.search_placeholder') }}" class="flex-1 px-4 py-2.5 bg-transparent text-sm focus:outline-none">
                         <button class="px-4 text-primary-600 hover:text-primary-700"><i class="fas fa-search"></i></button>
                     </div>
                 </form>
@@ -705,18 +705,18 @@
                             <span class="w-9 h-9 rounded-lg flex items-center justify-center" :class="openMenu === 'home' ? 'bg-primary-600 text-white' : 'bg-primary-100 text-primary-600'">
                                 <i class="fas fa-home"></i>
                             </span>
-                            <span class="font-semibold text-gray-900">HOME</span>
+                            <span class="font-semibold text-gray-900">{{ __('opac.menu.home') }}</span>
                         </span>
                         <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="openMenu === 'home' ? 'rotate-180 text-primary-600' : ''"></i>
                     </button>
                     <div x-show="openMenu === 'home'" x-collapse class="px-3 pb-3">
                         <div class="pl-12 space-y-1 border-l-2 border-primary-200 ml-1.5">
-                            <p class="text-[10px] font-bold text-primary-600 uppercase tracking-wider px-3 py-1.5">Profil</p>
+                            <p class="text-[10px] font-bold text-primary-600 uppercase tracking-wider px-3 py-1.5">{{ __('opac.home_menu.profile') }}</p>
                             <a href="{{ route('opac.page', 'visi-misi') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-bullseye text-xs text-gray-400"></i> Visi & Misi</a>
                             <a href="{{ route('opac.page', 'sejarah') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-landmark text-xs text-gray-400"></i> Sejarah</a>
                             <a href="{{ route('opac.page', 'struktur-organisasi') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-sitemap text-xs text-gray-400"></i> Struktur Organisasi</a>
                             <a href="{{ route('opac.page', 'mou') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-handshake text-xs text-gray-400"></i> MoU</a>
-                            <p class="text-[10px] font-bold text-primary-600 uppercase tracking-wider px-3 py-1.5 mt-2">Panduan</p>
+                            <p class="text-[10px] font-bold text-primary-600 uppercase tracking-wider px-3 py-1.5 mt-2">{{ __('opac.home_menu.guidelines') }}</p>
                             <a href="{{ route('opac.page', 'tata-tertib') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-clipboard-list text-xs text-gray-400"></i> Tata Tertib</a>
                             <a href="{{ route('opac.page', 'jam-layanan') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-clock text-xs text-gray-400"></i> Jam Layanan</a>
                             <a href="{{ route('opac.page', 'fasilitas') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-primary-600 hover:bg-white rounded-lg transition"><i class="fas fa-building text-xs text-gray-400"></i> Fasilitas</a>
@@ -732,7 +732,7 @@
                             <span class="w-9 h-9 rounded-lg flex items-center justify-center" :class="openMenu === 'eresources' ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-600'">
                                 <i class="fas fa-layer-group"></i>
                             </span>
-                            <span class="font-semibold text-gray-900">KOLEKSI</span>
+                            <span class="font-semibold text-gray-900">{{ __('opac.menu.collection') }}</span>
                         </span>
                         <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="openMenu === 'eresources' ? 'rotate-180 text-indigo-600' : ''"></i>
                     </button>
@@ -781,17 +781,17 @@
                             <span class="w-9 h-9 rounded-lg flex items-center justify-center" :class="openMenu === 'discover' ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-600'">
                                 <i class="fas fa-compass"></i>
                             </span>
-                            <span class="font-semibold text-gray-900">DISCOVER</span>
+                            <span class="font-semibold text-gray-900">{{ __('opac.menu.discover') }}</span>
                         </span>
                         <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="openMenu === 'discover' ? 'rotate-180 text-emerald-600' : ''"></i>
                     </button>
                     <div x-show="openMenu === 'discover'" x-collapse class="px-3 pb-3">
                         <div class="pl-12 space-y-1 border-l-2 border-emerald-200 ml-1.5">
-                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider px-3 py-1.5">New Experience</p>
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider px-3 py-1.5">{{ __('opac.discover_menu.new_experience') }}</p>
                             <a href="{{ route('opac.page', 'event-library') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-calendar-star text-xs text-gray-400"></i> Event Library</a>
                             <a href="{{ route('opac.page', 'virtual-tour') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-vr-cardboard text-xs text-gray-400"></i> Virtual Tour</a>
                             <a href="{{ route('opac.page', 'e-learning') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-laptop text-xs text-gray-400"></i> E-Learning</a>
-                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider px-3 py-1.5 mt-2">Explore More</p>
+                            <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider px-3 py-1.5 mt-2">{{ __('opac.discover_menu.explore') }}</p>
                             <a href="{{ route('opac.page', 'prosa-kreatif') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-pen-fancy text-xs text-gray-400"></i> Prosa Kreatif</a>
                             <a href="{{ route('opac.page', 'survey') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-poll text-xs text-gray-400"></i> Experience Survey</a>
                             <a href="{{ route('opac.page', 'research-tools') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-emerald-600 hover:bg-white rounded-lg transition"><i class="fas fa-microscope text-xs text-gray-400"></i> Research Tools</a>
@@ -806,18 +806,18 @@
                             <span class="w-9 h-9 rounded-lg flex items-center justify-center" :class="openMenu === 'guide' ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-600'">
                                 <i class="fas fa-book-open"></i>
                             </span>
-                            <span class="font-semibold text-gray-900">GUIDE</span>
+                            <span class="font-semibold text-gray-900">{{ __('opac.menu.guide') }}</span>
                         </span>
                         <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-200" :class="openMenu === 'guide' ? 'rotate-180 text-orange-600' : ''"></i>
                     </button>
                     <div x-show="openMenu === 'guide'" x-collapse class="px-3 pb-3">
                         <div class="pl-12 space-y-1 border-l-2 border-orange-200 ml-1.5">
-                            <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5">Panduan Pengguna</p>
+                            <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5">{{ __('opac.guide_menu.user_guide') }}</p>
                             <a href="{{ route('opac.page', 'panduan-opac') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-search text-xs text-gray-400"></i> Panduan OPAC</a>
                             <a href="{{ route('opac.panduan.thesis') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-upload text-xs text-gray-400"></i> Unggah Tugas Akhir</a>
                             <a href="{{ route('opac.panduan.plagiarism') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-teal-600 hover:bg-white rounded-lg transition"><i class="fas fa-shield-alt text-xs text-gray-400"></i> Cek Plagiasi</a>
                             <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-user-graduate text-xs text-gray-400"></i> Panduan Ospek</a>
-                            <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5 mt-2">Materi & Akademik</p>
+                            <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider px-3 py-1.5 mt-2">{{ __('opac.guide_menu.academic') }}</p>
                             <a href="{{ route('opac.page', 'panduan-akademik') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-graduation-cap text-xs text-gray-400"></i> Panduan Akademik</a>
                             <a href="{{ route('opac.page', 'materi-perpustakaan') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-chalkboard-teacher text-xs text-gray-400"></i> Materi Perpustakaan</a>
                             <a href="{{ route('opac.page', 'download-eddc') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-orange-600 hover:bg-white rounded-lg transition"><i class="fas fa-download text-xs text-gray-400"></i> Download E-DDC 23</a>
@@ -830,17 +830,17 @@
                     <span class="w-9 h-9 bg-pink-100 group-hover:bg-pink-600 rounded-lg flex items-center justify-center text-pink-600 group-hover:text-white transition">
                         <i class="fas fa-newspaper"></i>
                     </span>
-                    <span class="font-semibold text-gray-900">NEWS</span>
+                    <span class="font-semibold text-gray-900">{{ __('opac.menu.news') }}</span>
                 </a>
             </div>
 
             <!-- Quick Access -->
             <div class="p-4 border-t">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Akses Cepat</p>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">{{ __('opac.quick_access') }}</p>
                 <div class="grid grid-cols-3 gap-2">
                     <a href="{{ route('opac.search') . '?type=book' }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-primary-50 rounded-xl transition group">
                         <i class="fas fa-search text-gray-400 group-hover:text-primary-600"></i>
-                        <span class="text-[10px] text-gray-600 group-hover:text-primary-600">Katalog</span>
+                        <span class="text-[10px] text-gray-600 group-hover:text-primary-600">{{ __('opac.catalog') }}</span>
                     </a>
                     <a href="{{ route('opac.search') . '?type=ebook' }}" class="flex flex-col items-center gap-1 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition group">
                         <i class="fas fa-book text-gray-400 group-hover:text-orange-600"></i>
