@@ -974,6 +974,306 @@ return [
         'get_latest_info' => 'احصل على آخر الأخبار عبر وسائل التواصل الاجتماعي',
     ],
     
+    // عرض الكتالوج (تفاصيل الكتاب)
+    'catalog_show' => [
+        'back' => 'رجوع',
+        'home' => 'الرئيسية',
+        'books' => 'الكتب',
+        'author_unknown' => 'مؤلف غير معروف',
+        'copies' => 'النسخ',
+        'available' => 'متاح',
+        'year' => 'السنة',
+        'book_info' => 'معلومات الكتاب',
+        'isbn' => 'ISBN',
+        'publisher' => 'الناشر',
+        'publish_year' => 'سنة النشر',
+        'language' => 'اللغة',
+        'pages' => 'الصفحات',
+        'call_number' => 'رقم الاستدعاء',
+        'edition' => 'الطبعة',
+        'publish_place' => 'مكان النشر',
+        'subject' => 'الموضوع',
+        'abstract' => 'الملخص',
+        'availability' => 'توفر النسخ',
+        'location_unknown' => 'الموقع غير معروف',
+        'borrowed' => 'مُعار',
+        'no_copies' => 'لا توجد نسخ متاحة',
+        'share' => 'مشاركة',
+        'print' => 'طباعة',
+        'link_copied' => 'تم نسخ الرابط!',
+        'related_books' => 'كتب ذات صلة',
+        'view_all' => 'عرض الكل',
+    ],
+    
+    // عرض الكتاب الخارجي (Open Library)
+    'external_book_show' => [
+        'loading' => 'تحميل البيانات من Open Library...',
+        'load_failed' => 'فشل تحميل البيانات',
+        'back_to_search' => 'العودة للبحث',
+        'author_unknown' => 'مؤلف غير معروف',
+        'year' => 'السنة',
+        'metadata' => 'البيانات الوصفية',
+        'book_access' => 'الوصول للكتاب',
+        'read_online' => 'اقرأ عبر الإنترنت',
+        'available_archive' => 'متاح في Internet Archive',
+        'read' => 'اقرأ',
+        'view_original' => 'عرض في الموقع الأصلي',
+        'visit' => 'زيارة',
+        'info_box' => 'هذا الكتاب من Open Library، مكتبة رقمية مجانية تضم أكثر من 4 ملايين كتاب. يمكن قراءة بعض الكتب عبر الإنترنت من خلال Internet Archive.',
+        'book_info' => 'معلومات الكتاب',
+        'author' => 'المؤلف',
+        'publish_year' => 'سنة النشر',
+        'publisher' => 'الناشر',
+        'pages' => 'الصفحات',
+        'pages_count' => ':count صفحة',
+        'source' => 'المصدر',
+        'description' => 'الوصف',
+        'subjects_categories' => 'المواضيع والفئات',
+        'share' => 'مشاركة',
+        'search_again' => 'بحث مرة أخرى',
+        'link_copied' => 'تم نسخ الرابط!',
+    ],
+    
+    // تصفح Universitaria
+    'universitaria_browse' => [
+        'intellectual_heritage' => 'التراث الفكري',
+        'description' => 'Universitaria هي مجموعة قيمة تجمع التراث الفكري والتاريخي لمعهد دار السلام كونتور الحديث. من خلال كتب الذكرى والمخطوطات، تشهد Universitaria على الرحلة الفكرية والروحية التي نحتت آثارًا تاريخية وفكرية في هذه المؤسسة.',
+        'documents' => 'الوثائق',
+        'categories' => 'التصنيفات',
+        'search_placeholder' => 'بحث في الوثائق التاريخية...',
+        'premium_notice' => 'مجموعة مميزة وتاريخية',
+        'protected_notice' => 'هذه الوثيقة محمية ويمكن قراءتها فقط عبر الإنترنت (لا يمكن تنزيلها).',
+        'login_to_access' => 'سجل الدخول للوصول.',
+        'all_collection' => 'جميع المجموعات',
+        'read_online' => 'اقرأ أونلاين',
+        'not_found' => 'غير موجود',
+        'try_other' => 'حاول تغيير كلمة البحث أو اختر تصنيفًا آخر',
+        'universitaria_collection' => 'مجموعة Universitaria',
+        'switch_viewer' => 'تبديل العارض',
+        'protected_document' => 'هذه الوثيقة محمية ولا يمكن تنزيلها',
+        'loading' => 'جاري تحميل الوثيقة...',
+        'trying_viewer' => 'جاري التجربة',
+        'viewer_attempt' => 'جاري تجربة العارض',
+        'load_failed' => 'فشل تحميل PDF',
+        'all_viewers_tried' => 'تم تجربة جميع العارضين. قد تكون الوثيقة كبيرة جدًا أو الصيغة غير مدعومة.',
+        'large_file_notice' => 'الملفات الكبيرة (>20 ميجابايت) قد تستغرق وقتًا أطول للتحميل',
+        'retry' => 'إعادة المحاولة',
+        'open_new_tab' => 'فتح في تبويب جديد',
+        'navigation_hint' => 'استخدم التمرير أو الإيماءات للتنقل بين الصفحات',
+        'viewer_label' => 'العارض',
+        'protected' => 'محمي',
+        'size' => 'الحجم',
+        'load_success' => 'تم تحميل الوثيقة بنجاح',
+        'load_error' => 'فشل تحميل الوثيقة',
+    ],
+    
+    // عرض الرسالة الإلكترونية (صفحة التفاصيل)
+    'ethesis_show' => [
+        'back' => 'رجوع',
+        'home' => 'الرئيسية',
+        'year' => 'السنة',
+        'views' => 'المشاهدات',
+        'documents_available' => 'الوثائق المتاحة',
+        'bab_preview' => 'الفصل 1-3 (معاينة)',
+        'public_access' => 'متاح للجمهور',
+        'read' => 'اقرأ',
+        'open_new_tab' => 'فتح في تبويب جديد',
+        'new_tab' => 'تبويب جديد',
+        'download' => 'تحميل',
+        'loading_document' => 'جاري تحميل الوثيقة...',
+        'load_failed' => 'فشل تحميل PDF',
+        'pdf_warning' => 'لا يتم عرض PDF؟',
+        'pdf_warning_desc' => 'إذا كنت تستخدم إضافة مدير التنزيلات (IDM، FDM، إلخ)، حاول تعطيلها مؤقتًا أو استخدم زر "تبويب جديد" أعلاه.',
+        'possible_causes' => 'الأسباب المحتملة:',
+        'cause_1' => 'إضافة مدير التنزيلات تعترض الطلب',
+        'cause_2' => 'المتصفح لا يدعم عارض PDF',
+        'cause_3' => 'انقطع الاتصال بالإنترنت',
+        'retry' => 'إعادة المحاولة',
+        'navigation_hint' => 'استخدم التمرير أو الإيماءات للتنقل بين الصفحات',
+        'switch_viewer' => 'تبديل العارض',
+        'close' => 'إغلاق',
+        'full_text' => 'النص الكامل',
+        'members_only' => 'أعضاء المكتبة فقط',
+        'not_available' => 'غير متاح',
+        'login' => 'تسجيل الدخول',
+        'fulltext_info' => 'للوصول إلى النص الكامل، يرجى تسجيل الدخول كعضو في المكتبة. إذا لم تكن مسجلاً، قم بزيارة المكتبة للتسجيل.',
+        'thesis_info' => 'معلومات الرسالة',
+        'author' => 'المؤلف',
+        'nim' => 'رقم الطالب',
+        'type' => 'النوع',
+        'faculty' => 'الكلية',
+        'department' => 'البرنامج الدراسي',
+        'advisor1' => 'المشرف الأول',
+        'advisor2' => 'المشرف الثاني',
+        'keywords' => 'الكلمات المفتاحية',
+        'approval_sheet' => 'ورقة الموافقة',
+        'view_full' => 'عرض كامل',
+        'abstract' => 'الملخص',
+        'share' => 'مشاركة',
+        'print' => 'طباعة',
+        'link_copied' => 'تم نسخ الرابط!',
+        'related_theses' => 'رسائل ذات صلة',
+    ],
+    
+    // البحث العام
+    'global_search' => [
+        // Header
+        'title' => 'مكتبة جامعة دار السلام كونتور',
+        'subtitle' => 'جامعة دار السلام كونتور',
+        'search_placeholder' => 'اكتب العنوان، المؤلف، ISBN، أو كلمات مفتاحية...',
+        'search' => 'بحث',
+        'close' => 'إغلاق',
+        'e_resources_notice' => '+100 ألف مصدر إلكتروني',
+        'view_more' => 'عرض',
+        
+        // Tabs
+        'tab_all' => 'الكل',
+        'tab_book' => 'الكتب',
+        'tab_ebook' => 'الكتب الإلكترونية',
+        'tab_ethesis' => 'الرسائل الجامعية',
+        'tab_journal' => 'المجلات',
+        'tab_external' => 'المكتبة المفتوحة',
+        'tab_shamela' => 'الشاملة',
+        
+        // Filters
+        'filters' => 'الفلاتر',
+        'filter_search' => 'فلاتر البحث',
+        'reset' => 'إعادة تعيين',
+        'library_location' => 'موقع المكتبة',
+        'all_locations' => 'جميع المواقع',
+        'collection_type' => 'نوع المجموعة',
+        'all_types' => 'جميع الأنواع',
+        'faculty_dept' => 'الكلية والقسم',
+        'all_faculties' => 'جميع الكليات',
+        'all_departments' => 'جميع الأقسام',
+        'thesis_type' => 'نوع الرسالة',
+        'thesis_skripsi' => 'رسالة البكالوريوس',
+        'thesis_tesis' => 'رسالة الماجستير',
+        'thesis_disertasi' => 'رسالة الدكتوراه',
+        'journal_source' => 'مصدر المجلة',
+        'all_journals' => 'جميع المجلات',
+        'subject' => 'الموضوع',
+        'view_all_subjects' => 'عرض جميع الموضوعات',
+        'language' => 'اللغة',
+        'all_languages' => 'الكل',
+        'year_published' => 'سنة النشر',
+        'year_from' => 'من',
+        'year_to' => 'إلى',
+        'this_year' => 'هذا العام',
+        'last_year' => 'العام الماضي',
+        
+        // Statistics
+        'collection_stats' => 'إحصائيات المجموعة',
+        'printed_books' => 'الكتب المطبوعة',
+        
+        // Search Tips
+        'search_tips' => 'نصائح البحث',
+        'tip_1' => 'استخدم كلمات محددة للحصول على نتائج أدق',
+        'tip_2' => 'فلتر حسب الموقع لمعرفة توفر الكتاب',
+        'tip_3' => 'اجمع الفلاتر لتضييق النتائج',
+        
+        // Results
+        'results_for' => 'نتائج لـ',
+        'all_collection' => 'جميع المجموعات',
+        'items_found' => 'عنصر تم العثور عليه',
+        'active_filters' => 'فلتر نشط',
+        'active_filters_label' => 'الفلاتر النشطة:',
+        'clear_all' => 'مسح الكل',
+        
+        // Sort
+        'sort_relevance' => 'الصلة',
+        'sort_newest' => 'الأحدث',
+        'sort_oldest' => 'الأقدم',
+        'sort_title_asc' => 'العنوان أ-ي',
+        'sort_title_desc' => 'العنوان ي-أ',
+        
+        // Loading
+        'searching' => 'جاري البحث في المجموعات...',
+        
+        // Results Display
+        'view_detail' => 'عرض التفاصيل',
+        'unknown_author' => 'مؤلف غير معروف',
+        'unknown_author_ar' => 'المؤلف غير معروف',
+        
+        // Pagination
+        'page_of' => 'صفحة :page من :total',
+        'previous' => 'السابق',
+        'next' => 'التالي',
+        
+        // Empty States
+        'search_open_library' => 'بحث الكتب في المكتبة المفتوحة',
+        'open_library_desc' => 'اكتب كلمات للبحث من',
+        'open_library_count' => '+4 مليون كتاب دولي',
+        'open_library_source' => 'في المكتبة المفتوحة (Internet Archive).',
+        'open_library_footer' => 'نتائج البحث من',
+        
+        'search_shamela' => 'بحث الكتب في المكتبة الشاملة',
+        'shamela_desc' => 'اكتب كلمات للبحث من',
+        'shamela_count' => '8,425 كتاب إسلامي كلاسيكي',
+        'shamela_source' => 'في قاعدة البيانات المحلية المكتبة الشاملة.',
+        'shamela_footer' => 'البيانات مخزنة محليًا (+7 مليون صفحة)',
+        
+        'try_search' => 'جرب البحث:',
+        'no_results' => 'لا توجد نتائج',
+        'no_results_for' => 'لم يتم العثور على مجموعة بكلمة',
+        'try_other_keywords' => 'جرب كلمات أخرى أو عدّل فلاتر البحث.',
+        'start_search' => 'ابدأ البحث بكتابة كلمات في مربع البحث.',
+        'reset_all_filters' => 'إعادة تعيين جميع الفلاتر',
+        'search_suggestions' => 'اقتراحات البحث:',
+        
+        // Subject Modal
+        'select_subject' => 'اختر الموضوع',
+        'apply' => 'تطبيق',
+    ],
+    
+    // عرض المجلة
+    'journal_show' => [
+        // Navigation
+        'back' => 'رجوع',
+        'home' => 'الرئيسية',
+        'journal' => 'المجلات',
+        'article_detail' => 'تفاصيل المقال',
+        
+        // Hero
+        'year' => 'السنة',
+        'views' => 'المشاهدات',
+        'volume' => 'المجلد',
+        
+        // Access Section
+        'access_article' => 'الوصول للمقال',
+        'open_in_journal' => 'فتح في المجلة المفتوحة',
+        'view_full_article' => 'عرض المقال الكامل',
+        'open' => 'فتح',
+        'download_pdf' => 'تحميل PDF',
+        'download_document' => 'تحميل المستند',
+        'download' => 'تحميل',
+        
+        // Abstract
+        'abstract' => 'الملخص',
+        'abstract_not_available' => 'الملخص غير متوفر',
+        'abstract_en' => 'الملخص (الإنجليزية)',
+        
+        // Article Info
+        'article_info' => 'معلومات المقال',
+        'issue' => 'العدد',
+        'pages' => 'الصفحات',
+        'publish_date' => 'تاريخ النشر',
+        
+        // Keywords
+        'keywords' => 'الكلمات المفتاحية',
+        
+        // Journal Info
+        'view_all_articles' => 'عرض جميع المقالات',
+        
+        // Actions
+        'share' => 'مشاركة',
+        'link_copied' => 'تم نسخ الرابط!',
+        'search_journal' => 'بحث المجلات',
+        
+        // Related
+        'related_articles' => 'مقالات ذات صلة',
+    ],
+    
     // الوصول لقاعدة البيانات
     'database_access' => [
         'consortium' => 'اتحاد FPPTI جاوة الشرقية',

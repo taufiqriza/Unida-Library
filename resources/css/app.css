@@ -22,3 +22,55 @@
     display: none;
     /* Chrome, Safari and Opera */
 }
+
+/* Elegant transparent scrollbar */
+.scrollbar-elegant {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.scrollbar-elegant::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+}
+
+.scrollbar-elegant::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.scrollbar-elegant::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.4));
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.scrollbar-elegant::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.6));
+}
+
+/* Light version for light backgrounds */
+.scrollbar-elegant-light {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+}
+
+.scrollbar-elegant-light::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+}
+
+.scrollbar-elegant-light::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+.scrollbar-elegant-light::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.4));
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.scrollbar-elegant-light::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.4), rgba(99, 102, 241, 0.6));
+}

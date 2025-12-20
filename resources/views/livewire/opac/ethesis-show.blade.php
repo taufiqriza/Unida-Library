@@ -10,13 +10,13 @@
             {{-- Back Button --}}
             <div class="relative z-10 px-4 pt-4 lg:px-6 lg:pt-6 flex items-center justify-between">
                 <button onclick="window.history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-xl transition backdrop-blur-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Kembali</span>
+                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                    <span>{{ __('opac.ethesis_show.back') }}</span>
                 </button>
                 
                 {{-- Breadcrumb (Desktop) --}}
                 <nav class="hidden lg:flex items-center gap-2 text-sm text-white/70">
-                    <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                    <a href="{{ route('opac.home') }}" class="hover:text-white">{{ __('opac.ethesis_show.home') }}</a>
                     <span>/</span>
                     <a href="{{ route('opac.search') }}?type=ethesis" class="hover:text-white">E-Thesis</a>
                     <span>/</span>
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                     
-                    <div class="text-center lg:text-left flex-1">
+                    <div class="text-center lg:text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} flex-1">
                         <span class="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full mb-2">{{ $thesis->getTypeLabel() }}</span>
                         <h1 class="text-xl lg:text-3xl font-bold text-white leading-tight">{{ $thesis->title }}</h1>
                         <p class="text-purple-200 mt-2 text-sm lg:text-base">{{ $thesis->author }}</p>
@@ -41,12 +41,12 @@
                         <div class="flex items-center justify-center lg:justify-start gap-4 mt-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->year }}</div>
-                                <div class="text-xs text-purple-200">Tahun</div>
+                                <div class="text-xs text-purple-200">{{ __('opac.ethesis_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->views ?? 0 }}</div>
-                                <div class="text-xs text-purple-200">Dilihat</div>
+                                <div class="text-xs text-purple-200">{{ __('opac.ethesis_show.views') }}</div>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                 <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-folder-open text-purple-500"></i>
-                        Dokumen Tersedia
+                        {{ __('opac.ethesis_show.documents_available') }}
                     </h3>
                 </div>
                 <div class="p-4 space-y-3" x-data="pdfViewer('{{ $thesis->file_path ? asset('storage/' . $thesis->file_path) : '' }}')">
@@ -74,18 +74,18 @@
                                 <i class="fas fa-file-pdf text-green-600 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">BAB 1-3 (Preview)</p>
+                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.bab_preview') }}</p>
                                 <p class="text-xs text-green-600 flex items-center gap-1">
-                                    <i class="fas fa-unlock"></i> Dapat diakses publik
+                                    <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.public_access') }}
                                 </p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
                             <button @click="openModal()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
                                 <i class="fas fa-eye"></i>
-                                <span class="hidden sm:inline">Baca</span>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
                             </button>
-                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-3 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg hover:bg-green-200 transition" title="Buka di tab baru">
+                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-3 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg hover:bg-green-200 transition" title="{{ __('opac.ethesis_show.open_new_tab') }}">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
@@ -122,17 +122,17 @@
                                     </div>
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-xs lg:text-base line-clamp-1">{{ Str::limit($thesis->title, 40) }}</h3>
-                                        <p class="text-green-200 text-[10px] lg:text-xs">BAB 1-3 (Preview)</p>
+                                        <p class="text-green-200 text-[10px] lg:text-xs">{{ __('opac.ethesis_show.bab_preview') }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-1 lg:gap-2 flex-shrink-0">
                                     <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-2 lg:px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs lg:text-sm font-medium transition flex items-center gap-1">
                                         <i class="fas fa-external-link-alt text-[10px] lg:text-xs"></i>
-                                        <span class="hidden lg:inline">Tab Baru</span>
+                                        <span class="hidden lg:inline">{{ __('opac.ethesis_show.new_tab') }}</span>
                                     </a>
                                     <a href="{{ asset('storage/' . $thesis->file_path) }}" download class="px-2 lg:px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs lg:text-sm font-medium transition flex items-center gap-1">
                                         <i class="fas fa-download text-[10px] lg:text-xs"></i>
-                                        <span class="hidden lg:inline">Unduh</span>
+                                        <span class="hidden lg:inline">{{ __('opac.ethesis_show.download') }}</span>
                                     </a>
                                     <button @click="closeModal()" class="w-8 h-8 lg:w-9 lg:h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
                                         <i class="fas fa-times"></i>
@@ -145,8 +145,8 @@
                                 <div class="flex items-start gap-2">
                                     <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
                                     <div class="flex-1">
-                                        <p class="text-xs text-amber-800 font-medium">PDF tidak dapat ditampilkan?</p>
-                                        <p class="text-[10px] text-amber-700 mt-0.5">Jika Anda menggunakan ekstensi download manager (IDM, FDM, dll), coba nonaktifkan sementara atau gunakan tombol "Tab Baru" di atas.</p>
+                                        <p class="text-xs text-amber-800 font-medium">{{ __('opac.ethesis_show.pdf_warning') }}</p>
+                                        <p class="text-[10px] text-amber-700 mt-0.5">{{ __('opac.ethesis_show.pdf_warning_desc') }}</p>
                                     </div>
                                     <button @click="showWarning = false" class="text-amber-500 hover:text-amber-700">
                                         <i class="fas fa-times text-xs"></i>
@@ -160,7 +160,7 @@
                                 <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
                                     <div class="text-center">
                                         <div class="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                                        <p class="text-white text-sm">Memuat dokumen...</p>
+                                        <p class="text-white text-sm">{{ __('opac.ethesis_show.loading_document') }}</p>
                                     </div>
                                 </div>
                                 
@@ -170,28 +170,28 @@
                                         <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <i class="fas fa-exclamation-circle text-red-400 text-2xl"></i>
                                         </div>
-                                        <h4 class="text-white font-bold mb-2">Gagal Memuat PDF</h4>
-                                        <p class="text-gray-400 text-sm mb-4">Kemungkinan penyebab:</p>
-                                        <ul class="text-gray-400 text-xs text-left space-y-1 mb-4">
+                                        <h4 class="text-white font-bold mb-2">{{ __('opac.ethesis_show.load_failed') }}</h4>
+                                        <p class="text-gray-400 text-sm mb-4">{{ __('opac.ethesis_show.possible_causes') }}</p>
+                                        <ul class="text-gray-400 text-xs text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} space-y-1 mb-4">
                                             <li class="flex items-start gap-2">
                                                 <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>Ekstensi download manager (IDM, FDM) menginterupsi</span>
+                                                <span>{{ __('opac.ethesis_show.cause_1') }}</span>
                                             </li>
                                             <li class="flex items-start gap-2">
                                                 <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>Browser tidak mendukung PDF viewer</span>
+                                                <span>{{ __('opac.ethesis_show.cause_2') }}</span>
                                             </li>
                                             <li class="flex items-start gap-2">
                                                 <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>Koneksi internet terputus</span>
+                                                <span>{{ __('opac.ethesis_show.cause_3') }}</span>
                                             </li>
                                         </ul>
                                         <div class="flex gap-2 justify-center">
                                             <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
-                                                <i class="fas fa-external-link-alt mr-1"></i> Buka di Tab Baru
+                                                <i class="fas fa-external-link-alt {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.ethesis_show.open_new_tab') }}
                                             </a>
                                             <button @click="retryLoad()" class="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-600 transition">
-                                                <i class="fas fa-redo mr-1"></i> Coba Lagi
+                                                <i class="fas fa-redo {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.ethesis_show.retry') }}
                                             </button>
                                         </div>
                                     </div>
@@ -212,16 +212,16 @@
                             {{-- Modal Footer --}}
                             <div class="px-3 lg:px-4 py-2 bg-gray-100 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
                                 <p class="text-[10px] lg:text-xs text-gray-500 hidden sm:block">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Gunakan scroll atau gesture untuk navigasi halaman
+                                    <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                                    {{ __('opac.ethesis_show.navigation_hint') }}
                                 </p>
-                                <div class="flex items-center gap-2 ml-auto">
+                                <div class="flex items-center gap-2 {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }}">
                                     <button @click="toggleViewer()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-lg transition flex items-center gap-1">
                                         <i class="fas fa-sync-alt"></i>
-                                        <span class="hidden sm:inline">Ganti Viewer</span>
+                                        <span class="hidden sm:inline">{{ __('opac.ethesis_show.switch_viewer') }}</span>
                                     </button>
                                     <button @click="closeModal()" class="px-4 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-xs lg:text-sm font-medium rounded-lg transition">
-                                        Tutup
+                                        {{ __('opac.ethesis_show.close') }}
                                     </button>
                                 </div>
                             </div>
@@ -326,14 +326,14 @@
                                 <i class="fas fa-book {{ $thesis->is_fulltext_public ? 'text-blue-600' : 'text-gray-400' }} text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">Full Text (Lengkap)</p>
+                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
                                 @if($thesis->is_fulltext_public)
                                     <p class="text-xs text-blue-600 flex items-center gap-1">
-                                        <i class="fas fa-unlock"></i> Dapat diakses publik
+                                        <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.public_access') }}
                                     </p>
                                 @else
                                     <p class="text-xs text-gray-500 flex items-center gap-1">
-                                        <i class="fas fa-lock"></i> Hanya untuk anggota perpustakaan
+                                        <i class="fas fa-lock"></i> {{ __('opac.ethesis_show.members_only') }}
                                     </p>
                                 @endif
                             </div>
@@ -341,22 +341,22 @@
                         @if($thesis->is_fulltext_public && $thesis->file_path)
                             <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                                 <i class="fas fa-download"></i>
-                                <span class="hidden sm:inline">Unduh</span>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.download') }}</span>
                             </a>
                         @elseif(auth('member')->check() && $thesis->file_path)
                             <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                                 <i class="fas fa-download"></i>
-                                <span class="hidden sm:inline">Unduh</span>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.download') }}</span>
                             </a>
                         @elseif(!$thesis->file_path)
                             <span class="px-4 py-2 bg-gray-300 text-gray-500 text-sm font-medium rounded-lg flex items-center gap-2">
                                 <i class="fas fa-file-excel"></i>
-                                <span class="hidden sm:inline">Tidak tersedia</span>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.not_available') }}</span>
                             </span>
                         @else
                             <a href="{{ route('login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
                                 <i class="fas fa-sign-in-alt"></i>
-                                <span class="hidden sm:inline">Login</span>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
                             </a>
                         @endif
                     </div>
@@ -365,7 +365,7 @@
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
                         <p class="text-xs text-amber-700 flex items-start gap-2">
                             <i class="fas fa-info-circle mt-0.5"></i>
-                            <span>Untuk mengakses full text, silakan login sebagai anggota perpustakaan. Jika belum terdaftar, kunjungi perpustakaan untuk mendaftar.</span>
+                            <span>{{ __('opac.ethesis_show.fulltext_info') }}</span>
                         </p>
                     </div>
                 </div>
@@ -376,7 +376,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-info-circle text-purple-500"></i>
-                        Informasi Tugas Akhir
+                        {{ __('opac.ethesis_show.thesis_info') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -387,7 +387,7 @@
                                 <i class="fas fa-user text-purple-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Penulis</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.author') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $thesis->author }}</p>
                             </div>
                         </div>
@@ -398,7 +398,7 @@
                                 <i class="fas fa-id-card text-blue-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">NIM</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.nim') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 font-mono">{{ $thesis->nim ?? '-' }}</p>
                             </div>
                         </div>
@@ -409,7 +409,7 @@
                                 <i class="fas fa-graduation-cap text-emerald-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Jenis</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.type') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $thesis->getTypeLabel() }}</p>
                             </div>
                         </div>
@@ -420,7 +420,7 @@
                                 <i class="fas fa-calendar text-amber-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tahun</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.year') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $thesis->year }}</p>
                             </div>
                         </div>
@@ -431,7 +431,7 @@
                                 <i class="fas fa-university text-rose-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Fakultas</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.faculty') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $thesis->department?->faculty?->name ?? '-' }}</p>
                             </div>
                         </div>
@@ -442,7 +442,7 @@
                                 <i class="fas fa-book-reader text-indigo-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Program Studi</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.department') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $thesis->department?->name ?? '-' }}</p>
                             </div>
                         </div>
@@ -454,7 +454,7 @@
                                 <i class="fas fa-chalkboard-teacher text-teal-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Pembimbing 1</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.advisor1') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $thesis->advisor1 }}</p>
                             </div>
                         </div>
@@ -467,7 +467,7 @@
                                 <i class="fas fa-user-tie text-cyan-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Pembimbing 2</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.advisor2') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $thesis->advisor2 }}</p>
                             </div>
                         </div>
@@ -482,7 +482,7 @@
                                 <i class="fas fa-tags text-violet-600 text-sm"></i>
                             </div>
                             <div class="flex-1">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide mb-2">Kata Kunci</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide mb-2">{{ __('opac.ethesis_show.keywords') }}</p>
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach(explode(',', $thesis->keywords) as $keyword)
                                         <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg border border-purple-100">{{ trim($keyword) }}</span>
@@ -501,7 +501,7 @@
                 <div class="px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-file-signature text-amber-500"></i>
-                        Lembar Pengesahan
+                        {{ __('opac.ethesis_show.approval_sheet') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -513,7 +513,7 @@
                         @endphp
                         
                         @if($isImage)
-                            <img src="{{ asset('storage/' . $thesis->approval_path) }}" alt="Lembar Pengesahan" class="w-full max-h-96 object-contain">
+                            <img src="{{ asset('storage/' . $thesis->approval_path) }}" alt="{{ __('opac.ethesis_show.approval_sheet') }}" class="w-full max-h-96 object-contain">
                         @else
                             {{-- PDF Preview --}}
                             <div class="aspect-[3/4] max-h-96 w-full">
@@ -526,11 +526,11 @@
                     <div class="flex gap-2">
                         <a href="{{ asset('storage/' . $thesis->approval_path) }}" target="_blank" class="flex-1 px-4 py-2.5 bg-amber-100 text-amber-700 text-sm font-semibold rounded-xl hover:bg-amber-200 transition flex items-center justify-center gap-2">
                             <i class="fas fa-expand"></i>
-                            Lihat Full
+                            {{ __('opac.ethesis_show.view_full') }}
                         </a>
                         <a href="{{ asset('storage/' . $thesis->approval_path) }}" download class="flex-1 px-4 py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-xl hover:bg-amber-700 transition flex items-center justify-center gap-2">
                             <i class="fas fa-download"></i>
-                            Unduh
+                            {{ __('opac.ethesis_show.download') }}
                         </a>
                     </div>
                 </div>
@@ -543,7 +543,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-align-left text-purple-500"></i>
-                        Abstrak
+                        {{ __('opac.ethesis_show.abstract') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -555,13 +555,13 @@
             {{-- Share Button --}}
             <div class="bg-white rounded-2xl p-4 shadow-lg">
                 <div class="flex gap-3">
-                    <button onclick="navigator.share ? navigator.share({title: '{{ $thesis->title }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link disalin!'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ $thesis->title }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('{{ __('opac.ethesis_show.link_copied') }}'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
                         <i class="fas fa-share-alt"></i>
-                        <span>Bagikan</span>
+                        <span>{{ __('opac.ethesis_show.share') }}</span>
                     </button>
                     <button onclick="window.print()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
                         <i class="fas fa-print"></i>
-                        <span>Cetak</span>
+                        <span>{{ __('opac.ethesis_show.print') }}</span>
                     </button>
                 </div>
             </div>
@@ -570,7 +570,7 @@
             @if($relatedTheses->count() > 0)
             <div class="pt-4">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-gray-900">Tugas Akhir Terkait</h2>
+                    <h2 class="text-lg font-bold text-gray-900">{{ __('opac.ethesis_show.related_theses') }}</h2>
                 </div>
                 <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
                     @foreach($relatedTheses as $related)

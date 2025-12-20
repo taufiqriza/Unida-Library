@@ -6,7 +6,7 @@
         <div class="flex items-center justify-center py-32">
             <div class="text-center">
                 <div class="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p class="text-gray-500">Memuat data dari Open Library...</p>
+                <p class="text-gray-500">{{ __('opac.external_book_show.loading') }}</p>
             </div>
         </div>
         @elseif($error)
@@ -15,10 +15,10 @@
             <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
             </div>
-            <h2 class="text-xl font-bold text-gray-900 mb-2">Gagal Memuat Data</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">{{ __('opac.external_book_show.load_failed') }}</h2>
             <p class="text-gray-500 mb-6">{{ $error }}</p>
             <a href="{{ route('opac.search') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition">
-                <i class="fas fa-arrow-left"></i> Kembali ke Pencarian
+                <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i> {{ __('opac.external_book_show.back_to_search') }}
             </a>
         </div>
         @elseif($book)
@@ -33,13 +33,13 @@
             {{-- Back Button --}}
             <div class="relative z-10 px-4 pt-4 lg:px-6 lg:pt-6 flex items-center justify-between">
                 <button onclick="window.history.back()" class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm rounded-xl transition backdrop-blur-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Kembali</span>
+                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                    <span>{{ __('opac.catalog_show.back') }}</span>
                 </button>
                 
                 {{-- Breadcrumb (Desktop) --}}
                 <nav class="hidden lg:flex items-center gap-2 text-sm text-white/70">
-                    <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                    <a href="{{ route('opac.home') }}" class="hover:text-white">{{ __('opac.catalog_show.home') }}</a>
                     <span>/</span>
                     <a href="{{ route('opac.search') }}?type=external" class="hover:text-white">Open Library</a>
                     <span>/</span>
@@ -70,32 +70,32 @@
                         </div>
                     </div>
                     
-                    <div class="text-center lg:text-left flex-1">
+                    <div class="text-center lg:text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} flex-1">
                         <span class="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full mb-2">
-                            <i class="fas fa-globe mr-1"></i> Open Library
+                            <i class="fas fa-globe {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> Open Library
                         </span>
                         <h1 class="text-xl lg:text-3xl font-bold text-white leading-tight">{{ $book['title'] }}</h1>
                         <p class="text-cyan-200 mt-2 text-sm lg:text-base">
-                            {{ is_array($book['authors'] ?? null) ? implode(', ', $book['authors']) : ($book['authors'] ?? 'Penulis tidak diketahui') }}
+                            {{ is_array($book['authors'] ?? null) ? implode(', ', $book['authors']) : ($book['authors'] ?? __('opac.external_book_show.author_unknown')) }}
                         </p>
                         
                         <div class="flex items-center justify-center lg:justify-start gap-4 mt-4">
                             @if($book['first_publish_year'] ?? $book['first_publish_date'] ?? $book['publish_date'] ?? null)
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $book['first_publish_year'] ?? $book['first_publish_date'] ?? $book['publish_date'] }}</div>
-                                <div class="text-xs text-cyan-200">Tahun</div>
+                                <div class="text-xs text-cyan-200">{{ __('opac.external_book_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             @endif
                             @if($this->borrowable)
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-green-400"><i class="fas fa-check"></i></div>
-                                <div class="text-xs text-cyan-200">Tersedia</div>
+                                <div class="text-xs text-cyan-200">{{ __('opac.catalog_show.available') }}</div>
                             </div>
                             @else
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-yellow-400"><i class="fas fa-info"></i></div>
-                                <div class="text-xs text-cyan-200">Metadata</div>
+                                <div class="text-xs text-cyan-200">{{ __('opac.external_book_show.metadata') }}</div>
                             </div>
                             @endif
                         </div>
@@ -112,7 +112,7 @@
                 <div class="px-4 py-3 bg-gradient-to-r from-cyan-50 to-white border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-book-open text-cyan-500"></i>
-                        Akses Buku
+                        {{ __('opac.external_book_show.book_access') }}
                     </h3>
                 </div>
                 <div class="p-4 space-y-3">
@@ -124,15 +124,15 @@
                                 <i class="fas fa-book-reader text-green-600 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">Baca Online</p>
+                                <p class="font-semibold text-gray-900">{{ __('opac.external_book_show.read_online') }}</p>
                                 <p class="text-xs text-green-600 flex items-center gap-1">
-                                    <i class="fas fa-unlock"></i> Tersedia di Internet Archive
+                                    <i class="fas fa-unlock"></i> {{ __('opac.external_book_show.available_archive') }}
                                 </p>
                             </div>
                         </div>
                         <a href="{{ $this->readUrl }}" target="_blank" rel="noopener" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
                             <i class="fas fa-external-link-alt"></i>
-                            <span class="hidden sm:inline">Baca</span>
+                            <span class="hidden sm:inline">{{ __('opac.external_book_show.read') }}</span>
                         </a>
                     </div>
                     @endif
@@ -146,13 +146,13 @@
                             <div>
                                 <p class="font-semibold text-gray-900">Open Library</p>
                                 <p class="text-xs text-cyan-600 flex items-center gap-1">
-                                    <i class="fas fa-link"></i> Lihat di situs asli
+                                    <i class="fas fa-link"></i> {{ __('opac.external_book_show.view_original') }}
                                 </p>
                             </div>
                         </div>
                         <a href="{{ $book['url'] ?? '#' }}" target="_blank" rel="noopener" class="px-4 py-2 bg-cyan-600 text-white text-sm font-medium rounded-lg hover:bg-cyan-700 transition flex items-center gap-2">
                             <i class="fas fa-external-link-alt"></i>
-                            <span class="hidden sm:inline">Kunjungi</span>
+                            <span class="hidden sm:inline">{{ __('opac.external_book_show.visit') }}</span>
                         </a>
                     </div>
 
@@ -160,7 +160,7 @@
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
                         <p class="text-xs text-amber-700 flex items-start gap-2">
                             <i class="fas fa-info-circle mt-0.5"></i>
-                            <span>Buku ini berasal dari Open Library, perpustakaan digital gratis dengan 4+ juta buku. Beberapa buku dapat dibaca secara online melalui Internet Archive.</span>
+                            <span>{{ __('opac.external_book_show.info_box') }}</span>
                         </p>
                     </div>
                 </div>
@@ -171,7 +171,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-info-circle text-cyan-500"></i>
-                        Informasi Buku
+                        {{ __('opac.external_book_show.book_info') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -183,7 +183,7 @@
                                 <i class="fas fa-user text-cyan-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Penulis</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.external_book_show.author') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">
                                     {{ is_array($book['authors']) ? implode(', ', array_slice($book['authors'], 0, 3)) : $book['authors'] }}
                                 </p>
@@ -198,7 +198,7 @@
                                 <i class="fas fa-calendar text-amber-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tahun Terbit</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.external_book_show.publish_year') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $book['first_publish_year'] ?? $book['first_publish_date'] ?? $book['publish_date'] }}</p>
                             </div>
                         </div>
@@ -211,7 +211,7 @@
                                 <i class="fas fa-building text-purple-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Penerbit</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.external_book_show.publisher') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">
                                     {{ is_array($book['publishers']) ? ($book['publishers'][0] ?? '-') : $book['publishers'] }}
                                 </p>
@@ -226,8 +226,8 @@
                                 <i class="fas fa-file-alt text-blue-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Halaman</p>
-                                <p class="text-sm font-semibold text-gray-900">{{ $book['number_of_pages'] }} halaman</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.external_book_show.pages') }}</p>
+                                <p class="text-sm font-semibold text-gray-900">{{ __('opac.external_book_show.pages_count', ['count' => $book['number_of_pages']]) }}</p>
                             </div>
                         </div>
                         @endif
@@ -251,7 +251,7 @@
                                 <i class="fas fa-globe text-rose-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Sumber</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.external_book_show.source') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $book['source'] ?? 'Open Library' }}</p>
                             </div>
                         </div>
@@ -265,7 +265,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-align-left text-cyan-500"></i>
-                        Deskripsi
+                        {{ __('opac.external_book_show.description') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -280,7 +280,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-tags text-amber-500"></i>
-                        Subjek & Kategori
+                        {{ __('opac.external_book_show.subjects_categories') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -296,13 +296,13 @@
             {{-- Share Button --}}
             <div class="bg-white rounded-2xl p-4 shadow-lg">
                 <div class="flex gap-3">
-                    <button onclick="navigator.share ? navigator.share({title: '{{ $book['title'] }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link disalin!'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ $book['title'] }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('{{ __('opac.external_book_show.link_copied') }}'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
                         <i class="fas fa-share-alt"></i>
-                        <span>Bagikan</span>
+                        <span>{{ __('opac.external_book_show.share') }}</span>
                     </button>
                     <a href="{{ route('opac.search') }}" class="flex-1 py-3 bg-cyan-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-cyan-700 transition">
                         <i class="fas fa-search"></i>
-                        <span>Cari Lagi</span>
+                        <span>{{ __('opac.external_book_show.search_again') }}</span>
                     </a>
                 </div>
             </div>

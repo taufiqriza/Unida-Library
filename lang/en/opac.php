@@ -974,6 +974,306 @@ return [
         'get_latest_info' => 'Get the latest info on our social media',
     ],
     
+    // Catalog Show (Book Detail)
+    'catalog_show' => [
+        'back' => 'Back',
+        'home' => 'Home',
+        'books' => 'Books',
+        'author_unknown' => 'Unknown Author',
+        'copies' => 'Copies',
+        'available' => 'Available',
+        'year' => 'Year',
+        'book_info' => 'Book Information',
+        'isbn' => 'ISBN',
+        'publisher' => 'Publisher',
+        'publish_year' => 'Publication Year',
+        'language' => 'Language',
+        'pages' => 'Pages',
+        'call_number' => 'Call Number',
+        'edition' => 'Edition',
+        'publish_place' => 'Publication Place',
+        'subject' => 'Subject',
+        'abstract' => 'Abstract',
+        'availability' => 'Copy Availability',
+        'location_unknown' => 'Location unknown',
+        'borrowed' => 'Borrowed',
+        'no_copies' => 'No copies available',
+        'share' => 'Share',
+        'print' => 'Print',
+        'link_copied' => 'Link copied!',
+        'related_books' => 'Related Books',
+        'view_all' => 'View All',
+    ],
+    
+    // External Book Show (Open Library)
+    'external_book_show' => [
+        'loading' => 'Loading data from Open Library...',
+        'load_failed' => 'Failed to Load Data',
+        'back_to_search' => 'Back to Search',
+        'author_unknown' => 'Unknown Author',
+        'year' => 'Year',
+        'metadata' => 'Metadata',
+        'book_access' => 'Book Access',
+        'read_online' => 'Read Online',
+        'available_archive' => 'Available on Internet Archive',
+        'read' => 'Read',
+        'view_original' => 'View on original site',
+        'visit' => 'Visit',
+        'info_box' => 'This book is from Open Library, a free digital library with 4+ million books. Some books can be read online through Internet Archive.',
+        'book_info' => 'Book Information',
+        'author' => 'Author',
+        'publish_year' => 'Publication Year',
+        'publisher' => 'Publisher',
+        'pages' => 'Pages',
+        'pages_count' => ':count pages',
+        'source' => 'Source',
+        'description' => 'Description',
+        'subjects_categories' => 'Subjects & Categories',
+        'share' => 'Share',
+        'search_again' => 'Search Again',
+        'link_copied' => 'Link copied!',
+    ],
+    
+    // Universitaria Browse
+    'universitaria_browse' => [
+        'intellectual_heritage' => 'Intellectual Heritage',
+        'description' => 'Universitaria is a valuable collection that gathers the intellectual heritage and history of Pondok Modern Darussalam Gontor. Through commemorative books and manuscripts, Universitaria serves as a silent witness to the intellectual and spiritual journey that carved historical traces and thoughts in this institution.',
+        'documents' => 'Documents',
+        'categories' => 'Categories',
+        'search_placeholder' => 'Search historical documents...',
+        'premium_notice' => 'Premium & Historical Collection',
+        'protected_notice' => 'This document is protected and can only be read online (cannot be downloaded).',
+        'login_to_access' => 'Login to access.',
+        'all_collection' => 'All Collection',
+        'read_online' => 'Read Online',
+        'not_found' => 'Not found',
+        'try_other' => 'Try changing your search keyword or select another category',
+        'universitaria_collection' => 'Universitaria Collection',
+        'switch_viewer' => 'Switch Viewer',
+        'protected_document' => 'This document is protected and cannot be downloaded',
+        'loading' => 'Loading document...',
+        'trying_viewer' => 'Trying',
+        'viewer_attempt' => 'Trying viewer',
+        'load_failed' => 'Failed to Load PDF',
+        'all_viewers_tried' => 'All viewers have been tried. Document might be too large or format not supported.',
+        'large_file_notice' => 'Large files (>20MB) may take longer to load',
+        'retry' => 'Retry',
+        'open_new_tab' => 'Open New Tab',
+        'navigation_hint' => 'Use scroll or gesture to navigate pages',
+        'viewer_label' => 'Viewer',
+        'protected' => 'Protected',
+        'size' => 'Size',
+        'load_success' => 'Document loaded successfully',
+        'load_error' => 'Failed to load document',
+    ],
+    
+    // EThesis Show (Detail Page)
+    'ethesis_show' => [
+        'back' => 'Back',
+        'home' => 'Home',
+        'year' => 'Year',
+        'views' => 'Views',
+        'documents_available' => 'Documents Available',
+        'bab_preview' => 'Chapter 1-3 (Preview)',
+        'public_access' => 'Publicly accessible',
+        'read' => 'Read',
+        'open_new_tab' => 'Open in new tab',
+        'new_tab' => 'New Tab',
+        'download' => 'Download',
+        'loading_document' => 'Loading document...',
+        'load_failed' => 'Failed to Load PDF',
+        'pdf_warning' => 'PDF not displaying?',
+        'pdf_warning_desc' => 'If you are using a download manager extension (IDM, FDM, etc.), try disabling it temporarily or use the "New Tab" button above.',
+        'possible_causes' => 'Possible causes:',
+        'cause_1' => 'Download manager extension (IDM, FDM) is intercepting',
+        'cause_2' => 'Browser does not support PDF viewer',
+        'cause_3' => 'Internet connection lost',
+        'retry' => 'Retry',
+        'navigation_hint' => 'Use scroll or gesture to navigate pages',
+        'switch_viewer' => 'Switch Viewer',
+        'close' => 'Close',
+        'full_text' => 'Full Text (Complete)',
+        'members_only' => 'Library members only',
+        'not_available' => 'Not available',
+        'login' => 'Login',
+        'fulltext_info' => 'To access full text, please log in as a library member. If not registered, visit the library to register.',
+        'thesis_info' => 'Thesis Information',
+        'author' => 'Author',
+        'nim' => 'Student ID',
+        'type' => 'Type',
+        'faculty' => 'Faculty',
+        'department' => 'Study Program',
+        'advisor1' => 'Advisor 1',
+        'advisor2' => 'Advisor 2',
+        'keywords' => 'Keywords',
+        'approval_sheet' => 'Approval Sheet',
+        'view_full' => 'View Full',
+        'abstract' => 'Abstract',
+        'share' => 'Share',
+        'print' => 'Print',
+        'link_copied' => 'Link copied!',
+        'related_theses' => 'Related Theses',
+    ],
+    
+    // Global Search
+    'global_search' => [
+        // Header
+        'title' => 'UNIDA Gontor Library',
+        'subtitle' => 'Darussalam Gontor University',
+        'search_placeholder' => 'Type title, author, ISBN, or keywords...',
+        'search' => 'Search',
+        'close' => 'Close',
+        'e_resources_notice' => '100K+ e-resources',
+        'view_more' => 'View',
+        
+        // Tabs
+        'tab_all' => 'All',
+        'tab_book' => 'Books',
+        'tab_ebook' => 'E-Books',
+        'tab_ethesis' => 'E-Thesis',
+        'tab_journal' => 'Journals',
+        'tab_external' => 'Open Library',
+        'tab_shamela' => 'Shamela',
+        
+        // Filters
+        'filters' => 'Filters',
+        'filter_search' => 'Search Filters',
+        'reset' => 'Reset',
+        'library_location' => 'Library Location',
+        'all_locations' => 'All Locations',
+        'collection_type' => 'Collection Type',
+        'all_types' => 'All Types',
+        'faculty_dept' => 'Faculty & Department',
+        'all_faculties' => 'All Faculties',
+        'all_departments' => 'All Departments',
+        'thesis_type' => 'Thesis Type',
+        'thesis_skripsi' => 'Undergraduate Thesis',
+        'thesis_tesis' => 'Master Thesis',
+        'thesis_disertasi' => 'Dissertation',
+        'journal_source' => 'Journal Source',
+        'all_journals' => 'All Journals',
+        'subject' => 'Subject',
+        'view_all_subjects' => 'View all subjects',
+        'language' => 'Language',
+        'all_languages' => 'All',
+        'year_published' => 'Year Published',
+        'year_from' => 'From',
+        'year_to' => 'To',
+        'this_year' => 'This year',
+        'last_year' => 'Last year',
+        
+        // Statistics
+        'collection_stats' => 'Collection Statistics',
+        'printed_books' => 'Printed Books',
+        
+        // Search Tips
+        'search_tips' => 'Search Tips',
+        'tip_1' => 'Use specific keywords for more accurate results',
+        'tip_2' => 'Filter by location for book availability',
+        'tip_3' => 'Combine filters to narrow down results',
+        
+        // Results
+        'results_for' => 'Results for',
+        'all_collection' => 'All Collections',
+        'items_found' => 'items found',
+        'active_filters' => 'active filters',
+        'active_filters_label' => 'Active filters:',
+        'clear_all' => 'Clear all',
+        
+        // Sort
+        'sort_relevance' => 'Relevance',
+        'sort_newest' => 'Newest',
+        'sort_oldest' => 'Oldest',
+        'sort_title_asc' => 'Title A-Z',
+        'sort_title_desc' => 'Title Z-A',
+        
+        // Loading
+        'searching' => 'Searching collections...',
+        
+        // Results Display
+        'view_detail' => 'View Detail',
+        'unknown_author' => 'Unknown author',
+        'unknown_author_ar' => 'Unknown author',
+        
+        // Pagination
+        'page_of' => 'Page :page of :total',
+        'previous' => 'Previous',
+        'next' => 'Next',
+        
+        // Empty States
+        'search_open_library' => 'Search Books on Open Library',
+        'open_library_desc' => 'Type keywords to search from',
+        'open_library_count' => '4+ million international book collections',
+        'open_library_source' => 'on Open Library (Internet Archive).',
+        'open_library_footer' => 'Search results from',
+        
+        'search_shamela' => 'Search Books on Maktabah Shamela',
+        'shamela_desc' => 'Type keywords to search from',
+        'shamela_count' => '8,425 classical Islamic books',
+        'shamela_source' => 'in local database المكتبة الشاملة.',
+        'shamela_footer' => 'Data stored locally (7+ million pages)',
+        
+        'try_search' => 'Try searching:',
+        'no_results' => 'No results found',
+        'no_results_for' => 'No collection found with keyword',
+        'try_other_keywords' => 'Try other keywords or adjust search filters.',
+        'start_search' => 'Start searching by typing keywords in the search box.',
+        'reset_all_filters' => 'Reset All Filters',
+        'search_suggestions' => 'Search suggestions:',
+        
+        // Subject Modal
+        'select_subject' => 'Select Subject',
+        'apply' => 'Apply',
+    ],
+    
+    // Journal Show
+    'journal_show' => [
+        // Navigation
+        'back' => 'Back',
+        'home' => 'Home',
+        'journal' => 'Journals',
+        'article_detail' => 'Article Detail',
+        
+        // Hero
+        'year' => 'Year',
+        'views' => 'Views',
+        'volume' => 'Volume',
+        
+        // Access Section
+        'access_article' => 'Article Access',
+        'open_in_journal' => 'Open in Open Journal',
+        'view_full_article' => 'View full article',
+        'open' => 'Open',
+        'download_pdf' => 'Download PDF',
+        'download_document' => 'Download document',
+        'download' => 'Download',
+        
+        // Abstract
+        'abstract' => 'Abstract',
+        'abstract_not_available' => 'Abstract not available',
+        'abstract_en' => 'Abstract (English)',
+        
+        // Article Info
+        'article_info' => 'Article Information',
+        'issue' => 'Issue',
+        'pages' => 'Pages',
+        'publish_date' => 'Publish Date',
+        
+        // Keywords
+        'keywords' => 'Keywords',
+        
+        // Journal Info
+        'view_all_articles' => 'View All Articles',
+        
+        // Actions
+        'share' => 'Share',
+        'link_copied' => 'Link copied!',
+        'search_journal' => 'Search Journals',
+        
+        // Related
+        'related_articles' => 'Related Articles',
+    ],
+    
     // Database Access
     'database_access' => [
         'consortium' => 'FPPTI East Java Consortium',

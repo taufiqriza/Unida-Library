@@ -15,7 +15,7 @@
                 <a href="{{ route('opac.home') }}" class="hover:text-white transition">
                     <i class="fas fa-home"></i>
                 </a>
-                <i class="fas fa-chevron-right text-xs"></i>
+                <i class="fas fa-chevron-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }} text-xs"></i>
                 <span class="text-white font-medium">Universitaria</span>
             </nav>
 
@@ -25,13 +25,10 @@
                         <span class="text-amber-300">Universitaria</span>
                     </h1>
                     <h2 class="text-xl lg:text-2xl font-light text-blue-100 mb-4">
-                        Warisan Intelektual <span class="font-semibold">PMDG</span>
+                        {{ __('opac.universitaria_browse.intellectual_heritage') }} <span class="font-semibold">PMDG</span>
                     </h2>
                     <p class="text-blue-200 max-w-2xl leading-relaxed">
-                        Universitaria adalah koleksi berharga yang menghimpun warisan intelektual dan sejarah 
-                        Pondok Modern Darussalam Gontor. Melalui buku peringatan dan manuskripnya, Universitaria 
-                        menjadi saksi bisu perjalanan intelektual dan spiritual yang memahat jejak-jejak sejarah 
-                        dan pemikiran di lembaga ini.
+                        {{ __('opac.universitaria_browse.description') }}
                     </p>
                 </div>
                 
@@ -39,11 +36,11 @@
                 <div class="flex gap-4">
                     <div class="bg-white/10 backdrop-blur rounded-2xl px-6 py-4 text-center">
                         <p class="text-3xl font-bold text-amber-300">{{ $ebooks->total() }}</p>
-                        <p class="text-sm text-blue-200">Dokumen</p>
+                        <p class="text-sm text-blue-200">{{ __('opac.universitaria_browse.documents') }}</p>
                     </div>
                     <div class="bg-white/10 backdrop-blur rounded-2xl px-6 py-4 text-center">
                         <p class="text-3xl font-bold text-amber-300">{{ count($categories) }}</p>
-                        <p class="text-sm text-blue-200">Kategori</p>
+                        <p class="text-sm text-blue-200">{{ __('opac.universitaria_browse.categories') }}</p>
                     </div>
                 </div>
             </div>
@@ -53,9 +50,9 @@
                 <div class="relative">
                     <input type="text" 
                            wire:model.live.debounce.300ms="search"
-                           placeholder="Cari dokumen bersejarah..."
-                           class="w-full pl-12 pr-4 py-4 bg-white/10 backdrop-blur border border-white/20 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-blue-200"></i>
+                           placeholder="{{ __('opac.universitaria_browse.search_placeholder') }}"
+                           class="w-full {{ app()->getLocale() === 'ar' ? 'pr-12 pl-4' : 'pl-12 pr-4' }} py-4 bg-white/10 backdrop-blur border border-white/20 rounded-2xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent">
+                    <i class="fas fa-search absolute {{ app()->getLocale() === 'ar' ? 'right-4' : 'left-4' }} top-1/2 -translate-y-1/2 text-blue-200"></i>
                 </div>
             </div>
         </div>
@@ -67,9 +64,9 @@
             <div class="flex items-center gap-3 text-amber-800">
                 <i class="fas fa-shield-alt"></i>
                 <p class="text-sm">
-                    <strong>Koleksi Premium & Bersejarah</strong> - Dokumen ini dilindungi dan hanya dapat dibaca online (tidak dapat di-download).
+                    <strong>{{ __('opac.universitaria_browse.premium_notice') }}</strong> - {{ __('opac.universitaria_browse.protected_notice') }}
                     @if(!auth()->check())
-                        <a href="{{ route('opac.login') }}" class="underline font-semibold">Login untuk mengakses.</a>
+                        <a href="{{ route('opac.login') }}" class="underline font-semibold">{{ __('opac.universitaria_browse.login_to_access') }}</a>
                     @endif
                 </p>
             </div>
@@ -81,21 +78,21 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {{-- All Categories --}}
             <button wire:click="selectCategory(null)" 
-                    class="group relative rounded-2xl p-5 text-left transition-all duration-300 overflow-hidden
+                    class="group relative rounded-2xl p-5 text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} transition-all duration-300 overflow-hidden
                            {{ !$selectedCategory ? 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/25' : 'bg-white hover:bg-blue-50 border border-gray-100' }}">
                 <div class="relative z-10">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3
                                 {{ !$selectedCategory ? 'bg-white/20' : 'bg-gradient-to-br from-blue-100 to-indigo-100' }}">
                         <i class="fas fa-layer-group text-lg {{ !$selectedCategory ? 'text-white' : 'text-blue-600' }}"></i>
                     </div>
-                    <h3 class="font-bold {{ !$selectedCategory ? 'text-white' : 'text-gray-900' }}">Semua Koleksi</h3>
-                    <p class="text-sm {{ !$selectedCategory ? 'text-blue-200' : 'text-gray-500' }}">{{ $ebooks->total() }} Dokumen</p>
+                    <h3 class="font-bold {{ !$selectedCategory ? 'text-white' : 'text-gray-900' }}">{{ __('opac.universitaria_browse.all_collection') }}</h3>
+                    <p class="text-sm {{ !$selectedCategory ? 'text-blue-200' : 'text-gray-500' }}">{{ $ebooks->total() }} {{ __('opac.universitaria_browse.documents') }}</p>
                 </div>
             </button>
 
             @foreach($categories as $category)
             <button wire:click="selectCategory('{{ $category->slug }}')" 
-                    class="group relative rounded-2xl p-5 text-left transition-all duration-300 overflow-hidden
+                    class="group relative rounded-2xl p-5 text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} transition-all duration-300 overflow-hidden
                            {{ $selectedCategory === $category->slug ? 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/25' : 'bg-white hover:bg-blue-50 border border-gray-100' }}">
                 <div class="relative z-10">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-3
@@ -103,7 +100,7 @@
                         <i class="fas {{ $category->icon ?? 'fa-folder' }} text-lg {{ $selectedCategory === $category->slug ? 'text-white' : 'text-amber-600' }}"></i>
                     </div>
                     <h3 class="font-bold {{ $selectedCategory === $category->slug ? 'text-white' : 'text-gray-900' }}">{{ $category->name }}</h3>
-                    <p class="text-sm {{ $selectedCategory === $category->slug ? 'text-blue-200' : 'text-gray-500' }}">{{ $category->ebooks_count }} Dokumen</p>
+                    <p class="text-sm {{ $selectedCategory === $category->slug ? 'text-blue-200' : 'text-gray-500' }}">{{ $category->ebooks_count }} {{ __('opac.universitaria_browse.documents') }}</p>
                 </div>
             </button>
             @endforeach
@@ -128,7 +125,7 @@
                     @endif
                     
                     {{-- Protected Badge --}}
-                    <div class="absolute top-2 right-2">
+                    <div class="absolute top-2 {{ app()->getLocale() === 'ar' ? 'left-2' : 'right-2' }}">
                         <span class="px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow">
                             <i class="fas fa-crown text-[8px]"></i> Premium
                         </span>
@@ -143,7 +140,7 @@
                     
                     {{-- Year Badge --}}
                     @if($ebook->publish_year)
-                    <div class="absolute bottom-2 left-2">
+                    <div class="absolute bottom-2 {{ app()->getLocale() === 'ar' ? 'right-2' : 'left-2' }}">
                         <span class="px-2 py-1 bg-black/50 backdrop-blur text-white text-xs font-medium rounded-lg">
                             {{ $ebook->publish_year }}
                         </span>
@@ -159,7 +156,7 @@
                     <div class="flex items-center gap-2 mt-2 text-xs text-gray-500">
                         <i class="fas fa-file-pdf text-red-500"></i>
                         <span>{{ $ebook->file_size }} MB</span>
-                        <span class="text-amber-600"><i class="fas fa-eye"></i> Baca Online</span>
+                        <span class="text-amber-600"><i class="fas fa-eye"></i> {{ __('opac.universitaria_browse.read_online') }}</span>
                     </div>
                 </div>
             </div>
@@ -175,8 +172,8 @@
             <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-search text-3xl text-blue-400"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ditemukan</h3>
-            <p class="text-gray-500">Coba ubah kata kunci pencarian atau pilih kategori lain</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('opac.universitaria_browse.not_found') }}</h3>
+            <p class="text-gray-500">{{ __('opac.universitaria_browse.try_other') }}</p>
         </div>
         @endif
     </div>
@@ -207,14 +204,14 @@
                         <h3 class="font-bold text-white truncate" x-text="currentTitle"></h3>
                         <p class="text-blue-200 text-xs flex items-center gap-2">
                             <i class="fas fa-crown text-amber-400"></i>
-                            <span>Koleksi Universitaria</span>
+                            <span>{{ __('opac.universitaria_browse.universitaria_collection') }}</span>
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <button @click="toggleViewer()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition flex items-center gap-2">
                         <i class="fas fa-sync-alt"></i>
-                        <span class="hidden sm:inline">Ganti Viewer</span>
+                        <span class="hidden sm:inline">{{ __('opac.universitaria_browse.switch_viewer') }}</span>
                     </button>
                     <button @click="closeReader()" class="w-10 h-10 bg-white/10 hover:bg-red-500/80 text-white rounded-lg flex items-center justify-center transition">
                         <i class="fas fa-times text-lg"></i>
@@ -225,7 +222,7 @@
             {{-- Warning Banner --}}
             <div x-show="showWarning" class="bg-amber-500 px-4 py-2 flex items-center justify-center gap-2 text-white text-sm flex-shrink-0">
                 <i class="fas fa-shield-alt"></i>
-                <span>Dokumen ini dilindungi dan tidak dapat di-download</span>
+                <span>{{ __('opac.universitaria_browse.protected_document') }}</span>
                 <button @click="showWarning = false" class="ml-2 opacity-70 hover:opacity-100">
                     <i class="fas fa-times"></i>
                 </button>
@@ -239,11 +236,11 @@
                         <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
                         <p class="text-white font-medium" x-text="statusMessage"></p>
                         <p class="text-gray-400 text-sm mt-1">
-                            <span x-show="currentSize > 0">Ukuran: <span x-text="currentSize"></span> MB | </span>
-                            Viewer: <span x-text="getViewerName()" class="text-blue-400"></span>
+                            <span x-show="currentSize > 0">{{ __('opac.universitaria_browse.size') }}: <span x-text="currentSize"></span> MB | </span>
+                            {{ __('opac.universitaria_browse.viewer_label') }}: <span x-text="getViewerName()" class="text-blue-400"></span>
                         </p>
                         <p class="text-gray-500 text-xs mt-2" x-show="viewerAttempts > 0">
-                            Mencoba viewer ke-<span x-text="viewerAttempts + 1"></span>...
+                            {{ __('opac.universitaria_browse.viewer_attempt') }}<span x-text="viewerAttempts + 1"></span>...
                         </p>
                     </div>
                 </div>
@@ -254,17 +251,17 @@
                         <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
                         </div>
-                        <h4 class="text-xl font-bold text-white mb-2">Gagal Memuat PDF</h4>
-                        <p class="text-gray-400 text-sm mb-2">Semua viewer telah dicoba. Dokumen mungkin terlalu besar atau format tidak didukung.</p>
+                        <h4 class="text-xl font-bold text-white mb-2">{{ __('opac.universitaria_browse.load_failed') }}</h4>
+                        <p class="text-gray-400 text-sm mb-2">{{ __('opac.universitaria_browse.all_viewers_tried') }}</p>
                         <p class="text-gray-500 text-xs mb-4" x-show="currentSize > 20">
-                            <i class="fas fa-info-circle mr-1"></i>File besar (>20MB) mungkin memerlukan waktu lebih lama
+                            <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ __('opac.universitaria_browse.large_file_notice') }}
                         </p>
                         <div class="flex gap-2 justify-center flex-wrap">
                             <button x-on:click="retryLoad()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-redo mr-1"></i> Coba Lagi
+                                <i class="fas fa-redo {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.universitaria_browse.retry') }}
                             </button>
                             <button x-on:click="openInNewTab()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                <i class="fas fa-external-link-alt mr-1"></i> Buka Tab Baru
+                                <i class="fas fa-external-link-alt {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.universitaria_browse.open_new_tab') }}
                             </button>
                         </div>
                     </div>
@@ -285,11 +282,11 @@
             {{-- Footer --}}
             <div class="bg-gray-800 px-4 py-2 flex items-center justify-between flex-shrink-0">
                 <p class="text-gray-400 text-xs hidden sm:block">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Gunakan scroll atau gesture untuk navigasi halaman | Viewer: <span x-text="viewerType" class="font-medium text-white"></span>
+                    <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
+                    {{ __('opac.universitaria_browse.navigation_hint') }} | {{ __('opac.universitaria_browse.viewer_label') }}: <span x-text="viewerType" class="font-medium text-white"></span>
                 </p>
-                <div class="flex items-center gap-2 ml-auto">
-                    <span class="text-amber-400 text-xs"><i class="fas fa-lock mr-1"></i>Protected</span>
+                <div class="flex items-center gap-2 {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }}">
+                    <span class="text-amber-400 text-xs"><i class="fas fa-lock {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ __('opac.universitaria_browse.protected') }}</span>
                 </div>
             </div>
         </div>
@@ -307,12 +304,12 @@ function universitariaReader() {
         currentUrl: '',
         currentTitle: '',
         currentSize: 0,
-        viewerType: 'native', // Start with native for speed
+        viewerType: 'native',
         viewerAttempts: 0,
         maxAttempts: 3,
         loadTimeout: null,
-        viewerOrder: ['native', 'google', 'mozilla'], // Fallback order
-        statusMessage: 'Memuat dokumen...',
+        viewerOrder: ['native', 'google', 'mozilla'],
+        statusMessage: '{{ __("opac.universitaria_browse.loading") }}',
         
         openReader(url, title, size = 0) {
             this.currentUrl = url;
@@ -323,19 +320,15 @@ function universitariaReader() {
             this.error = false;
             this.showWarning = true;
             this.viewerAttempts = 0;
-            this.statusMessage = 'Memuat dokumen...';
+            this.statusMessage = '{{ __("opac.universitaria_browse.loading") }}';
             
-            // Choose best initial viewer based on file size
             if (size > 50) {
-                // Large files (>50MB) - use native first, faster
                 this.viewerType = 'native';
                 this.viewerOrder = ['native', 'mozilla', 'google'];
             } else if (size > 20) {
-                // Medium files - use native
                 this.viewerType = 'native';
                 this.viewerOrder = ['native', 'google', 'mozilla'];
             } else {
-                // Small files - Google is reliable
                 this.viewerType = 'google';
                 this.viewerOrder = ['google', 'native', 'mozilla'];
             }
@@ -359,9 +352,8 @@ function universitariaReader() {
             const frame = this.$refs.pdfFrame;
             if (!frame) return;
             
-            this.statusMessage = `Mencoba ${this.getViewerName()}...`;
+            this.statusMessage = `{{ __("opac.universitaria_browse.trying_viewer") }} ${this.getViewerName()}...`;
             
-            // Shorter timeout, faster fallback
             const timeoutMs = this.viewerType === 'native' ? 8000 : 12000;
             
             this.loadTimeout = setTimeout(() => {
@@ -379,7 +371,7 @@ function universitariaReader() {
                 case 'mozilla':
                     src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(this.currentUrl)}`;
                     break;
-                default: // native
+                default:
                     src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
             }
             
@@ -393,11 +385,10 @@ function universitariaReader() {
             if (this.viewerAttempts >= this.maxAttempts) {
                 this.error = true;
                 this.loading = false;
-                this.statusMessage = 'Gagal memuat dokumen';
+                this.statusMessage = '{{ __("opac.universitaria_browse.load_error") }}';
                 return;
             }
             
-            // Get next viewer in order
             const currentIdx = this.viewerOrder.indexOf(this.viewerType);
             const nextIdx = (currentIdx + 1) % this.viewerOrder.length;
             this.viewerType = this.viewerOrder[nextIdx];
@@ -418,7 +409,7 @@ function universitariaReader() {
         onFrameLoad() {
             clearTimeout(this.loadTimeout);
             this.loading = false;
-            this.statusMessage = 'Dokumen berhasil dimuat';
+            this.statusMessage = '{{ __("opac.universitaria_browse.load_success") }}';
             setTimeout(() => {
                 this.showWarning = false;
             }, 2000);
@@ -454,4 +445,3 @@ function universitariaReader() {
     }
 }
 </script>
-

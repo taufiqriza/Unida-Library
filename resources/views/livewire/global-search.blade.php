@@ -10,8 +10,8 @@
         <div class="relative max-w-7xl mx-auto px-4 py-8 lg:py-12 z-10">
             {{-- Title --}}
             <div class="text-center mb-6">
-                <h1 class="text-2xl lg:text-4xl font-bold text-white mb-2">Perpustakaan UNIDA Gontor</h1>
-                <p class="text-blue-200 text-sm lg:text-base">Universitas Darussalam Gontor</p>
+                <h1 class="text-2xl lg:text-4xl font-bold text-white mb-2">{{ __('opac.global_search.title') }}</h1>
+                <p class="text-blue-200 text-sm lg:text-base">{{ __('opac.global_search.subtitle') }}</p>
             </div>
 
             {{-- Search Box - Full Rounded Design like Homepage --}}
@@ -29,7 +29,7 @@
                             type="text" 
                             wire:model.live.debounce.400ms="query"
                             id="searchInput"
-                            placeholder="Ketik judul, pengarang, ISBN, atau kata kunci..." 
+                            placeholder="{{ __('opac.global_search.search_placeholder') }}" 
                             class="flex-1 px-2 py-4 lg:py-5 text-gray-700 text-sm lg:text-base focus:outline-none bg-transparent"
                             autofocus
                         >
@@ -42,7 +42,7 @@
                         <div class="m-1.5 flex items-center bg-gray-100 rounded-full p-1 gap-1">
                             <button class="px-5 lg:px-6 py-2.5 lg:py-3 bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg shadow-primary-600/30 text-sm flex items-center gap-2">
                                 <i class="fas fa-search"></i>
-                                <span class="hidden sm:inline">Cari</span>
+                                <span class="hidden sm:inline">{{ __('opac.global_search.search') }}</span>
                             </button>
                             <button type="button" id="advancedBtn" onclick="openAdvancedSearch()" class="w-10 h-10 lg:w-11 lg:h-11 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-white rounded-full transition-all duration-300">
                                 <i class="fas fa-sliders-h"></i>
@@ -53,41 +53,113 @@
             </div>
 
             {{-- Resource Type Tabs --}}
-            <div class="flex items-center justify-center gap-2 lg:gap-3 mt-8 overflow-x-auto pb-2 scrollbar-hide">
-                @php
-                    $tabs = [
-                        'all' => ['icon' => 'fa-layer-group', 'label' => 'Semua'],
-                        'book' => ['icon' => 'fa-book', 'label' => 'Buku'],
-                        'ebook' => ['icon' => 'fa-file-pdf', 'label' => 'E-Book'],
-                        'ethesis' => ['icon' => 'fa-graduation-cap', 'label' => 'E-Thesis'],
-                        'journal' => ['icon' => 'fa-file-lines', 'label' => 'Jurnal'],
-                        'external' => ['icon' => 'fa-globe', 'label' => 'Open Library'],
-                        'shamela' => ['icon' => 'fa-book-quran', 'label' => 'Shamela'],
-                    ];
-                    
-                    // Compact number formatting function
-                    $formatCompact = function($num) {
-                        if ($num >= 1000000) return round($num / 1000000, 1) . 'M';
-                        if ($num >= 1000) return round($num / 1000, 1) . 'K';
-                        return number_format($num);
-                    };
-                @endphp
-                @foreach($tabs as $key => $tab)
+            @php 
+                $isRtl = app()->getLocale() === 'ar';
+                $tabs = [
+                    'all' => ['icon' => 'fa-layer-group', 'label' => __('opac.global_search.tab_all')],
+                    'book' => ['icon' => 'fa-book', 'label' => __('opac.global_search.tab_book')],
+                    'ebook' => ['icon' => 'fa-file-pdf', 'label' => __('opac.global_search.tab_ebook')],
+                    'ethesis' => ['icon' => 'fa-graduation-cap', 'label' => __('opac.global_search.tab_ethesis')],
+                    'journal' => ['icon' => 'fa-file-lines', 'label' => __('opac.global_search.tab_journal')],
+                    'external' => ['icon' => 'fa-globe', 'label' => __('opac.global_search.tab_external')],
+                    'shamela' => ['icon' => 'fa-book-quran', 'label' => __('opac.global_search.tab_shamela')],
+                ];
+                
+                $formatCompact = function($num) {
+                    if ($num >= 1000000) return round($num / 1000000, 1) . 'M';
+                    if ($num >= 1000) return round($num / 1000, 1) . 'K';
+                    return number_format($num);
+                };
+            @endphp
+            
+            @if($isRtl)
+                {{-- Arabic: Full width with flex-wrap, no scroll needed --}}
+                <div class="flex flex-wrap items-center justify-center gap-2 mt-8 px-4">
+                    @foreach($tabs as $key => $tab)
+                        <button 
+                            wire:click="setResourceType('{{ $key }}')"
+                            class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all
+                                {{ $resourceType === $key 
+                                    ? 'bg-white text-primary-700 shadow-lg scale-105' 
+                                    : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
+                        >
+                            <i class="fas {{ $tab['icon'] }}"></i>
+                            <span>{{ $tab['label'] }}</span>
+                            <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
+                                {{ $formatCompact($counts[$key] ?? 0) }}
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
+            @else
+                {{-- Other languages: Horizontal scroll with navigation arrows --}}
+                <div class="relative mt-8" x-data="{ 
+                    container: null,
+                    canScrollLeft: false,
+                    canScrollRight: true,
+                    init() {
+                        this.container = this.$refs.tabsScroll;
+                        this.updateArrows();
+                        this.container.addEventListener('scroll', () => this.updateArrows());
+                        window.addEventListener('resize', () => this.updateArrows());
+                    },
+                    updateArrows() {
+                        if (!this.container) return;
+                        this.canScrollLeft = this.container.scrollLeft > 20;
+                        this.canScrollRight = this.container.scrollLeft < (this.container.scrollWidth - this.container.clientWidth - 20);
+                    },
+                    scrollLeft() {
+                        this.container.scrollBy({ left: -250, behavior: 'smooth' });
+                    },
+                    scrollRight() {
+                        this.container.scrollBy({ left: 250, behavior: 'smooth' });
+                    }
+                }">
+                    {{-- Left Arrow --}}
                     <button 
-                        wire:click="setResourceType('{{ $key }}')"
-                        class="flex items-center gap-2 px-4 lg:px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap
-                            {{ $resourceType === $key 
-                                ? 'bg-white text-primary-700 shadow-lg scale-105' 
-                                : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
+                        x-show="canScrollLeft"
+                        x-transition.opacity.duration.200ms
+                        @click="scrollLeft()"
+                        class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white/30 hover:bg-white/50 backdrop-blur-md text-white rounded-full shadow-lg transition-all hover:scale-110"
                     >
-                        <i class="fas {{ $tab['icon'] }}"></i>
-                        <span>{{ $tab['label'] }}</span>
-                        <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
-                            {{ $formatCompact($counts[$key] ?? 0) }}
-                        </span>
+                        <i class="fas fa-chevron-left"></i>
                     </button>
-                @endforeach
-            </div>
+                    
+                    {{-- Tabs Container --}}
+                    <div 
+                        x-ref="tabsScroll"
+                        class="flex items-center gap-2 lg:gap-3 overflow-x-auto px-12 lg:px-14 pb-2"
+                        style="-ms-overflow-style: none; scrollbar-width: none;"
+                    >
+                        <style>[x-ref="tabsScroll"]::-webkit-scrollbar { display: none; }</style>
+                        @foreach($tabs as $key => $tab)
+                            <button 
+                                wire:click="setResourceType('{{ $key }}')"
+                                class="flex items-center gap-2 px-4 lg:px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap
+                                    {{ $resourceType === $key 
+                                        ? 'bg-white text-primary-700 shadow-lg scale-105' 
+                                        : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
+                            >
+                                <i class="fas {{ $tab['icon'] }}"></i>
+                                <span>{{ $tab['label'] }}</span>
+                                <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
+                                    {{ $formatCompact($counts[$key] ?? 0) }}
+                                </span>
+                            </button>
+                        @endforeach
+                    </div>
+                    
+                    {{-- Right Arrow --}}
+                    <button 
+                        x-show="canScrollRight"
+                        x-transition.opacity.duration.200ms
+                        @click="scrollRight()"
+                        class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white/30 hover:bg-white/50 backdrop-blur-md text-white rounded-full shadow-lg transition-all hover:scale-110"
+                    >
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            @endif
         </div>
         
         {{-- E-Resources Notice - Absolute at bottom of header, no height change --}}
@@ -99,13 +171,13 @@
             <div class="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-white/15 backdrop-blur-md rounded-full border border-white/25 shadow-lg text-xs">
                 <i class="fas fa-lightbulb text-amber-300"></i>
                 <span class="text-white/90">
-                    <span class="font-semibold text-white">100K+ e-resources</span>
+                    <span class="font-semibold text-white">{{ __('opac.global_search.e_resources_notice') }}</span>
                     <span class="hidden sm:inline"> — Shamela, Waqfeya, Open Library</span>
-                    <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium">Lihat →</a>
+                    <a href="{{ route('opac.page', 'journal-subscription') }}" class="ml-1 text-amber-300 hover:text-amber-200 font-medium">{{ __('opac.global_search.view_more') }} →</a>
                 </span>
                 <button @click="showNotice = false" 
                         class="ml-1 w-5 h-5 flex items-center justify-center bg-white/20 hover:bg-red-500 text-white/80 hover:text-white rounded-full transition-all"
-                        title="Tutup">
+                        title="{{ __('opac.global_search.close') }}">
                     <i class="fas fa-times text-[10px]"></i>
                 </button>
             </div>
@@ -125,7 +197,7 @@
                 >
                     <span class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-sliders-h text-primary-500"></i> 
-                        Filter Pencarian
+                        {{ __('opac.global_search.filter_search') }}
                         @if($this->activeFiltersCount > 0)
                             <span class="px-2 py-0.5 text-xs bg-primary-100 text-primary-700 rounded-full">{{ $this->activeFiltersCount }}</span>
                         @endif
@@ -143,11 +215,11 @@
                                     <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-filter text-primary-600 text-sm"></i>
                                     </div>
-                                    Filter
+                                    {{ __('opac.global_search.filters') }}
                                 </h3>
                                 @if($this->activeFiltersCount > 0)
                                     <button wire:click="clearAllFilters" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                                        <i class="fas fa-times"></i> Reset
+                                        <i class="fas fa-times"></i> {{ __('opac.global_search.reset') }}
                                     </button>
                                 @endif
                             </div>
@@ -160,10 +232,10 @@
                                     <span class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-map-marker-alt text-red-500 text-xs"></i>
                                     </span>
-                                    Lokasi Perpustakaan
+                                    {{ __('opac.global_search.library_location') }}
                                 </label>
                                 <select wire:model.live="branchId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
-                                    <option value="">Semua Lokasi</option>
+                                    <option value="">{{ __('opac.global_search.all_locations') }}</option>
                                     @foreach($this->branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
@@ -179,10 +251,10 @@
                                     <span class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-layer-group text-blue-500 text-xs"></i>
                                     </span>
-                                    Jenis Koleksi
+                                    {{ __('opac.global_search.collection_type') }}
                                 </label>
                                 <select wire:model.live="collectionTypeId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
-                                    <option value="">Semua Jenis</option>
+                                    <option value="">{{ __('opac.global_search.all_types') }}</option>
                                     @foreach($this->collectionTypes as $type)
                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
                                     @endforeach
@@ -197,18 +269,18 @@
                                     <span class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-university text-purple-500 text-xs"></i>
                                     </span>
-                                    Fakultas & Prodi
+                                    {{ __('opac.global_search.faculty_dept') }}
                                 </label>
                                 <div class="space-y-2">
                                     <select wire:model.live="facultyId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
-                                        <option value="">Semua Fakultas</option>
+                                        <option value="">{{ __('opac.global_search.all_faculties') }}</option>
                                         @foreach($this->faculties as $faculty)
                                             <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
                                         @endforeach
                                     </select>
                                     @if($facultyId)
                                     <select wire:model.live="departmentId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
-                                        <option value="">Semua Program Studi</option>
+                                        <option value="">{{ __('opac.global_search.all_departments') }}</option>
                                         @foreach($this->departments as $dept)
                                             <option value="{{ $dept->id }}">{{ $dept->name }}</option>
                                         @endforeach
@@ -223,10 +295,10 @@
                                     <span class="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-scroll text-pink-500 text-xs"></i>
                                     </span>
-                                    Jenis Tugas Akhir
+                                    {{ __('opac.global_search.thesis_type') }}
                                 </label>
                                 <div class="flex flex-wrap gap-2">
-                                    @foreach(['skripsi' => 'Skripsi', 'tesis' => 'Tesis', 'disertasi' => 'Disertasi'] as $key => $label)
+                                    @foreach(['skripsi' => __('opac.global_search.thesis_skripsi'), 'tesis' => __('opac.global_search.thesis_tesis'), 'disertasi' => __('opac.global_search.thesis_disertasi')] as $key => $label)
                                         <button 
                                             wire:click="$set('thesisType', '{{ $thesisType === $key ? '' : $key }}')"
                                             class="px-3 py-1.5 text-xs font-medium rounded-full transition
@@ -248,10 +320,10 @@
                                     <span class="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-file-lines text-indigo-500 text-xs"></i>
                                     </span>
-                                    Sumber Jurnal
+                                    {{ __('opac.global_search.journal_source') }}
                                 </label>
                                 <select wire:model.live="journalCode" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
-                                    <option value="">Semua Jurnal</option>
+                                    <option value="">{{ __('opac.global_search.all_journals') }}</option>
                                     @foreach($this->journalSources as $source)
                                         <option value="{{ $source->code }}">{{ $source->name }}</option>
                                     @endforeach
@@ -266,7 +338,7 @@
                                     <span class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-tags text-amber-500 text-xs"></i>
                                     </span>
-                                    Subjek
+                                    {{ __('opac.global_search.subject') }}
                                 </label>
                                 
                                 {{-- Selected Subjects --}}
@@ -301,7 +373,7 @@
                                     @click="showSubjectModal = true"
                                     class="mt-2 text-xs text-primary-600 hover:text-primary-700 font-medium"
                                 >
-                                    <i class="fas fa-plus mr-1"></i> Lihat semua subjek
+                                    <i class="fas fa-plus mr-1"></i> {{ __('opac.global_search.view_all_subjects') }}
                                 </button>
                             </div>
                             @endif
@@ -314,7 +386,7 @@
                                     <span class="w-6 h-6 bg-cyan-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-globe text-cyan-500 text-xs"></i>
                                     </span>
-                                    Bahasa
+                                    {{ __('opac.global_search.language') }}
                                 </label>
                                 <div class="flex flex-wrap gap-2">
                                     <button 
@@ -322,7 +394,7 @@
                                         class="px-3 py-1.5 text-xs font-medium rounded-full transition
                                             {{ !$language ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
                                     >
-                                        Semua
+                                        {{ __('opac.global_search.all_languages') }}
                                     </button>
                                     @foreach($this->languages as $code => $name)
                                         <button 
@@ -344,14 +416,14 @@
                                     <span class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
                                         <i class="fas fa-calendar text-green-500 text-xs"></i>
                                     </span>
-                                    Tahun Terbit
+                                    {{ __('opac.global_search.year_published') }}
                                 </label>
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
                                         <input 
                                             type="number" 
                                             wire:model.live.debounce.500ms="yearFrom" 
-                                            placeholder="Dari" 
+                                            placeholder="{{ __('opac.global_search.year_from') }}" 
                                             min="1900" 
                                             max="{{ date('Y') }}" 
                                             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
@@ -361,7 +433,7 @@
                                         <input 
                                             type="number" 
                                             wire:model.live.debounce.500ms="yearTo" 
-                                            placeholder="Sampai" 
+                                            placeholder="{{ __('opac.global_search.year_to') }}" 
                                             min="1900" 
                                             max="{{ date('Y') }}" 
                                             class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
@@ -375,7 +447,7 @@
                                             wire:click="$set('yearFrom', {{ $year }})"
                                             class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-green-100 hover:text-green-700 transition"
                                         >
-                                            {{ $year == date('Y') ? 'Tahun ini' : ($year == date('Y')-1 ? 'Tahun lalu' : $year) }}
+                                            {{ $year == date('Y') ? __('opac.global_search.this_year') : ($year == date('Y')-1 ? __('opac.global_search.last_year') : $year) }}
                                         </button>
                                     @endforeach
                                 </div>
@@ -386,12 +458,12 @@
                     {{-- Statistics Card --}}
                     <div class="bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-700 rounded-2xl p-5 text-white shadow-lg">
                         <h4 class="font-bold mb-4 flex items-center gap-2">
-                            <i class="fas fa-chart-pie"></i> Statistik Koleksi
+                            <i class="fas fa-chart-pie"></i> {{ __('opac.global_search.collection_stats') }}
                         </h4>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between p-2 bg-white/10 rounded-lg">
                                 <span class="flex items-center gap-2 text-sm text-primary-100">
-                                    <i class="fas fa-book w-4"></i> Buku Cetak
+                                    <i class="fas fa-book w-4"></i> {{ __('opac.global_search.printed_books') }}
                                 </span>
                                 <span class="font-bold">{{ number_format($counts['book']) }}</span>
                             </div>
@@ -427,20 +499,20 @@
                     {{-- Help Card --}}
                     <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
                         <h4 class="font-semibold text-amber-800 mb-2 flex items-center gap-2">
-                            <i class="fas fa-lightbulb text-amber-500"></i> Tips Pencarian
+                            <i class="fas fa-lightbulb text-amber-500"></i> {{ __('opac.global_search.search_tips') }}
                         </h4>
                         <ul class="text-xs text-amber-700 space-y-1.5">
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check text-amber-500 mt-0.5"></i>
-                                <span>Gunakan kata kunci spesifik untuk hasil lebih akurat</span>
+                                <span>{{ __('opac.global_search.tip_1') }}</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check text-amber-500 mt-0.5"></i>
-                                <span>Filter berdasarkan lokasi untuk ketersediaan buku</span>
+                                <span>{{ __('opac.global_search.tip_2') }}</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check text-amber-500 mt-0.5"></i>
-                                <span>Kombinasikan filter untuk mempersempit hasil</span>
+                                <span>{{ __('opac.global_search.tip_3') }}</span>
                             </li>
                         </ul>
                     </div>
@@ -454,15 +526,15 @@
                     <div>
                         @if($query)
                             <h2 class="text-lg font-bold text-gray-900">
-                                Hasil untuk "<span class="text-primary-600">{{ $query }}</span>"
+                                {{ __('opac.global_search.results_for') }} "<span class="text-primary-600">{{ $query }}</span>"
                             </h2>
                         @else
-                            <h2 class="text-lg font-bold text-gray-900">Semua Koleksi</h2>
+                            <h2 class="text-lg font-bold text-gray-900">{{ __('opac.global_search.all_collection') }}</h2>
                         @endif
                         <p class="text-sm text-gray-500 mt-0.5">
-                            {{ number_format($this->totalResults) }} item ditemukan
+                            {{ number_format($this->totalResults) }} {{ __('opac.global_search.items_found') }}
                             @if($this->activeFiltersCount > 0)
-                                <span class="text-primary-600">({{ $this->activeFiltersCount }} filter aktif)</span>
+                                <span class="text-primary-600">({{ $this->activeFiltersCount }} {{ __('opac.global_search.active_filters') }})</span>
                             @endif
                         </p>
                     </div>
@@ -470,11 +542,11 @@
                     <div class="flex items-center gap-3">
                         {{-- Sort --}}
                         <select wire:model.live="sortBy" class="px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 bg-white">
-                            <option value="relevance">Relevansi</option>
-                            <option value="newest">Terbaru</option>
-                            <option value="oldest">Terlama</option>
-                            <option value="title_asc">Judul A-Z</option>
-                            <option value="title_desc">Judul Z-A</option>
+                            <option value="relevance">{{ __('opac.global_search.sort_relevance') }}</option>
+                            <option value="newest">{{ __('opac.global_search.sort_newest') }}</option>
+                            <option value="oldest">{{ __('opac.global_search.sort_oldest') }}</option>
+                            <option value="title_asc">{{ __('opac.global_search.sort_title_asc') }}</option>
+                            <option value="title_desc">{{ __('opac.global_search.sort_title_desc') }}</option>
                         </select>
                         
                         {{-- View Toggle --}}
@@ -498,7 +570,7 @@
                 {{-- Active Filters Pills --}}
                 @if($this->activeFiltersCount > 0)
                 <div class="flex flex-wrap items-center gap-2 mb-4 p-3 bg-gray-50 rounded-xl">
-                    <span class="text-xs text-gray-500 font-medium">Filter aktif:</span>
+                    <span class="text-xs text-gray-500 font-medium">{{ __('opac.global_search.active_filters_label') }}</span>
                     
                     @if($branchId)
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
@@ -549,7 +621,7 @@
                     @endif
                     
                     <button wire:click="clearAllFilters" class="text-xs text-gray-500 hover:text-red-600 font-medium ml-auto">
-                        Hapus semua
+                        {{ __('opac.global_search.clear_all') }}
                     </button>
                 </div>
                 @endif
@@ -558,7 +630,7 @@
                 <div wire:loading.flex wire:target="query, resourceType, branchId, collectionTypeId, facultyId, departmentId, language, yearFrom, yearTo, thesisType, sortBy, journalCode" class="items-center justify-center py-16">
                     <div class="text-center">
                         <div class="w-12 h-12 border-3 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                        <p class="text-sm text-gray-500">Mencari koleksi...</p>
+                        <p class="text-sm text-gray-500">{{ __('opac.global_search.searching') }}</p>
                     </div>
                 </div>
 
@@ -658,7 +730,7 @@
                                             {{-- Hover Overlay --}}
                                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
                                                 <span class="text-white text-[10px] font-medium flex items-center gap-1">
-                                                    <i class="fas fa-arrow-right"></i> Lihat Detail
+                                                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'left' : 'right' }}"></i> {{ __('opac.global_search.view_detail') }}
                                                 </span>
                                             </div>
                                         </div>
@@ -786,7 +858,7 @@
                         @if($this->totalPages > 1)
                         <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
                             <div class="text-sm text-gray-500">
-                                Halaman {{ $page }} dari {{ $this->totalPages }}
+                                {{ __('opac.global_search.page_of', ['page' => $page, 'total' => $this->totalPages]) }}
                             </div>
                             <div class="flex items-center gap-2">
                                 <button 
@@ -798,7 +870,7 @@
                                             : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
                                 >
                                     <i class="fas fa-chevron-left text-xs"></i>
-                                    <span class="hidden sm:inline">Sebelumnya</span>
+                                    <span class="hidden sm:inline">{{ __('opac.global_search.previous') }}</span>
                                 </button>
                                 
                                 {{-- Page Numbers --}}
@@ -834,7 +906,7 @@
                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                                             : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
                                 >
-                                    <span class="hidden sm:inline">Selanjutnya</span>
+                                    <span class="hidden sm:inline">{{ __('opac.global_search.next') }}</span>
                                     <i class="fas fa-chevron-right text-xs"></i>
                                 </button>
                             </div>
@@ -849,17 +921,17 @@
                                 <div class="w-24 h-24 bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                     <i class="fas fa-globe text-4xl text-cyan-500"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Buku di Open Library</h3>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('opac.global_search.search_open_library') }}</h3>
                                 <p class="text-gray-500 max-w-md mx-auto mb-6">
-                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-cyan-600">4+ juta koleksi buku internasional</span> 
-                                    di Open Library (Internet Archive).
+                                    {{ __('opac.global_search.open_library_desc') }} <span class="font-semibold text-cyan-600">{{ __('opac.global_search.open_library_count') }}</span> 
+                                    {{ __('opac.global_search.open_library_source') }}
                                 </p>
                                 
                                 {{-- Example Keywords --}}
                                 <div class="mt-6 p-6 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl max-w-lg mx-auto border border-cyan-100">
                                     <h4 class="font-semibold text-gray-700 mb-3">
                                         <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
-                                        Coba cari:
+                                        {{ __('opac.global_search.try_search') }}
                                     </h4>
                                     <div class="flex flex-wrap justify-center gap-2">
                                         @foreach(['Laravel', 'Python', 'Machine Learning', 'Islamic Finance', 'Entrepreneurship'] as $suggestion)
@@ -875,24 +947,24 @@
                                 
                                 <p class="text-xs text-gray-400 mt-6">
                                     <i class="fas fa-info-circle mr-1"></i>
-                                    Hasil pencarian berasal dari <a href="https://openlibrary.org" target="_blank" class="text-cyan-600 hover:underline">openlibrary.org</a>
+                                    {{ __('opac.global_search.open_library_footer') }} <a href="https://openlibrary.org" target="_blank" class="text-cyan-600 hover:underline">openlibrary.org</a>
                                 </p>
                             @elseif($resourceType === 'shamela' && !$query)
                                 {{-- Special message for Shamela - Islamic Books --}}
                                 <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                     <i class="fas fa-book-quran text-4xl text-blue-600"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Cari Kitab di Maktabah Shamela</h3>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('opac.global_search.search_shamela') }}</h3>
                                 <p class="text-gray-500 max-w-md mx-auto mb-6">
-                                    Ketik kata kunci untuk mencari dari <span class="font-semibold text-blue-600">8,425 kitab Islam klasik</span> 
-                                    dalam database lokal المكتبة الشاملة.
+                                    {{ __('opac.global_search.shamela_desc') }} <span class="font-semibold text-blue-600">{{ __('opac.global_search.shamela_count') }}</span> 
+                                    {{ __('opac.global_search.shamela_source') }}
                                 </p>
                                 
                                 {{-- Example Keywords --}}
                                 <div class="mt-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl max-w-lg mx-auto border border-blue-100">
                                     <h4 class="font-semibold text-gray-700 mb-3">
                                         <i class="fas fa-mosque text-blue-600 mr-2"></i>
-                                        Coba cari:
+                                        {{ __('opac.global_search.try_search') }}
                                     </h4>
                                     <div class="flex flex-wrap justify-center gap-2">
                                         @foreach(['حديث', 'فقه', 'تفسير', 'سيرة', 'عقيدة', 'تاريخ'] as $suggestion)
@@ -908,31 +980,31 @@
                                 
                                 <p class="text-xs text-gray-400 mt-6">
                                     <i class="fas fa-database mr-1"></i>
-                                    Data tersimpan secara lokal (7+ juta halaman)
+                                    {{ __('opac.global_search.shamela_footer') }}
                                 </p>
                             @else
                                 {{-- Default empty state --}}
                                 <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                     <i class="fas fa-search text-4xl text-gray-300"></i>
                                 </div>
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ada hasil ditemukan</h3>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ __('opac.global_search.no_results') }}</h3>
                                 <p class="text-gray-500 max-w-md mx-auto mb-6">
                                     @if($query)
-                                        Tidak ditemukan koleksi dengan kata kunci "<span class="font-medium">{{ $query }}</span>". 
-                                        Coba kata kunci lain atau sesuaikan filter pencarian.
+                                        {{ __('opac.global_search.no_results_for') }} "<span class="font-medium">{{ $query }}</span>". 
+                                        {{ __('opac.global_search.try_other_keywords') }}
                                     @else
-                                        Mulai pencarian dengan mengetik kata kunci di kolom pencarian.
+                                        {{ __('opac.global_search.start_search') }}
                                     @endif
                                 </p>
                                 @if($this->activeFiltersCount > 0)
                                     <button wire:click="clearAllFilters" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-xl font-medium hover:bg-primary-700 transition shadow-lg shadow-primary-600/30">
-                                        <i class="fas fa-redo"></i> Reset Semua Filter
+                                        <i class="fas fa-redo"></i> {{ __('opac.global_search.reset_all_filters') }}
                                     </button>
                                 @endif
                                 
                                 {{-- Suggestions --}}
                                 <div class="mt-8 p-6 bg-gray-50 rounded-2xl max-w-lg mx-auto">
-                                    <h4 class="font-semibold text-gray-700 mb-3">Saran pencarian:</h4>
+                                    <h4 class="font-semibold text-gray-700 mb-3">{{ __('opac.global_search.search_suggestions') }}</h4>
                                     <div class="flex flex-wrap justify-center gap-2">
                                         @foreach(['Manajemen', 'Akuntansi', 'Hukum', 'Teknik', 'Ekonomi'] as $suggestion)
                                             <button 
@@ -976,7 +1048,7 @@
                 <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-white">
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                            <i class="fas fa-tags text-amber-500"></i> Pilih Subjek
+                            <i class="fas fa-tags text-amber-500"></i> {{ __('opac.global_search.select_subject') }}
                         </h3>
                         <button @click="showSubjectModal = false" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
                             <i class="fas fa-times"></i>
@@ -1002,10 +1074,10 @@
                 
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
                     <button @click="showSubjectModal = false" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
-                        Tutup
+                        {{ __('opac.global_search.close') }}
                     </button>
                     <button @click="showSubjectModal = false" class="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        Terapkan
+                        {{ __('opac.global_search.apply') }}
                     </button>
                 </div>
             </div>

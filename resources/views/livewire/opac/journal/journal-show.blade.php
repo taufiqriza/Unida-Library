@@ -12,18 +12,18 @@
             {{-- Back Button (Mobile) --}}
             <div class="relative z-10 px-4 pt-4 lg:hidden">
                 <a href="{{ route('opac.journals.index') }}" class="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Kembali</span>
+                    <i class="fas fa-arrow-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }}"></i>
+                    <span>{{ __('opac.journal_show.back') }}</span>
                 </a>
             </div>
             
             {{-- Breadcrumb (Desktop) --}}
             <nav class="hidden lg:block relative z-10 px-6 pt-6 text-sm text-white/70">
-                <a href="{{ route('opac.home') }}" class="hover:text-white">Beranda</a>
+                <a href="{{ route('opac.home') }}" class="hover:text-white">{{ __('opac.journal_show.home') }}</a>
                 <span class="mx-2">/</span>
-                <a href="{{ route('opac.journals.index') }}" class="hover:text-white">Jurnal</a>
+                <a href="{{ route('opac.journals.index') }}" class="hover:text-white">{{ __('opac.journal_show.journal') }}</a>
                 <span class="mx-2">/</span>
-                <span class="text-white">Detail Artikel</span>
+                <span class="text-white">{{ __('opac.journal_show.article_detail') }}</span>
             </nav>
             
             {{-- Cover & Basic Info --}}
@@ -65,19 +65,19 @@
                             @if($article->publish_year)
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $article->publish_year }}</div>
-                                <div class="text-xs text-blue-200">Tahun</div>
+                                <div class="text-xs text-blue-200">{{ __('opac.journal_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             @endif
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ number_format($article->views) }}</div>
-                                <div class="text-xs text-blue-200">Dilihat</div>
+                                <div class="text-xs text-blue-200">{{ __('opac.journal_show.views') }}</div>
                             </div>
                             @if($article->volume)
                             <div class="w-px h-10 bg-white/20"></div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">Vol. {{ $article->volume }}</div>
-                                <div class="text-xs text-blue-200">Volume</div>
+                                <div class="text-xs text-blue-200">{{ __('opac.journal_show.volume') }}</div>
                             </div>
                             @endif
                         </div>
@@ -94,7 +94,7 @@
                 <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-download text-blue-500"></i>
-                        Akses Artikel
+                        {{ __('opac.journal_show.access_article') }}
                     </h3>
                 </div>
                 <div class="p-4 space-y-3">
@@ -105,15 +105,15 @@
                                 <i class="fas fa-external-link-alt text-blue-600 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">Buka di Open Journal</p>
+                                <p class="font-semibold text-gray-900">{{ __('opac.journal_show.open_in_journal') }}</p>
                                 <p class="text-xs text-blue-600 flex items-center gap-1">
-                                    <i class="fas fa-link"></i> Lihat artikel lengkap
+                                    <i class="fas fa-link"></i> {{ __('opac.journal_show.view_full_article') }}
                                 </p>
                             </div>
                         </div>
                         <a href="{{ $article->url }}" target="_blank" rel="noopener" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                             <i class="fas fa-external-link-alt"></i>
-                            <span class="hidden sm:inline">Buka</span>
+                            <span class="hidden sm:inline">{{ __('opac.journal_show.open') }}</span>
                         </a>
                     </div>
 
@@ -125,15 +125,15 @@
                                 <i class="fas fa-file-pdf text-red-600 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">Download PDF</p>
+                                <p class="font-semibold text-gray-900">{{ __('opac.journal_show.download_pdf') }}</p>
                                 <p class="text-xs text-red-600 flex items-center gap-1">
-                                    <i class="fas fa-download"></i> Unduh dokumen
+                                    <i class="fas fa-download"></i> {{ __('opac.journal_show.download_document') }}
                                 </p>
                             </div>
                         </div>
                         <a href="{{ $article->pdf_url }}" target="_blank" rel="noopener" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition flex items-center gap-2">
                             <i class="fas fa-download"></i>
-                            <span class="hidden sm:inline">Unduh</span>
+                            <span class="hidden sm:inline">{{ __('opac.journal_show.download') }}</span>
                         </a>
                     </div>
                     @endif
@@ -145,19 +145,19 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-file-alt text-blue-500"></i>
-                        Abstrak
+                        {{ __('opac.journal_show.abstract') }}
                     </h3>
                 </div>
                 <div class="p-4">
                     @if($article->abstract)
                         <p class="text-sm text-gray-600 leading-relaxed text-justify">{{ $article->abstract }}</p>
                     @else
-                        <p class="text-gray-500 italic">Abstrak tidak tersedia</p>
+                        <p class="text-gray-500 italic">{{ __('opac.journal_show.abstract_not_available') }}</p>
                     @endif
 
                     @if($article->abstract_en)
                         <hr class="my-4">
-                        <h4 class="font-semibold text-gray-800 mb-2">Abstract (English)</h4>
+                        <h4 class="font-semibold text-gray-800 mb-2">{{ __('opac.journal_show.abstract_en') }}</h4>
                         <p class="text-sm text-gray-600 leading-relaxed text-justify">{{ $article->abstract_en }}</p>
                     @endif
                 </div>
@@ -168,7 +168,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-info-circle text-blue-500"></i>
-                        Informasi Artikel
+                        {{ __('opac.journal_show.article_info') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -179,7 +179,7 @@
                                 <i class="fas fa-book-open text-blue-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Jurnal</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.journal') }}</p>
                                 <p class="text-sm font-semibold text-gray-900 truncate">{{ $article->journal_name }}</p>
                             </div>
                         </div>
@@ -191,7 +191,7 @@
                                 <i class="fas fa-layer-group text-purple-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Volume</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.volume') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $article->volume }}</p>
                             </div>
                         </div>
@@ -204,7 +204,7 @@
                                 <i class="fas fa-hashtag text-emerald-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Nomor</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.issue') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $article->issue }}</p>
                             </div>
                         </div>
@@ -217,7 +217,7 @@
                                 <i class="fas fa-file-alt text-amber-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Halaman</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.pages') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $article->pages }}</p>
                             </div>
                         </div>
@@ -230,7 +230,7 @@
                                 <i class="fas fa-calendar text-rose-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tahun</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.year') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $article->publish_year }}</p>
                             </div>
                         </div>
@@ -243,7 +243,7 @@
                                 <i class="fas fa-clock text-indigo-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
-                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tanggal Terbit</p>
+                                <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.journal_show.publish_date') }}</p>
                                 <p class="text-sm font-semibold text-gray-900">{{ $article->published_at->format('d M Y') }}</p>
                             </div>
                         </div>
@@ -275,7 +275,7 @@
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fas fa-tags text-amber-500"></i>
-                        Kata Kunci
+                        {{ __('opac.journal_show.keywords') }}
                     </h3>
                 </div>
                 <div class="p-4">
@@ -302,7 +302,7 @@
                 @endif
                 <a href="{{ route('opac.journals.index', ['journal' => $article->journal_code]) }}" 
                    class="mt-4 block text-center px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition border border-blue-200">
-                    Lihat Semua Artikel
+                    {{ __('opac.journal_show.view_all_articles') }}
                 </a>
             </div>
             @endif
@@ -310,13 +310,13 @@
             {{-- Share Button --}}
             <div class="bg-white rounded-2xl p-4 shadow-lg">
                 <div class="flex gap-3">
-                    <button onclick="navigator.share ? navigator.share({title: '{{ $article->title }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link disalin!'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
+                    <button onclick="navigator.share ? navigator.share({title: '{{ $article->title }}', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('{{ __('opac.journal_show.link_copied') }}'))" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
                         <i class="fas fa-share-alt"></i>
-                        <span>Bagikan</span>
+                        <span>{{ __('opac.journal_show.share') }}</span>
                     </button>
                     <a href="{{ route('opac.journals.index') }}" class="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-blue-700 transition">
                         <i class="fas fa-search"></i>
-                        <span>Cari Jurnal</span>
+                        <span>{{ __('opac.journal_show.search_journal') }}</span>
                     </a>
                 </div>
             </div>
@@ -325,7 +325,7 @@
             @if($related->count() > 0)
             <div class="pt-4">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-bold text-gray-900">Artikel Terkait</h2>
+                    <h2 class="text-lg font-bold text-gray-900">{{ __('opac.journal_show.related_articles') }}</h2>
                 </div>
                 <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 scrollbar-hide">
                     @foreach($related as $rel)

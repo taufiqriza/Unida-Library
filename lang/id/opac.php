@@ -974,6 +974,306 @@ return [
         'get_latest_info' => 'Dapatkan info terbaru di sosial media kami',
     ],
     
+    // Catalog Show (Book Detail)
+    'catalog_show' => [
+        'back' => 'Kembali',
+        'home' => 'Beranda',
+        'books' => 'Buku',
+        'author_unknown' => 'Penulis tidak diketahui',
+        'copies' => 'Eksemplar',
+        'available' => 'Tersedia',
+        'year' => 'Tahun',
+        'book_info' => 'Informasi Buku',
+        'isbn' => 'ISBN',
+        'publisher' => 'Penerbit',
+        'publish_year' => 'Tahun Terbit',
+        'language' => 'Bahasa',
+        'pages' => 'Halaman',
+        'call_number' => 'No. Panggil',
+        'edition' => 'Edisi',
+        'publish_place' => 'Tempat Terbit',
+        'subject' => 'Subjek',
+        'abstract' => 'Abstrak',
+        'availability' => 'Ketersediaan Eksemplar',
+        'location_unknown' => 'Lokasi tidak diketahui',
+        'borrowed' => 'Dipinjam',
+        'no_copies' => 'Tidak ada eksemplar tersedia',
+        'share' => 'Bagikan',
+        'print' => 'Cetak',
+        'link_copied' => 'Link disalin!',
+        'related_books' => 'Buku Terkait',
+        'view_all' => 'Lihat Semua',
+    ],
+    
+    // External Book Show (Open Library)
+    'external_book_show' => [
+        'loading' => 'Memuat data dari Open Library...',
+        'load_failed' => 'Gagal Memuat Data',
+        'back_to_search' => 'Kembali ke Pencarian',
+        'author_unknown' => 'Penulis tidak diketahui',
+        'year' => 'Tahun',
+        'metadata' => 'Metadata',
+        'book_access' => 'Akses Buku',
+        'read_online' => 'Baca Online',
+        'available_archive' => 'Tersedia di Internet Archive',
+        'read' => 'Baca',
+        'view_original' => 'Lihat di situs asli',
+        'visit' => 'Kunjungi',
+        'info_box' => 'Buku ini berasal dari Open Library, perpustakaan digital gratis dengan 4+ juta buku. Beberapa buku dapat dibaca secara online melalui Internet Archive.',
+        'book_info' => 'Informasi Buku',
+        'author' => 'Penulis',
+        'publish_year' => 'Tahun Terbit',
+        'publisher' => 'Penerbit',
+        'pages' => 'Halaman',
+        'pages_count' => ':count halaman',
+        'source' => 'Sumber',
+        'description' => 'Deskripsi',
+        'subjects_categories' => 'Subjek & Kategori',
+        'share' => 'Bagikan',
+        'search_again' => 'Cari Lagi',
+        'link_copied' => 'Link disalin!',
+    ],
+    
+    // Universitaria Browse
+    'universitaria_browse' => [
+        'intellectual_heritage' => 'Warisan Intelektual',
+        'description' => 'Universitaria adalah koleksi berharga yang menghimpun warisan intelektual dan sejarah Pondok Modern Darussalam Gontor. Melalui buku peringatan dan manuskripnya, Universitaria menjadi saksi bisu perjalanan intelektual dan spiritual yang memahat jejak-jejak sejarah dan pemikiran di lembaga ini.',
+        'documents' => 'Dokumen',
+        'categories' => 'Kategori',
+        'search_placeholder' => 'Cari dokumen bersejarah...',
+        'premium_notice' => 'Koleksi Premium & Bersejarah',
+        'protected_notice' => 'Dokumen ini dilindungi dan hanya dapat dibaca online (tidak dapat di-download).',
+        'login_to_access' => 'Login untuk mengakses.',
+        'all_collection' => 'Semua Koleksi',
+        'read_online' => 'Baca Online',
+        'not_found' => 'Tidak ditemukan',
+        'try_other' => 'Coba ubah kata kunci pencarian atau pilih kategori lain',
+        'universitaria_collection' => 'Koleksi Universitaria',
+        'switch_viewer' => 'Ganti Viewer',
+        'protected_document' => 'Dokumen ini dilindungi dan tidak dapat di-download',
+        'loading' => 'Memuat dokumen...',
+        'trying_viewer' => 'Mencoba',
+        'viewer_attempt' => 'Mencoba viewer ke-',
+        'load_failed' => 'Gagal Memuat PDF',
+        'all_viewers_tried' => 'Semua viewer telah dicoba. Dokumen mungkin terlalu besar atau format tidak didukung.',
+        'large_file_notice' => 'File besar (>20MB) mungkin memerlukan waktu lebih lama',
+        'retry' => 'Coba Lagi',
+        'open_new_tab' => 'Buka Tab Baru',
+        'navigation_hint' => 'Gunakan scroll atau gesture untuk navigasi halaman',
+        'viewer_label' => 'Viewer',
+        'protected' => 'Protected',
+        'size' => 'Ukuran',
+        'load_success' => 'Dokumen berhasil dimuat',
+        'load_error' => 'Gagal memuat dokumen',
+    ],
+    
+    // EThesis Show (Detail Page)
+    'ethesis_show' => [
+        'back' => 'Kembali',
+        'home' => 'Beranda',
+        'year' => 'Tahun',
+        'views' => 'Dilihat',
+        'documents_available' => 'Dokumen Tersedia',
+        'bab_preview' => 'BAB 1-3 (Preview)',
+        'public_access' => 'Dapat diakses publik',
+        'read' => 'Baca',
+        'open_new_tab' => 'Buka di tab baru',
+        'new_tab' => 'Tab Baru',
+        'download' => 'Unduh',
+        'loading_document' => 'Memuat dokumen...',
+        'load_failed' => 'Gagal Memuat PDF',
+        'pdf_warning' => 'PDF tidak dapat ditampilkan?',
+        'pdf_warning_desc' => 'Jika Anda menggunakan ekstensi download manager (IDM, FDM, dll), coba nonaktifkan sementara atau gunakan tombol "Tab Baru" di atas.',
+        'possible_causes' => 'Kemungkinan penyebab:',
+        'cause_1' => 'Ekstensi download manager (IDM, FDM) menginterupsi',
+        'cause_2' => 'Browser tidak mendukung PDF viewer',
+        'cause_3' => 'Koneksi internet terputus',
+        'retry' => 'Coba Lagi',
+        'navigation_hint' => 'Gunakan scroll atau gesture untuk navigasi halaman',
+        'switch_viewer' => 'Ganti Viewer',
+        'close' => 'Tutup',
+        'full_text' => 'Full Text (Lengkap)',
+        'members_only' => 'Hanya untuk anggota perpustakaan',
+        'not_available' => 'Tidak tersedia',
+        'login' => 'Login',
+        'fulltext_info' => 'Untuk mengakses full text, silakan login sebagai anggota perpustakaan. Jika belum terdaftar, kunjungi perpustakaan untuk mendaftar.',
+        'thesis_info' => 'Informasi Tugas Akhir',
+        'author' => 'Penulis',
+        'nim' => 'NIM',
+        'type' => 'Jenis',
+        'faculty' => 'Fakultas',
+        'department' => 'Program Studi',
+        'advisor1' => 'Pembimbing 1',
+        'advisor2' => 'Pembimbing 2',
+        'keywords' => 'Kata Kunci',
+        'approval_sheet' => 'Lembar Pengesahan',
+        'view_full' => 'Lihat Full',
+        'abstract' => 'Abstrak',
+        'share' => 'Bagikan',
+        'print' => 'Cetak',
+        'link_copied' => 'Link disalin!',
+        'related_theses' => 'Tugas Akhir Terkait',
+    ],
+    
+    // Global Search
+    'global_search' => [
+        // Header
+        'title' => 'Perpustakaan UNIDA Gontor',
+        'subtitle' => 'Universitas Darussalam Gontor',
+        'search_placeholder' => 'Ketik judul, pengarang, ISBN, atau kata kunci...',
+        'search' => 'Cari',
+        'close' => 'Tutup',
+        'e_resources_notice' => '100K+ e-resources',
+        'view_more' => 'Lihat',
+        
+        // Tabs
+        'tab_all' => 'Semua',
+        'tab_book' => 'Buku',
+        'tab_ebook' => 'E-Book',
+        'tab_ethesis' => 'E-Thesis',
+        'tab_journal' => 'Jurnal',
+        'tab_external' => 'Open Library',
+        'tab_shamela' => 'Shamela',
+        
+        // Filters
+        'filters' => 'Filter',
+        'filter_search' => 'Filter Pencarian',
+        'reset' => 'Reset',
+        'library_location' => 'Lokasi Perpustakaan',
+        'all_locations' => 'Semua Lokasi',
+        'collection_type' => 'Jenis Koleksi',
+        'all_types' => 'Semua Jenis',
+        'faculty_dept' => 'Fakultas & Prodi',
+        'all_faculties' => 'Semua Fakultas',
+        'all_departments' => 'Semua Program Studi',
+        'thesis_type' => 'Jenis Tugas Akhir',
+        'thesis_skripsi' => 'Skripsi',
+        'thesis_tesis' => 'Tesis',
+        'thesis_disertasi' => 'Disertasi',
+        'journal_source' => 'Sumber Jurnal',
+        'all_journals' => 'Semua Jurnal',
+        'subject' => 'Subjek',
+        'view_all_subjects' => 'Lihat semua subjek',
+        'language' => 'Bahasa',
+        'all_languages' => 'Semua',
+        'year_published' => 'Tahun Terbit',
+        'year_from' => 'Dari',
+        'year_to' => 'Sampai',
+        'this_year' => 'Tahun ini',
+        'last_year' => 'Tahun lalu',
+        
+        // Statistics
+        'collection_stats' => 'Statistik Koleksi',
+        'printed_books' => 'Buku Cetak',
+        
+        // Search Tips
+        'search_tips' => 'Tips Pencarian',
+        'tip_1' => 'Gunakan kata kunci spesifik untuk hasil lebih akurat',
+        'tip_2' => 'Filter berdasarkan lokasi untuk ketersediaan buku',
+        'tip_3' => 'Kombinasikan filter untuk mempersempit hasil',
+        
+        // Results
+        'results_for' => 'Hasil untuk',
+        'all_collection' => 'Semua Koleksi',
+        'items_found' => 'item ditemukan',
+        'active_filters' => 'filter aktif',
+        'active_filters_label' => 'Filter aktif:',
+        'clear_all' => 'Hapus semua',
+        
+        // Sort
+        'sort_relevance' => 'Relevansi',
+        'sort_newest' => 'Terbaru',
+        'sort_oldest' => 'Terlama',
+        'sort_title_asc' => 'Judul A-Z',
+        'sort_title_desc' => 'Judul Z-A',
+        
+        // Loading
+        'searching' => 'Mencari koleksi...',
+        
+        // Results Display
+        'view_detail' => 'Lihat Detail',
+        'unknown_author' => 'Penulis tidak diketahui',
+        'unknown_author_ar' => 'المؤلف غير معروف',
+        
+        // Pagination
+        'page_of' => 'Halaman :page dari :total',
+        'previous' => 'Sebelumnya',
+        'next' => 'Selanjutnya',
+        
+        // Empty States
+        'search_open_library' => 'Cari Buku di Open Library',
+        'open_library_desc' => 'Ketik kata kunci untuk mencari dari',
+        'open_library_count' => '4+ juta koleksi buku internasional',
+        'open_library_source' => 'di Open Library (Internet Archive).',
+        'open_library_footer' => 'Hasil pencarian berasal dari',
+        
+        'search_shamela' => 'Cari Kitab di Maktabah Shamela',
+        'shamela_desc' => 'Ketik kata kunci untuk mencari dari',
+        'shamela_count' => '8,425 kitab Islam klasik',
+        'shamela_source' => 'dalam database lokal المكتبة الشاملة.',
+        'shamela_footer' => 'Data tersimpan secara lokal (7+ juta halaman)',
+        
+        'try_search' => 'Coba cari:',
+        'no_results' => 'Tidak ada hasil ditemukan',
+        'no_results_for' => 'Tidak ditemukan koleksi dengan kata kunci',
+        'try_other_keywords' => 'Coba kata kunci lain atau sesuaikan filter pencarian.',
+        'start_search' => 'Mulai pencarian dengan mengetik kata kunci di kolom pencarian.',
+        'reset_all_filters' => 'Reset Semua Filter',
+        'search_suggestions' => 'Saran pencarian:',
+        
+        // Subject Modal
+        'select_subject' => 'Pilih Subjek',
+        'apply' => 'Terapkan',
+    ],
+    
+    // Journal Show
+    'journal_show' => [
+        // Navigation
+        'back' => 'Kembali',
+        'home' => 'Beranda',
+        'journal' => 'Jurnal',
+        'article_detail' => 'Detail Artikel',
+        
+        // Hero
+        'year' => 'Tahun',
+        'views' => 'Dilihat',
+        'volume' => 'Volume',
+        
+        // Access Section
+        'access_article' => 'Akses Artikel',
+        'open_in_journal' => 'Buka di Open Journal',
+        'view_full_article' => 'Lihat artikel lengkap',
+        'open' => 'Buka',
+        'download_pdf' => 'Download PDF',
+        'download_document' => 'Unduh dokumen',
+        'download' => 'Unduh',
+        
+        // Abstract
+        'abstract' => 'Abstrak',
+        'abstract_not_available' => 'Abstrak tidak tersedia',
+        'abstract_en' => 'Abstract (English)',
+        
+        // Article Info
+        'article_info' => 'Informasi Artikel',
+        'issue' => 'Nomor',
+        'pages' => 'Halaman',
+        'publish_date' => 'Tanggal Terbit',
+        
+        // Keywords
+        'keywords' => 'Kata Kunci',
+        
+        // Journal Info
+        'view_all_articles' => 'Lihat Semua Artikel',
+        
+        // Actions
+        'share' => 'Bagikan',
+        'link_copied' => 'Link disalin!',
+        'search_journal' => 'Cari Jurnal',
+        
+        // Related
+        'related_articles' => 'Artikel Terkait',
+    ],
+    
     // Database Access
     'database_access' => [
         'consortium' => 'Konsorsium FPPTI Jawa Timur',
