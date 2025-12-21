@@ -52,9 +52,8 @@
                 </div>
             </div>
 
-            {{-- Resource Type Tabs --}}
+            {{-- Resource Type Tabs - Flex wrap for all languages, no scroll --}}
             @php 
-                $isRtl = app()->getLocale() === 'ar';
                 $tabs = [
                     'all' => ['icon' => 'fa-layer-group', 'label' => __('opac.global_search.tab_all')],
                     'book' => ['icon' => 'fa-book', 'label' => __('opac.global_search.tab_book')],
@@ -72,94 +71,23 @@
                 };
             @endphp
             
-            @if($isRtl)
-                {{-- Arabic: Full width with flex-wrap, no scroll needed --}}
-                <div class="flex flex-wrap items-center justify-center gap-2 mt-8 px-4">
-                    @foreach($tabs as $key => $tab)
-                        <button 
-                            wire:click="setResourceType('{{ $key }}')"
-                            class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all
-                                {{ $resourceType === $key 
-                                    ? 'bg-white text-primary-700 shadow-lg scale-105' 
-                                    : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
-                        >
-                            <i class="fas {{ $tab['icon'] }}"></i>
-                            <span>{{ $tab['label'] }}</span>
-                            <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
-                                {{ $formatCompact($counts[$key] ?? 0) }}
-                            </span>
-                        </button>
-                    @endforeach
-                </div>
-            @else
-                {{-- Other languages: Horizontal scroll with navigation arrows --}}
-                <div class="relative mt-8" x-data="{ 
-                    container: null,
-                    canScrollLeft: false,
-                    canScrollRight: true,
-                    init() {
-                        this.container = this.$refs.tabsScroll;
-                        this.updateArrows();
-                        this.container.addEventListener('scroll', () => this.updateArrows());
-                        window.addEventListener('resize', () => this.updateArrows());
-                    },
-                    updateArrows() {
-                        if (!this.container) return;
-                        this.canScrollLeft = this.container.scrollLeft > 20;
-                        this.canScrollRight = this.container.scrollLeft < (this.container.scrollWidth - this.container.clientWidth - 20);
-                    },
-                    scrollLeft() {
-                        this.container.scrollBy({ left: -250, behavior: 'smooth' });
-                    },
-                    scrollRight() {
-                        this.container.scrollBy({ left: 250, behavior: 'smooth' });
-                    }
-                }">
-                    {{-- Left Arrow --}}
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-8 px-4">
+                @foreach($tabs as $key => $tab)
                     <button 
-                        x-show="canScrollLeft"
-                        x-transition.opacity.duration.200ms
-                        @click="scrollLeft()"
-                        class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white/30 hover:bg-white/50 backdrop-blur-md text-white rounded-full shadow-lg transition-all hover:scale-110"
+                        wire:click="setResourceType('{{ $key }}')"
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all
+                            {{ $resourceType === $key 
+                                ? 'bg-white text-primary-700 shadow-lg scale-105' 
+                                : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
                     >
-                        <i class="fas fa-chevron-left"></i>
+                        <i class="fas {{ $tab['icon'] }}"></i>
+                        <span>{{ $tab['label'] }}</span>
+                        <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
+                            {{ $formatCompact($counts[$key] ?? 0) }}
+                        </span>
                     </button>
-                    
-                    {{-- Tabs Container --}}
-                    <div 
-                        x-ref="tabsScroll"
-                        class="flex items-center gap-2 lg:gap-3 overflow-x-auto px-12 lg:px-14 pb-2"
-                        style="-ms-overflow-style: none; scrollbar-width: none;"
-                    >
-                        <style>[x-ref="tabsScroll"]::-webkit-scrollbar { display: none; }</style>
-                        @foreach($tabs as $key => $tab)
-                            <button 
-                                wire:click="setResourceType('{{ $key }}')"
-                                class="flex items-center gap-2 px-4 lg:px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap
-                                    {{ $resourceType === $key 
-                                        ? 'bg-white text-primary-700 shadow-lg scale-105' 
-                                        : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
-                            >
-                                <i class="fas {{ $tab['icon'] }}"></i>
-                                <span>{{ $tab['label'] }}</span>
-                                <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
-                                    {{ $formatCompact($counts[$key] ?? 0) }}
-                                </span>
-                            </button>
-                        @endforeach
-                    </div>
-                    
-                    {{-- Right Arrow --}}
-                    <button 
-                        x-show="canScrollRight"
-                        x-transition.opacity.duration.200ms
-                        @click="scrollRight()"
-                        class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 items-center justify-center bg-white/30 hover:bg-white/50 backdrop-blur-md text-white rounded-full shadow-lg transition-all hover:scale-110"
-                    >
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            @endif
+                @endforeach
+            </div>
         </div>
         
         {{-- E-Resources Notice - Absolute at bottom of header, no height change --}}

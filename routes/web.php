@@ -29,6 +29,7 @@ Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');
 Route::get('/catalog/{id}', \App\Livewire\Opac\CatalogShow::class)->name('opac.catalog.show');
 Route::get('/ebook/{id}', \App\Livewire\Opac\EbookShow::class)->name('opac.ebook.show');
+Route::get('/ebook/kubuku/{id}', \App\Livewire\Opac\EbookKubukuShow::class)->name('opac.ebook.kubuku.show');
 Route::get('/ethesis/{id}', \App\Livewire\Opac\EthesisShow::class)->name('opac.ethesis.show');
 Route::get('/news', \App\Livewire\Opac\NewsList::class)->name('opac.news.index');
 Route::get('/news/{slug}', \App\Livewire\Opac\NewsShow::class)->name('opac.news.show');

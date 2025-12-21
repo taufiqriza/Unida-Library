@@ -35,4 +35,22 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | KUBUKU E-Library API
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for KUBUKU digital library integration.
+    | API provides access to subscribed e-book collection.
+    |
+    */
+
+    'kubuku' => [
+        'enabled' => env('KUBUKU_ENABLED', true),
+        'api_key' => env('KUBUKU_API_KEY'),
+        'base_url' => env('KUBUKU_BASE_URL', 'https://kubuku.id/api/wl'),
+        'cache_ttl' => env('KUBUKU_CACHE_TTL', 3600), // 1 hour
+        'search_limit' => env('KUBUKU_SEARCH_LIMIT', 20),
+    ],
+
 ];

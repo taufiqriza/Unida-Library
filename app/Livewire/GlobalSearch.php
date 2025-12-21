@@ -14,6 +14,7 @@ use App\Models\Subject;
 use App\Models\JournalSource;
 use App\Services\OpenLibraryService;
 use App\Services\ShamelaService;
+use App\Services\KubukuService;
 use Livewire\Component;
 use Illuminate\Support\Collection;
 
@@ -185,6 +186,10 @@ class GlobalSearch extends Component
 
         if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
             $results = $results->merge($this->searchEbooks());
+            // Also search KUBUKU e-books
+            if ($this->query) {
+                $results = $results->merge($this->searchKubuku());
+            }
         }
 
         if ($this->resourceType === 'all' || $this->resourceType === 'ethesis') {
@@ -541,6 +546,27 @@ class GlobalSearch extends Component
     ]);
 }
 
+    protected function searchKubuku(): Collection
+    {
+        if (empty($this->query)) {
+            return collect();
+        }
+
+        $kubuku = app(KubukuService::class);
+        
+        if (!$kubuku->isEnabled()) {
+            return collect();
+        }
+
+        // When showing only ebook, use pagination
+        if ($this->resourceType === 'ebook') {
+            return $kubuku->search($this->query, $this->page);
+        }
+
+        // When showing 'all', just return first page
+        return $kubuku->search($this->query, 1)->take(10);
+    }
+
     protected function applySorting(Collection $results): Collection
     {
         return match($this->sortBy) {
@@ -559,12 +585,14 @@ class GlobalSearch extends Component
         $externalCount = $this->getExternalCount($baseQuery);
         $shamelaCount = $this->getShamelaCount($baseQuery);
         
+        $kubukuCount = $this->getKubukuCount($baseQuery);
+        
         return [
-            'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + 
+            'all' => $this->getBookCount($baseQuery) + $this->getEbookCount($baseQuery) + $kubukuCount +
                      $this->getEthesisCount($baseQuery) +
                      $this->getJournalCount($baseQuery) + $externalCount + $shamelaCount,
             'book' => $this->getBookCount($baseQuery),
-            'ebook' => $this->getEbookCount($baseQuery),
+            'ebook' => $this->getEbookCount($baseQuery) + $kubukuCount,
             'ethesis' => $this->getEthesisCount($baseQuery),
             'journal' => $this->getJournalCount($baseQuery),
             'external' => $externalCount,
@@ -690,6 +718,23 @@ class GlobalSearch extends Component
     $result = $localService->search($search, 100);
     return $result['total'] ?? 0;
 }
+
+    protected function getKubukuCount(?string $search): int
+    {
+        $kubuku = app(KubukuService::class);
+        
+        if (!$kubuku->isEnabled()) {
+            return 0;
+        }
+        
+        // If no search query, return total from API
+        if (empty($search)) {
+            return $kubuku->getTotalCount();
+        }
+        
+        // Get search count
+        return $kubuku->getSearchCount($search);
+    }
 
     // Computed: Filter Options
     public function getBranchesProperty()

@@ -1589,4 +1589,33 @@ return [
             'tips_title' => 'Tips for Accessing E-Resources',
         ],
     ],
+
+    // KUBUKU E-Library
+    'kubuku' => [
+        'loading' => 'Loading e-book...',
+        'back_to_search' => 'Back to Search',
+        'back' => 'Back',
+        'home' => 'Home',
+        'year' => 'Year',
+        'pages' => 'Pages',
+        'category' => 'Category',
+        'subcategory' => 'Subcategory',
+        'read_now' => 'Read Now',
+        'share' => 'Share',
+        'ebook_info' => 'E-Book Information',
+        'author' => 'Author',
+        'publisher' => 'Publisher',
+        'source' => 'Source',
+        'synopsis' => 'Synopsis',
+        'reader_notice_title' => 'Reading KUBUKU E-Book',
+        'reader_notice_desc' => 'This e-book is provided through the KUBUKU E-Library service subscribed by the library. To read, you need to install the KUBUKU Desktop application.',
+        'login_required' => 'Please login first to read this e-book.',
+        'read_error' => 'Failed to open e-book. Please try again later.',
+        'read_confirm_title' => 'Open E-Book Reader',
+        'read_confirm_desc' => 'The e-book will be opened using KUBUKU Reader application.',
+        'desktop_app_notice' => 'Make sure you have installed the KUBUKU Desktop application on your device.',
+        'cancel' => 'Cancel',
+        'open_reader' => 'Open Reader',
+    ],
 ];
+

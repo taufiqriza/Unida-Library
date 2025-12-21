@@ -1627,4 +1627,33 @@ return [
             'tip_4' => 'Hubungi pustakawan jika mengalami kendala akses',
         ],
     ],
+
+    // KUBUKU E-Library
+    'kubuku' => [
+        'loading' => 'Memuat e-book...',
+        'back_to_search' => 'Kembali ke Pencarian',
+        'back' => 'Kembali',
+        'home' => 'Beranda',
+        'year' => 'Tahun',
+        'pages' => 'Halaman',
+        'category' => 'Kategori',
+        'subcategory' => 'Sub Kategori',
+        'read_now' => 'Baca Sekarang',
+        'share' => 'Bagikan',
+        'ebook_info' => 'Informasi E-Book',
+        'author' => 'Penulis',
+        'publisher' => 'Penerbit',
+        'source' => 'Sumber',
+        'synopsis' => 'Sinopsis',
+        'reader_notice_title' => 'Membaca E-Book KUBUKU',
+        'reader_notice_desc' => 'E-Book ini disediakan melalui layanan KUBUKU E-Library yang telah dilanggan oleh perpustakaan. Untuk membaca, Anda perlu menginstal aplikasi KUBUKU Desktop.',
+        'login_required' => 'Silakan login terlebih dahulu untuk membaca e-book ini.',
+        'read_error' => 'Gagal membuka e-book. Silakan coba lagi nanti.',
+        'read_confirm_title' => 'Buka E-Book Reader',
+        'read_confirm_desc' => 'E-Book akan dibuka menggunakan aplikasi KUBUKU Reader.',
+        'desktop_app_notice' => 'Pastikan Anda telah menginstal aplikasi KUBUKU Desktop di perangkat Anda.',
+        'cancel' => 'Batal',
+        'open_reader' => 'Buka Reader',
+    ],
 ];
+

@@ -1588,4 +1588,33 @@ return [
             'tips_title' => 'نصائح للوصول إلى الموارد الإلكترونية',
         ],
     ],
+
+    // KUBUKU E-Library
+    'kubuku' => [
+        'loading' => 'جاري تحميل الكتاب...',
+        'back_to_search' => 'العودة للبحث',
+        'back' => 'رجوع',
+        'home' => 'الرئيسية',
+        'year' => 'السنة',
+        'pages' => 'الصفحات',
+        'category' => 'الفئة',
+        'subcategory' => 'الفئة الفرعية',
+        'read_now' => 'اقرأ الآن',
+        'share' => 'مشاركة',
+        'ebook_info' => 'معلومات الكتاب الإلكتروني',
+        'author' => 'المؤلف',
+        'publisher' => 'الناشر',
+        'source' => 'المصدر',
+        'synopsis' => 'الملخص',
+        'reader_notice_title' => 'قراءة كتاب KUBUKU',
+        'reader_notice_desc' => 'هذا الكتاب متاح من خلال خدمة KUBUKU التي اشتركت فيها المكتبة. للقراءة، تحتاج إلى تثبيت تطبيق KUBUKU Desktop.',
+        'login_required' => 'يرجى تسجيل الدخول أولاً لقراءة هذا الكتاب.',
+        'read_error' => 'فشل في فتح الكتاب. يرجى المحاولة لاحقاً.',
+        'read_confirm_title' => 'فتح قارئ الكتب',
+        'read_confirm_desc' => 'سيتم فتح الكتاب باستخدام تطبيق KUBUKU Reader.',
+        'desktop_app_notice' => 'تأكد من تثبيت تطبيق KUBUKU Desktop على جهازك.',
+        'cancel' => 'إلغاء',
+        'open_reader' => 'فتح القارئ',
+    ],
 ];
+
