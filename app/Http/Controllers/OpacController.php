@@ -225,6 +225,11 @@ class OpacController extends Controller
             return redirect()->route('opac.page', 'e-resources');
         }
 
+        // Redirect survey to new dynamic survey list
+        if ($slug === 'survey') {
+            return redirect()->route('opac.survey.index');
+        }
+
         // Pages with dedicated views
         $dedicatedViews = [
             // HOME
@@ -234,7 +239,7 @@ class OpacController extends Controller
             'digilib-apps', 'e-resources',
             // DISCOVER
             'event-library', 'virtual-tour', 'e-learning',
-            'prosa-kreatif', 'survey', 'research-tools',
+            'prosa-kreatif', 'research-tools',
             // GUIDE
             'panduan-opac', 'unggah-tugas-akhir', 'panduan-ospek',
             'panduan-akademik', 'materi-perpustakaan', 'download-eddc',

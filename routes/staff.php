@@ -88,6 +88,15 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         Route::prefix('control')->name('control.')->middleware('can:manage-staff')->group(function () {
             Route::get('/', \App\Livewire\Staff\Control\StaffControl::class)->name('index');
         });
+
+        // Survey Module
+        Route::prefix('survey')->name('survey.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Survey\SurveyDashboard::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\Survey\SurveyForm::class)->name('create');
+            Route::get('/{survey}/edit', \App\Livewire\Staff\Survey\SurveyForm::class)->name('edit');
+            Route::get('/{survey}/responses', \App\Livewire\Staff\Survey\SurveyResponses::class)->name('responses');
+            Route::get('/{survey}/analytics', \App\Livewire\Staff\Survey\SurveyAnalytics::class)->name('analytics');
+        });
         
         // Logout - secure with signed URL (no CSRF needed, expires in 5 min)
         Route::get('/logout/{signature}', function ($signature) {

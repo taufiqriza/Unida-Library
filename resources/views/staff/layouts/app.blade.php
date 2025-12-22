@@ -127,6 +127,7 @@
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
             ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
             ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
+            ['label' => 'Survey', 'icon' => 'fa-clipboard-question', 'route' => 'staff.survey.index', 'patterns' => ['staff.survey*']],
         ];
         // Add Control menu for admin only
         if (in_array($user->role, ['super_admin', 'admin'])) {
