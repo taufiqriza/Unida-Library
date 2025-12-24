@@ -97,13 +97,15 @@ class SecurityHeaders
                 "https://cdnjs.cloudflare.com " .
                 "https://www.google.com " .
                 "https://www.gstatic.com " .
-                "https://accounts.google.com",
+                "https://accounts.google.com " .
+                "https://cdn.tailwindcss.com",
             
             // Styles: self + Google Fonts + inline for Tailwind
             "style-src 'self' 'unsafe-inline' " .
                 "https://fonts.googleapis.com " .
                 "https://cdn.jsdelivr.net " .
-                "https://cdnjs.cloudflare.com",
+                "https://cdnjs.cloudflare.com " .
+                "https://cdn.tailwindcss.com",
             
             // Fonts
             "font-src 'self' " .
@@ -121,10 +123,12 @@ class SecurityHeaders
                 "https://accounts.google.com " .
                 "wss: ws:",
             
-            // Frames: Google OAuth, embedded content
+            // Frames: Google OAuth, YouTube, embedded content
             "frame-src 'self' " .
                 "https://accounts.google.com " .
-                "https://www.google.com",
+                "https://www.google.com " .
+                "https://www.youtube.com " .
+                "https://youtube.com",
             
             // Frame ancestors: prevent clickjacking
             "frame-ancestors 'self'",
