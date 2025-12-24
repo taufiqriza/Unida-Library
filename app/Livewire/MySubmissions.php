@@ -71,7 +71,7 @@ class MySubmissions extends Component
         }
 
         $query = ThesisSubmission::where('member_id', $this->memberId)
-            ->with(['department', 'reviewer'])
+            ->with(['department', 'reviewer', 'clearanceLetter'])
             ->latest();
 
         if ($this->filter !== 'all') {

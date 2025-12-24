@@ -438,17 +438,21 @@
                 </div>
                 @error('fulltext_file') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
 
-                {{-- Public Access Toggle --}}
-                <label class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl cursor-pointer mt-4">
-                    <input type="checkbox" wire:model="allow_fulltext_public" class="w-5 h-5 text-primary-600 rounded mt-0.5 flex-shrink-0">
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800">Izinkan akses publik untuk Full Text</p>
-                        <p class="text-xs text-gray-600 mt-0.5">
-                            Jika dicentang, file full text dapat diunduh oleh publik setelah dipublikasikan.
-                            Jika tidak, hanya BAB 1-3 yang dapat diakses publik.
-                        </p>
+                {{-- Access Info (no toggle) --}}
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mt-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-lock text-blue-600 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-blue-800">Akses Full Text Terbatas</p>
+                            <p class="text-xs text-blue-700 mt-0.5">
+                                Full text hanya dapat diakses oleh anggota perpustakaan yang login dengan email UNIDA Gontor.
+                                File BAB 1-3 (preview) tetap dapat diakses publik.
+                            </p>
+                        </div>
                     </div>
-                </label>
+                </div>
             </div>
         </div>
         @endif
@@ -562,11 +566,9 @@
                         </div>
                     @endforeach
                 </div>
-                @if($allow_fulltext_public)
-                    <p class="text-xs text-amber-600 mt-3 flex items-center gap-1">
-                        <i class="fas fa-globe"></i> Full text akan dapat diakses publik
-                    </p>
-                @endif
+                <p class="text-xs text-blue-600 mt-3 flex items-center gap-1">
+                    <i class="fas fa-lock"></i> Full text hanya dapat diakses member dengan email UNIDA Gontor
+                </p>
             </div>
 
             {{-- Agreement --}}

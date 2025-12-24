@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ClearanceLetter extends Model
 {
@@ -75,5 +76,19 @@ class ClearanceLetter extends Model
             'rejected' => 'red',
             default => 'gray',
         };
+    }
+
+    public function generateMemberSignatureQr(): string
+    {
+        $data = json_encode(['d'=>'SBP','i'=>$this->id,'n'=>$this->member->member_id,'h'=>substr(md5('M'.$this->id.$this->member_id),0,8)]);
+        $qr = QrCode::format('svg')->size(100)->margin(0)->generate($data);
+        return 'data:image/svg+xml;base64,' . base64_encode($qr);
+    }
+
+    public function generateApproverSignatureQr(): string
+    {
+        $data = json_encode(['d'=>'SBP','i'=>$this->id,'a'=>$this->approved_by,'h'=>substr(md5('A'.$this->id.$this->approved_by),0,8)]);
+        $qr = QrCode::format('svg')->size(100)->margin(0)->generate($data);
+        return 'data:image/svg+xml;base64,' . base64_encode($qr);
     }
 }

@@ -74,8 +74,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('opac.member.plagiarism.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
+            <form wire:submit="submit" class="space-y-4">
 
                 {{-- Member Info (Auto-filled) --}}
                 <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
@@ -123,12 +122,11 @@
                                 Judul Dokumen <span class="text-red-500">*</span>
                             </label>
                             <input type="text" 
-                                   name="document_title" 
+                                   wire:model="document_title"
                                    id="document_title" 
-                                   value="{{ old('document_title') }}"
                                    placeholder="Contoh: Implementasi Sistem Informasi Perpustakaan Berbasis Web"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition"
-                                   required>
+                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
+                            @error('document_title') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>
 
                         @if($submissions->count() > 0)
@@ -136,7 +134,7 @@
                             <label for="thesis_submission_id" class="block text-sm font-medium text-gray-700 mb-1">
                                 Kaitkan dengan Submission (Opsional)
                             </label>
-                            <select name="thesis_submission_id" 
+                            <select wire:model="thesis_submission_id"
                                     id="thesis_submission_id"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition">
                                 <option value="">-- Tidak dikaitkan --</option>
@@ -164,11 +162,26 @@
                             </div>
                             <p class="text-xs text-gray-400 mb-4">Format: PDF, DOCX • Maks. 20MB</p>
                             <input type="file" 
-                                   name="document" 
+                                   wire:model="document"
                                    accept=".pdf,.docx"
-                                   class="mx-auto block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
-                                   required>
+                                   class="mx-auto block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
                         </label>
+                        @error('document') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        
+                        {{-- Upload progress --}}
+                        <div wire:loading wire:target="document" class="mt-2">
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-teal-500 animate-pulse w-1/2"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Mengupload dokumen...</p>
+                        </div>
+                        
+                        @if($document)
+                        <div class="mt-2 p-2 bg-teal-50 rounded-lg flex items-center gap-2">
+                            <i class="fas fa-file-pdf text-teal-600"></i>
+                            <span class="text-sm text-teal-700">{{ $document->getClientOriginalName() }}</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -176,22 +189,29 @@
                 <div class="bg-white rounded-2xl border border-gray-200 p-4">
                     <label class="flex items-start gap-3 cursor-pointer">
                         <input type="checkbox" 
-                               name="agreement" 
-                               value="1"
-                               class="mt-1 w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
-                               required>
+                               wire:model="agreement"
+                               class="mt-1 w-5 h-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500">
                         <span class="text-sm text-gray-700">
                             Saya menyatakan bahwa dokumen ini adalah <strong>karya saya sendiri</strong> dan saya bertanggung jawab atas isi dokumen ini. 
                             Saya memahami bahwa hasil pengecekan ini hanya untuk referensi dan tidak menjamin dokumen bebas dari plagiarisme.
                         </span>
                     </label>
+                    @error('agreement') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 {{-- Submit Button --}}
                 <button type="submit" 
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-50 cursor-not-allowed"
                         class="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-teal-600 hover:to-emerald-700 transition shadow-lg shadow-teal-500/30 flex items-center justify-center gap-2">
-                    <i class="fas fa-search"></i>
-                    Mulai Pengecekan Plagiasi
+                    <span wire:loading.remove wire:target="submit">
+                        <i class="fas fa-search"></i>
+                        Mulai Pengecekan Plagiasi
+                    </span>
+                    <span wire:loading wire:target="submit">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Memproses...
+                    </span>
                 </button>
             </form>
         </div>

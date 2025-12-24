@@ -46,6 +46,28 @@ class ThesisFileController extends Controller
         return Storage::disk($this->disk)->download($filePath, $downloadName);
     }
 
+    /**
+     * Admin-only file access - no access control check
+     * Used by staff portal for reviewing submissions
+     */
+    public function adminShow(Request $request, ThesisSubmission $submission, string $type): StreamedResponse
+    {
+        $filePath = $this->getValidatedFilePath($submission, $type);
+
+        if (!Storage::disk($this->disk)->exists($filePath)) {
+            abort(404, 'File not found');
+        }
+
+        $mimeType = Storage::disk($this->disk)->mimeType($filePath);
+
+        return Storage::disk($this->disk)->response($filePath, basename($filePath), [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"',
+            'Content-Security-Policy' => "default-src 'none'; style-src 'unsafe-inline';",
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     protected function getValidatedFilePath(ThesisSubmission $submission, string $type): string
     {
         if (!in_array($type, ['cover', 'approval', 'preview', 'fulltext'])) {

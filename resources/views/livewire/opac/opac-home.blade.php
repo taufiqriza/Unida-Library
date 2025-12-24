@@ -53,52 +53,68 @@
         </div>
     </section>
 
-    <!-- Stats Bar - Individual Cards -->
-    <section class="max-w-7xl mx-auto px-3 lg:px-4 -mt-6 lg:-mt-10 relative z-10">
-        <div class="grid grid-cols-3 md:grid-cols-5 gap-2 lg:gap-3">
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-book text-blue-600 text-sm lg:text-lg"></i>
+    <!-- Stats Bar - Horizontal Scroll on Mobile -->
+    <section class="max-w-7xl mx-auto px-2 lg:px-4 -mt-5 lg:-mt-10 relative z-10">
+        <!-- Mobile: Horizontal Scroll | Desktop: Grid -->
+        <div class="flex lg:grid lg:grid-cols-6 gap-2 lg:gap-3 overflow-x-auto pb-1 lg:pb-0 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+            <!-- Buku -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book text-blue-600 text-xs lg:text-base"></i>
                 </div>
-                <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['books']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.book_titles') }}</div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-graduation-cap text-purple-600 text-sm lg:text-lg"></i>
-                </div>
-                <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['etheses']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">E-Thesis</div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['books'] >= 1000 ? round($stats['books']/1000) . 'K' : $stats['books'] }}</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.books') }}</div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg flex items-center gap-3">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-book-quran text-emerald-600 text-sm lg:text-lg"></i>
+            <!-- E-Thesis -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-graduation-cap text-purple-600 text-xs lg:text-base"></i>
                 </div>
-                <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">8,425</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.shamela_books') }}</div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-newspaper text-red-600 text-sm lg:text-lg"></i>
-                </div>
-                <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['journals']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">{{ __('opac.homepage.unida_journals') }}</div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['etheses'] >= 1000 ? round($stats['etheses']/1000) . 'K' : $stats['etheses'] }}</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.ethesis') }}</div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-3 lg:p-4 shadow-lg hidden md:flex items-center gap-3">
-                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-file-pdf text-orange-600 text-sm lg:text-lg"></i>
+            <!-- Shamela -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-book-quran text-emerald-600 text-xs lg:text-base"></i>
                 </div>
-                <div>
-                    <div class="text-lg lg:text-2xl font-bold text-gray-900">{{ number_format($stats['ebooks']) }}</div>
-                    <div class="text-[10px] lg:text-xs text-gray-500">E-Book</div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">8.4K</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.shamela') }}</div>
+                </div>
+            </div>
+            <!-- E-Book -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-pdf text-orange-600 text-xs lg:text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['ebooks'] >= 1000 ? round($stats['ebooks']/1000) . 'K' : $stats['ebooks'] }}</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.ebook') }}</div>
+                </div>
+            </div>
+            <!-- Jurnal -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-newspaper text-red-600 text-xs lg:text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['journals'] >= 1000 ? round($stats['journals']/1000) . 'K' : $stats['journals'] }}</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.journals') }}</div>
+                </div>
+            </div>
+            <!-- Anggota -->
+            <div class="bg-white rounded-xl p-2.5 lg:p-4 shadow-sm border border-gray-100 flex items-center gap-2 lg:gap-3 flex-shrink-0 w-[105px] lg:w-auto">
+                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-users text-cyan-600 text-xs lg:text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ ($stats['members'] ?? 12500) >= 1000 ? round(($stats['members'] ?? 12500)/1000) . 'K' : ($stats['members'] ?? 12500) }}</div>
+                    <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.members') }}</div>
                 </div>
             </div>
         </div>
@@ -109,28 +125,31 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Welcome Message -->
             <div class="lg:col-span-2">
-                <div class="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-6 lg:p-8 border border-gray-100 h-full">
-                    <div class="flex items-start gap-4 mb-6">
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 flex-shrink-0 p-2">
+                <div class="bg-gradient-to-br from-slate-50 to-white rounded-2xl p-4 lg:p-8 border border-gray-100 h-full">
+                    <div class="flex items-center gap-3 lg:gap-4 mb-4 lg:mb-6">
+                        <div class="w-12 h-12 lg:w-16 lg:h-16 bg-white rounded-xl lg:rounded-2xl flex items-center justify-center shadow-lg border border-gray-100 flex-shrink-0 p-1.5 lg:p-2">
                             <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-1">{{ __('opac.welcome_to_library') }}</h2>
-                            <p class="text-gray-500 text-sm">{{ __('opac.university') }}</p>
+                            <h2 class="text-lg lg:text-2xl font-bold text-gray-900 mb-0.5 lg:mb-1">{{ __('opac.welcome_to_library') }}</h2>
+                            <p class="text-gray-500 text-xs lg:text-sm">{{ __('opac.university') }}</p>
                         </div>
                     </div>
-                    <p class="text-gray-600 leading-relaxed mb-6">
+                    <p class="text-gray-600 leading-relaxed mb-4 lg:mb-6 text-sm lg:text-base hidden sm:block">
                         {{ __('opac.homepage.welcome_description') }}
                     </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('opac.page', 'visi-misi') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition">
-                            <i class="fas fa-bullseye"></i> {{ __('opac.home_menu.vision_mission') }}
+                    <p class="text-gray-600 text-sm mb-4 sm:hidden line-clamp-2">
+                        {{ Str::limit(__('opac.homepage.welcome_description'), 80) }}
+                    </p>
+                    <div class="flex flex-wrap gap-2 lg:gap-3">
+                        <a href="{{ route('opac.page', 'visi-misi') }}" class="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-blue-100 text-blue-700 rounded-lg text-xs lg:text-sm font-medium hover:bg-blue-200 transition">
+                            <i class="fas fa-bullseye text-[10px] lg:text-xs"></i> {{ __('opac.home_menu.vision_mission') }}
                         </a>
-                        <a href="{{ route('opac.page', 'jam-layanan') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200 transition">
-                            <i class="fas fa-clock"></i> {{ __('opac.home_menu.hours') }}
+                        <a href="{{ route('opac.page', 'jam-layanan') }}" class="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-emerald-100 text-emerald-700 rounded-lg text-xs lg:text-sm font-medium hover:bg-emerald-200 transition">
+                            <i class="fas fa-clock text-[10px] lg:text-xs"></i> {{ __('opac.home_menu.hours') }}
                         </a>
-                        <a href="{{ route('opac.page', 'fasilitas') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition">
-                            <i class="fas fa-building"></i> {{ __('opac.home_menu.facilities') }}
+                        <a href="{{ route('opac.page', 'fasilitas') }}" class="inline-flex items-center gap-1.5 lg:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 bg-purple-100 text-purple-700 rounded-lg text-xs lg:text-sm font-medium hover:bg-purple-200 transition">
+                            <i class="fas fa-building text-[10px] lg:text-xs"></i> {{ __('opac.home_menu.facilities') }}
                         </a>
                     </div>
                 </div>
@@ -182,82 +201,82 @@
     </section>
 
     <!-- Premium Digital Collections -->
-    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-10 lg:py-14 relative overflow-hidden">
+    <section class="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-6 lg:py-14 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48"></div>
         <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
-        <div class="max-w-7xl mx-auto px-3 lg:px-4 relative">
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-4">
-                    <i class="fas fa-crown text-amber-300"></i> {{ __('opac.homepage.premium_collection') }}
+        <div class="max-w-7xl mx-auto px-2 lg:px-4 relative">
+            <div class="text-center mb-4 lg:mb-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 bg-white/20 rounded-full text-white text-xs lg:text-sm font-medium mb-2 lg:mb-4">
+                    <i class="fas fa-crown text-amber-300 text-xs"></i> {{ __('opac.homepage.premium_collection') }}
                 </div>
-                <h2 class="text-2xl lg:text-3xl font-bold text-white mb-2">{{ __('opac.homepage.exclusive_digital') }}</h2>
-                <p class="text-blue-200">{{ __('opac.homepage.access_digital') }}</p>
+                <h2 class="text-lg lg:text-3xl font-bold text-white mb-1 lg:mb-2">{{ __('opac.homepage.exclusive_digital') }}</h2>
+                <p class="text-blue-200 text-xs lg:text-base hidden sm:block">{{ __('opac.homepage.access_digital') }}</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-6">
                 <!-- Maktabah Shamela -->
-                <a href="{{ route('opac.shamela.index') }}" class="group relative bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 overflow-hidden hover:shadow-2xl hover:shadow-emerald-500/30 transition-all hover:-translate-y-1">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <a href="{{ route('opac.shamela.index') }}" class="group relative bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 overflow-hidden hover:shadow-2xl transition-all">
+                    <div class="absolute top-0 right-0 w-20 lg:w-32 h-20 lg:h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                     <div class="relative">
-                        <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                            <i class="fas fa-book-quran text-white text-2xl"></i>
+                        <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4">
+                            <i class="fas fa-book-quran text-white text-base lg:text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.shamela_title') }}</h3>
-                        <p class="text-emerald-200 text-sm mb-4">{{ __('opac.homepage.shamela_desc') }}</p>
+                        <h3 class="text-sm lg:text-xl font-bold text-white mb-1 lg:mb-2">Shamela</h3>
+                        <p class="text-emerald-200 text-[10px] lg:text-sm mb-2 lg:mb-4 hidden sm:block">{{ __('opac.homepage.shamela_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.shamela_count') }}</span>
-                            <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
+                            <span class="px-2 py-0.5 lg:px-3 lg:py-1 bg-white/20 rounded-full text-white text-[9px] lg:text-xs font-medium">8.4K</span>
+                            <i class="fas fa-arrow-right text-white/70 text-xs lg:text-base"></i>
                         </div>
                     </div>
                 </a>
                 
                 <!-- Universitaria -->
-                <a href="{{ route('opac.universitaria.index') }}" class="group relative bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 overflow-hidden hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover:-translate-y-1">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                    <div class="absolute top-3 right-3">
-                        <span class="px-2 py-1 bg-white/25 rounded-full text-[10px] font-bold text-white"><i class="fas fa-crown mr-1"></i>PREMIUM</span>
+                <a href="{{ route('opac.universitaria.index') }}" class="group relative bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl lg:rounded-2xl p-3 lg:p-6 overflow-hidden hover:shadow-2xl transition-all">
+                    <div class="absolute top-0 right-0 w-20 lg:w-32 h-20 lg:h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                    <div class="absolute top-2 right-2 lg:top-3 lg:right-3">
+                        <span class="px-1.5 py-0.5 lg:px-2 lg:py-1 bg-white/25 rounded-full text-[8px] lg:text-[10px] font-bold text-white"><i class="fas fa-crown"></i></span>
                     </div>
                     <div class="relative">
-                        <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                            <i class="fas fa-landmark text-white text-2xl"></i>
+                        <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4">
+                            <i class="fas fa-landmark text-white text-base lg:text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.universitaria_title') }}</h3>
-                        <p class="text-amber-100 text-sm mb-4">{{ __('opac.homepage.universitaria_desc') }}</p>
+                        <h3 class="text-sm lg:text-xl font-bold text-white mb-1 lg:mb-2">Universitaria</h3>
+                        <p class="text-amber-100 text-[10px] lg:text-sm mb-2 lg:mb-4 hidden sm:block">{{ __('opac.homepage.universitaria_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.heritage') }}</span>
-                            <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
+                            <span class="px-2 py-0.5 lg:px-3 lg:py-1 bg-white/20 rounded-full text-white text-[9px] lg:text-xs font-medium">Heritage</span>
+                            <i class="fas fa-arrow-right text-white/70 text-xs lg:text-base"></i>
                         </div>
                     </div>
                 </a>
                 
                 <!-- Database Jurnal -->
-                <a href="{{ route('opac.database-access') }}" class="group relative bg-gradient-to-br from-indigo-600 to-blue-700 rounded-2xl p-6 overflow-hidden hover:shadow-2xl hover:shadow-indigo-500/30 transition-all hover:-translate-y-1">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <a href="{{ route('opac.database-access') }}" class="group relative bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 overflow-hidden hover:shadow-2xl transition-all">
+                    <div class="absolute top-0 right-0 w-20 lg:w-32 h-20 lg:h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                     <div class="relative">
-                        <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                            <i class="fas fa-database text-white text-2xl"></i>
+                        <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4">
+                            <i class="fas fa-database text-white text-base lg:text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.journal_database') }}</h3>
-                        <p class="text-indigo-200 text-sm mb-4">{{ __('opac.homepage.journal_desc') }}</p>
+                        <h3 class="text-sm lg:text-xl font-bold text-white mb-1 lg:mb-2">Database</h3>
+                        <p class="text-indigo-200 text-[10px] lg:text-sm mb-2 lg:mb-4 hidden sm:block">{{ __('opac.homepage.journal_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.journal_count') }}</span>
-                            <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
+                            <span class="px-2 py-0.5 lg:px-3 lg:py-1 bg-white/20 rounded-full text-white text-[9px] lg:text-xs font-medium">10+</span>
+                            <i class="fas fa-arrow-right text-white/70 text-xs lg:text-base"></i>
                         </div>
                     </div>
                 </a>
                 
                 <!-- E-Resources -->
-                <a href="{{ route('opac.page', 'e-resources') }}" class="group relative bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-6 overflow-hidden hover:shadow-2xl hover:shadow-violet-500/30 transition-all hover:-translate-y-1">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <a href="{{ route('opac.page', 'e-resources') }}" class="group relative bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 overflow-hidden hover:shadow-2xl transition-all">
+                    <div class="absolute top-0 right-0 w-20 lg:w-32 h-20 lg:h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                     <div class="relative">
-                        <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                            <i class="fas fa-globe text-white text-2xl"></i>
+                        <div class="w-10 h-10 lg:w-14 lg:h-14 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center mb-2 lg:mb-4">
+                            <i class="fas fa-globe text-white text-base lg:text-2xl"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">{{ __('opac.homepage.eresources_title') }}</h3>
-                        <p class="text-violet-200 text-sm mb-4">{{ __('opac.homepage.eresources_desc') }}</p>
+                        <h3 class="text-sm lg:text-xl font-bold text-white mb-1 lg:mb-2">E-Resources</h3>
+                        <p class="text-violet-200 text-[10px] lg:text-sm mb-2 lg:mb-4 hidden sm:block">{{ __('opac.homepage.eresources_desc') }}</p>
                         <div class="flex items-center justify-between">
-                            <span class="px-3 py-1 bg-white/20 rounded-full text-white text-xs font-medium">{{ __('opac.homepage.free_access') }}</span>
-                            <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-2 transition"></i>
+                            <span class="px-2 py-0.5 lg:px-3 lg:py-1 bg-white/20 rounded-full text-white text-[9px] lg:text-xs font-medium">Free</span>
+                            <i class="fas fa-arrow-right text-white/70 text-xs lg:text-base"></i>
                         </div>
                     </div>
                 </a>
@@ -464,16 +483,16 @@
 
     <!-- News & Events -->
     @if(count($news) > 0)
-    <section class="max-w-7xl mx-auto px-4 py-8 lg:py-10">
+    <section class="max-w-7xl mx-auto px-2 lg:px-4 py-6 lg:py-10">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3">
-                <div class="w-1 h-8 bg-blue-600 rounded-full"></div>
-                <h2 class="text-xl lg:text-2xl font-bold text-gray-900">{{ __('opac.homepage.news_announcements') }}</h2>
+        <div class="flex items-center justify-between mb-4 lg:mb-5">
+            <div class="flex items-center gap-2 lg:gap-3">
+                <div class="w-1 h-6 lg:h-8 bg-blue-600 rounded-full"></div>
+                <h2 class="text-base lg:text-2xl font-bold text-gray-900">{{ __('opac.homepage.news_announcements') }}</h2>
             </div>
-            <a href="{{ route('opac.news.index') }}" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium group">
+            <a href="{{ route('opac.news.index') }}" class="inline-flex items-center gap-1 lg:gap-2 text-xs lg:text-sm text-blue-600 hover:text-blue-700 font-medium group">
                 <span>{{ __('opac.view_all') }}</span>
-                <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                <i class="fas fa-arrow-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
             </a>
         </div>
         
@@ -489,14 +508,14 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
             
-            <!-- News Cards - 5 visible -->
-            <div id="newsScroll" class="flex gap-4 overflow-x-auto pb-2 scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
+            <!-- News Cards -->
+            <div id="newsScroll" class="flex gap-2 lg:gap-4 overflow-x-auto pb-2 scroll-smooth" style="-ms-overflow-style: none; scrollbar-width: none;">
                 <style>#newsScroll::-webkit-scrollbar { display: none; }</style>
                 
                 @foreach($news as $index => $item)
                 <a href="{{ route('opac.news.show', $item['slug']) }}" 
-                   class="flex-shrink-0 w-[calc(100%-1rem)] sm:w-[calc(50%-0.5rem)] lg:w-[calc(20%-0.8rem)] group">
-                    <div class="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
+                   class="flex-shrink-0 w-[160px] sm:w-[200px] lg:w-[calc(20%-0.8rem)] group">
+                    <div class="bg-white rounded-lg lg:rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
                         <!-- Image -->
                         <div class="relative aspect-[16/10] overflow-hidden bg-gray-100">
                             @if($item['image'])
@@ -504,43 +523,36 @@
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @else
                                 <div class="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                                    <i class="fas fa-newspaper text-3xl text-blue-300"></i>
+                                    <i class="fas fa-newspaper text-xl lg:text-3xl text-blue-300"></i>
                                 </div>
                             @endif
                             
                             <!-- Category Badge -->
                             @if(isset($item['category']) && $item['category'])
-                            <div class="absolute top-2 left-2">
-                                <span class="px-2 py-1 bg-blue-600 text-white text-[10px] font-medium rounded">
-                                    <i class="fas fa-tag mr-1"></i>{{ strtoupper($item['category']) }}
+                            <div class="absolute top-1.5 left-1.5 lg:top-2 lg:left-2">
+                                <span class="px-1.5 py-0.5 lg:px-2 lg:py-1 bg-blue-600 text-white text-[8px] lg:text-[10px] font-medium rounded">
+                                    {{ strtoupper(Str::limit($item['category'], 6, '')) }}
                                 </span>
                             </div>
                             @endif
                         </div>
                         
                         <!-- Content -->
-                        <div class="p-3">
+                        <div class="p-2 lg:p-3">
                             <!-- Date -->
-                            <div class="flex items-center gap-3 text-[11px] text-gray-400 mb-2">
-                                <span><i class="far fa-calendar mr-1"></i>{{ $item['published_at'] }}</span>
+                            <div class="text-[9px] lg:text-[11px] text-gray-400 mb-1 lg:mb-2">
+                                <i class="far fa-calendar mr-0.5"></i>{{ $item['published_at'] }}
                             </div>
                             
                             <!-- Title -->
-                            <h3 class="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition mb-2">
+                            <h3 class="font-semibold text-gray-900 text-xs lg:text-sm leading-snug line-clamp-2 group-hover:text-blue-600 transition">
                                 {{ $item['title'] }}
                             </h3>
                             
-                            <!-- Excerpt -->
+                            <!-- Excerpt - Hidden on mobile -->
                             @if(isset($item['excerpt']) && $item['excerpt'])
-                            <p class="text-gray-500 text-xs line-clamp-2 mb-3">{{ Str::limit(strip_tags($item['excerpt']), 80) }}</p>
+                            <p class="text-gray-500 text-xs line-clamp-2 mb-3 hidden lg:block">{{ Str::limit(strip_tags($item['excerpt']), 60) }}</p>
                             @endif
-                            
-                            <!-- Read More Button -->
-                            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
-                                <span class="inline-flex items-center gap-1.5 text-blue-600 text-xs font-medium group-hover:gap-2 transition-all">
-                                    {{ __('opac.read_more') }} <i class="fas fa-arrow-right text-[10px]"></i>
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </a>
@@ -634,39 +646,38 @@
         @endif
         
         <!-- Contact Bar -->
-        <div class="max-w-7xl mx-auto px-4 mt-8">
-            <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-2xl p-5 lg:p-6 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-2 lg:px-4 mt-6 lg:mt-8">
+            <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 rounded-xl lg:rounded-2xl p-3 lg:p-6 relative overflow-hidden">
                 <!-- Decorative -->
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                <div class="absolute top-0 right-0 w-20 lg:w-32 h-20 lg:h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
                 
-                <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
                     <!-- Info -->
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-headset text-white text-xl"></i>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-headset text-white text-base lg:text-xl"></i>
                         </div>
                         <div>
-                            <h3 class="text-white font-bold">{{ __('opac.homepage.need_help') }}</h3>
-                            <p class="text-blue-200 text-sm">{{ __('opac.homepage.contact_desc') }}</p>
+                            <h3 class="text-white font-bold text-sm lg:text-base">{{ __('opac.homepage.need_help') }}</h3>
+                            <p class="text-blue-200 text-[10px] lg:text-sm hidden sm:block">{{ __('opac.homepage.contact_desc') }}</p>
                         </div>
                     </div>
                     
                     <!-- Contact Buttons -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white text-sm transition group">
-                            <i class="fas fa-envelope"></i>
+                    <div class="flex flex-wrap items-center gap-2 lg:gap-3">
+                        <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-4 lg:py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg lg:rounded-xl text-white text-xs lg:text-sm transition">
+                            <i class="fas fa-envelope text-xs"></i>
                             <span class="hidden sm:inline">library@unida.gontor.ac.id</span>
                             <span class="sm:hidden">Email</span>
                         </a>
-                        <a href="https://wa.me/6285183053934" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 rounded-xl text-white text-sm font-medium transition group">
-                            <i class="fab fa-whatsapp text-lg"></i>
-                            <span>0851-8305-3934</span>
+                        <a href="https://wa.me/6285183053934" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-4 lg:py-2.5 bg-emerald-500 hover:bg-emerald-400 rounded-lg lg:rounded-xl text-white text-xs lg:text-sm font-medium transition">
+                            <i class="fab fa-whatsapp"></i>
+                            <span>WhatsApp</span>
                         </a>
-                        <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 rounded-xl text-white text-sm font-medium transition">
-                            <i class="fab fa-instagram text-lg"></i>
+                        <a href="https://www.instagram.com/libraryunidagontor" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-4 lg:py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg lg:rounded-xl text-white text-xs lg:text-sm font-medium transition">
+                            <i class="fab fa-instagram"></i>
                             <span class="hidden sm:inline">@libraryunidagontor</span>
-                            <span class="sm:hidden">Instagram</span>
+                            <span class="sm:hidden">IG</span>
                         </a>
                     </div>
                 </div>

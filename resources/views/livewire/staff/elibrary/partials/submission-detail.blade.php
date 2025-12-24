@@ -135,48 +135,71 @@
     </div>
     @endif
 
-    {{-- Files --}}
-    <div>
+    {{-- Files with PDF Preview Modal --}}
+    <div x-data="{ pdfPreviewUrl: null, pdfPreviewTitle: '' }">
         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
             <i class="fas fa-folder-open text-amber-400"></i> File Dokumen
         </label>
         <div class="grid grid-cols-2 gap-2">
             @if($selectedItem->cover_file)
-            <a href="{{ asset('storage/'.$selectedItem->cover_file) }}" target="_blank" class="flex items-center gap-3 p-3 bg-violet-50 hover:bg-violet-100 rounded-xl transition group">
+            <button type="button" x-on:click="pdfPreviewUrl = '{{ route('admin.thesis.file', [$selectedItem, 'cover']) }}'; pdfPreviewTitle = 'Cover'" class="flex items-center gap-3 p-3 bg-violet-50 hover:bg-violet-100 rounded-xl transition group text-left">
                 <div class="w-9 h-9 bg-violet-100 group-hover:bg-violet-200 rounded-lg flex items-center justify-center transition">
                     <i class="fas fa-image text-violet-600"></i>
                 </div>
                 <span class="text-sm font-medium text-violet-700">Cover</span>
-                <i class="fas fa-external-link text-violet-400 ml-auto text-xs"></i>
-            </a>
+                <i class="fas fa-eye text-violet-400 ml-auto text-xs"></i>
+            </button>
             @endif
             @if($selectedItem->approval_file)
-            <a href="{{ asset('storage/'.$selectedItem->approval_file) }}" target="_blank" class="flex items-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition group">
+            <button type="button" x-on:click="pdfPreviewUrl = '{{ route('admin.thesis.file', [$selectedItem, 'approval']) }}'; pdfPreviewTitle = 'Lembar Pengesahan'" class="flex items-center gap-3 p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition group text-left">
                 <div class="w-9 h-9 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center transition">
                     <i class="fas fa-file-signature text-blue-600"></i>
                 </div>
                 <span class="text-sm font-medium text-blue-700">Pengesahan</span>
-                <i class="fas fa-external-link text-blue-400 ml-auto text-xs"></i>
-            </a>
+                <i class="fas fa-eye text-blue-400 ml-auto text-xs"></i>
+            </button>
             @endif
             @if($selectedItem->preview_file)
-            <a href="{{ asset('storage/'.$selectedItem->preview_file) }}" target="_blank" class="flex items-center gap-3 p-3 bg-amber-50 hover:bg-amber-100 rounded-xl transition group">
+            <button type="button" x-on:click="pdfPreviewUrl = '{{ route('admin.thesis.file', [$selectedItem, 'preview']) }}'; pdfPreviewTitle = 'BAB 1-3 (Preview)'" class="flex items-center gap-3 p-3 bg-amber-50 hover:bg-amber-100 rounded-xl transition group text-left">
                 <div class="w-9 h-9 bg-amber-100 group-hover:bg-amber-200 rounded-lg flex items-center justify-center transition">
                     <i class="fas fa-file-pdf text-amber-600"></i>
                 </div>
-                <span class="text-sm font-medium text-amber-700">Preview</span>
-                <i class="fas fa-external-link text-amber-400 ml-auto text-xs"></i>
-            </a>
+                <span class="text-sm font-medium text-amber-700">BAB 1-3</span>
+                <i class="fas fa-eye text-amber-400 ml-auto text-xs"></i>
+            </button>
             @endif
             @if($selectedItem->fulltext_file)
-            <a href="{{ asset('storage/'.$selectedItem->fulltext_file) }}" target="_blank" class="flex items-center gap-3 p-3 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition group">
+            <button type="button" x-on:click="pdfPreviewUrl = '{{ route('admin.thesis.file', [$selectedItem, 'fulltext']) }}'; pdfPreviewTitle = 'Full Text'" class="flex items-center gap-3 p-3 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition group text-left">
                 <div class="w-9 h-9 bg-emerald-100 group-hover:bg-emerald-200 rounded-lg flex items-center justify-center transition">
                     <i class="fas fa-file-pdf text-emerald-600"></i>
                 </div>
                 <span class="text-sm font-medium text-emerald-700">Full Text</span>
-                <i class="fas fa-external-link text-emerald-400 ml-auto text-xs"></i>
-            </a>
+                <i class="fas fa-eye text-emerald-400 ml-auto text-xs"></i>
+            </button>
             @endif
+        </div>
+
+        {{-- PDF Preview Modal --}}
+        <div x-show="pdfPreviewUrl" x-cloak @keydown.escape.window="pdfPreviewUrl = null" 
+            class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/70" style="position: fixed;">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col">
+                {{-- Modal Header --}}
+                <div class="flex items-center justify-between p-4 border-b border-gray-100">
+                    <h3 class="text-lg font-semibold text-gray-900" x-text="pdfPreviewTitle"></h3>
+                    <div class="flex items-center gap-2">
+                        <a :href="pdfPreviewUrl" target="_blank" class="px-3 py-1.5 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition flex items-center gap-1">
+                            <i class="fas fa-external-link text-xs"></i> Tab Baru
+                        </a>
+                        <button type="button" @click="pdfPreviewUrl = null" class="w-9 h-9 bg-gray-100 hover:bg-red-100 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-xmark text-gray-500 hover:text-red-500"></i>
+                        </button>
+                    </div>
+                </div>
+                {{-- Modal Body --}}
+                <div class="flex-1 p-2 min-h-0">
+                    <iframe :src="pdfPreviewUrl" class="w-full h-full rounded-lg border border-gray-200"></iframe>
+                </div>
+            </div>
         </div>
     </div>
 

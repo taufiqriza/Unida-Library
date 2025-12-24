@@ -63,6 +63,16 @@ return [
         'news' => 'NEWS',
     ],
     
+    // Stats Bar
+    'stats' => [
+        'books' => 'Books',
+        'ethesis' => 'E-Thesis',
+        'shamela' => 'Shamela',
+        'ebook' => 'E-Book',
+        'journals' => 'Journals',
+        'members' => 'Members',
+    ],
+    
     // Homepage
     'homepage' => [
         // Hero

@@ -1,79 +1,88 @@
 <div>
-    {{-- Hero Header --}}
-    {{-- Stats Cards --}}
-    <div class="grid grid-cols-3 lg:grid-cols-6 gap-2 lg:gap-3 mb-4 lg:mb-6">
-        @foreach([
-            'all' => ['label' => 'Total', 'icon' => 'fa-layer-group', 'color' => 'bg-gray-100 text-gray-600', 'border' => 'border-gray-200'],
-            'draft' => ['label' => 'Draft', 'icon' => 'fa-file', 'color' => 'bg-gray-50 text-gray-500', 'border' => 'border-gray-200'],
-            'submitted' => ['label' => 'Diajukan', 'icon' => 'fa-paper-plane', 'color' => 'bg-blue-50 text-blue-600', 'border' => 'border-blue-200'],
-            'revision_required' => ['label' => 'Revisi', 'icon' => 'fa-edit', 'color' => 'bg-orange-50 text-orange-600', 'border' => 'border-orange-200'],
-            'approved' => ['label' => 'Disetujui', 'icon' => 'fa-check-circle', 'color' => 'bg-emerald-50 text-emerald-600', 'border' => 'border-emerald-200'],
-            'rejected' => ['label' => 'Ditolak', 'icon' => 'fa-times-circle', 'color' => 'bg-red-50 text-red-600', 'border' => 'border-red-200'],
-        ] as $key => $stat)
-        <div class="bg-white rounded-xl border {{ $stat['border'] }} p-3 text-center hover:shadow-md transition cursor-pointer group" wire:click="setFilter('{{ $key }}')">
-            <div class="text-xl lg:text-2xl font-bold text-gray-900 group-hover:scale-110 transition-transform">{{ $counts[$key] ?? 0 }}</div>
-            <div class="text-[10px] lg:text-xs text-gray-500 flex items-center justify-center gap-1.5 mt-1">
-                <i class="fas {{ $stat['icon'] }} {{ Str::after($stat['color'], ' ') }}"></i>
-                <span class="hidden sm:inline">{{ $stat['label'] }}</span>
+    {{-- Stats Cards - 3 compact horizontal cards --}}
+    @php
+        $processCount = ($counts['draft'] ?? 0) + ($counts['submitted'] ?? 0) + ($counts['revision_required'] ?? 0);
+        $completedCount = ($counts['approved'] ?? 0) + ($counts['published'] ?? 0);
+        $rejectedCount = $counts['rejected'] ?? 0;
+    @endphp
+    <div class="grid grid-cols-3 gap-2 mb-3 lg:mb-6">
+        {{-- Proses --}}
+        <div class="bg-white rounded-lg border border-blue-200 p-2 lg:p-3 flex items-center gap-2 hover:shadow-sm transition cursor-pointer" wire:click="setFilter('submitted')">
+            <div class="w-8 h-8 lg:w-10 lg:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-clock text-blue-600 text-xs lg:text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="text-lg lg:text-xl font-bold text-gray-900 leading-none">{{ $processCount }}</div>
+                <div class="text-[9px] lg:text-xs text-gray-500 truncate">Proses</div>
             </div>
         </div>
-        @endforeach
+        
+        {{-- Selesai --}}
+        <div class="bg-white rounded-lg border border-emerald-200 p-2 lg:p-3 flex items-center gap-2 hover:shadow-sm transition cursor-pointer" wire:click="setFilter('approved')">
+            <div class="w-8 h-8 lg:w-10 lg:h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-emerald-600 text-xs lg:text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="text-lg lg:text-xl font-bold text-gray-900 leading-none">{{ $completedCount }}</div>
+                <div class="text-[9px] lg:text-xs text-gray-500 truncate">Selesai</div>
+            </div>
+        </div>
+        
+        {{-- Ditolak --}}
+        <div class="bg-white rounded-lg border border-red-200 p-2 lg:p-3 flex items-center gap-2 hover:shadow-sm transition cursor-pointer" wire:click="setFilter('rejected')">
+            <div class="w-8 h-8 lg:w-10 lg:h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-times text-red-600 text-xs lg:text-sm"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="text-lg lg:text-xl font-bold text-gray-900 leading-none">{{ $rejectedCount }}</div>
+                <div class="text-[9px] lg:text-xs text-gray-500 truncate">Ditolak</div>
+            </div>
+        </div>
     </div>
 
     {{-- Flash Messages --}}
     @if(session('success'))
-        <div class="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl flex items-center gap-3 animate-fade-in">
-            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-check-circle text-emerald-500"></i>
-            </div>
+        <div class="mb-3 lg:mb-4 p-3 lg:p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl lg:rounded-2xl flex items-center gap-2 lg:gap-3 animate-fade-in text-sm">
+            <i class="fas fa-check-circle text-emerald-500"></i>
             <span class="font-medium">{{ session('success') }}</span>
         </div>
     @endif
     @if(session('error'))
-        <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-exclamation-circle text-red-500"></i>
-            </div>
+        <div class="mb-3 lg:mb-4 p-3 lg:p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl lg:rounded-2xl flex items-center gap-2 lg:gap-3 text-sm">
+            <i class="fas fa-exclamation-circle text-red-500"></i>
             <span class="font-medium">{{ session('error') }}</span>
         </div>
     @endif
 
 
-    {{-- Filter Tabs --}}
-    <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 p-1.5 lg:p-2 mb-4 lg:mb-6">
-        <div class="flex gap-1 overflow-x-auto scrollbar-hide">
+    {{-- Filter Tabs - Full width on mobile --}}
+    <div class="bg-white rounded-lg lg:rounded-2xl shadow-sm border border-gray-100 p-1 lg:p-2 mb-3 lg:mb-6">
+        <div class="flex gap-0.5 lg:gap-1">
             @foreach([
                 'all' => ['label' => 'Semua', 'icon' => 'fa-th-large'],
                 'draft' => ['label' => 'Draft', 'icon' => 'fa-file'],
                 'submitted' => ['label' => 'Diajukan', 'icon' => 'fa-paper-plane'],
                 'revision_required' => ['label' => 'Revisi', 'icon' => 'fa-edit'],
-                'approved' => ['label' => 'Disetujui', 'icon' => 'fa-check'],
-                'rejected' => ['label' => 'Ditolak', 'icon' => 'fa-times'],
+                'approved' => ['label' => 'OK', 'icon' => 'fa-check'],
+                'rejected' => ['label' => 'Tolak', 'icon' => 'fa-times'],
             ] as $key => $tab)
                 <button 
                     wire:click="setFilter('{{ $key }}')"
                     @class([
-                        'px-3 lg:px-4 py-2 lg:py-2.5 rounded-lg lg:rounded-xl text-xs lg:text-sm font-medium whitespace-nowrap transition-all flex items-center gap-1.5 lg:gap-2',
-                        'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md shadow-primary-500/30' => $filter === $key,
-                        'text-gray-600 hover:bg-gray-100' => $filter !== $key,
+                        'flex-1 px-1.5 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-[10px] lg:text-sm font-medium transition-all flex flex-col lg:flex-row items-center justify-center gap-0.5 lg:gap-2',
+                        'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md' => $filter === $key,
+                        'text-gray-500 hover:bg-gray-100' => $filter !== $key,
                     ])
                 >
                     <i class="fas {{ $tab['icon'] }} text-[10px] lg:text-xs"></i>
-                    <span class="hidden sm:inline">{{ $tab['label'] }}</span>
-                    @if($counts[$key] > 0)
-                        <span @class([
-                            'px-1.5 lg:px-2 py-0.5 text-[10px] lg:text-xs rounded-full min-w-[18px] lg:min-w-[22px] text-center font-semibold',
-                            'bg-white/20' => $filter === $key,
-                            'bg-gray-200 text-gray-600' => $filter !== $key,
-                        ])>{{ $counts[$key] }}</span>
-                    @endif
+                    <span class="lg:inline">{{ $tab['label'] }}</span>
                 </button>
             @endforeach
         </div>
     </div>
 
-    {{-- Status Legend Card - Horizontal Scroll --}}
-    <div class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl lg:rounded-2xl p-3 lg:p-4 mb-4 lg:mb-6 border border-gray-100">
+    {{-- Status Legend Card - Hidden on mobile, show on desktop --}}
+    <div class="hidden lg:block bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl lg:rounded-2xl p-3 lg:p-4 mb-4 lg:mb-6 border border-gray-100">
         <div class="flex items-center gap-2 lg:gap-3 overflow-x-auto scrollbar-hide pb-1">
             <span class="flex-shrink-0 text-[10px] lg:text-xs font-semibold text-gray-500 flex items-center gap-1">
                 <i class="fas fa-info-circle"></i> Status:
@@ -118,7 +127,7 @@
                         <div class="relative flex-shrink-0">
                             <div class="w-16 h-22 lg:w-24 lg:h-32 bg-gradient-to-br from-primary-50 via-blue-50 to-sky-50 rounded-lg lg:rounded-xl flex items-center justify-center overflow-hidden shadow-sm group-hover:shadow-md transition">
                                 @if($submission->cover_file)
-                                    <img src="{{ Storage::url($submission->cover_file) }}" alt="" class="w-full h-full object-cover">
+                                    <img src="{{ route('thesis.file', [$submission, 'cover']) }}" alt="" class="w-full h-full object-cover">
                                 @else
                                     <div class="text-center">
                                         <i class="fas fa-book text-primary-300 text-xl lg:text-3xl"></i>
@@ -224,6 +233,16 @@
                                 @if($submission->isPublished() && $submission->ethesis_id)
                                     <a href="{{ route('opac.ethesis.show', $submission->ethesis_id) }}" class="px-2.5 lg:px-4 py-1.5 lg:py-2 bg-emerald-50 text-emerald-700 text-[10px] lg:text-xs font-semibold rounded-lg hover:bg-emerald-100 transition inline-flex items-center gap-1">
                                         <i class="fas fa-external-link-alt"></i> E-Thesis
+                                    </a>
+                                @endif
+
+                                @php $clearanceLetter = $submission->clearanceLetter; @endphp
+                                @if($clearanceLetter && $clearanceLetter->status === 'approved')
+                                    <a href="{{ route('opac.member.clearance-letter.download', $clearanceLetter) }}" class="px-2.5 lg:px-4 py-1.5 lg:py-2 bg-blue-50 text-blue-700 text-[10px] lg:text-xs font-semibold rounded-lg hover:bg-blue-100 transition inline-flex items-center gap-1">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </a>
+                                    <a href="{{ route('opac.member.clearance-letter', $clearanceLetter) }}" target="_blank" class="px-2.5 lg:px-4 py-1.5 lg:py-2 bg-violet-50 text-violet-700 text-[10px] lg:text-xs font-semibold rounded-lg hover:bg-violet-100 transition inline-flex items-center gap-1">
+                                        <i class="fas fa-print"></i> Cetak
                                     </a>
                                 @endif
 

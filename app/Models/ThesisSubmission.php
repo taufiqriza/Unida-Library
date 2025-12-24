@@ -67,6 +67,11 @@ class ThesisSubmission extends Model
         return $this->hasMany(ThesisSubmissionLog::class, 'submission_id');
     }
 
+    public function clearanceLetter()
+    {
+        return $this->hasOne(ClearanceLetter::class);
+    }
+
     // Enum accessor
     public function getThesisTypeEnum(): ?ThesisType
     {

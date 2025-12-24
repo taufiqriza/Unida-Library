@@ -132,32 +132,21 @@ class ReviewThesisSubmission extends Page implements HasForms, HasInfolists
                         InfoGrid::make(4)->schema([
                             ImageEntry::make('cover_file')
                                 ->label('Cover')
-                                ->disk('public')
+                                ->disk('thesis')
                                 ->height(150)
                                 ->defaultImageUrl('https://ui-avatars.com/api/?name=No+Cover&background=e5e7eb&color=9ca3af'),
                             TextEntry::make('approval_file')
                                 ->label('Lembar Pengesahan')
-                                ->formatStateUsing(fn($state) => $state ? '📄 Download PDF' : '-')
-                                ->url(fn($state) => $state ? Storage::disk('public')->url($state) : null)
-                                ->openUrlInNewTab()
+                                ->formatStateUsing(fn($state) => $state ? '📄 Ada' : '-')
                                 ->color('primary'),
                             TextEntry::make('preview_file')
                                 ->label('BAB 1-3')
-                                ->formatStateUsing(fn($state) => $state ? '📄 Download PDF' : '-')
-                                ->url(fn($state) => $state ? Storage::disk('public')->url($state) : null)
-                                ->openUrlInNewTab()
+                                ->formatStateUsing(fn($state) => $state ? '📄 Ada' : '-')
                                 ->color('primary'),
                             TextEntry::make('fulltext_file')
                                 ->label('Full Text')
-                                ->formatStateUsing(fn($state) => $state ? '📄 Download PDF' : '-')
-                                ->url(fn($state) => $state ? Storage::disk('public')->url($state) : null)
-                                ->openUrlInNewTab()
+                                ->formatStateUsing(fn($state) => $state ? '📄 Ada' : '-')
                                 ->color('primary'),
-                        ]),
-                        InfoGrid::make(2)->schema([
-                            IconEntry::make('allow_fulltext_public')
-                                ->label('User minta akses publik Full Text')
-                                ->boolean(),
                         ]),
                     ])->collapsible(),
             ]);

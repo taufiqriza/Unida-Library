@@ -63,6 +63,16 @@ return [
         'news' => 'الأخبار',
     ],
     
+    // Stats Bar
+    'stats' => [
+        'books' => 'الكتب',
+        'ethesis' => 'الرسائل',
+        'shamela' => 'الشاملة',
+        'ebook' => 'إلكترونية',
+        'journals' => 'المجلات',
+        'members' => 'الأعضاء',
+    ],
+    
     // Homepage
     'homepage' => [
         // Hero

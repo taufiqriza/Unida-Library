@@ -87,6 +87,10 @@ Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileComple
     // Settings Profile (Livewire)
     Route::get('/settings', \App\Livewire\Opac\Member\Settings::class)->name('settings');
     
+    // Clearance Letter (Surat Bebas Pustaka)
+    Route::get('/clearance-letter/{letter}', \App\Livewire\Opac\Member\ClearanceLetterPrint::class)->name('clearance-letter');
+    Route::get('/clearance-letter/{letter}/download', [App\Http\Controllers\Opac\ClearanceLetterController::class, 'download'])->name('clearance-letter.download');
+    
     // Plagiarism Check (Livewire)
     Route::prefix('plagiarism')->name('plagiarism.')->group(function () {
         Route::get('/', \App\Livewire\Opac\Plagiarism\PlagiarismIndex::class)->name('index');
@@ -110,6 +114,11 @@ Route::get('/member/dashboard', \App\Livewire\Opac\Member\Dashboard::class)->mid
 // Thesis file access (with access control)
 Route::get('/thesis-file/{submission}/{type}', [ThesisFileController::class, 'show'])->name('thesis.file');
 Route::get('/thesis-file/{submission}/{type}/download', [ThesisFileController::class, 'download'])->name('thesis.file.download');
+
+// Admin thesis file access (no access control - for staff portal)
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/thesis-file/{submission}/{type}', [ThesisFileController::class, 'adminShow'])->name('admin.thesis.file');
+});
 
 // DDC API (for admin panel DDC lookup)
 Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.search');

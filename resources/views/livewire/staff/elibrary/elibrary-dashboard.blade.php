@@ -185,7 +185,7 @@
                     </div>
 
                     {{-- Footer Actions --}}
-                    @if($isMainBranch && $selectedType === 'submission' && in_array($selectedItem->status, ['submitted', 'under_review', 'approved']))
+                    @if($canReviewThesis && $selectedType === 'submission' && in_array($selectedItem->status, ['submitted', 'under_review', 'approved']))
                     <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50 flex-shrink-0">
                         <div class="mb-4">
                             <label class="flex items-center gap-2 text-xs font-semibold text-gray-600 uppercase tracking-wider mb-2">
@@ -218,7 +218,7 @@
                     @endif
 
                     {{-- Published Footer --}}
-                    @if($isMainBranch && $selectedType === 'submission' && $selectedItem->status === 'published')
+                    @if($canReviewThesis && $selectedType === 'submission' && $selectedItem->status === 'published')
                     <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">

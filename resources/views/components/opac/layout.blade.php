@@ -675,9 +675,13 @@
             <div class="bg-gradient-to-r from-primary-700 to-primary-900 p-4">
                 <div class="flex items-center justify-between">
                     <img src="{{ url('storage/logo.png') }}" alt="UNIDA Library" class="h-9 w-auto">
-                    <button @click="sidebarOpen = false" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <!-- Language Switcher for Mobile -->
+                        <x-opac.language-switcher mobile="true" />
+                        <button @click="sidebarOpen = false" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1046,7 +1050,7 @@
                 <span class="text-[10px] mt-0.5 font-medium">E-Book</span>
             </a>
             <button @click="searchOpen = true; $nextTick(() => $refs.searchInput?.focus())" class="flex flex-col items-center -mt-5">
-                <span class="w-14 h-14 bg-gradient-to-br from-accent-400 to-accent-500 text-gray-900 rounded-2xl shadow-lg shadow-accent-500/40 flex items-center justify-center ring-4 ring-primary-800">
+                <span class="w-14 h-14 bg-white text-primary-600 rounded-full flex items-center justify-center" style="box-shadow: 0 0 0 5px #1e3d9a">
                     <i class="fas fa-search text-xl"></i>
                 </span>
                 <span class="text-[10px] mt-1 font-medium text-white">{{ __('opac.search') }}</span>
@@ -1070,5 +1074,75 @@
     @include('partials.floating-widgets')
 
     <script src="{{ url('livewire/livewire.js') }}" data-csrf="{{ csrf_token() }}" data-update-uri="{{ url('livewire/update') }}"></script>
+    
+    {{-- SweetAlert2 for elegant notifications --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Custom Livewire notification handler
+        document.addEventListener('livewire:init', () => {
+            // Loading indicator
+            Livewire.on('showLoading', (params) => {
+                const { message = 'Memproses...', title = '' } = params[0] || {};
+                Swal.fire({
+                    title: title,
+                    html: `<div class="flex flex-col items-center gap-3">
+                        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                        <p class="text-gray-600 text-sm">${message}</p>
+                    </div>`,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    showConfirmButton: false,
+                    background: '#fff',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-xl',
+                        htmlContainer: 'py-4'
+                    }
+                });
+            });
+            
+            // Success notification
+            Livewire.on('showSuccess', (params) => {
+                const { message = 'Berhasil!', title = 'Sukses' } = params[0] || {};
+                Swal.fire({
+                    icon: 'success',
+                    title: title,
+                    text: message,
+                    timer: 2500,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    background: '#fff',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-xl',
+                        title: 'text-lg font-bold text-gray-800',
+                        htmlContainer: 'text-sm text-gray-600'
+                    }
+                });
+            });
+            
+            // Error notification
+            Livewire.on('showError', (params) => {
+                const { message = 'Terjadi kesalahan', title = 'Gagal' } = params[0] || {};
+                Swal.fire({
+                    icon: 'error',
+                    title: title,
+                    text: message,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3b82f6',
+                    background: '#fff',
+                    customClass: {
+                        popup: 'rounded-2xl shadow-xl',
+                        title: 'text-lg font-bold text-gray-800',
+                        htmlContainer: 'text-sm text-gray-600',
+                        confirmButton: 'rounded-xl px-6'
+                    }
+                });
+            });
+            
+            // Close any open alert
+            Livewire.on('closeAlert', () => {
+                Swal.close();
+            });
+        });
+    </script>
 </body>
 </html>

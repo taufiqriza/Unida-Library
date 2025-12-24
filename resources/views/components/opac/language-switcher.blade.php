@@ -2,10 +2,10 @@
     {{-- Current Language Button --}}
     <button @click="open = !open" 
             @click.away="open = false"
-            class="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg transition border border-white/10">
-        <span class="text-sm">{{ $availableLocales[$locale]['flag'] ?? '🌐' }}</span>
+            class="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-white/90 hover:text-white hover:bg-white/10 rounded transition">
+        <span class="text-xs">{{ $availableLocales[$locale]['flag'] ?? '🌐' }}</span>
         <span class="hidden sm:inline uppercase">{{ $locale }}</span>
-        <i class="fas fa-chevron-down text-[8px] transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+        <i class="fas fa-chevron-down text-[7px] opacity-60" :class="open ? 'rotate-180' : ''"></i>
     </button>
     
     {{-- Dropdown Menu --}}

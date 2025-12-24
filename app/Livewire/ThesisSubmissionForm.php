@@ -57,7 +57,7 @@ class ThesisSubmissionForm extends Component
 
     protected $listeners = ['refreshComponent' => '$refresh'];
     
-    protected ?int $memberId = null;
+    public ?int $memberId = null;
 
     // Validation rules per step
     protected function rules(): array
@@ -274,6 +274,14 @@ class ThesisSubmissionForm extends Component
 
     public function saveDraft(): void
     {
+        // Ensure memberId is fresh from Auth
+        $this->refreshMemberId();
+        
+        if (!$this->memberId) {
+            $this->redirect(route('login'));
+            return;
+        }
+        
         // Minimal validation for draft - only require title
         $this->validate([
             'title' => 'required|min:3',
@@ -298,17 +306,39 @@ class ThesisSubmissionForm extends Component
 
     public function submit(): void
     {
+        // Ensure memberId is fresh from Auth
+        $this->refreshMemberId();
+        
         if (!$this->memberId) {
             $this->redirect(route('login'));
             return;
         }
         
+        // Show loading indicator
+        $this->dispatch('showLoading', ['message' => 'Menyimpan tugas akhir...', 'title' => '']);
+        
         $this->validateStep();
         $submission = $this->saveSubmission('submitted');
         $submission->submit($this->memberId);
         
+        // Close loading and show success
+        $this->dispatch('closeAlert');
+        $this->dispatch('showSuccess', [
+            'title' => '🎉 Berhasil!', 
+            'message' => 'Tugas akhir berhasil diajukan. Silakan tunggu proses verifikasi dari pustakawan.'
+        ]);
+        
         session()->flash('success', 'Tugas akhir berhasil diajukan! Silakan tunggu proses verifikasi dari pustakawan.');
         $this->redirect(route('opac.member.submissions'));
+    }
+    
+    /**
+     * Refresh memberId from Auth guard to prevent hydration issues
+     */
+    protected function refreshMemberId(): void
+    {
+        $member = Auth::guard('member')->user();
+        $this->memberId = $member?->id;
     }
 
     protected function saveSubmission(string $status): ThesisSubmission
@@ -331,7 +361,7 @@ class ThesisSubmissionForm extends Component
             'examiner3' => $this->examiner3,
             'year' => $this->year,
             'defense_date' => $this->defense_date,
-            'allow_fulltext_public' => $this->allow_fulltext_public,
+            'allow_fulltext_public' => false, // Always locked - only UNIDA members can access
             'status' => $status,
         ];
 

@@ -63,6 +63,16 @@ return [
         'news' => 'NEWS',
     ],
     
+    // Stats Bar
+    'stats' => [
+        'books' => 'Buku',
+        'ethesis' => 'E-Thesis',
+        'shamela' => 'Shamela',
+        'ebook' => 'E-Book',
+        'journals' => 'Jurnal',
+        'members' => 'Anggota',
+    ],
+    
     // Homepage
     'homepage' => [
         // Hero
@@ -624,23 +634,63 @@ return [
         // Panduan Member
         'panduan_member' => [
             'title' => 'Panduan Member Perpustakaan',
-            'subtitle' => 'Cara login, registrasi, dan menggunakan fitur member perpustakaan digital',
+            'subtitle' => 'Cara login, registrasi, jenis keanggotaan, dan menggunakan fitur member perpustakaan digital',
             'breadcrumb' => 'Panduan',
+            
+            // Account Info
             'account_title' => 'Akun Member Perpustakaan',
             'account_desc' => 'Dengan akun member, Anda dapat mengakses berbagai layanan perpustakaan digital seperti peminjaman online, unggah tugas akhir, cek plagiasi, dan riwayat transaksi.',
+            
+            // Member Types
+            'member_types_title' => 'Jenis Keanggotaan',
+            'student_member' => 'Mahasiswa UNIDA',
+            'student_member_desc' => 'Keanggotaan otomatis untuk mahasiswa aktif UNIDA Gontor. Cukup login dengan email @unida.gontor.ac.id atau @mhs.unida.gontor.ac.id.',
+            'student_member_benefits' => 'Keuntungan: Akses penuh ke semua fitur termasuk unggah tugas akhir, cek plagiasi, dan surat bebas pustaka.',
+            'public_member' => 'Anggota Umum',
+            'public_member_desc' => 'Keanggotaan untuk masyarakat umum, alumni, atau civitas non-mahasiswa. Mendaftar melalui formulir manual.',
+            'public_member_benefits' => 'Akses: Peminjaman buku, katalog online, dan akses e-resources terbatas.',
+            
+            // Registration Flow
+            'registration_title' => 'Cara Mendaftar',
+            'reg_student_title' => 'Mahasiswa UNIDA (Otomatis)',
+            'reg_student_step1' => 'Klik tombol "Masuk dengan Email UNIDA"',
+            'reg_student_step2' => 'Login dengan akun Google menggunakan email @unida.gontor.ac.id',
+            'reg_student_step3' => 'Sistem otomatis mendeteksi Anda sebagai mahasiswa',
+            'reg_student_step4' => 'Lengkapi data profil (nama, NIM, program studi)',
+            'reg_student_step5' => 'Akun member langsung aktif!',
+            'reg_public_title' => 'Anggota Umum (Manual)',
+            'reg_public_step1' => 'Klik "Daftar Manual" pada halaman login',
+            'reg_public_step2' => 'Isi formulir dengan data lengkap',
+            'reg_public_step3' => 'Upload foto dan bukti identitas',
+            'reg_public_step4' => 'Tunggu verifikasi admin perpustakaan',
+            'reg_public_step5' => 'Setelah disetujui, akun aktif',
+            
+            // Google Email Connection
+            'google_email_title' => 'Menghubungkan Email UNIDA ke Google',
+            'google_email_desc' => 'Email UNIDA (@unida.gontor.ac.id) adalah akun Google Workspace. Jika belum terhubung ke handphone:',
+            'google_email_step1' => 'Buka Pengaturan > Akun > Tambah Akun',
+            'google_email_step2' => 'Pilih Google',
+            'google_email_step3' => 'Masukkan email UNIDA lengkap (nama@unida.gontor.ac.id)',
+            'google_email_step4' => 'Masukkan password email UNIDA',
+            'google_email_step5' => 'Selesai! Email UNIDA kini terhubung ke Google',
+            'google_email_tip' => 'Setelah terhubung, Anda bisa login ke perpustakaan dengan satu klik!',
+            
+            // Login Methods
             'login_title' => 'Cara Login',
             'google_login_title' => 'Login dengan Email UNIDA (Rekomendasi)',
             'google_login_desc' => 'Cara tercepat untuk mahasiswa dan civitas akademika UNIDA Gontor:',
             'google_step1' => 'Klik tombol "Masuk / Daftar dengan Email UNIDA"',
             'google_step2' => 'Pilih akun Google dengan email @unida.gontor.ac.id',
-            'google_step3' => 'Jika pertama kali, akun member akan dibuat otomatis',
+            'google_step3' => 'Jika pertama kali, sistem akan minta lengkapi profil',
             'google_step4' => 'Anda langsung masuk ke Dashboard Member',
             'google_tip' => 'Tips: Login Google otomatis membuat akun baru jika belum terdaftar!',
             'manual_login_title' => 'Login Manual',
-            'manual_login_desc' => 'Untuk anggota yang sudah terdaftar sebelumnya:',
+            'manual_login_desc' => 'Untuk anggota umum atau yang sudah terdaftar sebelumnya:',
             'manual_step1' => 'Masukkan No. Anggota atau Email',
             'manual_step2' => 'Masukkan Password',
             'manual_step3' => 'Klik tombol "Masuk"',
+            
+            // Dashboard Features
             'features_title' => 'Fitur Dashboard Member',
             'active_loans' => 'Peminjaman Aktif',
             'active_loans_desc' => 'Lihat daftar buku yang sedang dipinjam dan tanggal jatuh tempo.',
@@ -649,15 +699,31 @@ return [
             'plagiarism_check' => 'Cek Plagiasi',
             'plagiarism_check_desc' => 'Scan dokumen dengan iThenticate. Kuota terbatas per mahasiswa.',
             'clearance_letter' => 'Surat Bebas Pustaka',
-            'clearance_letter_desc' => 'Ajukan dan unduh surat bebas pustaka untuk wisuda.',
+            'clearance_letter_desc' => 'Surat otomatis terbit saat tugas akhir disetujui dan tidak ada peminjaman/denda.',
+            
+            // Clearance Letter Flow
+            'clearance_flow_title' => 'Proses Surat Bebas Pustaka',
+            'clearance_flow_desc' => 'Surat bebas pustaka diterbitkan otomatis dengan syarat:',
+            'clearance_req1' => 'Tugas akhir telah diunggah dan disetujui admin',
+            'clearance_req2' => 'Tidak memiliki peminjaman buku aktif',
+            'clearance_req3' => 'Tidak memiliki denda yang belum dibayar',
+            'clearance_auto' => 'Surat langsung muncul di dashboard dan bisa diunduh/cetak dalam format PDF.',
+            
+            // FAQ
             'faq_title' => 'Pertanyaan Umum',
             'faq1_q' => 'Bagaimana jika email UNIDA saya tidak bisa login?',
-            'faq1_a' => 'Pastikan menggunakan email @unida.gontor.ac.id. Jika masih bermasalah, hubungi petugas perpustakaan.',
+            'faq1_a' => 'Pastikan menggunakan email @unida.gontor.ac.id atau @mhs.unida.gontor.ac.id. Jika masih bermasalah, hubungi petugas perpustakaan atau IT Helpdesk UNIDA.',
             'faq2_q' => 'Bagaimana cara mendaftar sebagai anggota baru?',
-            'faq2_a_student' => 'Mahasiswa UNIDA: Login dengan email UNIDA, akun otomatis dibuat.',
-            'faq2_a_public' => 'Anggota Umum: Klik "Daftar Manual" atau datang ke perpustakaan.',
+            'faq2_a_student' => 'Mahasiswa UNIDA: Login dengan email UNIDA, akun otomatis dibuat dengan role mahasiswa.',
+            'faq2_a_public' => 'Anggota Umum: Klik "Daftar Manual", isi formulir, tunggu verifikasi admin.',
             'faq3_q' => 'Lupa password, bagaimana cara reset?',
-            'faq3_a' => 'Hubungi petugas perpustakaan dengan KTM/identitas. Atau gunakan login Google jika sudah terhubung.',
+            'faq3_a' => 'Untuk mahasiswa: gunakan fitur reset password Google. Untuk anggota umum: hubungi petugas perpustakaan.',
+            'faq4_q' => 'Kapan surat bebas pustaka saya terbit?',
+            'faq4_a' => 'Surat otomatis terbit saat admin menyetujui tugas akhir Anda, asalkan tidak ada peminjaman atau denda aktif.',
+            'faq5_q' => 'Apa bedanya mahasiswa dan anggota umum?',
+            'faq5_a' => 'Mahasiswa memiliki akses penuh termasuk unggah tugas akhir dan cek plagiasi. Anggota umum terbatas pada peminjaman dan katalog.',
+            
+            // CTA
             'cta_title' => 'Siap Menggunakan Layanan Perpustakaan?',
             'cta_desc' => 'Login sekarang untuk mengakses semua fitur member',
             'login_now' => 'Masuk Sekarang',

@@ -39,6 +39,16 @@ class ElibraryDashboard extends Component
         return auth()->user()->branch?->is_main ?? false;
     }
 
+    /**
+     * Check if current user can review thesis submissions
+     * Only Super Admin and Admin can review (not regular Librarian)
+     */
+    public function canReviewThesis(): bool
+    {
+        $user = auth()->user();
+        return $user->isAdmin(); // Super Admin or Admin only
+    }
+
     public function viewDetail($id, $type)
     {
         $this->selectedType = $type;
@@ -60,7 +70,31 @@ class ElibraryDashboard extends Component
 
     public function approveSubmission()
     {
-        if (!$this->isMainBranch() || !$this->selectedItem) return;
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
+        
+        // Check for active loans
+        $member = $this->selectedItem->member;
+        $hasWarnings = false;
+        
+        if ($member) {
+            if ($member->hasOutstandingLoans()) {
+                $loanCount = $member->outstanding_loans_count;
+                $this->dispatch('notify', 
+                    type: 'warning', 
+                    message: "⚠️ Mahasiswa ini masih memiliki {$loanCount} peminjaman aktif. Pastikan semua buku dikembalikan sebelum memberikan surat bebas pustaka."
+                );
+                $hasWarnings = true;
+            }
+            
+            if ($member->hasUnpaidFines()) {
+                $fines = number_format($member->total_unpaid_fines, 0, ',', '.');
+                $this->dispatch('notify', 
+                    type: 'warning', 
+                    message: "⚠️ Mahasiswa ini memiliki denda belum dibayar Rp {$fines}."
+                );
+                $hasWarnings = true;
+            }
+        }
         
         $this->selectedItem->update([
             'status' => 'approved',
@@ -68,13 +102,38 @@ class ElibraryDashboard extends Component
             'reviewed_at' => now(),
             'review_notes' => $this->reviewNotes,
         ]);
-        $this->dispatch('notify', type: 'success', message: 'Submission disetujui');
+        
+        // Auto-create clearance letter if member has no active loans and fines
+        if ($member && !$hasWarnings) {
+            \App\Models\ClearanceLetter::updateOrCreate(
+                [
+                    'member_id' => $member->id,
+                    'thesis_submission_id' => $this->selectedItem->id,
+                ],
+                [
+                    'letter_number' => \App\Models\ClearanceLetter::generateLetterNumber(),
+                    'purpose' => 'Bebas Pustaka - ' . ucfirst($this->selectedItem->type),
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                    'notes' => 'Otomatis disetujui bersamaan dengan persetujuan tugas akhir.',
+                ]
+            );
+        }
+        
+        $message = 'Submission disetujui';
+        if ($hasWarnings) {
+            $message .= ' (dengan catatan peminjaman/denda)';
+        } else {
+            $message .= ' dan surat bebas pustaka telah diterbitkan';
+        }
+        $this->dispatch('notify', type: 'success', message: $message);
         $this->closeModal();
     }
 
     public function rejectSubmission()
     {
-        if (!$this->isMainBranch() || !$this->selectedItem) return;
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
         
         $this->selectedItem->update([
             'status' => 'rejected',
@@ -88,7 +147,7 @@ class ElibraryDashboard extends Component
 
     public function requestRevision()
     {
-        if (!$this->isMainBranch() || !$this->selectedItem) return;
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
         
         $this->selectedItem->update([
             'status' => 'revision_required',
@@ -102,7 +161,7 @@ class ElibraryDashboard extends Component
 
     public function publishSubmission()
     {
-        if (!$this->isMainBranch() || !$this->selectedItem) return;
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
         
         // Create ethesis from submission
         $ethesis = \App\Models\Ethesis::create([
@@ -273,6 +332,7 @@ class ElibraryDashboard extends Component
             'plagiarismStats' => $plagiarismStats,
             'data' => $data,
             'isMainBranch' => $isMain,
+            'canReviewThesis' => $this->canReviewThesis(),
         ])->extends('staff.layouts.app')->section('content');
     }
 }

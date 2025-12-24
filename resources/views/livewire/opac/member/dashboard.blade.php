@@ -77,48 +77,48 @@
             </div>
 
             {{-- Stats Cards --}}
-            <div class="grid grid-cols-4 gap-2 lg:gap-4 mb-4">
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-book-reader text-blue-600 text-sm"></i>
+            <div class="grid grid-cols-4 gap-1.5 lg:gap-4 mb-3 lg:mb-4">
+                <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-3 shadow-sm border border-gray-100">
+                    <div class="flex flex-col lg:flex-row items-center lg:gap-2 text-center lg:text-left">
+                        <div class="w-7 h-7 lg:w-9 lg:h-9 bg-blue-100 rounded-lg flex items-center justify-center mb-1 lg:mb-0">
+                            <i class="fas fa-book-reader text-blue-600 text-[10px] lg:text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-xl font-bold text-gray-900">{{ $loans->count() }}</p>
-                            <p class="text-[10px] text-gray-500">Dipinjam</p>
+                            <p class="text-base lg:text-xl font-bold text-gray-900">{{ $loans->count() }}</p>
+                            <p class="text-[8px] lg:text-[10px] text-gray-500">Dipinjam</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-exclamation-triangle text-orange-600 text-sm"></i>
+                <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-3 shadow-sm border border-gray-100">
+                    <div class="flex flex-col lg:flex-row items-center lg:gap-2 text-center lg:text-left">
+                        <div class="w-7 h-7 lg:w-9 lg:h-9 bg-orange-100 rounded-lg flex items-center justify-center mb-1 lg:mb-0">
+                            <i class="fas fa-exclamation-triangle text-orange-600 text-[10px] lg:text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-xl font-bold text-gray-900">{{ $loans->where('due_date', '<', now())->count() }}</p>
-                            <p class="text-[10px] text-gray-500">Terlambat</p>
+                            <p class="text-base lg:text-xl font-bold text-gray-900">{{ $loans->where('due_date', '<', now())->count() }}</p>
+                            <p class="text-[8px] lg:text-[10px] text-gray-500">Terlambat</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 bg-violet-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-file-alt text-violet-600 text-sm"></i>
+                <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-3 shadow-sm border border-gray-100">
+                    <div class="flex flex-col lg:flex-row items-center lg:gap-2 text-center lg:text-left">
+                        <div class="w-7 h-7 lg:w-9 lg:h-9 bg-violet-100 rounded-lg flex items-center justify-center mb-1 lg:mb-0">
+                            <i class="fas fa-file-alt text-violet-600 text-[10px] lg:text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-xl font-bold text-gray-900">{{ $submissions->count() }}</p>
-                            <p class="text-[10px] text-gray-500">Submission</p>
+                            <p class="text-base lg:text-xl font-bold text-gray-900">{{ $submissions->count() }}</p>
+                            <p class="text-[8px] lg:text-[10px] text-gray-500">Tugas Akhir</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-coins text-red-600 text-sm"></i>
+                <div class="bg-white rounded-lg lg:rounded-xl p-2 lg:p-3 shadow-sm border border-gray-100">
+                    <div class="flex flex-col lg:flex-row items-center lg:gap-2 text-center lg:text-left">
+                        <div class="w-7 h-7 lg:w-9 lg:h-9 bg-red-100 rounded-lg flex items-center justify-center mb-1 lg:mb-0">
+                            <i class="fas fa-coins text-red-600 text-[10px] lg:text-sm"></i>
                         </div>
                         <div>
-                            <p class="text-xl font-bold text-gray-900">{{ $fines->count() }}</p>
-                            <p class="text-[10px] text-gray-500">Denda</p>
+                            <p class="text-base lg:text-xl font-bold text-gray-900">{{ $fines->count() }}</p>
+                            <p class="text-[8px] lg:text-[10px] text-gray-500">Denda</p>
                         </div>
                     </div>
                 </div>
@@ -144,19 +144,26 @@
                         </div>
                         <div class="p-3 space-y-2">
                             @foreach($clearanceLetters->where('status', 'approved') as $letter)
-                            <div class="p-3 bg-white rounded-xl border border-emerald-100 flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">{{ $letter->letter_number }}</p>
-                                    <p class="text-xs text-gray-500">{{ $letter->approved_at?->format('d M Y') }}</p>
+                            <div class="p-3 bg-white rounded-xl border border-emerald-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ $letter->letter_number }}</p>
+                                        <p class="text-xs text-gray-500">Diterbitkan {{ $letter->approved_at?->format('d M Y') }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <a href="{{ route('opac.member.clearance-letter.download', $letter) }}" class="px-2 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-1">
+                                            <i class="fas fa-download"></i> PDF
+                                        </a>
+                                        <a href="{{ route('opac.member.clearance-letter', $letter) }}" target="_blank" class="px-2 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition flex items-center gap-1">
+                                            <i class="fas fa-print"></i> Cetak
+                                        </a>
+                                    </div>
                                 </div>
-                                @if($letter->file_path)
-                                <a href="{{ Storage::url($letter->file_path) }}" target="_blank" class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition">
-                                    <i class="fas fa-download mr-1"></i> Unduh
-                                </a>
-                                @else
-                                <span class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-lg">
-                                    <i class="fas fa-check mr-1"></i> Disetujui
-                                </span>
+                                @if($letter->thesisSubmission)
+                                <div class="bg-emerald-50 rounded-lg p-2 border-l-3 border-emerald-400">
+                                    <p class="text-xs text-emerald-700 font-medium line-clamp-1">{{ $letter->thesisSubmission->title }}</p>
+                                    <p class="text-[10px] text-emerald-600">{{ ucfirst($letter->thesisSubmission->type) }} • {{ $letter->thesisSubmission->year }}</p>
+                                </div>
                                 @endif
                             </div>
                             @endforeach
@@ -165,7 +172,7 @@
                     @endif
 
                     {{-- CTA Buttons Grid --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
                         {{-- Cek Plagiasi CTA (Left) --}}
                         @if(\App\Services\Plagiarism\PlagiarismService::isEnabled())
                         @php
@@ -174,59 +181,67 @@
                             $plagiarismRemaining = max(0, $plagiarismQuota - $plagiarismUsed);
                             $latestChecks = auth('member')->user()->plagiarismChecks()->latest()->take(3)->get();
                         @endphp
-                        <a href="{{ route('opac.member.plagiarism.index') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-4 lg:p-5 text-white shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-shield-alt text-xl"></i>
+                        <a href="{{ route('opac.member.plagiarism.index') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
+                            <div class="flex items-center gap-2 lg:gap-3">
+                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-shield-alt text-base lg:text-xl"></i>
                                 </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-sm lg:text-base">Cek Plagiasi</h3>
-                                    <p class="text-teal-200 text-xs">Khusus dokumen tugas akhir</p>
-                                    <p class="text-white/80 text-xs mt-0.5">
-                                        <i class="fas fa-ticket-alt mr-1"></i> Kuota: {{ $plagiarismRemaining }}/{{ $plagiarismQuota }} tersisa
-                                    </p>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
+                                    <p class="text-teal-200 text-[10px] lg:text-xs truncate">Kuota: {{ $plagiarismRemaining }}/{{ $plagiarismQuota }}</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
                             </div>
                         </a>
                         @endif
 
                         {{-- Unggah Tugas Akhir CTA (Right) --}}
-                        <a href="{{ route('opac.member.submit-thesis') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-4 lg:p-5 text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 transition-all group">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                    <i class="fas fa-upload text-xl"></i>
+                        <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
+                            <div class="flex items-center gap-2 lg:gap-3">
+                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-upload text-base lg:text-xl"></i>
                                 </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-sm lg:text-base">Unggah Tugas Akhir</h3>
-                                    <p class="text-violet-200 text-xs lg:text-sm">Submit skripsi/tesis/disertasi</p>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-xs lg:text-sm">Upload TA</h3>
+                                    <p class="text-violet-200 text-[10px] lg:text-xs truncate">Skripsi/Tesis</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
                             </div>
                         </a>
                     </div>
 
-                    {{-- Maktabah Shamela Card --}}
-                    <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-2xl p-4 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all group relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
-                        <div class="relative flex items-center gap-4">
-                            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:scale-110 transition-transform">
-                                <i class="fas fa-book-quran text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="font-bold text-base lg:text-lg">Maktabah Shamela</h3>
-                                    <span class="px-2 py-0.5 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">LOKAL</span>
+                    {{-- Shamela & Database Cards Grid --}}
+                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                        {{-- Maktabah Shamela Card --}}
+                        <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
+                            <div class="relative flex items-center gap-2 lg:gap-3">
+                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-book-quran text-sm lg:text-lg"></i>
                                 </div>
-                                <p class="text-blue-200 text-xs lg:text-sm">Akses 8,425 kitab Islam klasik — 7+ juta halaman</p>
-                                <p class="text-blue-300 text-xs mt-1" dir="rtl">
-                                    <i class="fas fa-mosque ml-1"></i> المكتبة الشاملة
-                                </p>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                        <h3 class="font-bold text-xs lg:text-sm">Shamela</h3>
+                                        <span class="px-1 py-0.5 bg-amber-400 text-amber-900 text-[7px] lg:text-[8px] font-bold rounded">8.4K</span>
+                                    </div>
+                                    <p class="text-emerald-200 text-[9px] lg:text-xs truncate">Kitab klasik</p>
+                                </div>
                             </div>
-                            <i class="fas fa-chevron-right text-white/60 group-hover:translate-x-1 transition-transform"></i>
-                        </div>
-                    </a>
+                        </a>
+
+                        {{-- FPPTI Database Access Card --}}
+                        <a href="{{ route('opac.database-access') }}" class="block bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
+                            <div class="relative flex items-center gap-2 lg:gap-3">
+                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-database text-sm lg:text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                        <h3 class="font-bold text-xs lg:text-sm">Database</h3>
+                                        <span class="px-1 py-0.5 bg-amber-400 text-amber-900 text-[7px] lg:text-[8px] font-bold rounded">FPPTI</span>
+                                    </div>
+                                    <p class="text-indigo-200 text-[9px] lg:text-xs truncate">Gale, ProQuest</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
 
                     {{-- Peminjaman Aktif --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -438,7 +453,7 @@
                                         {{-- Cover --}}
                                         <div class="w-12 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                             @if($sub->cover_file)
-                                                <img src="{{ Storage::url($sub->cover_file) }}" alt="" class="w-full h-full object-cover">
+                                                <img src="{{ route('thesis.file', [$sub, 'cover']) }}" alt="" class="w-full h-full object-cover">
                                             @else
                                                 <i class="fas fa-book text-primary-400 text-sm"></i>
                                             @endif
