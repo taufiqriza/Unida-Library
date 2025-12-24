@@ -1,166 +1,182 @@
-# 🚀 Deployment Guide - Laravel Perpustakaan to VM
+# Deployment Guide - Perpustakaan UNIDA Gontor
 
-## Overview
+## Server Information
+- **Domain**: https://library.unida.gontor.ac.id
+- **Server IP**: 103.195.19.158
+- **User**: vm-4
+- **OS**: Ubuntu 24.04 LTS
 
-| Component | Size | Sync Method |
-|-----------|------|-------------|
-| Application Code | ~500MB | Git/rsync |
-| Main Database (SQLite) | 84KB | Direct copy |
-| Shamela Database | 21GB | rsync (background) |
-| Universitaria PDFs | 4.8GB | rsync (background) |
-| Book Databases | 672MB | rsync (background) |
-| Total Storage | ~28GB | rsync incremental |
+## Directory Structure (Professional Setup)
 
----
+```
+/var/www/perpustakaan-app/
+├── current/                    # Application code (git repo)
+│   ├── app/
+│   ├── bootstrap/
+│   ├── config/
+│   ├── database/
+│   ├── public/                 # Web root (only this exposed to web)
+│   ├── resources/
+│   ├── routes/
+│   ├── storage -> ../shared/storage  # Symlink to shared
+│   ├── .env -> ../shared/.env        # Symlink to shared
+│   └── ...
+├── shared/                     # Persistent data (survives deployments)
+│   ├── .env                    # Environment configuration
+│   └── storage/
+│       ├── app/public/         # User uploads
+│       ├── framework/
+│       │   ├── cache/
+│       │   ├── sessions/
+│       │   └── views/
+│       └── logs/
+```
 
-## 🎯 Recommended Deployment Strategy
+## Security Benefits
+- Only `/public` folder is exposed to web server
+- Application code is outside web root
+- `.env` and sensitive files are not accessible via web
+- Storage is separated and persists across deployments
 
-### Phase 1: Application Deployment (15 min)
+## Git Workflow
+
+### Branches
+- `master` - Development branch
+- `production` - Production deployment branch
+
+### Deploy New Changes
+
+1. **Local Development**
+   ```bash
+   # Make changes on master
+   git add .
+   git commit -m "Your changes"
+   git push origin master
+   ```
+
+2. **Merge to Production**
+   ```bash
+   git checkout production
+   git merge master
+   git push origin production
+   ```
+
+3. **Deploy to Server**
+   ```bash
+   ssh vm-4@103.195.19.158
+   cd /var/www/perpustakaan-app/current
+   ./deploy.sh
+   ```
+
+   Or quick deploy:
+   ```bash
+   ssh vm-4@103.195.19.158 "cd /var/www/perpustakaan-app/current && ./deploy.sh"
+   ```
+
+## Manual Deployment Steps
 
 ```bash
-# 1. Clone/pull code on VM
-cd /var/www
-git clone git@github.com:your-repo/perpustakaan.git
-# OR git pull if updating
+# SSH to server
+ssh vm-4@103.195.19.158
 
-# 2. Install dependencies
-cd perpustakaan
-composer install --optimize-autoloader --no-dev
+# Go to app directory
+cd /var/www/perpustakaan-app/current
+
+# Pull latest code
+git pull origin production
+
+# Install dependencies
+composer install --no-dev --optimize-autoloader
+
+# Build assets
 npm ci && npm run build
 
-# 3. Copy environment
-cp .env.example .env
-nano .env  # Configure production values
+# Run migrations
+php artisan migrate --force
 
-# 4. Generate key & optimize
-php artisan key:generate
+# Clear cache
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+# Optimize
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-php artisan storage:link
+
+# Fix permissions
+sudo chown -R www-data:www-data ../shared/storage
+sudo chmod -R 775 ../shared/storage
+
+# Restart PHP-FPM
+sudo systemctl reload php8.3-fpm
 ```
 
-### Phase 2: Database Sync (5 min)
+## Rollback
 
-**Option A: Copy SQLite from Local (Recommended)**
+If something goes wrong:
 ```bash
-# From local machine - main app database only
-scp database/database.sqlite user@vm:/var/www/perpustakaan/database/
-```
-
-**Option B: Fresh Migration + Seed**
-```bash
-php artisan migrate --force
-php artisan db:seed --force
-```
-
-### Phase 3: Large Files Sync (2-8 hours, background)
-
-Use the existing workflow: `/sync-large-files`
-
-```bash
-# From local machine, run in screen/tmux
-export PROD_HOST="your-vm-ip"
-export PROD_USER="your-user"
-export PROD_PATH="/var/www/perpustakaan/storage"
-
-# Start with Shamela (largest, run overnight)
-screen -S shamela-sync
-rsync -avz --progress -e ssh \
-  storage/database/shamela_content.db \
-  storage/database/master.db \
-  storage/database/cover.db \
-  storage/database/book/ \
-  $PROD_USER@$PROD_HOST:$PROD_PATH/database/
-
-# Ctrl+A, D to detach
-```
-
----
-
-## 📋 Pre-Deployment Checklist
-
-```bash
-# Local - Before deployment
-[ ] Backup production database
-[ ] Run tests: php artisan test
-[ ] Check composer audit: composer audit
-[ ] Commit all changes
-[ ] Tag release: git tag v1.x.x
-
-# VM - Environment
-[ ] PHP 8.2+ installed
-[ ] Required extensions: pdo, sqlite3, gd, mbstring, xml
-[ ] Composer installed
-[ ] Node.js 18+ installed
-[ ] Storage directories writable
-```
-
----
-
-## 🔧 Production .env Template
-
-```env
-APP_NAME="Perpustakaan UNIDA"
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://perpustakaan.unida.gontor.ac.id
-
-# Database
-DB_CONNECTION=sqlite
-# OR for MySQL:
-# DB_CONNECTION=mysql
-# DB_HOST=127.0.0.1
-# DB_DATABASE=perpustakaan
-# DB_USERNAME=perpustakaan_user
-# DB_PASSWORD=secure_password
-
-# Session Security
-SESSION_DRIVER=database
-SESSION_ENCRYPT=true
-SESSION_SECURE_COOKIE=true
-SESSION_LIFETIME=120
-
-# Security
-ADMIN_IP_RESTRICTION=true
-ADMIN_ALLOWED_IPS=your.office.ip,another.ip
-```
-
----
-
-## 🔄 Update/Maintenance Workflow
-
-```bash
-# Quick code update (no large files)
-cd /var/www/perpustakaan
-git pull origin main
-composer install --optimize-autoloader --no-dev
-npm ci && npm run build
-php artisan migrate --force
+cd /var/www/perpustakaan-app/current
+git log --oneline -5  # Find previous commit
+git reset --hard <commit-hash>
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
-php artisan queue:restart
+sudo systemctl reload php8.3-fpm
 ```
 
----
+## Database
 
-## ⚠️ Important Notes
+- **Type**: MariaDB 10.11
+- **Database**: perpustakaan
+- **User**: perpustakaan
+- **Host**: 127.0.0.1
 
-1. **Large files are NOT in git** - must sync via rsync
-2. **storage/database/** is gitignored - Shamela, Ebooks, etc.
-3. **Main SQLite** (84KB) contains app data - sync via scp
-4. **Run Shamela sync overnight** - 21GB takes 2-8 hours
-5. **Use incremental sync** - rsync only transfers changes
+### Backup Database
+```bash
+mysqldump -u perpustakaan -p perpustakaan > backup_$(date +%Y%m%d).sql
+```
 
----
+### Restore Database
+```bash
+mysql -u perpustakaan -p perpustakaan < backup_file.sql
+```
 
-## Verification Commands
+## Services
 
 ```bash
-# On VM after deployment
-php artisan about
-php artisan route:list | wc -l
-du -sh storage/database/*
-sqlite3 database/database.sqlite "SELECT COUNT(*) FROM users;"
+# Nginx
+sudo systemctl status nginx
+sudo systemctl reload nginx
+
+# PHP-FPM
+sudo systemctl status php8.3-fpm
+sudo systemctl reload php8.3-fpm
+
+# MariaDB
+sudo systemctl status mariadb
+```
+
+## Logs
+
+```bash
+# Laravel logs
+tail -f /var/www/perpustakaan-app/shared/storage/logs/laravel.log
+
+# Nginx error log
+sudo tail -f /var/log/nginx/error.log
+
+# PHP-FPM log
+sudo tail -f /var/log/php8.3-fpm.log
+```
+
+## SSL Certificate
+
+SSL is managed by Certbot (Let's Encrypt). Auto-renewal is configured.
+
+```bash
+# Check certificate
+sudo certbot certificates
+
+# Manual renewal
+sudo certbot renew
 ```
