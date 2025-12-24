@@ -30,7 +30,10 @@ return new class extends Migration
             $table->timestamp('synced_at')->nullable();
             $table->timestamps();
             
-            $table->fullText(['title', 'abstract']); // For search
+            // Fulltext index only for MySQL
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText(['title', 'abstract']);
+            }
         });
 
         Schema::create('journal_sources', function (Blueprint $table) {

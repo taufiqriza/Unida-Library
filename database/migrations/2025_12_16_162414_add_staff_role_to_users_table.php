@@ -9,12 +9,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Modify enum to include staff and pustakawan roles
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('super_admin', 'admin', 'librarian', 'staff', 'pustakawan') NOT NULL DEFAULT 'staff'");
+        // SQLite doesn't support ENUM, skip for SQLite
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('super_admin', 'admin', 'librarian', 'staff', 'pustakawan') NOT NULL DEFAULT 'staff'");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('super_admin', 'admin', 'librarian') NOT NULL DEFAULT 'librarian'");
+        if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('super_admin', 'admin', 'librarian') NOT NULL DEFAULT 'librarian'");
+        }
     }
 };

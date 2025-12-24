@@ -47,7 +47,13 @@ return new class extends Migration
         }
 
         $indexName = "{$table}_{$column}_index";
-        $exists = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
+        $driver = Schema::getConnection()->getDriverName();
+        
+        if ($driver === 'sqlite') {
+            $exists = DB::select("SELECT name FROM sqlite_master WHERE type='index' AND name=?", [$indexName]);
+        } else {
+            $exists = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
+        }
         
         if (empty($exists)) {
             Schema::table($table, fn(Blueprint $t) => $t->index($column));
