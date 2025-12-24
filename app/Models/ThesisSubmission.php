@@ -269,6 +269,10 @@ class ThesisSubmission extends Model
             return null;
         }
 
+        // Only copy cover to public storage (for display in search results)
+        // Preview and fulltext stay in private storage, accessed via controller with permission check
+        $publicCoverPath = $this->copyFileToPublic($this->cover_file, 'covers');
+
         // Create Ethesis record
         $ethesis = Ethesis::create([
             'department_id' => $this->department_id,
@@ -287,9 +291,9 @@ class ThesisSubmission extends Model
             'defense_date' => $this->defense_date,
             'type' => $this->type,
             'keywords' => $this->keywords,
-            'file_path' => $this->fulltext_file,
-            'cover_path' => $this->cover_file,
-            'preview_path' => $this->preview_file,
+            'file_path' => $this->fulltext_file,      // Keep in thesis/ storage (private)
+            'cover_path' => $publicCoverPath,          // Public for display
+            'preview_path' => $this->preview_file,     // Keep in thesis/ storage (private)
             'is_public' => true,
             'is_fulltext_public' => $this->allow_fulltext_public || $this->fulltext_visible,
             'user_id' => $userId,
@@ -303,6 +307,46 @@ class ThesisSubmission extends Model
         $this->logAction('published', $fromStatus, self::STATUS_PUBLISHED, null, null, $userId);
 
         return $ethesis;
+    }
+
+    /**
+     * Copy file from thesis private storage to public storage
+     */
+    protected function copyFileToPublic(?string $sourcePath, string $publicFolder): ?string
+    {
+        if (!$sourcePath) {
+            return null;
+        }
+
+        // Source is in thesis/ disk
+        $sourceFullPath = storage_path('app/thesis/' . $sourcePath);
+        
+        if (!file_exists($sourceFullPath)) {
+            // File doesn't exist in thesis/, check if already in public
+            $publicPath = storage_path('app/public/' . $sourcePath);
+            if (file_exists($publicPath)) {
+                return $sourcePath; // Already in public
+            }
+            return null;
+        }
+
+        // Get just the filename
+        $filename = basename($sourcePath);
+        
+        // Destination path in public storage
+        $destPath = $publicFolder . '/' . $filename;
+        $destFullPath = storage_path('app/public/' . $destPath);
+
+        // Ensure destination directory exists
+        $destDir = dirname($destFullPath);
+        if (!is_dir($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+
+        // Copy the file
+        copy($sourceFullPath, $destFullPath);
+
+        return $destPath;
     }
 
     protected function logAction(string $action, ?string $fromStatus, string $toStatus, ?string $notes = null, ?int $memberId = null, ?int $userId = null): void
