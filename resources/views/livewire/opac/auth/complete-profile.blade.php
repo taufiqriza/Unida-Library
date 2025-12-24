@@ -1,26 +1,37 @@
 <div>
     <div class="min-h-[70vh] flex items-center justify-center py-8 px-4">
-        <div class="w-full max-w-md">
+        <div class="w-full max-w-lg">
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
+                {{-- Header --}}
                 <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-4 flex items-center gap-4">
                     <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-user-edit text-2xl text-white"></i>
+                        <i class="fas {{ $step === 1 ? 'fa-search' : 'fa-user-edit' }} text-2xl text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-white">{{ __('opac.auth.complete_profile.title') }}</h1>
-                        <p class="text-primary-200 text-sm">{{ __('opac.auth.complete_profile.subtitle') }}</p>
+                        <h1 class="text-lg font-bold text-white">
+                            {{ $step === 1 ? 'Cari Data Anda' : __('opac.auth.complete_profile.title') }}
+                        </h1>
+                        <p class="text-primary-200 text-sm">
+                            {{ $step === 1 ? 'Temukan data Anda di sistem SIAKAD' : __('opac.auth.complete_profile.subtitle') }}
+                        </p>
                     </div>
                 </div>
 
                 <div class="p-6">
-                    @if($errors->any())
-                    <div class="bg-red-50 border border-red-200 text-red-600 text-sm p-4 rounded-xl mb-5">
-                        <ul class="list-disc list-inside">
-                            @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
-                        </ul>
+                    {{-- Step Indicator --}}
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full {{ $step >= 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">1</div>
+                            <span class="text-sm font-medium {{ $step >= 1 ? 'text-primary-600' : 'text-gray-400' }}">Cari Data</span>
+                        </div>
+                        <div class="w-8 h-0.5 {{ $step >= 2 ? 'bg-primary-600' : 'bg-gray-200' }}"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full {{ $step >= 2 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">2</div>
+                            <span class="text-sm font-medium {{ $step >= 2 ? 'text-primary-600' : 'text-gray-400' }}">Lengkapi Profil</span>
+                        </div>
                     </div>
-                    @endif
 
+                    {{-- Logged in user info --}}
                     <div class="bg-gray-50 rounded-xl p-4 mb-5 flex items-center gap-3">
                         <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
                             <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -31,115 +42,359 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('member.complete-profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4" x-data="profileForm()">
-                        @csrf
+                    @if($step === 1)
+                    
+                    @if($autoDetected && $selectedPddikti)
+                    {{-- AUTO-DETECTED: Quick Confirm View --}}
+                    <div class="space-y-4">
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-magic text-green-600"></i>
+                                <span class="font-semibold text-green-700">Data SIAKAD Terdeteksi!</span>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-green-100">
+                                <p class="font-bold text-gray-800 text-lg">{{ $selectedPddikti->name }}</p>
+                                <div class="mt-2 space-y-1 text-sm text-gray-600">
+                                    <p><i class="fas fa-id-card w-5 text-gray-400"></i> {{ $selectedPddikti->member_id }}</p>
+                                    @if($selectedPddikti->department)
+                                    <p><i class="fas fa-graduation-cap w-5 text-gray-400"></i> {{ $selectedPddikti->department->name }}</p>
+                                    @endif
+                                    @if($selectedPddikti->branch)
+                                    <p><i class="fas fa-building w-5 text-gray-400"></i> {{ $selectedPddikti->branch->name }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                         
-                        <!-- Photo Upload -->
+                        <button type="button" wire:click="quickConfirm" 
+                            wire:loading.attr="disabled"
+                            class="w-full py-3.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
+                            <span wire:loading.remove wire:target="quickConfirm">
+                                <i class="fas fa-check-circle"></i> Ya, Ini Data Saya
+                            </span>
+                            <span wire:loading wire:target="quickConfirm">
+                                <i class="fas fa-spinner fa-spin"></i> Memproses...
+                            </span>
+                        </button>
+                        
+                        <button type="button" wire:click="$set('autoDetected', false)" 
+                            class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
+                            <i class="fas fa-search mr-1"></i> Bukan data saya, cari manual
+                        </button>
+                    </div>
+                    
+                    @else
+                    {{-- STEP 1: SIAKAD Search --}}
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                <i class="fas fa-user mr-1 text-primary-500"></i> Nama Lengkap Anda
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                    wire:model="searchName" 
+                                    wire:keydown.enter="searchPddikti"
+                                    placeholder="Masukkan nama lengkap sesuai SIAKAD..."
+                                    class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <button type="button" 
+                                    wire:click="searchPddikti" 
+                                    wire:loading.attr="disabled"
+                                    class="px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition disabled:opacity-50">
+                                    <span wire:loading.remove wire:target="searchPddikti">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <span wire:loading wire:target="searchPddikti">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Ketik minimal 3 karakter, lalu tekan Enter atau klik Cari</p>
+                        </div>
+
+                        {{-- Search Results --}}
+                        @if(count($searchResults) > 0)
+                        <div class="border border-gray-200 rounded-xl overflow-hidden">
+                            <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                                <p class="text-sm font-medium text-gray-700">
+                                    @if(count($searchResults) === 1 && !$isSearching && strlen($searchName) < 3)
+                                    <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
+                                    Mungkin ini data Anda? Silakan pilih atau cari manual
+                                    @elseif(count($searchResults) > 1 && !$isSearching && strlen($searchName) < 3)
+                                    <i class="fas fa-users text-blue-500 mr-1"></i>
+                                    Ditemukan {{ count($searchResults) }} data yang mirip - pilih yang sesuai
+                                    @else
+                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                    Ditemukan {{ count($searchResults) }} data mahasiswa UNIDA Gontor
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                @foreach($searchResults as $result)
+                                <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedPddiktiId == $result->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
+                                    <input type="radio" 
+                                        wire:click="selectPddikti({{ $result->id }})"
+                                        name="siakad_selection" 
+                                        value="{{ $result->id }}"
+                                        {{ $selectedPddiktiId == $result->id ? 'checked' : '' }}
+                                        class="w-4 h-4 text-primary-600 focus:ring-primary-500">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">{{ $result->name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $result->member_id ?? '-' }}
+                                            @if($result->department) · {{ $result->department->code ?? $result->department->name }}@endif
+                                            @if($result->branch) · {{ $result->branch->name }}@endif
+                                        </p>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Selected info --}}
+                        @if($selectedPddikti)
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <p class="text-sm text-green-700">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                Anda memilih: <strong>{{ $selectedPddikti->name }}</strong> ({{ $selectedPddikti->nim_nidn }})
+                            </p>
+                        </div>
+                        @endif
+                        @elseif(count($searchResults) === 0 && strlen($searchName) >= 3 && !$isSearching)
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+                            <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
+                            <p class="text-xs text-amber-600 mt-1">Nama tidak ditemukan di database SIAKAD.</p>
+                        </div>
+                        @endif
+
+                        {{-- Action buttons --}}
+                        <div class="flex flex-col gap-2 pt-4">
+                            @if($selectedPddiktiId)
+                            <button type="button" wire:click="proceedWithSelection" 
+                                class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
+                                <i class="fas fa-arrow-right mr-2"></i> Lanjutkan dengan Data Terpilih
+                            </button>
+                            @endif
+                            
+                            <div class="flex gap-2">
+                                <button type="button" wire:click="skipAsDosen" 
+                                    class="flex-1 py-2.5 border border-green-200 text-green-600 font-medium rounded-xl hover:bg-green-50 transition text-sm">
+                                    <i class="fas fa-chalkboard-teacher mr-1"></i> Dosen
+                                </button>
+                                <button type="button" wire:click="skipAsTendik" 
+                                    class="flex-1 py-2.5 border border-blue-200 text-blue-600 font-medium rounded-xl hover:bg-blue-50 transition text-sm">
+                                    <i class="fas fa-user-cog mr-1"></i> Tendik
+                                </button>
+                                <button type="button" wire:click="skipToManualEntry" 
+                                    class="flex-1 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition text-sm">
+                                    <i class="fas fa-edit mr-1"></i> Manual
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @endif {{-- End of autoDetected else --}}
+
+                    @else
+                    {{-- STEP 2: Profile Form --}}
+                    @if($errors->any())
+                    <div class="bg-red-50 border border-red-200 text-red-600 text-sm p-4 rounded-xl mb-5">
+                        <ul class="list-disc list-inside">
+                            @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    @if($selectedPddikti)
+                    {{-- SIMPLIFIED: Data Selected from SIAKAD --}}
+                    <div class="space-y-4">
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                                <span class="font-semibold text-green-700">Data SIAKAD Terhubung</span>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-green-100">
+                                <p class="font-bold text-gray-800 text-lg">{{ $selectedPddikti->name }}</p>
+                                <div class="mt-2 space-y-1 text-sm text-gray-600">
+                                    <p><i class="fas fa-id-card w-5 text-gray-400"></i> {{ $selectedPddikti->member_id }}</p>
+                                    @if($selectedPddikti->department)
+                                    <p><i class="fas fa-graduation-cap w-5 text-gray-400"></i> {{ $selectedPddikti->department->name }}</p>
+                                    @endif
+                                    @if($selectedPddikti->branch)
+                                    <p><i class="fas fa-building w-5 text-gray-400"></i> {{ $selectedPddikti->branch->name }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Only need phone number --}}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">No. HP (WhatsApp)</label>
+                            <input type="text" wire:model="phone" required placeholder="081234567890"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div class="flex gap-3 pt-2">
+                            <button type="button" wire:click="backToSearch" class="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali
+                            </button>
+                            <button type="button" wire:click="quickConfirm" 
+                                wire:loading.attr="disabled"
+                                class="flex-1 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition">
+                                <span wire:loading.remove wire:target="quickConfirm">
+                                    <i class="fas fa-check mr-2"></i> Konfirmasi
+                                </span>
+                                <span wire:loading wire:target="quickConfirm">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    @else
+                    
+                    @if($entryMode === 'tendik')
+                    {{-- TENDIK FORM: Simplified --}}
+                    <form wire:submit.prevent="save" class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-user-cog text-blue-500"></i>
+                                <span class="font-medium text-blue-700">Registrasi Tendik</span>
+                            </div>
+                            <p class="text-xs text-blue-600 mt-1">Tenaga Kependidikan - Perpustakaan Pusat</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
+                                <input type="text" wire:model="nim" required placeholder="Nomor Induk Pegawai"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                                <select wire:model="gender" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="">Pilih</option>
+                                    <option value="M">Laki-laki</option>
+                                    <option value="F">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Satuan Kerja</label>
+                            <input type="text" wire:model="satker" required placeholder="Contoh: Perpustakaan, IT Center, dll"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">No. HP (WhatsApp)</label>
+                            <input type="text" wire:model="phone" required placeholder="081234567890"
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" wire:click="backToSearch" class="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali
+                            </button>
+                            <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
+                                <i class="fas fa-check mr-2"></i> Daftar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    @else
+                    {{-- FULL FORM: Manual Entry --}}
+                    <form wire:submit.prevent="save" class="space-y-4">
+                        {{-- Photo Upload --}}
                         <div class="flex justify-center">
                             <label class="cursor-pointer group">
-                                <div class="w-24 h-24 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center group-hover:border-primary-500 transition overflow-hidden" x-ref="preview">
-                                    <i class="fas fa-camera text-gray-400 text-xl group-hover:text-primary-500"></i>
-                                    <span class="text-xs text-gray-400 mt-1">{{ __('opac.auth.complete_profile.upload_photo') }}</span>
+                                <div class="w-20 h-20 rounded-xl bg-gray-100 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center group-hover:border-primary-500 transition overflow-hidden" x-data x-ref="preview">
+                                    @if($photo)
+                                        <img src="{{ $photo->temporaryUrl() }}" class="w-full h-full object-cover">
+                                    @else
+                                        <i class="fas fa-camera text-gray-400 text-lg group-hover:text-primary-500"></i>
+                                        <span class="text-xs text-gray-400 mt-1">Foto</span>
+                                    @endif
                                 </div>
-                                <input type="file" name="photo" accept="image/*" class="hidden" @change="previewImage($event)">
+                                <input type="file" wire:model="photo" accept="image/*" class="hidden">
                             </label>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.nim') }}</label>
-                            <input type="text" name="nim" value="{{ old('nim') }}" required placeholder="{{ __('opac.auth.complete_profile.nim_placeholder') }}"
-                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.campus') }}</label>
-                                <select name="branch_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">{{ __('opac.auth.complete_profile.campus_placeholder') }}</option>
-                                    @foreach($branches as $branch)
-                                    <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">NIM/NIDN</label>
+                                <input type="text" wire:model="nim" required placeholder="Nomor Induk"
+                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.member_type') }}</label>
-                                <select name="member_type_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">{{ __('opac.auth.complete_profile.member_type_placeholder') }}</option>
-                                    @foreach($memberTypes as $type)
-                                    <option value="{{ $type->id }}" {{ old('member_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }}</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kampus</label>
+                                <select wire:model="branch_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="">Pilih Kampus</option>
+                                    @foreach($branches as $branch)
+                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.faculty') }}</label>
-                            <select name="faculty_id" x-model="facultyId" @change="loadDepartments()" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                <option value="">{{ __('opac.auth.complete_profile.faculty_placeholder') }}</option>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Anggota</label>
+                            <select wire:model="member_type_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">Pilih Jenis Anggota</option>
+                                @foreach($memberTypes as $type)
+                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fakultas</label>
+                            <select wire:model.live="faculty_id" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <option value="">Pilih Fakultas</option>
                                 @foreach($faculties as $faculty)
                                 <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
                                 @endforeach
                             </select>
                         </div>
+                        
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.department') }}</label>
-                            <select name="department_id" x-model="departmentId" required :disabled="!facultyId" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100">
-                                <option value="">{{ __('opac.auth.complete_profile.department_placeholder') }}</option>
-                                <template x-for="dept in departments" :key="dept.id">
-                                    <option :value="dept.id" x-text="dept.name"></option>
-                                </template>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Jurusan/Prodi</label>
+                            <select wire:model="department_id" required :disabled="!$faculty_id" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-100">
+                                <option value="">Pilih Jurusan</option>
+                                @foreach($departments as $dept)
+                                <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                @endforeach
                             </select>
                         </div>
+                        
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.gender') }}</label>
-                                <select name="gender" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                    <option value="">{{ __('opac.auth.complete_profile.gender_placeholder') }}</option>
-                                    <option value="M" {{ old('gender') == 'M' ? 'selected' : '' }}>{{ __('opac.auth.complete_profile.male') }}</option>
-                                    <option value="F" {{ old('gender') == 'F' ? 'selected' : '' }}>{{ __('opac.auth.complete_profile.female') }}</option>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                                <select wire:model="gender" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                    <option value="">Pilih</option>
+                                    <option value="M">Laki-laki</option>
+                                    <option value="F">Perempuan</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.complete_profile.phone') }}</label>
-                                <input type="text" name="phone" value="{{ old('phone') }}" required 
+                                <label class="block text-sm font-medium text-gray-700 mb-1">No. HP</label>
+                                <input type="text" wire:model="phone" required 
                                     class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
-                            <i class="fas fa-check mr-2"></i> {{ __('opac.auth.complete_profile.submit') }}
-                        </button>
+                        
+                        <div class="flex gap-3 pt-4">
+                            <button type="button" wire:click="backToSearch" class="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali
+                            </button>
+                            <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
+                                <i class="fas fa-check mr-2"></i> Simpan
+                            </button>
+                        </div>
                     </form>
+                    @endif {{-- End of entryMode tendik --}}
+                    @endif {{-- End of selectedPddikti --}}
+                    @endif {{-- End of step 1 --}}
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-    function profileForm() {
-        return {
-            facultyId: '{{ old('faculty_id') }}',
-            departmentId: '{{ old('department_id') }}',
-            departments: [],
-            async loadDepartments() {
-                if (!this.facultyId) {
-                    this.departments = [];
-                    return;
-                }
-                const res = await fetch(`/api/departments?faculty_id=${this.facultyId}`);
-                this.departments = await res.json();
-            },
-            previewImage(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.$refs.preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            },
-            init() {
-                if (this.facultyId) this.loadDepartments();
-            }
-        }
-    }
-    </script>
 </div>

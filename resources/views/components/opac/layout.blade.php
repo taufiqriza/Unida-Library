@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
     
+    {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
     {{-- Preconnect to CDNs for faster loading --}}
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -592,7 +595,7 @@
                                  <div class="p-5 bg-gradient-to-br from-primary-600 to-primary-800 relative overflow-hidden text-white">
                                      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvc3ZnPg==')] opacity-30"></div>
                                      <div class="relative flex items-center gap-4">
-                                         <div class="w-16 h-16 bg-white p-1 rounded-2xl shadow-lg rotate-3 shrink-0">
+                                         <div class="w-16 h-16 bg-white p-1 rounded-2xl shadow-lg shrink-0">
                                              @if(auth('member')->user()->photo)
                                                  <img src="{{ asset('storage/' . auth('member')->user()->photo) }}" class="w-full h-full object-cover rounded-xl">
                                              @else

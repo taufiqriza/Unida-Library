@@ -250,11 +250,35 @@ class SocialAuthController extends Controller
             return redirect()->route('staff.profile')->with('error', 'Akun Google sudah terhubung ke akun staf lain.');
         }
 
-        // Link Google account to staff user (updateOrCreate to avoid duplicate)
+        // Link Google account to staff user
         SocialAccount::updateOrCreate(
             ['provider' => 'google', 'provider_id' => $googleUser->getId(), 'user_id' => $user->id],
             ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
         );
+
+        // Also check if there's a matching Member by email and link
+        $member = Member::where('email', $googleUser->getEmail())->first();
+        if (!$member) {
+            // Check if staff email matches any imported student by NIM pattern in email
+            // e.g., 432022111002@student.unida.gontor.ac.id
+            $emailParts = explode('@', $googleUser->getEmail());
+            $nimOrUsername = $emailParts[0] ?? '';
+            $member = Member::where('member_id', $nimOrUsername)->first();
+        }
+
+        if ($member) {
+            // Link same Google to Member as well
+            SocialAccount::updateOrCreate(
+                ['provider' => 'google', 'provider_id' => $googleUser->getId(), 'member_id' => $member->id],
+                ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
+            );
+            
+            // Update member email and mark profile complete if staff
+            $member->update([
+                'email' => $googleUser->getEmail(),
+                'profile_completed' => true,
+            ]);
+        }
 
         return redirect()->route('staff.profile')->with('success', 'Akun Google berhasil dihubungkan!');
     }

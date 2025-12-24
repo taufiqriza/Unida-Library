@@ -65,9 +65,9 @@ class AppSettings extends Page implements HasForms
             'journal_scrape_schedule' => Setting::get('journal_scrape_schedule', 'weekly'),
             'kubuku_enabled' => (bool) Setting::get('kubuku_enabled', false),
             'kubuku_sync_schedule' => Setting::get('kubuku_sync_schedule', 'daily'),
-            'kubuku_api_url' => Setting::get('kubuku_api_url', ''),
+            'kubuku_api_url' => Setting::get('kubuku_api_url', 'https://kubuku.id/api/wl'),
             'kubuku_api_key' => Setting::get('kubuku_api_key', ''),
-            'kubuku_library_id' => Setting::get('kubuku_library_id', ''),
+            'kubuku_library_id' => Setting::get('kubuku_library_id', 'unida-gontor'),
             // Open Library Settings
             'openlibrary_enabled' => (bool) Setting::get('openlibrary_enabled', true),
             'openlibrary_search_limit' => (int) Setting::get('openlibrary_search_limit', 10),
@@ -503,19 +503,20 @@ class AppSettings extends Page implements HasForms
                                         ])
                                         ->default('daily')
                                         ->helperText('Rekomendasi Kubuku: sync di jam traffic rendah'),
-                                    Forms\Components\TextInput::make('kubuku_api_url')
-                                        ->label('API URL')
-                                        ->placeholder('https://api.kubuku.id/v1')
-                                        ->helperText('Endpoint REST API Kubuku'),
                                     Forms\Components\TextInput::make('kubuku_api_key')
                                         ->label('API Key')
                                         ->password()
                                         ->revealable()
-                                        ->helperText('API Key/Token dari Kubuku'),
-                                    Forms\Components\TextInput::make('kubuku_library_id')
-                                        ->label('Library ID')
-                                        ->placeholder('unida-gontor')
-                                        ->helperText('ID perpustakaan di sistem Kubuku'),
+                                        ->required()
+                                        ->helperText('API Key/Token dari Kubuku (hubungi tim Kubuku untuk mendapatkannya)'),
+                                    Forms\Components\TextInput::make('kubuku_api_url')
+                                        ->label('API URL')
+                                        ->default('https://kubuku.id/api/wl')
+                                        ->disabled()
+                                        ->dehydrated()
+                                        ->helperText('URL sudah dikonfigurasi secara default'),
+                                    Forms\Components\Hidden::make('kubuku_library_id')
+                                        ->default('unida-gontor'),
                                 ])->columns(2),
                             Forms\Components\Section::make('Aksi Manual Kubuku')
                                 ->schema([
@@ -525,33 +526,36 @@ class AppSettings extends Page implements HasForms
                                             ->icon('heroicon-o-signal')
                                             ->color('info')
                                             ->action(function ($get) {
-                                                $apiUrl = $get('kubuku_api_url');
+                                                $apiUrl = $get('kubuku_api_url') ?: 'https://kubuku.id/api/wl';
                                                 $apiKey = $get('kubuku_api_key');
                                                 
-                                                if (empty($apiUrl) || empty($apiKey)) {
+                                                if (empty($apiKey)) {
                                                     Notification::make()
-                                                        ->title('API URL dan API Key harus diisi')
+                                                        ->title('API Key harus diisi')
                                                         ->danger()
                                                         ->send();
                                                     return;
                                                 }
                                                 
                                                 try {
+                                                    // Kubuku API uses Authorization header without Bearer prefix
                                                     $response = \Http::timeout(15)->withHeaders([
-                                                        'Authorization' => 'Bearer ' . $apiKey,
+                                                        'Authorization' => $apiKey,
                                                         'Accept' => 'application/json',
-                                                    ])->get(rtrim($apiUrl, '/'));
+                                                    ])->get(rtrim($apiUrl, '/') . '/totalContent');
                                                     
                                                     if ($response->successful()) {
+                                                        $data = $response->json();
+                                                        $total = $data['total_content'] ?? $data['total'] ?? 'N/A';
                                                         Notification::make()
                                                             ->title('Koneksi Berhasil!')
-                                                            ->body('Kubuku API terhubung.')
+                                                            ->body("Kubuku API terhubung. Total E-Book: {$total}")
                                                             ->success()
                                                             ->send();
                                                     } elseif ($response->status() === 401 || $response->status() === 403) {
                                                         Notification::make()
                                                             ->title('Autentikasi Gagal')
-                                                            ->body('API Key tidak valid atau akses ditolak.')
+                                                            ->body('API Key tidak valid atau IP tidak di-whitelist.')
                                                             ->warning()
                                                             ->send();
                                                     } else {
@@ -595,7 +599,7 @@ class AppSettings extends Page implements HasForms
                                     ]),
                                     Forms\Components\Placeholder::make('kubuku_info')
                                         ->label('Informasi')
-                                        ->content('Dokumentasi API Kubuku akan tersedia dari pihak Kubuku. Sync otomatis berjalan sesuai jadwal yang dipilih di jam traffic rendah (rekomendasi: 02:00 dini hari).'),
+                                        ->content('Koleksi e-book dari Kubuku akan ditampilkan di katalog OPAC dan hasil pencarian. Untuk mendapatkan API Key, hubungi tim support Kubuku. Pastikan IP server sudah di-whitelist oleh Kubuku sebelum mengaktifkan integrasi.'),
                                 ]),
 
                             Forms\Components\Section::make('Open Library (Internet Archive)')

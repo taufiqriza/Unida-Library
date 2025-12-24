@@ -302,8 +302,9 @@
                         @if($book['cover'])
                             <img src="{{ $book['cover'] }}" alt="{{ $book['title'] }}" class="w-full h-full object-cover">
                         @else
-                            <div class="w-full h-full flex items-center justify-center">
-                                <i class="fas fa-book text-2xl text-blue-200"></i>
+                            <div class="w-full h-full bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-600 flex flex-col items-center justify-center p-2 text-center">
+                                <i class="fas fa-book text-lg text-white/70 mb-1"></i>
+                                <p class="text-white font-bold text-[8px] leading-tight line-clamp-3">{{ Str::limit($book['title'], 35) }}</p>
                             </div>
                         @endif
                         @if($index < 3)
@@ -440,8 +441,9 @@
                         @if($book['cover'])
                             <img src="{{ $book['cover'] }}" alt="{{ $book['title'] }}" class="w-full h-full object-cover">
                         @else
-                            <div class="w-full h-full flex items-center justify-center">
-                                <i class="fas fa-book text-2xl text-amber-200"></i>
+                            <div class="w-full h-full bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 flex flex-col items-center justify-center p-2 text-center">
+                                <i class="fas fa-book text-lg text-white/70 mb-1"></i>
+                                <p class="text-white font-bold text-[8px] leading-tight line-clamp-3">{{ Str::limit($book['title'], 35) }}</p>
                             </div>
                         @endif
                         @if($index < 3)

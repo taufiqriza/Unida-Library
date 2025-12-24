@@ -289,7 +289,7 @@ class GlobalSearch extends Component
             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
         }
 
-        return $query->limit(100)->get()->map(fn($book) => [
+        return $query->limit(500)->get()->map(fn($book) => [
             'type' => 'book',
             'id' => $book->id,
             'title' => $book->title,
@@ -335,7 +335,7 @@ class GlobalSearch extends Component
             $query->where('language', $this->language);
         }
 
-        return $query->limit(100)->get()->map(fn($ebook) => [
+        return $query->limit(500)->get()->map(fn($ebook) => [
             'type' => 'ebook',
             'id' => $ebook->id,
             'title' => $ebook->title,
@@ -391,7 +391,7 @@ class GlobalSearch extends Component
             $query->where('year', '<=', $this->yearTo);
         }
 
-        return $query->limit(100)->get()->map(fn($thesis) => [
+        return $query->limit(500)->get()->map(fn($thesis) => [
             'type' => 'ethesis',
             'id' => $thesis->id,
             'title' => $thesis->title,
@@ -476,7 +476,7 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->orderByDesc('published_at')->limit(100)->get()->map(fn($article) => [
+        return $query->orderByDesc('published_at')->limit(500)->get()->map(fn($article) => [
             'type' => 'journal',
             'id' => $article->id,
             'title' => $article->title,

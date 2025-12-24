@@ -34,8 +34,15 @@
                             @if($ebook->cover_url)
                                 <img src="{{ $ebook->cover_url }}" alt="{{ $ebook->title }}" class="w-full h-full object-cover">
                             @else
-                                <div class="w-full h-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
-                                    <i class="fas fa-file-pdf text-5xl text-orange-300"></i>
+                                {{-- Elegant Default Cover --}}
+                                <div class="w-full h-full bg-gradient-to-br from-amber-600 via-orange-500 to-red-600 flex flex-col items-center justify-center p-4 text-center">
+                                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3">
+                                        <i class="fas fa-book-open text-2xl text-white/80"></i>
+                                    </div>
+                                    <p class="text-white font-bold text-sm leading-tight line-clamp-4">{{ Str::limit($ebook->title, 60) }}</p>
+                                    @if($ebook->file_format)
+                                        <span class="mt-2 px-2 py-0.5 bg-white/20 text-white/80 text-[10px] font-semibold rounded">{{ $ebook->file_format }}</span>
+                                    @endif
                                 </div>
                             @endif
                         </div>
@@ -67,10 +74,16 @@
             
             {{-- Action Buttons --}}
             <div class="bg-white rounded-2xl p-4 shadow-lg flex gap-3">
-                @if($ebook->file_path)
-                <a href="{{ asset('storage/' . $ebook->file_path) }}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2">
+                @if($ebook->viewer_url)
+                <a href="{{ $ebook->viewer_url }}" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-xl shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2">
                     <i class="fas fa-book-reader"></i>
                     <span>{{ __('opac.ebook_show.read_now') }}</span>
+                </a>
+                @endif
+                @if($ebook->is_downloadable && $ebook->download_url)
+                <a href="{{ $ebook->download_url }}" target="_blank" class="flex-1 py-3 bg-emerald-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 hover:bg-emerald-600 transition">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
                 </a>
                 @endif
                 <button class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition">
@@ -143,8 +156,9 @@
                             @if($related->cover_url)
                                 <img src="{{ $related->cover_url }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             @else
-                                <div class="w-full h-full bg-gradient-to-br from-orange-100 to-orange-50 flex items-center justify-center">
-                                    <i class="fas fa-file-pdf text-2xl text-orange-300"></i>
+                                <div class="w-full h-full bg-gradient-to-br from-amber-600 via-orange-500 to-red-600 flex flex-col items-center justify-center p-2 text-center group-hover:scale-105 transition duration-300">
+                                    <i class="fas fa-book-open text-xl text-white/70 mb-1"></i>
+                                    <p class="text-white font-bold text-[10px] leading-tight line-clamp-3">{{ Str::limit($related->title, 40) }}</p>
                                 </div>
                             @endif
                         </div>

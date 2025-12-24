@@ -725,6 +725,12 @@ return [
     
     // Auth Pages
     'auth' => [
+        // Quick header items
+        'greeting' => 'Hai',
+        'connected' => 'Terhubung dengan Google',
+        'profile_incomplete' => 'Profil Anda belum lengkap',
+        'complete_now' => 'Lengkapi Sekarang',
+        
         // Login
         'login' => [
             'title' => 'Masuk Anggota',

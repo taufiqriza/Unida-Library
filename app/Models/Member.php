@@ -13,6 +13,7 @@ class Member extends Authenticatable
     use BelongsToBranch, HasApiTokens;
 
     protected $fillable = [
+        'pddikti_id', 'nim_nidn',
         'branch_id', 'faculty_id', 'department_id', 'member_id', 'name', 'gender', 'birth_date', 
         'address', 'city', 'phone', 'email', 'password', 'member_type_id', 'register_date',
         'expire_date', 'photo', 'is_active', 'profile_completed', 'notes',

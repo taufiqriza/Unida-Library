@@ -6,6 +6,8 @@ use App\Filament\Resources\EbookResource\Pages;
 use App\Models\Ebook;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -75,12 +77,48 @@ class EbookResource extends Resource
                     Forms\Components\Tabs\Tab::make('File & Format')
                         ->icon('heroicon-o-document-arrow-up')
                         ->schema([
+                            Forms\Components\Radio::make('file_source')
+                                ->label('Sumber File')
+                                ->options([
+                                    'local' => 'Upload Lokal',
+                                    'google_drive' => 'Google Drive',
+                                ])
+                                ->default('local')
+                                ->inline()
+                                ->live()
+                                ->columnSpanFull(),
+
+                            // Local Upload
                             Forms\Components\FileUpload::make('file_path')
                                 ->label('File E-Book')
                                 ->directory('ebooks')
                                 ->acceptedFileTypes(['application/pdf', 'application/epub+zip'])
                                 ->maxSize(102400)
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->visible(fn (Get $get) => $get('file_source') === 'local'),
+
+                            // Google Drive
+                            Forms\Components\TextInput::make('google_drive_url')
+                                ->label('Google Drive Link')
+                                ->placeholder('https://drive.google.com/file/d/FILE_ID/view?usp=sharing')
+                                ->helperText('Paste link share dari Google Drive. Pastikan file sudah di-share "Anyone with the link".')
+                                ->columnSpanFull()
+                                ->visible(fn (Get $get) => $get('file_source') === 'google_drive')
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (Get $get, Set $set, ?string $state) {
+                                    if ($state) {
+                                        $fileId = Ebook::extractGoogleDriveId($state);
+                                        $set('google_drive_id', $fileId);
+                                    }
+                                }),
+
+                            Forms\Components\TextInput::make('google_drive_id')
+                                ->label('Google Drive File ID')
+                                ->disabled()
+                                ->dehydrated()
+                                ->helperText('Otomatis diisi dari link di atas')
+                                ->visible(fn (Get $get) => $get('file_source') === 'google_drive'),
+
                             Forms\Components\FileUpload::make('cover_image')
                                 ->label('Cover')
                                 ->image()
@@ -143,6 +181,9 @@ class EbookResource extends Resource
                                     'restricted' => 'Terbatas (Perlu izin)',
                                 ])
                                 ->default('member'),
+                            Forms\Components\Toggle::make('is_downloadable')
+                                ->label('Boleh Download')
+                                ->default(false),
                             Forms\Components\Toggle::make('is_active')
                                 ->label('Aktif')
                                 ->default(true),
@@ -169,6 +210,14 @@ class EbookResource extends Resource
                     ->sortable()
                     ->limit(40)
                     ->description(fn ($record) => $record->authors->pluck('name')->implode(', ')),
+                Tables\Columns\TextColumn::make('file_source')
+                    ->label('Sumber')
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'google_drive' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => $state === 'google_drive' ? 'G-Drive' : 'Lokal'),
                 Tables\Columns\TextColumn::make('file_format')
                     ->label('Format')
                     ->badge()
@@ -195,6 +244,9 @@ class EbookResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('file_source')
+                    ->label('Sumber File')
+                    ->options(['local' => 'Lokal', 'google_drive' => 'Google Drive']),
                 Tables\Filters\SelectFilter::make('file_format')
                     ->label('Format')
                     ->options(['PDF' => 'PDF', 'EPUB' => 'EPUB']),
@@ -207,12 +259,18 @@ class EbookResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('preview')
+                    ->label('Preview')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn ($record) => $record->viewer_url)
+                    ->openUrlInNewTab()
+                    ->visible(fn ($record) => $record->viewer_url),
                 Tables\Actions\Action::make('download')
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn ($record) => $record->file_path ? asset('storage/' . $record->file_path) : null)
+                    ->url(fn ($record) => $record->download_url)
                     ->openUrlInNewTab()
-                    ->visible(fn ($record) => $record->file_path),
+                    ->visible(fn ($record) => $record->download_url),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

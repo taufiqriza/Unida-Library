@@ -575,8 +575,9 @@
                                         @if($item['cover'])
                                             <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         @else
-                                            <div class="w-full h-full flex items-center justify-center">
-                                                <i class="fas fa-book-quran text-2xl text-blue-300"></i>
+                                            <div class="w-full h-full bg-gradient-to-br from-amber-600 via-orange-500 to-red-600 flex flex-col items-center justify-center p-2 text-center">
+                                                <i class="fas fa-book-open text-lg text-white/70 mb-1"></i>
+                                                <p class="text-white font-bold text-[9px] leading-tight line-clamp-3">{{ Str::limit($item['title'], 35) }}</p>
                                             </div>
                                         @endif
                                     </div>
@@ -624,8 +625,9 @@
                                             @if($item['cover'])
                                                 <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                             @else
-                                                <div class="w-full h-full flex items-center justify-center">
-                                                    <i class="fas {{ $item['icon'] }} text-3xl text-slate-300"></i>
+                                                <div class="w-full h-full bg-gradient-to-br from-amber-600 via-orange-500 to-red-600 flex flex-col items-center justify-center p-3 text-center group-hover:scale-105 transition-transform duration-500">
+                                                    <i class="fas fa-book-open text-xl text-white/70 mb-2"></i>
+                                                    <p class="text-white font-bold text-xs leading-tight line-clamp-4">{{ Str::limit($item['title'], 50) }}</p>
                                                 </div>
                                             @endif
                                             
@@ -693,8 +695,9 @@
                                         @if($item['cover'])
                                             <img src="{{ $item['cover'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         @else
-                                            <div class="w-full h-full flex items-center justify-center">
-                                                <i class="fas {{ $item['icon'] }} text-xl text-slate-300"></i>
+                                            <div class="w-full h-full bg-gradient-to-br from-amber-600 via-orange-500 to-red-600 flex flex-col items-center justify-center p-1.5 text-center group-hover:scale-105 transition-transform duration-500">
+                                                <i class="fas fa-book-open text-sm text-white/70 mb-0.5"></i>
+                                                <p class="text-white font-bold text-[8px] leading-tight line-clamp-3">{{ Str::limit($item['title'], 30) }}</p>
                                             </div>
                                         @endif
                                         {{-- Type Icon Overlay --}}

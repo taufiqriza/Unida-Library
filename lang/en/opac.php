@@ -725,6 +725,12 @@ return [
     
     // Auth Pages
     'auth' => [
+        // Quick header items
+        'greeting' => 'Hi',
+        'connected' => 'Connected with Google',
+        'profile_incomplete' => 'Your profile is incomplete',
+        'complete_now' => 'Complete Now',
+        
         // Login
         'login' => [
             'title' => 'Member Login',

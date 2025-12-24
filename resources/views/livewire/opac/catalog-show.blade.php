@@ -34,8 +34,12 @@
                             @if($book->cover_url)
                                 <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
                             @else
-                                <div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                                    <i class="fas fa-book text-5xl text-blue-300"></i>
+                                {{-- Elegant Default Cover --}}
+                                <div class="w-full h-full bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-600 flex flex-col items-center justify-center p-4 text-center">
+                                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3">
+                                        <i class="fas fa-book text-2xl text-white/80"></i>
+                                    </div>
+                                    <p class="text-white font-bold text-sm leading-tight line-clamp-4">{{ Str::limit($book->title, 60) }}</p>
                                 </div>
                             @endif
                         </div>
@@ -287,8 +291,9 @@
                             @if($related->cover_url)
                                 <img src="{{ $related->cover_url }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             @else
-                                <div class="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                                    <i class="fas fa-book text-2xl text-blue-300"></i>
+                                <div class="w-full h-full bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-600 flex flex-col items-center justify-center p-2 text-center group-hover:scale-105 transition duration-300">
+                                    <i class="fas fa-book text-xl text-white/70 mb-1"></i>
+                                    <p class="text-white font-bold text-[10px] leading-tight line-clamp-3">{{ Str::limit($related->title, 40) }}</p>
                                 </div>
                             @endif
                         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -13,11 +14,14 @@ class KubukuService
     protected string $apiKey;
     protected int $cacheTtl;
     protected int $searchLimit;
+    protected bool $enabled;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.kubuku.base_url', 'https://kubuku.id/api/wl');
-        $this->apiKey = config('services.kubuku.api_key', '');
+        // Read from database Setting first, fallback to env
+        $this->enabled = (bool) Setting::get('kubuku_enabled', config('services.kubuku.enabled', true));
+        $this->baseUrl = Setting::get('kubuku_api_url') ?: config('services.kubuku.base_url', 'https://kubuku.id/api/wl');
+        $this->apiKey = Setting::get('kubuku_api_key') ?: config('services.kubuku.api_key', '');
         $this->cacheTtl = config('services.kubuku.cache_ttl', 3600);
         $this->searchLimit = config('services.kubuku.search_limit', 20);
     }
@@ -27,7 +31,7 @@ class KubukuService
      */
     public function isEnabled(): bool
     {
-        return config('services.kubuku.enabled', true) && !empty($this->apiKey);
+        return $this->enabled && !empty($this->apiKey);
     }
 
     /**
