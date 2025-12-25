@@ -48,7 +48,7 @@
             <p class="text-sm text-amber-700 mb-4">
                 Silakan login ke perpustakaan terpadu terlebih dahulu untuk akses otomatis ke Repository.
             </p>
-            <a href="{{ route('opac.login') }}" 
+            <a href="{{ route('login') }}" 
                class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl p-4 font-semibold hover:shadow-lg transition">
                 <i class="fas fa-sign-in-alt text-xl"></i>
                 <span>Login Perpustakaan</span>
