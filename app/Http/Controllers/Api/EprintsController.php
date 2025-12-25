@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class EprintsController extends Controller
 {
     /**
      * Verify member credentials for EPrints SSO
-     * POST /api/eprints/verify
      */
     public function verify(Request $request)
     {
@@ -21,18 +21,12 @@ class EprintsController extends Controller
             'token' => 'required|string',
         ]);
 
-        // Verify API token
         if ($request->token !== config('services.eprints.api_token')) {
-            Log::channel('security')->warning('EPrints API: Invalid token', [
-                'ip' => $request->ip(),
-                'email' => $request->email,
-            ]);
+            Log::channel('security')->warning('EPrints API: Invalid token', ['ip' => $request->ip()]);
             return response()->json(['valid' => false, 'error' => 'Invalid token'], 401);
         }
 
-        $member = Member::where('email', $request->email)
-            ->where('is_active', true)
-            ->first();
+        $member = Member::where('email', $request->email)->where('is_active', true)->first();
 
         if (!$member) {
             return response()->json(['valid' => false, 'error' => 'Member not found']);
@@ -45,47 +39,74 @@ class EprintsController extends Controller
                 'name' => $member->name,
                 'member_id' => $member->member_id,
                 'type' => $member->memberType?->name ?? 'Member',
-                'faculty' => $member->faculty?->name,
-                'department' => $member->department?->name,
             ],
         ]);
     }
 
     /**
-     * Create/sync EPrints user from Laravel member
-     * POST /api/eprints/sync
+     * Verify SSO login token
      */
-    public function sync(Request $request)
+    public function verifyLoginToken(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'token' => 'required|string',
+            'login_token' => 'required|string',
+            'api_token' => 'required|string',
         ]);
 
-        if ($request->token !== config('services.eprints.api_token')) {
-            return response()->json(['success' => false, 'error' => 'Invalid token'], 401);
+        if ($request->api_token !== config('services.eprints.api_token')) {
+            return response()->json(['valid' => false, 'error' => 'Invalid API token'], 401);
         }
 
-        $member = Member::where('email', $request->email)
-            ->where('is_active', true)
-            ->with(['memberType', 'faculty', 'department'])
-            ->first();
+        $cacheKey = 'eprints_login_' . $request->login_token;
+        $data = Cache::get($cacheKey);
+
+        if (!$data) {
+            return response()->json(['valid' => false, 'error' => 'Token expired or invalid']);
+        }
+
+        // Delete token after use (one-time use)
+        Cache::forget($cacheKey);
+
+        $member = Member::where('email', $data['email'])->where('is_active', true)->with(['memberType', 'faculty'])->first();
 
         if (!$member) {
-            return response()->json(['success' => false, 'error' => 'Member not found']);
+            return response()->json(['valid' => false, 'error' => 'Member not found']);
         }
 
-        // Return data for EPrints user creation
         return response()->json([
-            'success' => true,
-            'eprints_user' => [
-                'username' => $member->email,
+            'valid' => true,
+            'user' => [
                 'email' => $member->email,
+                'username' => $member->email,
                 'name_given' => explode(' ', $member->name)[0] ?? $member->name,
                 'name_family' => implode(' ', array_slice(explode(' ', $member->name), 1)) ?: '-',
                 'usertype' => $this->mapUserType($member->memberType?->code),
-                'dept' => $member->department?->name ?? $member->faculty?->name ?? 'UNIDA',
+                'dept' => $member->faculty?->name ?? 'UNIDA',
             ],
+        ]);
+    }
+
+    /**
+     * Generate SSO login token for member
+     */
+    public function generateLoginToken(Request $request)
+    {
+        $member = auth('member')->user();
+        
+        if (!$member) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $token = Str::random(64);
+        $cacheKey = 'eprints_login_' . $token;
+        
+        // Store token for 5 minutes
+        Cache::put($cacheKey, ['email' => $member->email, 'created_at' => now()], 300);
+
+        $eprintsUrl = config('services.eprints.base_url', 'https://repo.unida.gontor.ac.id');
+        
+        return response()->json([
+            'redirect_url' => $eprintsUrl . '/cgi/library_sso?token=' . $token,
         ]);
     }
 
@@ -93,8 +114,6 @@ class EprintsController extends Controller
     {
         return match ($code) {
             'DSN' => 'editor',
-            'MHS', 'S1', 'S2', 'S3' => 'user',
-            'STF' => 'user',
             default => 'user',
         };
     }

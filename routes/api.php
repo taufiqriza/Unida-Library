@@ -46,7 +46,7 @@ Route::middleware('throttle:api')->group(function () {
 
     // EPrints Integration
     Route::post('/eprints/verify', [EprintsController::class, 'verify']);
-    Route::post('/eprints/sync', [EprintsController::class, 'sync']);
+    Route::post('/eprints/verify-token', [EprintsController::class, 'verifyLoginToken']);
 });
 
 /*
@@ -64,4 +64,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('/my/loans', [MemberLoanController::class, 'active']);
     Route::get('/my/loans/history', [MemberLoanController::class, 'history']);
     Route::get('/my/fines', [MemberLoanController::class, 'fines']);
+});
+
+// Member Auth (session-based for web)
+Route::middleware(['web', 'auth:member'])->group(function () {
+    Route::get('/eprints/login-token', [EprintsController::class, 'generateLoginToken']);
 });

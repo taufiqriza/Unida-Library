@@ -18,6 +18,44 @@
     </div>
 
     <div class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {{-- SSO Login Card --}}
+        @auth('member')
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border border-green-200 p-6">
+            <h2 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                <i class="fas fa-check-circle"></i>
+                Login Otomatis
+            </h2>
+            <p class="text-sm text-green-700 mb-4">
+                Anda sudah login sebagai <strong>{{ auth('member')->user()->name }}</strong>. 
+                Klik tombol di bawah untuk langsung masuk ke Repository tanpa perlu login ulang.
+            </p>
+            <button onclick="ssoLogin()" id="sso-btn"
+                    class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 font-semibold hover:shadow-lg transition">
+                <i class="fas fa-sign-in-alt text-xl"></i>
+                <span>Masuk ke Repository</span>
+                <i class="fas fa-external-link-alt text-sm opacity-70"></i>
+            </button>
+            <p class="text-xs text-green-600 mt-2 text-center">
+                <i class="fas fa-shield-alt"></i> Login aman menggunakan akun perpustakaan Anda
+            </p>
+        </div>
+        @else
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-6">
+            <h2 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                <i class="fas fa-info-circle"></i>
+                Login Diperlukan
+            </h2>
+            <p class="text-sm text-amber-700 mb-4">
+                Silakan login ke perpustakaan terpadu terlebih dahulu untuk akses otomatis ke Repository.
+            </p>
+            <a href="{{ route('opac.login') }}" 
+               class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl p-4 font-semibold hover:shadow-lg transition">
+                <i class="fas fa-sign-in-alt text-xl"></i>
+                <span>Login Perpustakaan</span>
+            </a>
+        </div>
+        @endauth
+
         {{-- Info Card --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -25,9 +63,9 @@
                 Tentang Repository
             </h2>
             <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                Repository EPrints UNIDA Gontor menyimpan koleksi karya ilmiah sivitas akademika termasuk skripsi, tesis, disertasi, jurnal, dan publikasi lainnya.
+                Repository EPrints UNIDA Gontor menyimpan koleksi karya ilmiah sivitas akademika.
             </p>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-4 gap-3">
                 <div class="bg-blue-50 rounded-xl p-3 text-center">
                     <i class="fas fa-graduation-cap text-blue-500 text-xl mb-1"></i>
                     <p class="text-xs text-gray-600">Skripsi</p>
@@ -47,75 +85,12 @@
             </div>
         </div>
 
-        {{-- Login Info --}}
-        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-6">
-            <h2 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
-                <i class="fas fa-key"></i>
-                Cara Login ke Repository
-            </h2>
-            
-            @auth('member')
-            <div class="bg-white rounded-xl p-4 mb-4 border border-amber-200">
-                <p class="text-sm text-gray-700 mb-2">Gunakan kredensial berikut untuk login:</p>
-                <div class="space-y-2">
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                        <span class="text-gray-500 text-sm w-20">Email:</span>
-                        <code class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-mono">{{ auth('member')->user()->email }}</code>
-                    </div>
-                    <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                        <span class="text-gray-500 text-sm w-20">Password:</span>
-                        <span class="text-gray-600 text-sm">Password akun perpustakaan Anda</span>
-                    </div>
-                </div>
-            </div>
-            @endauth
-
-            <div class="space-y-3 text-sm text-amber-900">
-                <div class="flex items-start gap-3">
-                    <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                    <p>Klik tombol "Buka Repository" di bawah</p>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                    <p>Browser akan menampilkan popup login (HTTP Basic Auth)</p>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                    <p>Masukkan email dan password akun perpustakaan Anda</p>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
-                    <p>Jika belum punya akun EPrints, daftar dulu di halaman Register</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Action Buttons --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <a href="https://repo.unida.gontor.ac.id/cgi/users/home" target="_blank" 
-               class="flex items-center justify-center gap-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-xl p-4 font-semibold hover:shadow-lg transition">
-                <i class="fas fa-sign-in-alt text-xl"></i>
-                <span>Buka Repository (Login)</span>
-                <i class="fas fa-external-link-alt text-sm opacity-70"></i>
-            </a>
-            
-            <a href="https://repo.unida.gontor.ac.id/cgi/register" target="_blank"
-               class="flex items-center justify-center gap-3 bg-white text-orange-600 border-2 border-orange-500 rounded-xl p-4 font-semibold hover:bg-orange-50 transition">
-                <i class="fas fa-user-plus text-xl"></i>
-                <span>Daftar Akun Baru</span>
-                <i class="fas fa-external-link-alt text-sm opacity-70"></i>
-            </a>
-        </div>
-
         {{-- Browse Without Login --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <i class="fas fa-search text-green-500"></i>
                 Jelajahi Tanpa Login
             </h2>
-            <p class="text-gray-600 text-sm mb-4">
-                Anda bisa menjelajahi dan mencari koleksi repository tanpa perlu login:
-            </p>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <a href="https://repo.unida.gontor.ac.id" target="_blank" class="bg-gray-50 hover:bg-gray-100 rounded-xl p-3 text-center transition">
                     <i class="fas fa-home text-gray-500 text-lg mb-1"></i>
@@ -135,5 +110,54 @@
                 </a>
             </div>
         </div>
+
+        {{-- Manual Login --}}
+        <div class="bg-gray-50 rounded-2xl border border-gray-200 p-4">
+            <details class="group">
+                <summary class="cursor-pointer text-sm text-gray-600 flex items-center gap-2">
+                    <i class="fas fa-chevron-right group-open:rotate-90 transition-transform"></i>
+                    Login Manual (jika SSO tidak berfungsi)
+                </summary>
+                <div class="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                    <a href="https://repo.unida.gontor.ac.id/cgi/users/home" target="_blank" 
+                       class="block text-center bg-white border border-gray-300 text-gray-700 rounded-lg p-2 text-sm hover:bg-gray-50">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Login dengan HTTP Auth
+                    </a>
+                    <a href="https://repo.unida.gontor.ac.id/cgi/register" target="_blank"
+                       class="block text-center bg-white border border-gray-300 text-gray-700 rounded-lg p-2 text-sm hover:bg-gray-50">
+                        <i class="fas fa-user-plus mr-2"></i> Daftar Akun Baru
+                    </a>
+                </div>
+            </details>
+        </div>
     </div>
+
+    @auth('member')
+    <script>
+    function ssoLogin() {
+        const btn = document.getElementById('sso-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+        
+        fetch('/api/eprints/login-token', {
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.redirect_url) {
+                window.open(data.redirect_url, '_blank');
+            } else {
+                alert('Gagal mendapatkan token login');
+            }
+        })
+        .catch(e => {
+            alert('Terjadi kesalahan: ' + e.message);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sign-in-alt text-xl"></i> <span>Masuk ke Repository</span> <i class="fas fa-external-link-alt text-sm opacity-70"></i>';
+        });
+    }
+    </script>
+    @endauth
 </div>
