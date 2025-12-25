@@ -226,7 +226,7 @@
                         </a>
 
                         {{-- Repository EPrints Card --}}
-                        <a href="https://repo.unida.gontor.ac.id/cgi/users/home" target="_blank" class="block bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
+                        <a href="{{ route('opac.repository') }}" class="block bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
                             <div class="relative flex items-center gap-2 lg:gap-3">
                                 <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-archive text-sm lg:text-lg"></i>
