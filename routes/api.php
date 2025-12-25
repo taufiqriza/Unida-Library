@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\ElibraryController;
+use App\Http\Controllers\Api\EprintsController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\MemberLoanController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,10 @@ Route::middleware('throttle:api')->group(function () {
 
     // Auth (with stricter rate limit for login)
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+
+    // EPrints Integration
+    Route::post('/eprints/verify', [EprintsController::class, 'verify']);
+    Route::post('/eprints/sync', [EprintsController::class, 'sync']);
 });
 
 /*

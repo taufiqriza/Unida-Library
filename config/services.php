@@ -53,4 +53,15 @@ return [
         'search_limit' => env('KUBUKU_SEARCH_LIMIT', 20),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | EPrints Repository Integration
+    |--------------------------------------------------------------------------
+    */
+
+    'eprints' => [
+        'api_token' => env('EPRINTS_API_TOKEN'),
+        'base_url' => env('EPRINTS_BASE_URL', 'https://repo.unida.gontor.ac.id'),
+    ],
+
 ];
