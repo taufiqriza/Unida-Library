@@ -95,7 +95,7 @@ class Circulation extends Page implements HasForms
         }
 
         // Branch validation
-        $currentBranchId = auth('web')->user()->getCurrentBranchId();
+        $currentBranchId = auth('admin')->user()->getCurrentBranchId();
         if ($currentBranchId && $item->branch_id !== $currentBranchId) {
             Notification::make()
                 ->title('Item milik cabang lain')

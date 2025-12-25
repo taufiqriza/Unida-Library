@@ -259,6 +259,41 @@
                             </div>
                             @endif
 
+                            {{-- E-Book Source Filter --}}
+                            @if($resourceType === 'ebook')
+                            <div class="filter-section">
+                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
+                                    <span class="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-book-reader text-emerald-500 text-xs"></i>
+                                    </span>
+                                    {{ __('opac.global_search.ebook_source') }}
+                                </label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button 
+                                        wire:click="$set('ebookSource', null)"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition
+                                            {{ !$ebookSource ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
+                                    >
+                                        {{ __('opac.global_search.all_sources') }}
+                                    </button>
+                                    <button 
+                                        wire:click="$set('ebookSource', 'local')"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition flex items-center gap-1
+                                            {{ $ebookSource === 'local' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
+                                    >
+                                        <i class="fas fa-database text-[10px]"></i> Local
+                                    </button>
+                                    <button 
+                                        wire:click="$set('ebookSource', 'kubuku')"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition flex items-center gap-1
+                                            {{ $ebookSource === 'kubuku' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
+                                    >
+                                        <i class="fas fa-cloud text-[10px]"></i> KUBUKU
+                                    </button>
+                                </div>
+                            </div>
+                            @endif
+
                             {{-- Subject Filter --}}
                             @if($resourceType === 'all' || $resourceType === 'book')
                             <div class="filter-section">

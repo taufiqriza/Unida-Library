@@ -66,7 +66,7 @@
                 <p class="text-sm">
                     <strong>{{ __('opac.universitaria_browse.premium_notice') }}</strong> - {{ __('opac.universitaria_browse.protected_notice') }}
                     @if(!auth()->check())
-                        <a href="{{ route('opac.login') }}" class="underline font-semibold">{{ __('opac.universitaria_browse.login_to_access') }}</a>
+                        <a href="{{ route('login') }}" class="underline font-semibold">{{ __('opac.universitaria_browse.login_to_access') }}</a>
                     @endif
                 </p>
             </div>
@@ -111,7 +111,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($ebooks as $ebook)
             <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 cursor-pointer"
-                 x-on:click="{{ auth()->check() ? "openReader('" . asset('storage/' . $ebook->file_path) . "', '" . addslashes($ebook->title) . "', " . ($ebook->file_size ?? 0) . ")" : "window.location.href='" . route('opac.login') . "'" }}">
+                 x-on:click="openReader('{{ asset('storage/' . $ebook->file_path) }}', '{{ addslashes($ebook->title) }}', {{ $ebook->file_size ?? 0 }})">
                 {{-- Cover --}}
                 <div class="aspect-[3/4] bg-gradient-to-br from-blue-100 to-indigo-100 relative overflow-hidden">
                     @if($ebook->cover_image)
@@ -209,9 +209,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button @click="toggleViewer()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition flex items-center gap-2">
-                        <i class="fas fa-sync-alt"></i>
-                        <span class="hidden sm:inline">{{ __('opac.universitaria_browse.switch_viewer') }}</span>
+                    <button @click="openInNewTab()" class="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-external-link-alt"></i>
+                        <span class="hidden sm:inline">{{ __('opac.universitaria_browse.open_new_tab') }}</span>
                     </button>
                     <button @click="closeReader()" class="w-10 h-10 bg-white/10 hover:bg-red-500/80 text-white rounded-lg flex items-center justify-center transition">
                         <i class="fas fa-times text-lg"></i>
@@ -219,75 +219,24 @@
                 </div>
             </div>
             
-            {{-- Warning Banner --}}
-            <div x-show="showWarning" class="bg-amber-500 px-4 py-2 flex items-center justify-center gap-2 text-white text-sm flex-shrink-0">
-                <i class="fas fa-shield-alt"></i>
-                <span>{{ __('opac.universitaria_browse.protected_document') }}</span>
-                <button @click="showWarning = false" class="ml-2 opacity-70 hover:opacity-100">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
             {{-- PDF Viewer Container --}}
-            <div class="flex-1 relative bg-gray-900">
+            <div class="flex-1 relative bg-gray-100">
                 {{-- Loading State --}}
-                <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-900">
+                <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-100">
                     <div class="text-center">
-                        <div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p class="text-white font-medium" x-text="statusMessage"></p>
-                        <p class="text-gray-400 text-sm mt-1">
-                            <span x-show="currentSize > 0">{{ __('opac.universitaria_browse.size') }}: <span x-text="currentSize"></span> MB | </span>
-                            {{ __('opac.universitaria_browse.viewer_label') }}: <span x-text="getViewerName()" class="text-blue-400"></span>
-                        </p>
-                        <p class="text-gray-500 text-xs mt-2" x-show="viewerAttempts > 0">
-                            {{ __('opac.universitaria_browse.viewer_attempt') }}<span x-text="viewerAttempts + 1"></span>...
-                        </p>
-                    </div>
-                </div>
-                
-                {{-- Error State --}}
-                <div x-show="error" class="absolute inset-0 flex items-center justify-center bg-gray-900" style="display: none;">
-                    <div class="text-center max-w-md px-6">
-                        <div class="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-2">{{ __('opac.universitaria_browse.load_failed') }}</h4>
-                        <p class="text-gray-400 text-sm mb-2">{{ __('opac.universitaria_browse.all_viewers_tried') }}</p>
-                        <p class="text-gray-500 text-xs mb-4" x-show="currentSize > 20">
-                            <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ __('opac.universitaria_browse.large_file_notice') }}
-                        </p>
-                        <div class="flex gap-2 justify-center flex-wrap">
-                            <button x-on:click="retryLoad()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-redo {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.universitaria_browse.retry') }}
-                            </button>
-                            <button x-on:click="openInNewTab()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                <i class="fas fa-external-link-alt {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.universitaria_browse.open_new_tab') }}
-                            </button>
-                        </div>
+                        <div class="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-3"></div>
+                        <p class="text-gray-600 font-medium">{{ __('opac.universitaria_browse.loading') }}</p>
                     </div>
                 </div>
                 
                 {{-- PDF Frame --}}
                 <iframe 
                     x-ref="pdfFrame"
-                    x-show="!error"
                     x-on:load="onFrameLoad()"
-                    x-on:error="onFrameError()"
                     class="w-full h-full"
                     frameborder="0"
                     allowfullscreen>
                 </iframe>
-            </div>
-            
-            {{-- Footer --}}
-            <div class="bg-gray-800 px-4 py-2 flex items-center justify-between flex-shrink-0">
-                <p class="text-gray-400 text-xs hidden sm:block">
-                    <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                    {{ __('opac.universitaria_browse.navigation_hint') }} | {{ __('opac.universitaria_browse.viewer_label') }}: <span x-text="viewerType" class="font-medium text-white"></span>
-                </p>
-                <div class="flex items-center gap-2 {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }}">
-                    <span class="text-amber-400 text-xs"><i class="fas fa-lock {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>{{ __('opac.universitaria_browse.protected') }}</span>
-                </div>
             </div>
         </div>
     </div>
@@ -299,43 +248,21 @@ function universitariaReader() {
     return {
         showReader: false,
         loading: true,
-        error: false,
-        showWarning: true,
         currentUrl: '',
         currentTitle: '',
-        currentSize: 0,
-        viewerType: 'native',
-        viewerAttempts: 0,
-        maxAttempts: 3,
-        loadTimeout: null,
-        viewerOrder: ['native', 'google', 'mozilla'],
-        statusMessage: '{{ __("opac.universitaria_browse.loading") }}',
         
         openReader(url, title, size = 0) {
             this.currentUrl = url;
             this.currentTitle = title;
-            this.currentSize = size;
             this.showReader = true;
             this.loading = true;
-            this.error = false;
-            this.showWarning = true;
-            this.viewerAttempts = 0;
-            this.statusMessage = '{{ __("opac.universitaria_browse.loading") }}';
-            
-            if (size > 50) {
-                this.viewerType = 'native';
-                this.viewerOrder = ['native', 'mozilla', 'google'];
-            } else if (size > 20) {
-                this.viewerType = 'native';
-                this.viewerOrder = ['native', 'google', 'mozilla'];
-            } else {
-                this.viewerType = 'google';
-                this.viewerOrder = ['google', 'native', 'mozilla'];
-            }
             
             document.body.style.overflow = 'hidden';
             this.$nextTick(() => {
-                this.loadPdf();
+                const frame = this.$refs.pdfFrame;
+                if (frame) {
+                    frame.src = url + '#toolbar=1&navpanes=0&scrollbar=1';
+                }
             });
         },
         
@@ -344,103 +271,19 @@ function universitariaReader() {
             if (this.$refs.pdfFrame) {
                 this.$refs.pdfFrame.src = 'about:blank';
             }
-            clearTimeout(this.loadTimeout);
             document.body.style.overflow = '';
         },
         
-        loadPdf() {
-            const frame = this.$refs.pdfFrame;
-            if (!frame) return;
-            
-            this.statusMessage = `{{ __("opac.universitaria_browse.trying_viewer") }} ${this.getViewerName()}...`;
-            
-            const timeoutMs = this.viewerType === 'native' ? 8000 : 12000;
-            
-            this.loadTimeout = setTimeout(() => {
-                if (this.loading) {
-                    console.log(`${this.viewerType} timeout, trying next...`);
-                    this.tryNextViewer();
-                }
-            }, timeoutMs);
-            
-            let src = '';
-            switch(this.viewerType) {
-                case 'google':
-                    src = `https://docs.google.com/viewer?url=${encodeURIComponent(this.currentUrl)}&embedded=true`;
-                    break;
-                case 'mozilla':
-                    src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(this.currentUrl)}`;
-                    break;
-                default:
-                    src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
-            }
-            
-            frame.src = src;
-        },
-        
-        tryNextViewer() {
-            this.viewerAttempts++;
-            clearTimeout(this.loadTimeout);
-            
-            if (this.viewerAttempts >= this.maxAttempts) {
-                this.error = true;
-                this.loading = false;
-                this.statusMessage = '{{ __("opac.universitaria_browse.load_error") }}';
-                return;
-            }
-            
-            const currentIdx = this.viewerOrder.indexOf(this.viewerType);
-            const nextIdx = (currentIdx + 1) % this.viewerOrder.length;
-            this.viewerType = this.viewerOrder[nextIdx];
-            
-            console.log(`Switching to ${this.viewerType}`);
-            this.loadPdf();
-        },
-        
-        getViewerName() {
-            const names = {
-                'google': 'Google Docs',
-                'mozilla': 'Mozilla PDF.js',
-                'native': 'Browser PDF'
-            };
-            return names[this.viewerType] || this.viewerType;
-        },
-        
         onFrameLoad() {
-            clearTimeout(this.loadTimeout);
             this.loading = false;
-            this.statusMessage = '{{ __("opac.universitaria_browse.load_success") }}';
-            setTimeout(() => {
-                this.showWarning = false;
-            }, 2000);
-        },
-        
-        onFrameError() {
-            console.log(`${this.viewerType} error, trying next...`);
-            this.tryNextViewer();
-        },
-        
-        retryLoad() {
-            this.error = false;
-            this.loading = true;
-            this.viewerAttempts = 0;
-            this.viewerType = this.viewerOrder[0];
-            this.loadPdf();
-        },
-        
-        toggleViewer() {
-            clearTimeout(this.loadTimeout);
-            const currentIdx = this.viewerOrder.indexOf(this.viewerType);
-            const nextIdx = (currentIdx + 1) % this.viewerOrder.length;
-            this.viewerType = this.viewerOrder[nextIdx];
-            this.error = false;
-            this.loading = true;
-            this.viewerAttempts = 0;
-            this.loadPdf();
         },
         
         openInNewTab() {
             window.open(this.currentUrl, '_blank');
+        }
+    }
+}
+</script>
         }
     }
 }

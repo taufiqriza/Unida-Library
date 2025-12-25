@@ -1,20 +1,63 @@
 @section('title', 'Dashboard')
 
-<div class="space-y-4 lg:space-y-6" wire:init="loadData">
-
-    {{-- Mobile Header - App Style (hidden on desktop) --}}
-    <div class="lg:hidden -mx-4 -mt-4 px-4 pt-4 pb-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-b-3xl shadow-lg">
-        {{-- Greeting --}}
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <p class="text-blue-200 text-sm">Selamat {{ now()->hour < 12 ? 'Pagi' : (now()->hour < 15 ? 'Siang' : (now()->hour < 18 ? 'Sore' : 'Malam')) }} 👋</p>
-                <h1 class="text-white text-xl font-bold">{{ explode(' ', auth()->user()->name)[0] }}</h1>
+<div wire:init="loadData">
+    {{-- Desktop Header (hidden on mobile) --}}
+    <div class="hidden lg:flex lg:items-center lg:justify-between gap-4 mb-5">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                <i class="fas fa-chart-line text-2xl"></i>
             </div>
-            <button wire:click="loadData" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i>
+            <div>
+                <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
+                <p class="text-sm text-gray-500 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            {{-- Google Account Notice --}}
+            @if(!auth()->user()->socialAccounts()->where('provider', 'google')->exists())
+            <div x-data="{ show: !sessionStorage.getItem('hideGoogleNotice') }" x-show="show" x-cloak
+                 class="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/60 rounded-xl shadow-sm">
+                <div class="w-6 h-6 bg-white rounded-md shadow-sm flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 leading-tight">Login lebih mudah</span>
+                    <a href="{{ route('staff.profile') }}" class="text-xs text-blue-700 hover:text-blue-800 font-semibold leading-tight">Hubungkan Google →</a>
+                </div>
+                <button @click="show = false; sessionStorage.setItem('hideGoogleNotice', '1')" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full transition">
+                    <i class="fas fa-times text-[10px]"></i>
+                </button>
+            </div>
+            @endif
+            <button wire:click="loadData" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
+                <i class="fas fa-sync-alt text-xs" wire:loading.class="fa-spin" wire:target="loadData"></i>
+                Refresh
             </button>
         </div>
-        
+    </div>
+
+    <div class="space-y-5">
+        {{-- Mobile Header - App Style (hidden on desktop) --}}
+        <div class="lg:hidden -mx-4 -mt-4 px-4 pt-4 pb-6 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-b-3xl shadow-lg">
+            {{-- Greeting --}}
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-blue-200 text-sm">Selamat {{ now()->hour < 12 ? 'Pagi' : (now()->hour < 15 ? 'Siang' : (now()->hour < 18 ? 'Sore' : 'Malam')) }} 👋</p>
+                    <h1 class="text-white text-xl font-bold">{{ explode(' ', auth()->user()->name)[0] }}</h1>
+                </div>
+                <button wire:click="loadData" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i>
+                </button>
+            </div>
+            
         {{-- Today's Stats Row --}}
         <div class="flex gap-3">
             <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white">
@@ -39,26 +82,6 @@
                 <p class="text-2xl font-bold {{ ($stats['overdue'] ?? 0) > 0 ? 'text-red-200' : '' }}">{{ $stats['overdue'] ?? 0 }}</p>
             </div>
         </div>
-    </div>
-
-    {{-- Desktop Header (hidden on mobile) --}}
-    <div class="hidden lg:flex lg:items-center lg:justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                <i class="fas fa-chart-line text-2xl"></i>
-            </div>
-            <div>
-                <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p class="text-sm text-gray-500 flex items-center gap-2">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
-                </p>
-            </div>
-        </div>
-        <button wire:click="loadData" class="self-start lg:self-auto px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
-            <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i>
-            Refresh
-        </button>
     </div>
 
     {{-- Desktop Quick Stats - Today (hidden on mobile) --}}
@@ -385,6 +408,7 @@
                 @endforelse
             </div>
         </div>
+    </div>
     </div>
 </div>
 

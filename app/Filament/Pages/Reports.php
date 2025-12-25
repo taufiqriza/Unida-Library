@@ -35,7 +35,7 @@ class Reports extends Page
 
     public function getCurrentBranch(): ?Branch
     {
-        $branchId = auth('web')->user()->getCurrentBranchId();
+        $branchId = auth('admin')->user()->getCurrentBranchId();
         return $branchId ? Branch::find($branchId) : null;
     }
 

@@ -17,7 +17,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    @php $staffAccountMobile = \App\Models\User::where('email', $member->email)->first(); @endphp
+                    @php $staffAccountMobile = \App\Models\User::where('email', $member->email)->where('status', 'approved')->where('is_active', true)->first(); @endphp
                     @if($staffAccountMobile)
                     <a href="{{ route('auth.switch-portal', 'staff') }}" class="w-9 h-9 bg-blue-500/30 text-white rounded-full flex items-center justify-center hover:bg-blue-500/50 transition" title="Staff Portal">
                         <i class="fas fa-exchange-alt text-sm"></i>
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2 items-end">
-                        @php $staffAccount = \App\Models\User::where('email', $member->email)->first(); @endphp
+                        @php $staffAccount = \App\Models\User::where('email', $member->email)->where('status', 'approved')->where('is_active', true)->first(); @endphp
                         @if($staffAccount)
                         <a href="{{ route('auth.switch-portal', 'staff') }}" class="w-32 group bg-blue-500/20 hover:bg-blue-500/30 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-blue-400/30 shadow-sm backdrop-blur-md h-8">
                             <i class="fas fa-exchange-alt"></i> Staff Portal

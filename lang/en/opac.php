@@ -9,7 +9,7 @@ return [
     // General
     'site_name' => 'UNIDA Gontor Library',
     'tagline' => 'Gateway to Knowledge for This World & Hereafter',
-    'university' => 'Darussalam Gontor University',
+    'university' => 'University of Darussalam Gontor',
     'welcome' => 'Welcome',
     'welcome_to_library' => 'Welcome to UNIDA Library',
     'back' => 'Back',
@@ -87,7 +87,7 @@ return [
         'ebook' => 'E-Book',
         
         // Welcome
-        'welcome_description' => 'Darussalam Gontor University Library is a modern learning and research center. We provide access to thousands of books, scientific journals, e-books, and other digital resources to support the academic activities of UNIDA Gontor community.',
+        'welcome_description' => 'University of Darussalam Gontor Library is a modern learning and research center. We provide access to thousands of books, scientific journals, e-books, and other digital resources to support the academic activities of UNIDA Gontor community.',
         
         // Quick Services
         'quick_services' => 'Quick Services',
@@ -307,7 +307,7 @@ return [
             'title' => 'Library History',
             'subtitle' => 'Journey from ISID to UNIDA Gontor',
             'breadcrumb_profile' => 'Profile',
-            'intro' => 'Darussalam Gontor University Library (UNIDA) is a key institution in supporting the learning and research process on campus. With a historical journey starting from the Darussalam Institute of Islamic Studies (ISID) to becoming a leading university, this library functions as a dynamic center of knowledge and research.',
+            'intro' => 'University of Darussalam Gontor Library (UNIDA) is a key institution in supporting the learning and research process on campus. With a historical journey starting from the Darussalam Institute of Islamic Studies (ISID) to becoming a leading university, this library functions as a dynamic center of knowledge and research.',
             'key_institution' => 'key institution',
             'knowledge_center' => 'dynamic center of knowledge and research',
             'era_awal' => 'Early Era',
@@ -315,7 +315,7 @@ return [
             'era_isid_desc' => 'The library began as part of ISID, serving the literature needs of students with a focus on Islamic studies and religious sciences.',
             'tahun_2014' => '2014',
             'transformasi_title' => 'Transformation to UNIDA Gontor',
-            'transformasi_desc' => 'With the establishment of Darussalam Gontor University (UNIDA) in 2014, the library underwent significant transformation.',
+            'transformasi_desc' => 'With the establishment of University of Darussalam Gontor (UNIDA) in 2014, the library underwent significant transformation.',
             'transformasi_highlight' => 'significant transformation',
             'transformasi_desc_2' => 'The need to develop and expand the library to become more than just a book storage facility.',
             'revitalisasi' => 'Revitalization',
@@ -1135,7 +1135,7 @@ return [
     'global_search' => [
         // Header
         'title' => 'UNIDA Gontor Library',
-        'subtitle' => 'Darussalam Gontor University',
+        'subtitle' => 'University of Darussalam Gontor',
         'search_placeholder' => 'Type title, author, ISBN, or keywords...',
         'search' => 'Search',
         'close' => 'Close',
@@ -1168,6 +1168,8 @@ return [
         'thesis_disertasi' => 'Dissertation',
         'journal_source' => 'Journal Source',
         'all_journals' => 'All Journals',
+        'ebook_source' => 'E-Book Source',
+        'all_sources' => 'All Sources',
         'subject' => 'Subject',
         'view_all_subjects' => 'View all subjects',
         'language' => 'Language',

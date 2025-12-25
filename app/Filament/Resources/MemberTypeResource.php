@@ -20,7 +20,7 @@ class MemberTypeResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth('web')->user()?->isAdmin() ?? false;
+        return auth('admin')->user()?->isAdmin() ?? false;
     }
 
     public static function form(Form $form): Form

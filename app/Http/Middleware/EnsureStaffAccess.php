@@ -15,6 +15,11 @@ class EnsureStaffAccess
             abort(403, 'Akses ditolak. Anda bukan staff perpustakaan.');
         }
 
+        if ($user->status !== 'approved' || !$user->is_active) {
+            auth()->logout();
+            return redirect()->route('login')->withErrors(['email' => 'Akun Anda belum disetujui atau tidak aktif.']);
+        }
+
         return $next($request);
     }
 }

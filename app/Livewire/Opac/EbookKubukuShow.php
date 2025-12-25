@@ -103,7 +103,7 @@ class EbookKubukuShow extends Component
     public function render()
     {
         return view('livewire.opac.ebook-kubuku-show')
-            ->layout('layouts.opac', [
+            ->layout('components.opac.layout', [
                 'title' => $this->ebook['title'] ?? 'E-Book KUBUKU',
             ]);
     }

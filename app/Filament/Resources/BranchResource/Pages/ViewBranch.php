@@ -14,7 +14,7 @@ class ViewBranch extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn () => auth('web')->user()?->isSuperAdmin()),
+                ->visible(fn () => auth('admin')->user()?->isSuperAdmin()),
         ];
     }
 }

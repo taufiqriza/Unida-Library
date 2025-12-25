@@ -105,17 +105,10 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
                 abort(403, 'Invalid logout signature');
             }
             
-            // Logout from web guard
+            // Logout from web guard only - don't invalidate entire session
             auth()->guard('web')->logout();
             
-            // Also logout from member guard if somehow active
-            if (auth()->guard('member')->check()) {
-                auth()->guard('member')->logout();
-            }
-            
-            // Clear all session data
-            request()->session()->flush();
-            request()->session()->invalidate();
+            // Regenerate token for security
             request()->session()->regenerateToken();
             
             return redirect('/login')->with('success', 'Berhasil logout.');

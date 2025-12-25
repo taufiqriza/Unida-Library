@@ -52,8 +52,8 @@
         (function() {
             function syncDarkMode() {
                 const stored = localStorage.getItem('staffPortalDarkMode');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const isDark = stored === 'true' || (stored === null && prefersDark);
+                // Default to light mode if no preference stored
+                const isDark = stored === 'true';
                 if (isDark) {
                     document.documentElement.classList.add('dark');
                 } else {
@@ -470,7 +470,7 @@
         {{-- Main Content Wrapper - background controlled by CSS dark mode --}}
         <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden bg-slate-50"
              :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
-            <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-[88px] lg:pb-8 overflow-x-hidden">
+            <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-4 lg:pb-8 overflow-x-hidden">
                 {{-- Queue Status Alert for Admins --}}
                 <x-queue-status-alert />
                 

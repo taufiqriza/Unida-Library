@@ -26,14 +26,14 @@ class ExpiredMembers extends Page implements HasTable
             ->query(
                 Member::query()
                     ->where('expire_date', '<', now())
-                    ->when(!auth('web')->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth('web')->user()->branch_id))
-                    ->when(auth('web')->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
+                    ->when(!auth('admin')->user()->isSuperAdmin(), fn ($q) => $q->where('branch_id', auth('admin')->user()->branch_id))
+                    ->when(auth('admin')->user()->isSuperAdmin() && session('current_branch_id'), fn ($q) => $q->where('branch_id', session('current_branch_id')))
             )
             ->columns([
                 Tables\Columns\TextColumn::make('branch.name')
                     ->label('Cabang')
                     ->badge()
-                    ->visible(fn () => auth('web')->user()?->isSuperAdmin() && !session('current_branch_id')),
+                    ->visible(fn () => auth('admin')->user()?->isSuperAdmin() && !session('current_branch_id')),
                 Tables\Columns\TextColumn::make('member_id')
                     ->label('No. Anggota')
                     ->searchable(),
@@ -92,10 +92,13 @@ class ExpiredMembers extends Page implements HasTable
 
     public static function getNavigationBadge(): ?string
     {
+        $user = auth('admin')->user();
+        if (!$user) return null;
+        
         $query = Member::where('expire_date', '<', now());
         
-        if (!auth('web')->user()?->isSuperAdmin()) {
-            $query->where('branch_id', auth('web')->user()->branch_id);
+        if (!$user->isSuperAdmin()) {
+            $query->where('branch_id', $user->branch_id);
         } elseif (session('current_branch_id')) {
             $query->where('branch_id', session('current_branch_id'));
         }

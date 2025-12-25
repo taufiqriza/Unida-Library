@@ -123,8 +123,8 @@ class SecurityHeaders
                 "https://accounts.google.com " .
                 "wss: ws:",
             
-            // Frames: Google OAuth, YouTube, embedded content
-            "frame-src 'self' " .
+            // Frames: Google OAuth, YouTube, embedded content, blob for PDF
+            "frame-src 'self' blob: " .
                 "https://accounts.google.com " .
                 "https://www.google.com " .
                 "https://www.youtube.com " .

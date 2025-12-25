@@ -49,10 +49,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([])
-            ->authGuard('web')
+            ->authGuard('admin')
             ->renderHook(
                 'panels::user-menu.before',
-                fn () => view('livewire.quick-actions-hook') . (auth('web')->user()?->isSuperAdmin() ? view('livewire.branch-switcher-hook') : '')
+                fn () => view('livewire.quick-actions-hook') . (auth('admin')->user()?->isSuperAdmin() ? view('livewire.branch-switcher-hook') : '')
             )
             ->renderHook(
                 'panels::global-search.before',

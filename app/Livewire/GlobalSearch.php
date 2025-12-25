@@ -38,6 +38,7 @@ class GlobalSearch extends Component
     public $yearTo = null;
     public string $thesisType = '';
     public ?string $journalCode = null;
+    public ?string $ebookSource = null;
     
     // Sort & View
     public string $sortBy = 'relevance';
@@ -56,6 +57,7 @@ class GlobalSearch extends Component
         'resourceType' => ['as' => 'type', 'except' => 'all'],
         'branchId' => ['as' => 'branch', 'except' => null],
         'journalCode' => ['as' => 'journal', 'except' => null],
+        'ebookSource' => ['as' => 'esrc', 'except' => null],
         'collectionTypeId' => ['as' => 'collection', 'except' => null],
         'facultyId' => ['as' => 'faculty', 'except' => null],
         'departmentId' => ['as' => 'dept', 'except' => null],
@@ -135,7 +137,7 @@ class GlobalSearch extends Component
         $this->reset([
             'branchId', 'selectedSubjects', 'collectionTypeId', 
             'facultyId', 'departmentId', 'language', 
-            'yearFrom', 'yearTo', 'thesisType', 'sortBy', 'journalCode'
+            'yearFrom', 'yearTo', 'thesisType', 'sortBy', 'journalCode', 'ebookSource'
         ]);
         $this->page = 1;
     }
@@ -185,9 +187,12 @@ class GlobalSearch extends Component
         }
 
         if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
-            $results = $results->merge($this->searchEbooks());
-            // Also search KUBUKU e-books
-            if ($this->query) {
+            // Filter by source if specified
+            if (!$this->ebookSource || $this->ebookSource === 'local') {
+                $results = $results->merge($this->searchEbooks());
+            }
+            // KUBUKU e-books
+            if (!$this->ebookSource || $this->ebookSource === 'kubuku') {
                 $results = $results->merge($this->searchKubuku());
             }
         }
@@ -548,13 +553,17 @@ class GlobalSearch extends Component
 
     protected function searchKubuku(): Collection
     {
-        if (empty($this->query)) {
-            return collect();
-        }
-
         $kubuku = app(KubukuService::class);
         
         if (!$kubuku->isEnabled()) {
+            return collect();
+        }
+
+        // If no query, get all books (paginated)
+        if (empty($this->query)) {
+            if ($this->resourceType === 'ebook' && $this->ebookSource === 'kubuku') {
+                return $kubuku->getAll($this->page);
+            }
             return collect();
         }
 

@@ -1224,6 +1224,8 @@ return [
         'thesis_disertasi' => 'Disertasi',
         'journal_source' => 'Sumber Jurnal',
         'all_journals' => 'Semua Jurnal',
+        'ebook_source' => 'Sumber E-Book',
+        'all_sources' => 'Semua Sumber',
         'subject' => 'Subjek',
         'view_all_subjects' => 'Lihat semua subjek',
         'language' => 'Bahasa',

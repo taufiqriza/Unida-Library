@@ -29,7 +29,7 @@ class LoanResource extends Resource
                 Tables\Columns\TextColumn::make('branch.name')
                     ->label('Cabang')
                     ->badge()
-                    ->visible(fn () => auth('web')->user()?->isSuperAdmin() && !session('current_branch_id')),
+                    ->visible(fn () => auth('admin')->user()?->isSuperAdmin() && !session('current_branch_id')),
                 Tables\Columns\TextColumn::make('member.name')
                     ->label('Peminjam')
                     ->searchable()

@@ -28,7 +28,7 @@ class Dashboard extends Page
 
     public function getBranch(): ?Branch
     {
-        $user = auth('web')->user();
+        $user = auth('admin')->user();
         if ($user->isSuperAdmin()) {
             $branchId = session('current_branch_id');
             return $branchId ? Branch::find($branchId) : null;
@@ -47,7 +47,7 @@ class Dashboard extends Page
 
     public function getMainStats(): array
     {
-        $user = auth('web')->user();
+        $user = auth('admin')->user();
         $branchId = $user->getCurrentBranchId();
         $filterBranch = !$user->isSuperAdmin() || $branchId;
 
@@ -63,7 +63,7 @@ class Dashboard extends Page
 
     public function getAlertStats(): array
     {
-        $user = auth('web')->user();
+        $user = auth('admin')->user();
         $branchId = $user->getCurrentBranchId();
         $filterBranch = !$user->isSuperAdmin() || $branchId;
 
@@ -96,7 +96,7 @@ class Dashboard extends Page
 
     public function getLoanChartData(): array
     {
-        $user = auth('web')->user();
+        $user = auth('admin')->user();
         $branchId = $user->getCurrentBranchId();
         $filterBranch = !$user->isSuperAdmin() || $branchId;
 
@@ -125,7 +125,7 @@ class Dashboard extends Page
 
     public function getRecentLoans(): array
     {
-        $user = auth('web')->user();
+        $user = auth('admin')->user();
         $branchId = $user->getCurrentBranchId();
 
         $query = Loan::with(['member', 'item.book'])->latest('loan_date');

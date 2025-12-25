@@ -17,7 +17,7 @@ class CreateStockOpname extends CreateRecord
         
         // Set branch_id from current user's branch or session
         if (empty($data['branch_id'])) {
-            $data['branch_id'] = auth('web')->user()->getCurrentBranchId() 
+            $data['branch_id'] = auth('admin')->user()->getCurrentBranchId() 
                 ?? Branch::where('is_main', true)->first()?->id 
                 ?? 1;
         }
