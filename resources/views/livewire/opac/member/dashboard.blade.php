@@ -208,8 +208,8 @@
                         </a>
                     </div>
 
-                    {{-- Shamela & Database Cards Grid --}}
-                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
+                    {{-- Shamela, Database & Repository Cards Grid --}}
+                    <div class="grid grid-cols-3 gap-2 lg:gap-3">
                         {{-- Maktabah Shamela Card --}}
                         <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
                             <div class="relative flex items-center gap-2 lg:gap-3">
@@ -219,9 +219,23 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-1.5 mb-0.5">
                                         <h3 class="font-bold text-xs lg:text-sm">Shamela</h3>
-                                        <span class="px-1 py-0.5 bg-amber-400 text-amber-900 text-[7px] lg:text-[8px] font-bold rounded">8.4K</span>
                                     </div>
-                                    <p class="text-emerald-200 text-[9px] lg:text-xs truncate">Kitab klasik</p>
+                                    <p class="text-emerald-200 text-[9px] lg:text-xs truncate">8.4K Kitab</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        {{-- Repository EPrints Card --}}
+                        <a href="https://repo.unida.gontor.ac.id/cgi/users/home" target="_blank" class="block bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
+                            <div class="relative flex items-center gap-2 lg:gap-3">
+                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-archive text-sm lg:text-lg"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 mb-0.5">
+                                        <h3 class="font-bold text-xs lg:text-sm">Repository</h3>
+                                    </div>
+                                    <p class="text-orange-200 text-[9px] lg:text-xs truncate">EPrints</p>
                                 </div>
                             </div>
                         </a>
@@ -235,9 +249,8 @@
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-1.5 mb-0.5">
                                         <h3 class="font-bold text-xs lg:text-sm">Database</h3>
-                                        <span class="px-1 py-0.5 bg-amber-400 text-amber-900 text-[7px] lg:text-[8px] font-bold rounded">FPPTI</span>
                                     </div>
-                                    <p class="text-indigo-200 text-[9px] lg:text-xs truncate">Gale, ProQuest</p>
+                                    <p class="text-indigo-200 text-[9px] lg:text-xs truncate">FPPTI</p>
                                 </div>
                             </div>
                         </a>
