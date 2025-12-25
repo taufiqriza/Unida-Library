@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deployment script for Perpustakaan UNIDA Gontor
-# Usage: ./deploy.sh
+# Usage: bash deploy.sh
 
 set -e
 
@@ -13,45 +13,44 @@ echo "🚀 Starting deployment..."
 cd $CURRENT
 
 # Pull latest code
-echo "📥 Pulling latest code from production branch..."
+echo "📥 Pulling latest code..."
 git fetch origin production
 git reset --hard origin/production
 
-# Install dependencies
-echo "📦 Installing composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+# Restore symlinks (git reset removes them)
+echo "🔗 Restoring symlinks..."
+rm -rf .env storage
+ln -sf ../shared/.env .env
+ln -sf ../shared/storage storage
 
-# Install npm and build assets
-echo "🔨 Building assets..."
-npm ci --silent
-npm run build
+# Install composer (only if lock changed)
+echo "📦 Installing dependencies..."
+composer install --no-dev --optimize-autoloader --no-interaction --quiet
 
-# Clear and cache
-echo "🧹 Clearing cache..."
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan route:clear
+# Build assets (only if needed)
+if [ package.json -nt node_modules ]; then
+    echo "🔨 Building assets..."
+    npm ci --silent
+    npm run build
+fi
 
-# Run migrations
+# Migrations
 echo "📊 Running migrations..."
 php artisan migrate --force
 
-# Optimize
+# Cache
 echo "⚡ Optimizing..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Fix permissions
+# Permissions
 echo "🔐 Fixing permissions..."
 sudo chown -R www-data:www-data $SHARED/storage
 sudo chmod -R 775 $SHARED/storage
 sudo chmod -R 775 $CURRENT/bootstrap/cache
 
-# Restart PHP-FPM
-echo "🔄 Restarting PHP-FPM..."
+# Reload PHP
 sudo systemctl reload php8.3-fpm
 
-echo "✅ Deployment completed successfully!"
-echo "🌐 Site: https://library.unida.gontor.ac.id"
+echo "✅ Done! https://library.unida.gontor.ac.id"
