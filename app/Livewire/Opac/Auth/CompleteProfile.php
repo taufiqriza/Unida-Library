@@ -306,8 +306,6 @@ class CompleteProfile extends Component
                 $q->whereNull('email')->orWhere('email', '');
             })
             ->where('profile_completed', false)
-            // Prioritize exact matches first
-            ->orderByRaw("CASE WHEN name LIKE ? THEN 0 ELSE 1 END", ["%{$searchName}%"])
             ->orderBy('name')
             ->limit(20)
             ->get();

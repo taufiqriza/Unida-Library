@@ -51,7 +51,7 @@ class PlagiarismCreate extends Component
     protected function rules()
     {
         return [
-            'document' => 'required|file|mimes:pdf,docx|max:20480',
+            'document' => 'required|file|mimes:pdf,docx|max:20480|mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'document_title' => 'required|string|max:500',
             'thesis_submission_id' => 'nullable|exists:thesis_submissions,id',
             'agreement' => 'required|accepted',

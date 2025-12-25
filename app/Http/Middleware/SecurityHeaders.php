@@ -46,6 +46,10 @@ class SecurityHeaders
         $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         
+        // Prevent information disclosure
+        $response->headers->remove('X-Powered-By');
+        $response->headers->remove('Server');
+        
         // Permissions Policy (formerly Feature-Policy)
         $response->headers->set('Permissions-Policy', implode(', ', [
             'camera=(self)',
@@ -75,7 +79,12 @@ class SecurityHeaders
         if ($request->user() || $request->user('member')) {
             $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
             $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
         }
+
+        // Cross-Origin headers
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+        $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
 
         return $response;
     }
@@ -85,8 +94,6 @@ class SecurityHeaders
      */
     protected function buildContentSecurityPolicy(): string
     {
-        $nonce = $this->generateNonce();
-        
         $directives = [
             // Default fallback
             "default-src 'self'",
@@ -98,7 +105,9 @@ class SecurityHeaders
                 "https://www.google.com " .
                 "https://www.gstatic.com " .
                 "https://accounts.google.com " .
-                "https://cdn.tailwindcss.com",
+                "https://cdn.tailwindcss.com " .
+                "https://www.googletagmanager.com " .
+                "https://www.google-analytics.com",
             
             // Styles: self + Google Fonts + inline for Tailwind
             "style-src 'self' 'unsafe-inline' " .
@@ -121,6 +130,8 @@ class SecurityHeaders
             "connect-src 'self' " .
                 "https://api.qrserver.com " .
                 "https://accounts.google.com " .
+                "https://www.google-analytics.com " .
+                "https://region1.google-analytics.com " .
                 "wss: ws:",
             
             // Frames: Google OAuth, YouTube, embedded content, blob for PDF
@@ -147,16 +158,5 @@ class SecurityHeaders
         ];
 
         return implode('; ', $directives);
-    }
-
-    /**
-     * Generate CSP nonce for inline scripts (future use)
-     */
-    protected function generateNonce(): string
-    {
-        if (!session()->has('csp_nonce')) {
-            session(['csp_nonce' => base64_encode(random_bytes(16))]);
-        }
-        return session('csp_nonce');
     }
 }
