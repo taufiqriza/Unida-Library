@@ -387,7 +387,8 @@
                             :class="darkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'">
                         <div class="text-right hidden sm:block">
                             <p class="text-xs" :class="darkMode ? 'text-slate-400' : 'text-slate-400'">{{ $branch?->name ?? 'Semua Cabang' }}</p>
-                            <p class="text-sm font-semibold" :class="darkMode ? 'text-slate-100' : 'text-slate-900'">{{ $user->name }}</p>
+                            <p class="text-sm font-semibold leading-tight" :class="darkMode ? 'text-slate-100' : 'text-slate-900'">{{ $user->name }}</p>
+                            <span style="font-size:9px;padding:1px 6px;background:{{ $user->role === 'super_admin' ? '#ef4444' : ($user->role === 'admin' ? '#f59e0b' : '#3b82f6') }};color:#fff;border-radius:3px;font-weight:600">{{ $user->role === 'super_admin' ? 'SUPER ADMIN' : ($user->role === 'admin' ? 'ADMIN' : 'STAF') }}</span>
                         </div>
                         <div class="w-10 h-10 rounded-full border-2 overflow-hidden" :class="darkMode ? 'border-slate-600' : 'border-slate-200'">
                             <img src="{{ $user->getAvatarUrl(100) }}" class="w-full h-full object-cover">
