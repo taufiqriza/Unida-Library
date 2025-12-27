@@ -32,6 +32,42 @@
             </button>
         </div>
 
+        {{-- Visitor Button --}}
+        @php
+            $visitorBranch = auth()->user()->branch_id ? \App\Models\Branch::find(auth()->user()->branch_id) : null;
+        @endphp
+        <div class="p-3 border-b border-gray-100">
+            @if($visitorBranch)
+            <a href="{{ route('visitor.kiosk', $visitorBranch->code) }}" target="_blank"
+               class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-door-open text-white"></i>
+                    <span class="text-white font-semibold text-sm">Visitor</span>
+                </div>
+                <i class="fas fa-external-link-alt text-white/70 text-xs"></i>
+            </a>
+            @else
+            <div x-data="{ showBranches: false }" class="relative">
+                <button @click="showBranches = !showBranches" class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-door-open text-white"></i>
+                        <span class="text-white font-semibold text-sm">Visitor</span>
+                    </div>
+                    <i class="fas fa-chevron-down text-white/70 text-xs transition-transform" :class="showBranches && 'rotate-180'"></i>
+                </button>
+                <div x-show="showBranches" x-transition class="mt-2 bg-gray-50 rounded-xl max-h-40 overflow-y-auto">
+                    @foreach(\App\Models\Branch::where('is_active', true)->orderBy('name')->get() as $branch)
+                    <a href="{{ route('visitor.kiosk', $branch->code) }}" target="_blank"
+                       class="flex items-center justify-between px-4 py-2 hover:bg-amber-50 transition text-sm">
+                        <span class="text-gray-700">{{ $branch->name }}</span>
+                        <i class="fas fa-external-link-alt text-gray-400 text-xs"></i>
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        </div>
+
         {{-- Sirkulasi Section --}}
         <div class="p-3 border-b border-gray-100">
             <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1">Sirkulasi</p>
