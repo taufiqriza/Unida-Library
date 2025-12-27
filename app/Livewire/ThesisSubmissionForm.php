@@ -115,7 +115,9 @@ class ThesisSubmissionForm extends Component
         
         // Auto-fill from member
         $this->author = $member->name;
-        $this->nim = $member->member_id;
+        $this->nim = $member->member_id ?? $member->nim_nidn;
+        $this->faculty_id = $member->faculty_id;
+        $this->department_id = $member->department_id;
 
         // Load existing submission for edit
         if ($submissionId) {
