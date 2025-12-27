@@ -133,8 +133,11 @@
     </div>
 
     {{-- Visitor Quick Action --}}
-    @if(auth()->user()->branch)
-    <a href="{{ route('visitor.kiosk', auth()->user()->branch->code) }}" target="_blank"
+    @php
+        $visitorBranch = auth()->user()->branch ?? \App\Models\Branch::where('is_active', true)->first();
+    @endphp
+    @if($visitorBranch)
+    <a href="{{ route('visitor.kiosk', $visitorBranch->code) }}" target="_blank"
        class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl shadow transition active:scale-[0.98]">
         <div class="flex items-center gap-3">
             <i class="fas fa-door-open text-white"></i>
