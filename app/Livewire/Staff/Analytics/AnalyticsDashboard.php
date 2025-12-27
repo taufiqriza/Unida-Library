@@ -3,13 +3,19 @@
 namespace App\Livewire\Staff\Analytics;
 
 use App\Models\Setting;
+use App\Models\Visit;
+use App\Models\Branch;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class AnalyticsDashboard extends Component
 {
+    public string $activeTab = 'online';
     public string $period = '7d';
+    public string $visitPeriod = '7d';
+    public ?int $visitBranch = null;
     public bool $isConfigured = false;
     public bool $isLoading = true;
     
@@ -19,6 +25,14 @@ class AnalyticsDashboard extends Component
     public array $topCountries = [];
     public array $devices = [];
     public array $trafficSources = [];
+    
+    // Visit stats
+    public array $visitStats = [];
+    public array $visitDaily = [];
+    public array $visitByPurpose = [];
+    public array $visitByHour = [];
+    public array $visitTopMembers = [];
+    public array $visitRecent = [];
     
     public function mount()
     {
@@ -306,10 +320,95 @@ class AnalyticsDashboard extends Component
         ];
     }
 
+    public function loadVisitData()
+    {
+        $days = match($this->visitPeriod) {
+            '7d' => 7, '30d' => 30, '90d' => 90, 'today' => 0, default => 7
+        };
+        
+        $startDate = $days === 0 ? today() : now()->subDays($days)->startOfDay();
+        
+        $query = Visit::where('visited_at', '>=', $startDate);
+        if ($this->visitBranch) {
+            $query->where('branch_id', $this->visitBranch);
+        }
+        
+        // Main stats
+        $this->visitStats = [
+            'total' => (clone $query)->count(),
+            'members' => (clone $query)->where('visitor_type', 'member')->count(),
+            'guests' => (clone $query)->where('visitor_type', 'guest')->count(),
+            'today' => Visit::whereDate('visited_at', today())
+                ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))->count(),
+            'avg_daily' => $days > 0 ? round((clone $query)->count() / $days, 1) : (clone $query)->count(),
+        ];
+        
+        // Daily trend
+        $this->visitDaily = (clone $query)
+            ->selectRaw('DATE(visited_at) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count', 'date')
+            ->toArray();
+        
+        // By purpose
+        $this->visitByPurpose = (clone $query)
+            ->selectRaw('purpose, COUNT(*) as count')
+            ->groupBy('purpose')
+            ->pluck('count', 'purpose')
+            ->toArray();
+        
+        // By hour (peak hours)
+        $this->visitByHour = (clone $query)
+            ->selectRaw('HOUR(visited_at) as hour, COUNT(*) as count')
+            ->groupBy('hour')
+            ->orderBy('hour')
+            ->pluck('count', 'hour')
+            ->toArray();
+        
+        // Top members
+        $this->visitTopMembers = Visit::where('visited_at', '>=', $startDate)
+            ->where('visitor_type', 'member')
+            ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))
+            ->selectRaw('member_id, COUNT(*) as visit_count')
+            ->groupBy('member_id')
+            ->orderByDesc('visit_count')
+            ->limit(10)
+            ->with('member:id,name,member_id')
+            ->get()
+            ->toArray();
+        
+        // Recent visits
+        $this->visitRecent = Visit::where('visited_at', '>=', $startDate)
+            ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))
+            ->with(['member:id,name,member_id', 'branch:id,name'])
+            ->orderByDesc('visited_at')
+            ->limit(20)
+            ->get()
+            ->toArray();
+    }
+
+    public function updatedVisitPeriod()
+    {
+        $this->loadVisitData();
+    }
+
+    public function updatedVisitBranch()
+    {
+        $this->loadVisitData();
+    }
+
     public function render()
     {
-        return view('livewire.staff.analytics.analytics-dashboard')
-            ->extends('staff.layouts.app')
+        $branches = Branch::where('is_active', true)->orderBy('name')->get();
+        
+        if ($this->activeTab === 'offline' && empty($this->visitStats)) {
+            $this->loadVisitData();
+        }
+        
+        return view('livewire.staff.analytics.analytics-dashboard', [
+            'branches' => $branches,
+        ])->extends('staff.layouts.app')
             ->section('content');
     }
 }
