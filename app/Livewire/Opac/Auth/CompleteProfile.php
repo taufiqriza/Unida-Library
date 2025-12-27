@@ -87,8 +87,8 @@ class CompleteProfile extends Component
         $googleName = $this->member->name ?? '';
         
         // === PHASE 0: Direct NIM match from email ===
-        // Many UNIDA emails are: nim@student.xxx.unida.gontor.ac.id
-        if (preg_match('/^(\d{12,15})@/', $email, $nimMatch)) {
+        // Many UNIDA emails are: nim@student.xxx.unida.gontor.ac.id or nim@stu.unida.gontor.ac.id
+        if (preg_match('/^(\d{12,15})@(student|stu|mhs)/', $email, $nimMatch)) {
             $nimFromEmail = $nimMatch[1];
             $directMatch = Member::with(['department', 'branch'])
                 ->where('member_id', $nimFromEmail)
