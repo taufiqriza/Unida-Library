@@ -24,6 +24,15 @@ class StatisticsExportController extends Controller
             }
         }
 
+        // Audit log
+        \Log::info('Statistics export', [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'type' => $type,
+            'branch_id' => $branchId,
+            'ip' => request()->ip(),
+        ]);
+
         // Get statistics data
         $component = new LibraryStatistics();
         $component->selectedBranch = $branchId;

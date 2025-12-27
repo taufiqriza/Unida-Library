@@ -44,6 +44,12 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('export', function (Request $request) {
+            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip())->response(function () {
+                return back()->with('error', 'Terlalu banyak permintaan export. Coba lagi dalam 1 menit.');
+            });
+        });
+
         // Gates
         Gate::define('manage-staff', function ($user) {
             return in_array($user->role, ['super_admin', 'admin']);
