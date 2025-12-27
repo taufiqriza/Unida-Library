@@ -137,7 +137,8 @@ class StatisticsReportService
                 return $this->sanitizeArray($value);
             }
             if (is_string($value)) {
-                return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+                return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
             }
             return $value;
         }, $data);

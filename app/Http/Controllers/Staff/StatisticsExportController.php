@@ -17,10 +17,10 @@ class StatisticsExportController extends Controller
         if ($user->role !== 'super_admin') {
             $branchId = $user->branch_id;
         } else {
-            // Super admin must select a branch
+            // Super admin must select a branch - validate it exists
             $branchId = $request->get('branch');
-            if (!$branchId) {
-                return back()->with('error', 'Silakan pilih cabang terlebih dahulu');
+            if (!$branchId || !\App\Models\Branch::where('id', $branchId)->where('is_active', true)->exists()) {
+                return back()->with('error', 'Silakan pilih cabang yang valid');
             }
         }
 
