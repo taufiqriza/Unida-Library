@@ -148,7 +148,7 @@
         </div>
         <i class="fas fa-external-link-alt text-white/70 text-sm"></i>
     </a>
-    @elseif($isSuper)
+    @else
     <div x-data="{ open: false }" class="relative">
         <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl shadow transition active:scale-[0.98]">
             <div class="flex items-center gap-3">
