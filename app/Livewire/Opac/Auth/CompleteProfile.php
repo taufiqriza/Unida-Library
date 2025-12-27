@@ -86,6 +86,32 @@ class CompleteProfile extends Component
         
         $googleName = $this->member->name ?? '';
         
+        // === PHASE 0: Direct NIM match from email ===
+        // Many UNIDA emails are: nim@student.xxx.unida.gontor.ac.id
+        if (preg_match('/^(\d{12,15})@/', $email, $nimMatch)) {
+            $nimFromEmail = $nimMatch[1];
+            $directMatch = Member::with(['department', 'branch'])
+                ->where('member_id', $nimFromEmail)
+                ->where('profile_completed', false)
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                ->first();
+            
+            if ($directMatch) {
+                $this->autoDetected = true;
+                $this->searchResults = collect([$directMatch]);
+                $this->selectedPddiktiId = $directMatch->id;
+                $this->selectedPddikti = $directMatch;
+                $this->nim = $directMatch->member_id;
+                $this->branch_id = $directMatch->branch_id;
+                $this->department_id = $directMatch->department_id;
+                $this->faculty_id = $directMatch->faculty_id;
+                $this->gender = $directMatch->gender ?? '';
+                $mahasiswaType = MemberType::where('name', 'like', '%Mahasiswa%')->first();
+                $this->member_type_id = $mahasiswaType?->id ?? $directMatch->member_type_id;
+                return;
+            }
+        }
+        
         // === PHASE 1: Extract all possible identifiers ===
         
         // Extract prodi from domain (e.g., student.ei.unida.gontor.ac.id → EI)
