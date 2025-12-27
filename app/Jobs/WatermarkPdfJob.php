@@ -67,12 +67,25 @@ class WatermarkPdfJob implements ShouldQueue
 
     protected function applyWatermark(string $sourcePath): string
     {
+        // First, decompress PDF using Ghostscript for compatibility
+        $decompressedPath = sys_get_temp_dir() . '/decomp_' . uniqid() . '.pdf';
+        $gsCmd = sprintf(
+            'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=%s %s 2>&1',
+            escapeshellarg($decompressedPath),
+            escapeshellarg($sourcePath)
+        );
+        exec($gsCmd, $output, $returnCode);
+        
+        if ($returnCode !== 0 || !file_exists($decompressedPath)) {
+            Log::warning("GS decompress failed, using original: " . implode("\n", $output));
+            $decompressedPath = $sourcePath;
+        }
+        
         $pdf = new Fpdi();
         $pdf->setPrintHeader(false);
         $pdf->setPrintFooter(false);
         
-        $pageCount = $pdf->setSourceFile($sourcePath);
-        $logoPath = storage_path('app/public/logo-unida.png');
+        $pageCount = $pdf->setSourceFile($decompressedPath);
         
         for ($i = 1; $i <= $pageCount; $i++) {
             $templateId = $pdf->importPage($i);
@@ -81,28 +94,22 @@ class WatermarkPdfJob implements ShouldQueue
             $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
             $pdf->useTemplate($templateId, 0, 0, $size['width'], $size['height']);
             
-            // Logo watermark - 70% of page, centered, 15% opacity
-            if (file_exists($logoPath)) {
-                $logoWidth = $size['width'] * 0.7;
-                $logoX = ($size['width'] - $logoWidth) / 2;
-                $logoY = ($size['height'] - $logoWidth * 0.8) / 2; // Adjust for aspect ratio
-                
-                $pdf->SetAlpha(0.15);
-                $pdf->Image($logoPath, $logoX, $logoY, $logoWidth, 0, 'PNG');
-                $pdf->SetAlpha(1);
-            }
-            
-            // Footer text - bottom right corner
-            $pdf->SetAlpha(0.5);
-            $pdf->SetFont('helvetica', '', 8);
+            // Footer text watermark - bottom center
+            $pdf->SetAlpha(0.4);
+            $pdf->SetFont('helvetica', 'B', 9);
             $pdf->SetTextColor(100, 100, 100);
-            $pdf->SetXY($size['width'] - 75, $size['height'] - 8);
-            $pdf->Cell(70, 5, 'Perpustakaan UNIDA Gontor', 0, 0, 'R');
+            $pdf->SetXY(0, $size['height'] - 10);
+            $pdf->Cell($size['width'], 5, 'Perpustakaan UNIDA Gontor - library.unida.gontor.ac.id', 0, 0, 'C');
             $pdf->SetAlpha(1);
         }
         
         $outputPath = sys_get_temp_dir() . '/wm_' . uniqid() . '.pdf';
         $pdf->Output($outputPath, 'F');
+        
+        // Cleanup decompressed file
+        if ($decompressedPath !== $sourcePath && file_exists($decompressedPath)) {
+            unlink($decompressedPath);
+        }
         
         return $outputPath;
     }
