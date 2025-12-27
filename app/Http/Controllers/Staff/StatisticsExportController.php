@@ -56,8 +56,8 @@ class StatisticsExportController extends Controller
             'circulation' => $service->exportCirculation(),
             'full' => $service->exportFull(),
             'catalog' => $this->exportCatalog($branchId),
-            'ebooks' => $this->exportEbooks($branchId),
-            'ethesis' => $this->exportEthesis($branchId),
+            'ebooks' => $this->exportEbooks(),
+            'ethesis' => $this->exportEthesis(),
             default => abort(404),
         };
     }
@@ -138,95 +138,119 @@ class StatisticsExportController extends Controller
         return 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
     }
 
-    protected function exportEbooks(?int $branchId)
+    protected function exportEbooks()
     {
-        $filename = 'daftar-ebook-' . now()->format('Y-m-d') . '.csv';
+        // Get summary statistics
+        $totalEbooks = \App\Models\Ebook::where('is_active', true)->count();
+        $bySource = \App\Models\Ebook::where('is_active', true)
+            ->selectRaw("COALESCE(file_source, 'local') as source, COUNT(*) as count")
+            ->groupBy('source')
+            ->pluck('count', 'source')
+            ->toArray();
+        
+        // Kubuku count (from external API - stored separately or check collection_type)
+        $kubukuCount = \App\Models\Ebook::where('is_active', true)
+            ->where(function($q) {
+                $q->where('file_source', 'kubuku')
+                  ->orWhere('collection_type', 'kubuku');
+            })->count();
+        
+        // Shamela count
+        $shamelaCount = \DB::table('shamela_books')->count();
+        
+        // Open Library is external API, no local count
+        
+        $byCategory = \App\Models\Ebook::where('is_active', true)
+            ->join('digital_categories', 'ebooks.digital_category_id', '=', 'digital_categories.id')
+            ->selectRaw('digital_categories.name, COUNT(*) as count')
+            ->groupBy('digital_categories.name')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->pluck('count', 'name')
+            ->toArray();
 
-        return response()->streamDownload(function () use ($branchId) {
-            $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            fputcsv($handle, ['No', 'Judul', 'Pengarang', 'Penerbit', 'Tahun', 'ISBN', 'Sumber', 'Kategori', 'Format', 'Akses', 'Views', 'Downloads']);
-            
-            $query = \App\Models\Ebook::query()
-                ->with(['publisher', 'authors', 'digitalCategory'])
-                ->where('is_active', true)
-                ->orderBy('title');
+        $byYear = \App\Models\Ebook::where('is_active', true)
+            ->whereNotNull('publish_year')
+            ->selectRaw('publish_year, COUNT(*) as count')
+            ->groupBy('publish_year')
+            ->orderByDesc('publish_year')
+            ->limit(10)
+            ->pluck('count', 'publish_year')
+            ->toArray();
 
-            $no = 1;
-            $query->chunk(500, function ($ebooks) use ($handle, &$no) {
-                foreach ($ebooks as $ebook) {
-                    $source = match($ebook->file_source) {
-                        'kubuku' => 'Kubuku',
-                        'google_drive' => 'Google Drive',
-                        'local' => 'Lokal',
-                        default => $ebook->file_source ?? 'Lokal',
-                    };
-                    fputcsv($handle, [
-                        $no++,
-                        $ebook->title,
-                        $ebook->authors->pluck('name')->implode('; '),
-                        $ebook->publisher?->name ?? '-',
-                        $ebook->publish_year ?? '-',
-                        $ebook->isbn ?? '-',
-                        $source,
-                        $ebook->digitalCategory?->name ?? '-',
-                        strtoupper($ebook->file_format ?? 'PDF'),
-                        $ebook->access_type == 'open' ? 'Terbuka' : 'Terbatas',
-                        $ebook->view_count ?? 0,
-                        $ebook->download_count ?? 0,
-                    ]);
-                }
-            });
-            
-            fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+        $totalViews = \App\Models\Ebook::where('is_active', true)->sum('view_count');
+        $totalDownloads = \App\Models\Ebook::where('is_active', true)->sum('download_count');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.statistics.ebooks', [
+            'totalEbooks' => $totalEbooks,
+            'bySource' => $bySource,
+            'kubukuCount' => $kubukuCount,
+            'shamelaCount' => $shamelaCount,
+            'byCategory' => $byCategory,
+            'byYear' => $byYear,
+            'totalViews' => $totalViews,
+            'totalDownloads' => $totalDownloads,
+            'generatedAt' => now()->format('d F Y, H:i'),
+            'generatedBy' => auth()->user()->name ?? 'System',
+            'logoBase64' => $this->getCompressedLogo(),
+        ]);
+
+        return $pdf->setPaper('A4', 'portrait')->download('laporan-ebook-' . now()->format('Y-m-d') . '.pdf');
     }
 
-    protected function exportEthesis(?int $branchId)
+    protected function exportEthesis()
     {
-        $filename = 'daftar-ethesis-' . now()->format('Y-m-d') . '.csv';
+        $totalEthesis = \App\Models\Ethesis::where('is_public', true)->count();
+        
+        $bySource = \App\Models\Ethesis::where('is_public', true)
+            ->selectRaw("COALESCE(source_type, 'local') as source, COUNT(*) as count")
+            ->groupBy('source')
+            ->pluck('count', 'source')
+            ->toArray();
 
-        return response()->streamDownload(function () use ($branchId) {
-            $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            fputcsv($handle, ['No', 'Judul', 'Penulis', 'NIM', 'Prodi', 'Jenis', 'Tahun', 'Pembimbing 1', 'Pembimbing 2', 'Sumber', 'Fulltext', 'Views', 'Downloads']);
-            
-            $query = \App\Models\Ethesis::query()
-                ->with(['department'])
-                ->where('is_public', true)
-                ->orderByDesc('year')
-                ->orderBy('title');
+        $byType = \App\Models\Ethesis::where('is_public', true)
+            ->selectRaw('type, COUNT(*) as count')
+            ->groupBy('type')
+            ->orderByDesc('count')
+            ->pluck('count', 'type')
+            ->toArray();
 
-            $no = 1;
-            $query->chunk(500, function ($theses) use ($handle, &$no) {
-                foreach ($theses as $thesis) {
-                    $source = match($thesis->source_type) {
-                        'eprints' => 'EPrints Repository',
-                        'local' => 'Sistem Lokal',
-                        'submission' => 'Upload Mahasiswa',
-                        default => $thesis->source_type ?? 'Lokal',
-                    };
-                    fputcsv($handle, [
-                        $no++,
-                        $thesis->title,
-                        $thesis->author,
-                        $thesis->nim ?? '-',
-                        $thesis->department?->name ?? '-',
-                        $thesis->getTypeLabel(),
-                        $thesis->year,
-                        $thesis->advisor1 ?? '-',
-                        $thesis->advisor2 ?? '-',
-                        $source,
-                        $thesis->is_fulltext_public ? 'Ya' : 'Tidak',
-                        $thesis->views ?? 0,
-                        $thesis->downloads ?? 0,
-                    ]);
-                }
-            });
-            
-            fclose($handle);
-        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+        $byDepartment = \App\Models\Ethesis::where('is_public', true)
+            ->join('departments', 'etheses.department_id', '=', 'departments.id')
+            ->selectRaw('departments.name, COUNT(*) as count')
+            ->groupBy('departments.name')
+            ->orderByDesc('count')
+            ->limit(15)
+            ->pluck('count', 'name')
+            ->toArray();
+
+        $byYear = \App\Models\Ethesis::where('is_public', true)
+            ->whereNotNull('year')
+            ->selectRaw('year, COUNT(*) as count')
+            ->groupBy('year')
+            ->orderByDesc('year')
+            ->limit(10)
+            ->pluck('count', 'year')
+            ->toArray();
+
+        $fulltextPublic = \App\Models\Ethesis::where('is_public', true)->where('is_fulltext_public', true)->count();
+        $totalViews = \App\Models\Ethesis::where('is_public', true)->sum('views');
+        $totalDownloads = \App\Models\Ethesis::where('is_public', true)->sum('downloads');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.statistics.ethesis', [
+            'totalEthesis' => $totalEthesis,
+            'bySource' => $bySource,
+            'byType' => $byType,
+            'byDepartment' => $byDepartment,
+            'byYear' => $byYear,
+            'fulltextPublic' => $fulltextPublic,
+            'totalViews' => $totalViews,
+            'totalDownloads' => $totalDownloads,
+            'generatedAt' => now()->format('d F Y, H:i'),
+            'generatedBy' => auth()->user()->name ?? 'System',
+            'logoBase64' => $this->getCompressedLogo(),
+        ]);
+
+        return $pdf->setPaper('A4', 'portrait')->download('laporan-ethesis-' . now()->format('Y-m-d') . '.pdf');
     }
 }

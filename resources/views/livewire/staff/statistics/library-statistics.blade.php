@@ -668,7 +668,7 @@
                 <p class="text-violet-200">Koleksi e-book tersedia untuk diunduh</p>
                 <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
                    class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
-                    <i class="fas fa-file-csv"></i> Export Daftar E-Book
+                    <i class="fas fa-file-pdf"></i> Export Laporan E-Book
                 </a>
             </div>
         </div>
@@ -684,7 +684,7 @@
                 <p class="text-emerald-200">Repositori karya ilmiah mahasiswa</p>
                 <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
                    class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
-                    <i class="fas fa-file-csv"></i> Export Daftar E-Thesis
+                    <i class="fas fa-file-pdf"></i> Export Laporan E-Thesis
                 </a>
             </div>
         </div>
@@ -701,13 +701,13 @@
             <div class="flex flex-wrap gap-3">
                 <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
                    class="px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-violet-500/25">
-                    <i class="fas fa-book-open"></i>
-                    <span>E-Book (CSV)</span>
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Laporan E-Book</span>
                 </a>
                 <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
                    class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-emerald-500/25">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>E-Thesis (CSV)</span>
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Laporan E-Thesis</span>
                 </a>
             </div>
         </div>
