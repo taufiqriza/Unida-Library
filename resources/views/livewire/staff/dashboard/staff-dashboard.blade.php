@@ -132,44 +132,6 @@
         </div>
     </div>
 
-    {{-- Visitor Quick Action --}}
-    @php
-        $user = auth()->user();
-        $branchId = $user->branch_id;
-        $isSuper = $user->role === 'super_admin';
-        $visitorBranch = $branchId ? \App\Models\Branch::find($branchId) : null;
-    @endphp
-    @if($visitorBranch)
-    <a href="{{ route('visitor.kiosk', $visitorBranch->code) }}" target="_blank"
-       class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl shadow transition active:scale-[0.98]">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-door-open text-white"></i>
-            <span class="text-white font-semibold">Visitor</span>
-        </div>
-        <i class="fas fa-external-link-alt text-white/70 text-sm"></i>
-    </a>
-    @else
-    <div x-data="{ open: false }" class="relative">
-        <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl shadow transition active:scale-[0.98]">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-door-open text-white"></i>
-                <span class="text-white font-semibold">Visitor</span>
-            </div>
-            <i class="fas fa-chevron-down text-white/70 text-sm transition-transform" :class="open && 'rotate-180'"></i>
-        </button>
-        <div x-show="open" @click.away="open = false" x-transition
-             class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 py-2 max-h-64 overflow-y-auto">
-            @foreach(\App\Models\Branch::where('is_active', true)->orderBy('name')->get() as $branch)
-            <a href="{{ route('visitor.kiosk', $branch->code) }}" target="_blank"
-               class="flex items-center justify-between px-4 py-2.5 hover:bg-amber-50 transition">
-                <span class="text-gray-700">{{ $branch->name }}</span>
-                <i class="fas fa-external-link-alt text-gray-400 text-xs"></i>
-            </a>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
     {{-- Mobile Quick Actions Grid --}}
     <div class="lg:hidden">
         <div class="flex items-center justify-between mb-3">
