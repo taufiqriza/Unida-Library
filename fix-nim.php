@@ -19,16 +19,19 @@ foreach ($members as $m) {
         
         if ($existing) {
             if (!$existing->email && !$existing->profile_completed) {
-                // SIAKAD data - merge and delete
+                // SIAKAD data - delete first, then update
                 echo "Fix: {$m->name} ({$m->member_id}) -> NIM: {$nim} (merge SIAKAD id:{$existing->id})\n";
+                $branchId = $existing->branch_id ?? $m->branch_id;
+                $facultyId = $existing->faculty_id ?? $m->faculty_id;
+                $deptId = $existing->department_id ?? $m->department_id;
+                $existing->delete(); // Delete SIAKAD first
                 $m->update([
                     'member_id' => $nim,
                     'nim_nidn' => $nim,
-                    'branch_id' => $existing->branch_id ?? $m->branch_id,
-                    'faculty_id' => $existing->faculty_id ?? $m->faculty_id,
-                    'department_id' => $existing->department_id ?? $m->department_id,
+                    'branch_id' => $branchId,
+                    'faculty_id' => $facultyId,
+                    'department_id' => $deptId,
                 ]);
-                $existing->delete();
                 $fixed++;
             } else {
                 echo "Skip: {$m->name} - NIM {$nim} already linked to another member\n";
