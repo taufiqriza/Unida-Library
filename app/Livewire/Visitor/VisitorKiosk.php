@@ -77,6 +77,36 @@ class VisitorKiosk extends Component
         $this->mode = 'success';
     }
 
+    public function quickCheckIn(string $purpose)
+    {
+        $this->purpose = $purpose;
+        $this->confirmMemberVisit();
+    }
+
+    public function quickGuestCheckIn(string $purpose)
+    {
+        $this->validate([
+            'guestName' => 'required|min:3|max:100',
+            'guestInstitution' => 'required|min:2|max:100',
+        ], [
+            'guestName.required' => 'Nama wajib diisi',
+            'guestName.min' => 'Nama minimal 3 karakter',
+            'guestInstitution.required' => 'Institusi wajib diisi',
+        ]);
+
+        Visit::create([
+            'branch_id' => $this->branch->id,
+            'guest_name' => $this->guestName,
+            'guest_institution' => $this->guestInstitution,
+            'visitor_type' => 'guest',
+            'purpose' => $purpose,
+            'visited_at' => now(),
+        ]);
+
+        $this->message = "Selamat datang, {$this->guestName}!";
+        $this->mode = 'success';
+    }
+
     public function submitGuest()
     {
         $this->validate([
