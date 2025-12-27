@@ -40,6 +40,11 @@ class MemberList extends Component
         $this->resetPage();
     }
 
+    public function updatingFilterLinked()
+    {
+        $this->resetPage();
+    }
+
     public function extendMembership($memberId)
     {
         $member = Member::with('memberType')->find($memberId);
