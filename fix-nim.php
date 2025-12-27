@@ -14,28 +14,33 @@ foreach ($members as $m) {
     if (preg_match('/^(\d{12,15})@/', $m->email, $match)) {
         $nim = $match[1];
         
-        // Check if NIM exists in SIAKAD data (unlinked member)
-        $siakad = Member::where('member_id', $nim)
-            ->where('id', '!=', $m->id)
-            ->first();
+        // Check if NIM already exists
+        $existing = Member::where('member_id', $nim)->where('id', '!=', $m->id)->first();
         
-        if ($siakad && !$siakad->email) {
-            echo "Fix: {$m->name} ({$m->member_id}) -> NIM: {$nim}\n";
-            
-            // Update current member with correct data from SIAKAD
+        if ($existing) {
+            if (!$existing->email && !$existing->profile_completed) {
+                // SIAKAD data - merge and delete
+                echo "Fix: {$m->name} ({$m->member_id}) -> NIM: {$nim} (merge SIAKAD id:{$existing->id})\n";
+                $m->update([
+                    'member_id' => $nim,
+                    'nim_nidn' => $nim,
+                    'branch_id' => $existing->branch_id ?? $m->branch_id,
+                    'faculty_id' => $existing->faculty_id ?? $m->faculty_id,
+                    'department_id' => $existing->department_id ?? $m->department_id,
+                ]);
+                $existing->delete();
+                $fixed++;
+            } else {
+                echo "Skip: {$m->name} - NIM {$nim} already linked to another member\n";
+            }
+        } else {
+            // NIM not in database, just update
+            echo "Fix: {$m->name} ({$m->member_id}) -> NIM: {$nim} (no SIAKAD)\n";
             $m->update([
                 'member_id' => $nim,
                 'nim_nidn' => $nim,
-                'branch_id' => $siakad->branch_id,
-                'faculty_id' => $siakad->faculty_id,
-                'department_id' => $siakad->department_id,
             ]);
-            
-            // Delete SIAKAD duplicate (data sudah di-merge)
-            $siakad->delete();
             $fixed++;
-        } else {
-            echo "Skip: {$m->name} - No SIAKAD match for NIM {$nim}\n";
         }
     }
 }
