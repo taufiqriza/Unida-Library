@@ -36,7 +36,12 @@ class ElibraryDashboard extends Component
 
     public function isMainBranch(): bool
     {
-        return auth()->user()->branch?->is_main ?? false;
+        $user = auth()->user();
+        // Super admin can see all data
+        if ($user->role === 'super_admin') {
+            return true;
+        }
+        return $user->branch?->is_main ?? false;
     }
 
     /**
