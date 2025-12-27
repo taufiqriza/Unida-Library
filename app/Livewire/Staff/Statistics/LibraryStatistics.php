@@ -45,7 +45,7 @@ class LibraryStatistics extends Component
     public function mount()
     {
         $user = auth()->user();
-        if (!in_array($user->role, ['super_admin', 'admin'])) {
+        if ($user->role !== 'super_admin') {
             $this->selectedBranch = $user->branch_id;
             $this->viewMode = 'branch';
         }

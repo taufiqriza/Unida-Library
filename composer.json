@@ -18,6 +18,7 @@
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "meilisearch/meilisearch-php": "^1.16",
+        "setasign/fpdi-tcpdf": "^2.3",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "smalot/pdfparser": "^2.12"
     },

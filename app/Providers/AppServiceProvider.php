@@ -61,11 +61,21 @@ class AppServiceProvider extends ServiceProvider
         try {
             if (!Schema::hasTable('settings')) return;
 
+            $mailMailer = Setting::get('mail_mailer');
+            
+            // If using Resend from .env, don't override
+            if (env('MAIL_MAILER') === 'resend') {
+                config(['mail.default' => 'resend']);
+                return;
+            }
+            
+            if (!$mailMailer) return;
+
             $mailHost = Setting::get('mail_host');
             if (!$mailHost) return;
 
             config([
-                'mail.default' => Setting::get('mail_mailer', 'smtp'),
+                'mail.default' => $mailMailer,
                 'mail.mailers.smtp.host' => $mailHost,
                 'mail.mailers.smtp.port' => Setting::get('mail_port', 587),
                 'mail.mailers.smtp.username' => Setting::get('mail_username'),

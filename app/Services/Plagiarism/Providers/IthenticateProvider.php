@@ -47,6 +47,16 @@ class IthenticateProvider
     }
 
     /**
+     * Make HTTP request with default timeout settings
+     */
+    protected function httpClient()
+    {
+        return Http::withHeaders($this->getHeaders())
+            ->timeout(60)
+            ->connectTimeout(30);
+    }
+
+    /**
      * Submit document for plagiarism check
      */
     public function submit(PlagiarismCheck $check): array
@@ -94,7 +104,7 @@ class IthenticateProvider
     protected function acceptEula(string $userId): void
     {
         // First get the latest EULA version
-        $eulaResponse = Http::withHeaders($this->getHeaders())
+        $eulaResponse = $this->httpClient()
             ->get("{$this->baseUrl}/api/v1/eula/latest");
         
         if (!$eulaResponse->successful()) {
@@ -105,7 +115,7 @@ class IthenticateProvider
         $eulaVersion = $eulaResponse->json('version', 'v1beta');
         
         // Accept EULA for the user
-        $response = Http::withHeaders($this->getHeaders())
+        $response = $this->httpClient()
             ->post("{$this->baseUrl}/api/v1/eula/{$eulaVersion}/accept", [
                 'user_id' => $userId,
                 'accepted_timestamp' => now()->toIso8601String(),
@@ -129,7 +139,7 @@ class IthenticateProvider
     {
         $member = $check->member;
         
-        $response = Http::withHeaders($this->getHeaders())
+        $response = $this->httpClient()
             ->post("{$this->baseUrl}/api/v1/submissions", [
                 'owner' => $member->member_id,
                 'title' => $check->document_title ?? $check->original_filename,
@@ -177,6 +187,8 @@ class IthenticateProvider
             'Content-Type' => 'binary/octet-stream',
             'Content-Disposition' => 'inline; filename="' . $check->original_filename . '"',
         ])
+        ->timeout(120) // 2 minutes for file upload
+        ->connectTimeout(30)
         ->withBody($fileContent, 'binary/octet-stream')
         ->put("{$this->baseUrl}/api/v1/submissions/{$submissionId}/original");
 
@@ -193,7 +205,7 @@ class IthenticateProvider
      */
     protected function requestSimilarityReport(string $submissionId): void
     {
-        $response = Http::withHeaders($this->getHeaders())
+        $response = $this->httpClient()
             ->put("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity", [
                 'generation_settings' => [
                     'search_repositories' => [
@@ -234,9 +246,9 @@ class IthenticateProvider
 
     /**
      * Poll for similarity results
-     * maxAttempts: 60, delaySeconds: 15 = max 15 minutes
+     * maxAttempts: 120, delaySeconds: 15 = max 30 minutes
      */
-    protected function pollForResults(string $submissionId, int $maxAttempts = 60, int $delaySeconds = 15): array
+    protected function pollForResults(string $submissionId, int $maxAttempts = 120, int $delaySeconds = 15): array
     {
         Log::info("iThenticate: Polling for results on submission: {$submissionId}");
 
@@ -321,7 +333,7 @@ class IthenticateProvider
     public function getReportUrl(string $submissionId): ?string
     {
         try {
-            $response = Http::withHeaders($this->getHeaders())
+            $response = $this->httpClient()
                 ->post("{$this->baseUrl}/api/v1/submissions/{$submissionId}/viewer-url", [
                     'viewer_user_id' => 'admin',
                     'locale' => 'id',
@@ -344,7 +356,7 @@ class IthenticateProvider
     public function downloadPdfReport(string $submissionId): ?string
     {
         try {
-            $response = Http::withHeaders($this->getHeaders())
+            $response = $this->httpClient()
                 ->post("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity/pdf", [
                     'locale' => 'id',
                 ]);

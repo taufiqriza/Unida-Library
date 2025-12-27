@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\PlagiarismCheck;
+use App\Notifications\PlagiarismCheckCompleted;
 use App\Services\Plagiarism\CertificateGenerator;
 use App\Services\Plagiarism\PlagiarismService;
 use Illuminate\Bus\Queueable;
@@ -16,9 +17,9 @@ class ProcessPlagiarismCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-    public int $timeout = 600; // 10 minutes
-    public int $backoff = 60; // Retry after 60 seconds
+    public int $tries = 5; // Allow retries for transient errors
+    public int $timeout = 2100; // 35 minutes for Turnitin processing (30 min polling + buffer)
+    public int $backoff = 120; // Retry after 2 minutes if needed
 
     public function __construct(
         public PlagiarismCheck $check
@@ -28,7 +29,6 @@ class ProcessPlagiarismCheck implements ShouldQueue
     {
         Log::info("Processing plagiarism check #{$this->check->id}");
 
-        // Update status to processing
         $this->check->update([
             'status' => PlagiarismCheck::STATUS_PROCESSING,
             'started_at' => now(),
@@ -36,10 +36,8 @@ class ProcessPlagiarismCheck implements ShouldQueue
         ]);
 
         try {
-            // Perform the check
             $result = $service->check($this->check);
 
-            // Update with results
             $this->check->update([
                 'status' => PlagiarismCheck::STATUS_COMPLETED,
                 'similarity_score' => $result['score'],
@@ -55,7 +53,8 @@ class ProcessPlagiarismCheck implements ShouldQueue
             $generator = new CertificateGenerator($this->check);
             $generator->generate();
 
-            Log::info("Certificate generated for check #{$this->check->id}");
+            // Send email notification
+            $this->sendNotification();
 
         } catch (\Exception $e) {
             Log::error("Plagiarism check #{$this->check->id} failed: " . $e->getMessage());
@@ -66,10 +65,12 @@ class ProcessPlagiarismCheck implements ShouldQueue
                 'completed_at' => now(),
             ]);
 
-            // Re-throw to trigger retry if applicable
             if ($this->attempts() < $this->tries) {
                 throw $e;
             }
+            
+            // Send failure notification on last attempt
+            $this->sendNotification();
         }
     }
 
@@ -82,5 +83,20 @@ class ProcessPlagiarismCheck implements ShouldQueue
             'error_message' => 'Proses gagal setelah beberapa percobaan: ' . $exception->getMessage(),
             'completed_at' => now(),
         ]);
+
+        $this->sendNotification();
+    }
+
+    protected function sendNotification(): void
+    {
+        try {
+            $member = $this->check->member;
+            if ($member && $member->email) {
+                $member->notify(new PlagiarismCheckCompleted($this->check->fresh()));
+                Log::info("Email notification sent for check #{$this->check->id}");
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to send notification for check #{$this->check->id}: " . $e->getMessage());
+        }
     }
 }

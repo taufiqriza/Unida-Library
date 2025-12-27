@@ -77,6 +77,7 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
 
         // Statistics
         Route::get('/statistics', \App\Livewire\Staff\Statistics\LibraryStatistics::class)->name('statistics.index');
+        Route::get('/statistics/export/{type}', [\App\Http\Controllers\Staff\StatisticsExportController::class, 'export'])->name('statistics.export');
 
         // Analytics (Google Analytics)
         Route::get('/analytics', \App\Livewire\Staff\Analytics\AnalyticsDashboard::class)->name('analytics.index');

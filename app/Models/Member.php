@@ -6,11 +6,12 @@ use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Member extends Authenticatable
 {
-    use BelongsToBranch, HasApiTokens;
+    use BelongsToBranch, HasApiTokens, Notifiable;
 
     protected $fillable = [
         'pddikti_id', 'nim_nidn',

@@ -20,6 +20,7 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
+            @if(auth()->user()->role === 'super_admin')
             <div class="relative">
                 <select wire:model.live="selectedBranch" 
                         class="appearance-none pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 min-w-[180px]">
@@ -30,10 +31,68 @@
                 </select>
                 <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
             </div>
+            @endif
             <button wire:click="loadStatistics" class="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-sm font-medium transition flex items-center gap-2 shadow-lg shadow-violet-500/25">
                 <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadStatistics"></i>
                 <span class="hidden sm:inline">Refresh</span>
             </button>
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" 
+                        @if(auth()->user()->role === 'super_admin' && !$selectedBranch) disabled @endif
+                        class="px-4 py-2.5 text-white rounded-xl text-sm font-medium transition flex items-center gap-2 shadow-lg
+                        {{ auth()->user()->role === 'super_admin' && !$selectedBranch ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/25' }}">
+                    <i class="fas fa-file-pdf"></i>
+                    <span class="hidden sm:inline">Export PDF</span>
+                    <i class="fas fa-chevron-down text-xs"></i>
+                </button>
+                @if(auth()->user()->role === 'super_admin' && !$selectedBranch)
+                <div class="absolute right-0 mt-2 w-56 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700 z-50" x-show="false">
+                    Pilih cabang terlebih dahulu
+                </div>
+                @endif
+                <div x-show="open" @click.away="open = false" x-transition
+                     class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                    @php 
+                        $exportBranch = auth()->user()->role === 'super_admin' ? $selectedBranch : auth()->user()->branch_id;
+                    @endphp
+                    <a href="{{ route('staff.statistics.export', ['type' => 'overview', 'branch' => $exportBranch]) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3">
+                        <i class="fas fa-chart-pie text-violet-500 w-5"></i>
+                        <div>
+                            <p class="font-medium text-gray-900">Ringkasan Umum</p>
+                            <p class="text-xs text-gray-500">Executive Summary</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('staff.statistics.export', ['type' => 'collection', 'branch' => $exportBranch]) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3">
+                        <i class="fas fa-book text-blue-500 w-5"></i>
+                        <div>
+                            <p class="font-medium text-gray-900">Analisis Koleksi</p>
+                            <p class="text-xs text-gray-500">Klasifikasi, Media, Bahasa</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('staff.statistics.export', ['type' => 'circulation', 'branch' => $exportBranch]) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center gap-3">
+                        <i class="fas fa-arrows-rotate text-amber-500 w-5"></i>
+                        <div>
+                            <p class="font-medium text-gray-900">Sirkulasi & Anggota</p>
+                            <p class="text-xs text-gray-500">Peminjaman, Denda, Tren</p>
+                        </div>
+                    </a>
+                    <hr class="my-2 border-gray-100">
+                    <a href="{{ route('staff.statistics.export', ['type' => 'full', 'branch' => $exportBranch]) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-emerald-50 flex items-center gap-3">
+                        <i class="fas fa-file-lines text-emerald-600 w-5"></i>
+                        <div>
+                            <p class="font-medium text-emerald-700">Laporan Lengkap</p>
+                            <p class="text-xs text-emerald-600">Untuk Audit Mutu Internal</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            @if(auth()->user()->role === 'super_admin' && !$selectedBranch)
+            <span class="text-xs text-amber-600 hidden lg:inline"><i class="fas fa-info-circle mr-1"></i>Pilih cabang untuk export</span>
+            @endif
         </div>
     </div>
 
