@@ -18,6 +18,7 @@ class MemberList extends Component
     public $filterType = '';
     public $filterStatus = '';
     public $filterExpired = '';
+    public $filterLinked = '';
     public $filterBranchId = ''; // For super admin branch filter
     
     protected $queryString = [
@@ -25,6 +26,7 @@ class MemberList extends Component
         'filterType' => ['except' => ''],
         'filterStatus' => ['except' => ''],
         'filterExpired' => ['except' => ''],
+        'filterLinked' => ['except' => ''],
         'filterBranchId' => ['except' => ''],
     ];
 
@@ -148,6 +150,8 @@ class MemberList extends Component
             ->when($this->filterStatus === 'inactive', fn($q) => $q->where('is_active', false))
             ->when($this->filterExpired === 'expired', fn($q) => $q->where('expire_date', '<', now()))
             ->when($this->filterExpired === 'valid', fn($q) => $q->where('expire_date', '>=', now()))
+            ->when($this->filterLinked === 'linked', fn($q) => $q->whereNotNull('email')->where('email', '!=', '')->where('profile_completed', true))
+            ->when($this->filterLinked === 'unlinked', fn($q) => $q->where(fn($q2) => $q2->whereNull('email')->orWhere('email', '')->orWhere('profile_completed', false)))
             ->latest()
             ->paginate(15);
 

@@ -141,6 +141,11 @@
                     <option value="valid">Masih Berlaku</option>
                     <option value="expired">Kadaluarsa</option>
                 </select>
+                <select wire:model.live="filterLinked" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
+                    <option value="">Login</option>
+                    <option value="linked">✓ Terhubung</option>
+                    <option value="unlinked">✗ Belum</option>
+                </select>
             </div>
         </div>
     </div>
