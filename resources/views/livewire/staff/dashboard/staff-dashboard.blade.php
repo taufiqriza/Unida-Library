@@ -134,8 +134,10 @@
 
     {{-- Visitor Quick Action --}}
     @php
-        $visitorBranch = auth()->user()->branch;
-        $isSuper = auth()->user()->role === 'super_admin';
+        $user = auth()->user();
+        $branchId = $user->branch_id;
+        $isSuper = $user->role === 'super_admin';
+        $visitorBranch = $branchId ? \App\Models\Branch::find($branchId) : null;
     @endphp
     @if($visitorBranch)
     <a href="{{ route('visitor.kiosk', $visitorBranch->code) }}" target="_blank"
