@@ -9,7 +9,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use setasign\Fpdi\Tcpdf\Fpdi;
 
 class WatermarkPdfJob implements ShouldQueue
 {
@@ -45,18 +44,19 @@ class WatermarkPdfJob implements ShouldQueue
         }
 
         try {
-            $watermarkedPath = $this->applyWatermark($sourcePath);
-            
-            // Replace original with watermarked version
-            if (file_exists($watermarkedPath)) {
-                // Backup original
-                $backupPath = str_replace('.pdf', '_original.pdf', $sourcePath);
+            // Backup original first
+            $backupPath = str_replace('.pdf', '_original.pdf', $sourcePath);
+            if (!file_exists($backupPath)) {
                 copy($sourcePath, $backupPath);
-                
-                // Replace with watermarked
+            }
+
+            $watermarkedPath = $this->applyWatermarkWithGhostscript($backupPath);
+            
+            if ($watermarkedPath && file_exists($watermarkedPath)) {
                 rename($watermarkedPath, $sourcePath);
-                
                 Log::info("Watermark applied to {$this->fileType} for submission #{$this->submission->id}");
+            } else {
+                Log::error("Watermark output not created for submission #{$this->submission->id}");
             }
 
         } catch (\Exception $e) {
@@ -65,52 +65,60 @@ class WatermarkPdfJob implements ShouldQueue
         }
     }
 
-    protected function applyWatermark(string $sourcePath): string
+    protected function applyWatermarkWithGhostscript(string $sourcePath): ?string
     {
-        // First, decompress PDF using Ghostscript for compatibility
-        $decompressedPath = sys_get_temp_dir() . '/decomp_' . uniqid() . '.pdf';
-        $gsCmd = sprintf(
-            'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH -sOutputFile=%s %s 2>&1',
-            escapeshellarg($decompressedPath),
+        $outputPath = sys_get_temp_dir() . '/wm_' . uniqid() . '.pdf';
+        $watermarkPs = $this->createWatermarkPostScript();
+        
+        // Use Ghostscript to add watermark overlay
+        $cmd = sprintf(
+            'gs -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 ' .
+            '-dAutoRotatePages=/None -sOutputFile=%s %s %s 2>&1',
+            escapeshellarg($outputPath),
+            escapeshellarg($watermarkPs),
             escapeshellarg($sourcePath)
         );
-        exec($gsCmd, $output, $returnCode);
         
-        if ($returnCode !== 0 || !file_exists($decompressedPath)) {
-            Log::warning("GS decompress failed, using original: " . implode("\n", $output));
-            $decompressedPath = $sourcePath;
+        exec($cmd, $output, $returnCode);
+        
+        // Cleanup temp PostScript file
+        if (file_exists($watermarkPs)) {
+            unlink($watermarkPs);
         }
         
-        $pdf = new Fpdi();
-        $pdf->setPrintHeader(false);
-        $pdf->setPrintFooter(false);
-        
-        $pageCount = $pdf->setSourceFile($decompressedPath);
-        
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $templateId = $pdf->importPage($i);
-            $size = $pdf->getTemplateSize($templateId);
-            
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($templateId, 0, 0, $size['width'], $size['height']);
-            
-            // Footer text watermark - bottom center
-            $pdf->SetAlpha(0.4);
-            $pdf->SetFont('helvetica', 'B', 9);
-            $pdf->SetTextColor(100, 100, 100);
-            $pdf->SetXY(0, $size['height'] - 10);
-            $pdf->Cell($size['width'], 5, 'Perpustakaan UNIDA Gontor - library.unida.gontor.ac.id', 0, 0, 'C');
-            $pdf->SetAlpha(1);
-        }
-        
-        $outputPath = sys_get_temp_dir() . '/wm_' . uniqid() . '.pdf';
-        $pdf->Output($outputPath, 'F');
-        
-        // Cleanup decompressed file
-        if ($decompressedPath !== $sourcePath && file_exists($decompressedPath)) {
-            unlink($decompressedPath);
+        if ($returnCode !== 0) {
+            Log::error("GS watermark failed: " . implode("\n", $output));
+            return null;
         }
         
         return $outputPath;
+    }
+
+    protected function createWatermarkPostScript(): string
+    {
+        $psPath = sys_get_temp_dir() . '/watermark_' . uniqid() . '.ps';
+        
+        // PostScript that adds footer text to each page
+        $ps = <<<'PS'
+%!PS-Adobe-3.0
+/watermark {
+    gsave
+    /Helvetica-Bold findfont 8 scalefont setfont
+    0.5 setgray
+    % Position at bottom center (adjust based on page size)
+    306 15 moveto
+    (Perpustakaan UNIDA Gontor - library.unida.gontor.ac.id) dup
+    stringwidth pop 2 div neg 0 rmoveto show
+    grestore
+} def
+
+<< /EndPage {
+    exch pop
+    0 eq { watermark true } { true } ifelse
+} bind >> setpagedevice
+PS;
+        
+        file_put_contents($psPath, $ps);
+        return $psPath;
     }
 }
