@@ -124,8 +124,21 @@ class VisitorKiosk extends Component
         $todayCount = Visit::where('branch_id', $this->branch->id)
             ->whereDate('visited_at', today())->count();
 
+        $todayStats = [
+            'member' => Visit::where('branch_id', $this->branch->id)
+                ->whereDate('visited_at', today())->where('visitor_type', 'member')->count(),
+            'guest' => Visit::where('branch_id', $this->branch->id)
+                ->whereDate('visited_at', today())->where('visitor_type', 'guest')->count(),
+        ];
+
+        foreach (['baca', 'pinjam', 'belajar', 'penelitian', 'lainnya'] as $purpose) {
+            $todayStats[$purpose] = Visit::where('branch_id', $this->branch->id)
+                ->whereDate('visited_at', today())->where('purpose', $purpose)->count();
+        }
+
         return view('livewire.visitor.visitor-kiosk', [
             'todayCount' => $todayCount,
+            'todayStats' => $todayStats,
         ])->layout('components.visitor-layout', ['branch' => $this->branch]);
     }
 }
