@@ -88,6 +88,14 @@
                             <p class="text-xs text-emerald-600">Untuk Audit Mutu Internal</p>
                         </div>
                     </a>
+                    <a href="{{ route('staff.statistics.export', ['type' => 'catalog', 'branch' => $exportBranch]) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-blue-50 flex items-center gap-3">
+                        <i class="fas fa-list-ul text-blue-600 w-5"></i>
+                        <div>
+                            <p class="font-medium text-blue-700">Daftar Koleksi</p>
+                            <p class="text-xs text-blue-600">Judul, ISBN, No. Panggil</p>
+                        </div>
+                    </a>
                 </div>
             </div>
             @if(auth()->user()->role === 'super_admin' && !$selectedBranch)
