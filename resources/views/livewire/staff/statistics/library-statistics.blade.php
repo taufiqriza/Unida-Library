@@ -666,6 +666,10 @@
                 <p class="text-violet-200 text-sm mb-1">E-Book Digital</p>
                 <p class="text-5xl font-bold mb-2">{{ number_format($stats['total_ebooks'] ?? 0) }}</p>
                 <p class="text-violet-200">Koleksi e-book tersedia untuk diunduh</p>
+                <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
+                   class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
+                    <i class="fas fa-file-csv"></i> Export Daftar E-Book
+                </a>
             </div>
         </div>
 
@@ -678,20 +682,34 @@
                 <p class="text-emerald-200 text-sm mb-1">E-Thesis / Tugas Akhir</p>
                 <p class="text-5xl font-bold mb-2">{{ number_format($stats['total_ethesis'] ?? 0) }}</p>
                 <p class="text-emerald-200">Repositori karya ilmiah mahasiswa</p>
+                <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
+                   class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
+                    <i class="fas fa-file-csv"></i> Export Daftar E-Thesis
+                </a>
             </div>
         </div>
     </div>
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div class="text-center py-8">
-            <div class="w-20 h-20 bg-violet-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-cloud text-violet-500 text-3xl"></i>
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div class="text-center lg:text-left">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Export Koleksi Digital</h3>
+                <p class="text-gray-500 max-w-md">
+                    Download daftar lengkap koleksi digital dalam format CSV untuk keperluan laporan dan audit.
+                </p>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Koleksi Digital</h3>
-            <p class="text-gray-500 max-w-md mx-auto">
-                Koleksi digital seperti e-book dan e-thesis tersedia untuk seluruh cabang perpustakaan.
-                Data ini tidak terpengaruh filter cabang.
-            </p>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
+                   class="px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-violet-500/25">
+                    <i class="fas fa-book-open"></i>
+                    <span>E-Book (CSV)</span>
+                </a>
+                <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
+                   class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-emerald-500/25">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>E-Thesis (CSV)</span>
+                </a>
+            </div>
         </div>
     </div>
     @endif

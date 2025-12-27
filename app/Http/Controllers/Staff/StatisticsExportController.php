@@ -56,6 +56,8 @@ class StatisticsExportController extends Controller
             'circulation' => $service->exportCirculation(),
             'full' => $service->exportFull(),
             'catalog' => $this->exportCatalog($branchId),
+            'ebooks' => $this->exportEbooks($branchId),
+            'ethesis' => $this->exportEthesis($branchId),
             default => abort(404),
         };
     }
@@ -134,5 +136,97 @@ class StatisticsExportController extends Controller
 
         if (filesize($logoPath) > 100000) return null;
         return 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+    }
+
+    protected function exportEbooks(?int $branchId)
+    {
+        $filename = 'daftar-ebook-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($branchId) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            fputcsv($handle, ['No', 'Judul', 'Pengarang', 'Penerbit', 'Tahun', 'ISBN', 'Sumber', 'Kategori', 'Format', 'Akses', 'Views', 'Downloads']);
+            
+            $query = \App\Models\Ebook::query()
+                ->with(['publisher', 'authors', 'digitalCategory'])
+                ->where('is_active', true)
+                ->orderBy('title');
+
+            $no = 1;
+            $query->chunk(500, function ($ebooks) use ($handle, &$no) {
+                foreach ($ebooks as $ebook) {
+                    $source = match($ebook->file_source) {
+                        'kubuku' => 'Kubuku',
+                        'google_drive' => 'Google Drive',
+                        'local' => 'Lokal',
+                        default => $ebook->file_source ?? 'Lokal',
+                    };
+                    fputcsv($handle, [
+                        $no++,
+                        $ebook->title,
+                        $ebook->authors->pluck('name')->implode('; '),
+                        $ebook->publisher?->name ?? '-',
+                        $ebook->publish_year ?? '-',
+                        $ebook->isbn ?? '-',
+                        $source,
+                        $ebook->digitalCategory?->name ?? '-',
+                        strtoupper($ebook->file_format ?? 'PDF'),
+                        $ebook->access_type == 'open' ? 'Terbuka' : 'Terbatas',
+                        $ebook->view_count ?? 0,
+                        $ebook->download_count ?? 0,
+                    ]);
+                }
+            });
+            
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    protected function exportEthesis(?int $branchId)
+    {
+        $filename = 'daftar-ethesis-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($branchId) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            fputcsv($handle, ['No', 'Judul', 'Penulis', 'NIM', 'Prodi', 'Jenis', 'Tahun', 'Pembimbing 1', 'Pembimbing 2', 'Sumber', 'Fulltext', 'Views', 'Downloads']);
+            
+            $query = \App\Models\Ethesis::query()
+                ->with(['department'])
+                ->where('is_public', true)
+                ->orderByDesc('year')
+                ->orderBy('title');
+
+            $no = 1;
+            $query->chunk(500, function ($theses) use ($handle, &$no) {
+                foreach ($theses as $thesis) {
+                    $source = match($thesis->source_type) {
+                        'eprints' => 'EPrints Repository',
+                        'local' => 'Sistem Lokal',
+                        'submission' => 'Upload Mahasiswa',
+                        default => $thesis->source_type ?? 'Lokal',
+                    };
+                    fputcsv($handle, [
+                        $no++,
+                        $thesis->title,
+                        $thesis->author,
+                        $thesis->nim ?? '-',
+                        $thesis->department?->name ?? '-',
+                        $thesis->getTypeLabel(),
+                        $thesis->year,
+                        $thesis->advisor1 ?? '-',
+                        $thesis->advisor2 ?? '-',
+                        $source,
+                        $thesis->is_fulltext_public ? 'Ya' : 'Tidak',
+                        $thesis->views ?? 0,
+                        $thesis->downloads ?? 0,
+                    ]);
+                }
+            });
+            
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 }
