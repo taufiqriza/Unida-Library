@@ -90,9 +90,9 @@
                     </a>
                     <a href="{{ route('staff.statistics.export', ['type' => 'catalog', 'branch' => $exportBranch]) }}"
                        class="block px-4 py-2.5 text-left text-sm hover:bg-blue-50 flex items-center gap-3">
-                        <i class="fas fa-list-ul text-blue-600 w-5"></i>
+                        <i class="fas fa-file-csv text-blue-600 w-5"></i>
                         <div>
-                            <p class="font-medium text-blue-700">Daftar Koleksi</p>
+                            <p class="font-medium text-blue-700">Daftar Koleksi (CSV)</p>
                             <p class="text-xs text-blue-600">Judul, ISBN, No. Panggil</p>
                         </div>
                     </a>

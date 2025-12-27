@@ -62,42 +62,45 @@ class StatisticsExportController extends Controller
 
     protected function exportCatalog(?int $branchId)
     {
-        $query = \App\Models\Book::query()
-            ->withoutGlobalScope('branch')
-            ->with(['publisher', 'items'])
-            ->select('id', 'title', 'publish_place', 'publisher_id', 'isbn', 'call_number', 'classification')
-            ->orderBy('title');
-
-        if ($branchId) {
-            $query->where('branch_id', $branchId);
-        }
-
-        $books = $query->get()->map(function ($book) {
-            return [
-                'title' => $book->title,
-                'copies' => $book->items->count(),
-                'publish_place' => $book->publish_place,
-                'publisher' => $book->publisher?->name,
-                'isbn' => $book->isbn,
-                'call_number' => $book->call_number ?? $book->classification,
-            ];
-        })->toArray();
-
         $branch = $branchId ? \App\Models\Branch::find($branchId) : null;
-        $branchName = $branch?->name ?? 'Seluruh Cabang';
+        $branchName = $branch?->name ?? 'Semua-Cabang';
+        $filename = 'daftar-koleksi-' . str($branchName)->slug() . '-' . now()->format('Y-m-d') . '.csv';
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.statistics.catalog', [
-            'books' => $books,
-            'branchName' => $branchName,
-            'generatedAt' => now()->format('d F Y, H:i'),
-            'generatedBy' => auth()->user()->name ?? 'System',
-            'totalTitles' => count($books),
-            'totalCopies' => array_sum(array_column($books, 'copies')),
-            'logoBase64' => $this->getCompressedLogo(),
-        ]);
+        return response()->streamDownload(function () use ($branchId) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+            
+            // Header
+            fputcsv($handle, ['No', 'Judul', 'Salin', 'Tempat Terbit', 'Penerbit', 'ISBN/ISSN', 'No. Panggil']);
+            
+            $query = \App\Models\Book::query()
+                ->withoutGlobalScope('branch')
+                ->with(['publisher'])
+                ->withCount('items')
+                ->select('id', 'title', 'publish_place', 'publisher_id', 'isbn', 'call_number', 'classification')
+                ->orderBy('title');
 
-        $filename = 'daftar-koleksi-' . ($branch ? str($branch->code ?? $branch->name)->slug() . '-' : '') . now()->format('Y-m-d') . '.pdf';
-        return $pdf->setPaper('A4', 'landscape')->download($filename);
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+
+            $no = 1;
+            $query->chunk(500, function ($books) use ($handle, &$no) {
+                foreach ($books as $book) {
+                    fputcsv($handle, [
+                        $no++,
+                        $book->title,
+                        $book->items_count,
+                        $book->publish_place ?? '-',
+                        $book->publisher?->name ?? '-',
+                        $book->isbn ?? '-',
+                        $book->call_number ?? $book->classification ?? '-',
+                    ]);
+                }
+            });
+            
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     protected function getCompressedLogo(): ?string
