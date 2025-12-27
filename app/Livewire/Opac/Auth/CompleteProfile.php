@@ -477,27 +477,27 @@ class CompleteProfile extends Component
 
         // If user selected an existing member record, merge data and delete duplicate
         if ($this->selectedPddiktiId && $this->selectedPddikti && $this->selectedPddikti->id !== $this->member->id) {
-            // The selected member is the imported SIAKAD data
-            // We'll update it with the current member's email and social account link
             $selectedMember = Member::find($this->selectedPddiktiId);
             if ($selectedMember) {
-                // Transfer data from current member (logged in via Google)
+                // Update selected member with form data + email from Google
                 $selectedMember->update([
                     'email' => $this->member->email,
+                    'member_id' => $this->nim, // Update NIM from form
+                    'nim_nidn' => $this->nim,
                     'phone' => $this->phone,
+                    'gender' => $this->gender,
                     'photo' => $this->photo ? $this->photo->store('members', 'public') : $selectedMember->photo,
                     'profile_completed' => true,
                 ]);
                 
-                // Transfer social accounts from current member to selected member
+                // Transfer social accounts
                 \App\Models\SocialAccount::where('member_id', $this->member->id)
                     ->update(['member_id' => $selectedMember->id]);
                 
-                // Delete the temporary member (the one created during Google login)
+                // Delete temp member
                 $this->member->delete();
                 
-                // Login as the selected (now merged) member
-                \Illuminate\Support\Facades\Auth::guard('member')->login($selectedMember);
+                Auth::guard('member')->login($selectedMember);
                 
                 return redirect()->route('member.dashboard')
                     ->with('success', 'Profil berhasil ditautkan dengan data SIAKAD.');
@@ -508,6 +508,8 @@ class CompleteProfile extends Component
             $data['photo'] = $this->photo->store('members', 'public');
         }
 
+        // Update NIM for non-merge case too
+        $data['nim_nidn'] = $this->nim;
         $this->member->update($data);
 
         return redirect()->route('member.dashboard')
