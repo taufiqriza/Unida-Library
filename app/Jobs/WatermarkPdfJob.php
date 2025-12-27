@@ -53,7 +53,8 @@ class WatermarkPdfJob implements ShouldQueue
             $watermarkedPath = $this->applyWatermarkWithGhostscript($backupPath);
             
             if ($watermarkedPath && file_exists($watermarkedPath)) {
-                rename($watermarkedPath, $sourcePath);
+                copy($watermarkedPath, $sourcePath);
+                unlink($watermarkedPath);
                 Log::info("Watermark applied to {$this->fileType} for submission #{$this->submission->id}");
             } else {
                 Log::error("Watermark output not created for submission #{$this->submission->id}");
