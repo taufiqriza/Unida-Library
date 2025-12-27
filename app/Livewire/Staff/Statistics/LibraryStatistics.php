@@ -105,6 +105,21 @@ class LibraryStatistics extends Component
                 ->whereHas('loans', fn($q) => $q->where('is_returned', false))->count(),
             'total_ebooks' => Ebook::where('is_active', true)->count(),
             'total_ethesis' => Ethesis::where('is_public', true)->count(),
+            'ebook_views' => Ebook::where('is_active', true)->sum('view_count'),
+            'ebook_downloads' => Ebook::where('is_active', true)->sum('download_count'),
+            'ethesis_views' => Ethesis::where('is_public', true)->sum('views'),
+            'ethesis_downloads' => Ethesis::where('is_public', true)->sum('downloads'),
+            'ethesis_fulltext' => Ethesis::where('is_public', true)->where('is_fulltext_public', true)->count(),
+            'shamela_count' => \DB::table('shamela_books')->count(),
+            'ebook_by_source' => Ebook::where('is_active', true)
+                ->selectRaw("COALESCE(file_source, 'local') as source, COUNT(*) as count")
+                ->groupBy('source')->pluck('count', 'source')->toArray(),
+            'ethesis_by_source' => Ethesis::where('is_public', true)
+                ->selectRaw("COALESCE(source_type, 'local') as source, COUNT(*) as count")
+                ->groupBy('source')->pluck('count', 'source')->toArray(),
+            'ethesis_by_type' => Ethesis::where('is_public', true)
+                ->selectRaw('type, COUNT(*) as count')
+                ->groupBy('type')->pluck('count', 'type')->toArray(),
             'total_members' => $this->queryWithBranch(Member::query(), $branchId)->count(),
             'active_members' => $this->queryWithBranch(Member::query(), $branchId)
                 ->where('expire_date', '>=', now())->count(),

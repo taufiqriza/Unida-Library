@@ -96,6 +96,23 @@
                             <p class="text-xs text-blue-600">Judul, ISBN, No. Panggil</p>
                         </div>
                     </a>
+                    <hr class="my-2 border-gray-100">
+                    <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-violet-50 flex items-center gap-3">
+                        <i class="fas fa-book-open text-violet-600 w-5"></i>
+                        <div>
+                            <p class="font-medium text-violet-700">Laporan E-Book</p>
+                            <p class="text-xs text-violet-600">Sumber, Kategori, Statistik</p>
+                        </div>
+                    </a>
+                    <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}"
+                       class="block px-4 py-2.5 text-left text-sm hover:bg-teal-50 flex items-center gap-3">
+                        <i class="fas fa-graduation-cap text-teal-600 w-5"></i>
+                        <div>
+                            <p class="font-medium text-teal-700">Laporan E-Thesis</p>
+                            <p class="text-xs text-teal-600">Prodi, Jenis, Statistik</p>
+                        </div>
+                    </a>
                 </div>
             </div>
             @if(auth()->user()->role === 'super_admin' && !$selectedBranch)
@@ -656,59 +673,219 @@
 
     {{-- Digital Tab --}}
     @if($activeTab === 'digital')
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 rounded-2xl p-6 text-white relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div class="relative">
-                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                    <i class="fas fa-book-open text-3xl"></i>
+    {{-- Summary Cards --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-book-open"></i>
                 </div>
-                <p class="text-violet-200 text-sm mb-1">E-Book Digital</p>
-                <p class="text-5xl font-bold mb-2">{{ number_format($stats['total_ebooks'] ?? 0) }}</p>
-                <p class="text-violet-200">Koleksi e-book tersedia untuk diunduh</p>
-                <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
-                   class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
-                    <i class="fas fa-file-pdf"></i> Export Laporan E-Book
+                <span class="text-3xl font-bold">{{ number_format($stats['total_ebooks'] ?? 0) }}</span>
+            </div>
+            <p class="text-violet-200 text-sm mt-2">Total E-Book</p>
+        </div>
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ number_format($stats['total_ethesis'] ?? 0) }}</span>
+            </div>
+            <p class="text-emerald-200 text-sm mt-2">Total E-Thesis</p>
+        </div>
+        <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-mosque"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ number_format($stats['shamela_count'] ?? 0) }}</span>
+            </div>
+            <p class="text-pink-200 text-sm mt-2">Maktabah Syamilah</p>
+        </div>
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-4 text-white">
+            <div class="flex items-center justify-between">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-download"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ number_format(($stats['ebook_downloads'] ?? 0) + ($stats['ethesis_downloads'] ?? 0)) }}</span>
+            </div>
+            <p class="text-amber-200 text-sm mt-2">Total Downloads</p>
+        </div>
+    </div>
+
+    {{-- E-Book Section --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-book-open text-violet-500"></i>
+                        E-Book Digital
+                    </h3>
+                    <p class="text-xs text-gray-500">{{ number_format($stats['total_ebooks'] ?? 0) }} koleksi</p>
+                </div>
+                <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" class="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs rounded-lg transition">
+                    <i class="fas fa-file-pdf mr-1"></i> Export
                 </a>
+            </div>
+            <div class="p-4">
+                <p class="text-xs text-gray-500 mb-3 font-medium">Sumber E-Book:</p>
+                <div class="space-y-2">
+                    @php
+                        $ebookSources = [
+                            'local' => ['name' => 'Koleksi Lokal', 'icon' => 'fa-server', 'color' => 'blue'],
+                            'google_drive' => ['name' => 'Google Drive', 'icon' => 'fa-google-drive', 'color' => 'amber'],
+                            'kubuku' => ['name' => 'Kubuku Digital', 'icon' => 'fa-cloud', 'color' => 'emerald'],
+                        ];
+                        $totalEbookSource = array_sum($stats['ebook_by_source'] ?? []);
+                    @endphp
+                    @foreach($stats['ebook_by_source'] ?? [] as $source => $count)
+                    @php $src = $ebookSources[$source] ?? ['name' => ucfirst($source), 'icon' => 'fa-folder', 'color' => 'gray']; @endphp
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-{{ $src['color'] }}-100 rounded-lg flex items-center justify-center text-{{ $src['color'] }}-600">
+                            <i class="fas {{ $src['icon'] }} text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-700">{{ $src['name'] }}</span>
+                                <span class="font-bold">{{ number_format($count) }}</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full mt-1">
+                                <div class="h-full bg-{{ $src['color'] }}-500 rounded-full" style="width: {{ $totalEbookSource > 0 ? ($count / $totalEbookSource) * 100 : 0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                    @if(($stats['shamela_count'] ?? 0) > 0)
+                    <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
+                        <div class="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600">
+                            <i class="fas fa-mosque text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-700">Maktabah Syamilah</span>
+                                <span class="font-bold">{{ number_format($stats['shamela_count']) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-3">
+                    <div class="text-center p-3 bg-violet-50 rounded-xl">
+                        <p class="text-2xl font-bold text-violet-600">{{ number_format($stats['ebook_views'] ?? 0) }}</p>
+                        <p class="text-xs text-gray-500">Views</p>
+                    </div>
+                    <div class="text-center p-3 bg-violet-50 rounded-xl">
+                        <p class="text-2xl font-bold text-violet-600">{{ number_format($stats['ebook_downloads'] ?? 0) }}</p>
+                        <p class="text-xs text-gray-500">Downloads</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 rounded-2xl p-6 text-white relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div class="relative">
-                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                    <i class="fas fa-graduation-cap text-3xl"></i>
+        {{-- E-Thesis Section --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-teal-50 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-emerald-500"></i>
+                        E-Thesis / Tugas Akhir
+                    </h3>
+                    <p class="text-xs text-gray-500">{{ number_format($stats['total_ethesis'] ?? 0) }} karya ilmiah</p>
                 </div>
-                <p class="text-emerald-200 text-sm mb-1">E-Thesis / Tugas Akhir</p>
-                <p class="text-5xl font-bold mb-2">{{ number_format($stats['total_ethesis'] ?? 0) }}</p>
-                <p class="text-emerald-200">Repositori karya ilmiah mahasiswa</p>
-                <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
-                   class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition">
-                    <i class="fas fa-file-pdf"></i> Export Laporan E-Thesis
+                <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg transition">
+                    <i class="fas fa-file-pdf mr-1"></i> Export
                 </a>
+            </div>
+            <div class="p-4">
+                <p class="text-xs text-gray-500 mb-3 font-medium">Sumber Data:</p>
+                <div class="space-y-2">
+                    @php
+                        $ethesisSources = [
+                            'local' => ['name' => 'Sistem Lokal', 'icon' => 'fa-server', 'color' => 'blue'],
+                            'repo' => ['name' => 'EPrints Repository', 'icon' => 'fa-database', 'color' => 'pink'],
+                        ];
+                        $totalEthesisSource = array_sum($stats['ethesis_by_source'] ?? []);
+                    @endphp
+                    @foreach($stats['ethesis_by_source'] ?? [] as $source => $count)
+                    @php $src = $ethesisSources[$source] ?? ['name' => ucfirst($source), 'icon' => 'fa-folder', 'color' => 'gray']; @endphp
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-{{ $src['color'] }}-100 rounded-lg flex items-center justify-center text-{{ $src['color'] }}-600">
+                            <i class="fas {{ $src['icon'] }} text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-700">{{ $src['name'] }}</span>
+                                <span class="font-bold">{{ number_format($count) }}</span>
+                            </div>
+                            <div class="h-1.5 bg-gray-100 rounded-full mt-1">
+                                <div class="h-full bg-{{ $src['color'] }}-500 rounded-full" style="width: {{ $totalEthesisSource > 0 ? ($count / $totalEthesisSource) * 100 : 0 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                <p class="text-xs text-gray-500 mb-3 mt-4 font-medium">Jenis Karya:</p>
+                <div class="flex flex-wrap gap-2">
+                    @php
+                        $types = ['skripsi' => 'Skripsi', 'tesis' => 'Tesis', 'disertasi' => 'Disertasi'];
+                        $typeColors = ['skripsi' => 'blue', 'tesis' => 'purple', 'disertasi' => 'amber'];
+                    @endphp
+                    @foreach($stats['ethesis_by_type'] ?? [] as $type => $count)
+                    <span class="px-3 py-1.5 bg-{{ $typeColors[$type] ?? 'gray' }}-100 text-{{ $typeColors[$type] ?? 'gray' }}-700 rounded-lg text-sm font-medium">
+                        {{ $types[$type] ?? ucfirst($type) }}: {{ number_format($count) }}
+                    </span>
+                    @endforeach
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-3 gap-2">
+                    <div class="text-center p-2 bg-emerald-50 rounded-xl">
+                        <p class="text-xl font-bold text-emerald-600">{{ number_format($stats['ethesis_fulltext'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Fulltext</p>
+                    </div>
+                    <div class="text-center p-2 bg-emerald-50 rounded-xl">
+                        <p class="text-xl font-bold text-emerald-600">{{ number_format($stats['ethesis_views'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Views</p>
+                    </div>
+                    <div class="text-center p-2 bg-emerald-50 rounded-xl">
+                        <p class="text-xl font-bold text-emerald-600">{{ number_format($stats['ethesis_downloads'] ?? 0) }}</p>
+                        <p class="text-[10px] text-gray-500">Downloads</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div class="text-center lg:text-left">
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Export Koleksi Digital</h3>
-                <p class="text-gray-500 max-w-md">
-                    Download daftar lengkap koleksi digital dalam format CSV untuk keperluan laporan dan audit.
-                </p>
+    {{-- External Sources Info --}}
+    <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-5 text-white">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <i class="fas fa-globe text-xl"></i>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('staff.statistics.export', ['type' => 'ebooks']) }}" 
-                   class="px-5 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-violet-500/25">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>Laporan E-Book</span>
-                </a>
-                <a href="{{ route('staff.statistics.export', ['type' => 'ethesis']) }}" 
-                   class="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition flex items-center gap-2 shadow-lg shadow-emerald-500/25">
-                    <i class="fas fa-file-pdf"></i>
-                    <span>Laporan E-Thesis</span>
-                </a>
+            <div>
+                <h3 class="font-bold">Integrasi Sumber Eksternal</h3>
+                <p class="text-slate-400 text-sm">Koleksi digital terintegrasi dengan berbagai sumber</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                <i class="fas fa-cloud text-emerald-400 mb-2"></i>
+                <p class="font-medium text-sm">Kubuku</p>
+                <p class="text-xs text-slate-400">E-Book Digital</p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                <i class="fas fa-mosque text-pink-400 mb-2"></i>
+                <p class="font-medium text-sm">Maktabah Syamilah</p>
+                <p class="text-xs text-slate-400">Kitab Klasik</p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                <i class="fas fa-database text-violet-400 mb-2"></i>
+                <p class="font-medium text-sm">EPrints Repository</p>
+                <p class="text-xs text-slate-400">Karya Ilmiah</p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+                <i class="fas fa-book-open text-blue-400 mb-2"></i>
+                <p class="font-medium text-sm">Open Library</p>
+                <p class="text-xs text-slate-400">API Eksternal</p>
             </div>
         </div>
     </div>
