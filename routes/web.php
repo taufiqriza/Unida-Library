@@ -24,6 +24,9 @@ Route::get('/locale/{locale}', function (string $locale) {
         ->withCookie(cookie('locale', $locale, 60 * 24 * 365)); // 1 year
 })->name('opac.set-locale');
 
+// Visitor Kiosk (Public - No Auth)
+Route::get('/visitor/{code}', \App\Livewire\Visitor\VisitorKiosk::class)->name('visitor.kiosk');
+
 // OPAC Routes (Livewire)
 Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');

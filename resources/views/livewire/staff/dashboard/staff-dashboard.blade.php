@@ -132,6 +132,25 @@
         </div>
     </div>
 
+    {{-- Visitor Kiosk Quick Action (Full Width) --}}
+    @if(auth()->user()->branch)
+    <a href="{{ route('visitor.kiosk', auth()->user()->branch->code) }}" target="_blank"
+       class="block w-full p-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-2xl shadow-lg transition transform hover:scale-[1.02] active:scale-[0.98]">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-door-open text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">Buka Kiosk Visitor</h3>
+                    <p class="text-amber-100 text-sm">Catat kunjungan perpustakaan {{ auth()->user()->branch->name }}</p>
+                </div>
+            </div>
+            <i class="fas fa-external-link-alt text-white/70 text-xl"></i>
+        </div>
+    </a>
+    @endif
+
     {{-- Mobile Quick Actions Grid --}}
     <div class="lg:hidden">
         <div class="flex items-center justify-between mb-3">
