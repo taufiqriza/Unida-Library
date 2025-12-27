@@ -1,3 +1,4 @@
+<div>
 @section('title', 'Analytics')
 
 <div class="space-y-6">
@@ -476,3 +477,4 @@ Livewire.on('dataLoaded', () => {
 });
 </script>
 @endpush
+</div>
