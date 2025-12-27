@@ -110,6 +110,43 @@
             </td>
         </tr>
     </table>
+
+    @if(count($byDepartment ?? []) > 0)
+    <p style="font-size:9px;font-weight:bold;margin:10px 0 4px;">2.6 Koleksi Per Prodi/Subjek</p>
+    <table class="data-table">
+        <tr><th>No</th><th>Prodi/Subjek</th><th>Jumlah</th><th>%</th></tr>
+        @php $totalDept = array_sum(array_column($byDepartment, 'count')); @endphp
+        @foreach(array_slice($byDepartment, 0, 15) as $i => $item)
+        <tr>
+            <td>{{ $i + 1 }}</td>
+            <td>{{ $item['department'] }}</td>
+            <td class="number">{{ number_format($item['count']) }}</td>
+            <td class="number">{{ $totalDept > 0 ? round(($item['count'] / $totalDept) * 100, 1) : 0 }}%</td>
+        </tr>
+        @endforeach
+    </table>
+    @endif
+
+    @if(count($byInputYear ?? []) > 0)
+    <p style="font-size:9px;font-weight:bold;margin:10px 0 4px;">2.7 Koleksi Per Tahun Input</p>
+    <table class="data-table">
+        <tr><th>No</th><th>Tahun Input</th><th>Jumlah Buku</th><th>%</th></tr>
+        @php $totalInput = array_sum(array_column($byInputYear, 'count')); @endphp
+        @foreach($byInputYear as $i => $item)
+        <tr>
+            <td>{{ $i + 1 }}</td>
+            <td>{{ $item['input_year'] }}</td>
+            <td class="number">{{ number_format($item['count']) }}</td>
+            <td class="number">{{ $totalInput > 0 ? round(($item['count'] / $totalInput) * 100, 1) : 0 }}%</td>
+        </tr>
+        @endforeach
+        <tr class="total-row">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td class="number">{{ number_format($totalInput) }}</td>
+            <td class="number">100%</td>
+        </tr>
+    </table>
+    @endif
 </div>
 
 {{-- BAGIAN 3 --}}

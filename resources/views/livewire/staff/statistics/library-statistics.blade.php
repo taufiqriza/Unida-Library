@@ -477,6 +477,70 @@
             </div>
         </div>
     </div>
+
+    {{-- Per Prodi & Per Tahun Input --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {{-- By Department/Prodi --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50">
+                <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-graduation-cap text-teal-500"></i>
+                    Koleksi Per Prodi/Subjek
+                </h3>
+            </div>
+            <div class="p-4 max-h-[400px] overflow-y-auto space-y-2">
+                @forelse($byDepartment as $index => $item)
+                @php $maxCount = count($byDepartment) > 0 ? max(array_column($byDepartment, 'count')) : 1; $pct = $maxCount > 0 ? ($item['count'] / $maxCount) * 100 : 0; @endphp
+                <div class="flex items-center gap-3">
+                    <span class="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-xs font-bold">{{ $index + 1 }}</span>
+                    <div class="flex-1">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-700 truncate">{{ $item['department'] }}</span>
+                            <span class="text-sm font-bold text-gray-900">{{ number_format($item['count']) }}</span>
+                        </div>
+                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-teal-500 rounded-full" style="width: {{ $pct }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <p class="text-center text-gray-400 py-8">Tidak ada data</p>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- By Input Year --}}
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 bg-gradient-to-r from-pink-50 to-rose-50">
+                <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-calendar-plus text-pink-500"></i>
+                    Koleksi Per Tahun Input
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Jumlah buku yang diinput ke sistem per tahun</p>
+            </div>
+            <div class="p-4 max-h-[400px] overflow-y-auto space-y-2">
+                @forelse($byInputYear as $index => $item)
+                @php $maxCount = count($byInputYear) > 0 ? max(array_column($byInputYear, 'count')) : 1; $pct = $maxCount > 0 ? ($item['count'] / $maxCount) * 100 : 0; @endphp
+                <div class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition">
+                    <div class="w-14 h-10 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                        {{ $item['input_year'] }}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Tahun {{ $item['input_year'] }}</span>
+                            <span class="text-sm font-bold text-gray-900">{{ number_format($item['count']) }} buku</span>
+                        </div>
+                        <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-pink-500 to-rose-500 rounded-full" style="width: {{ $pct }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <p class="text-center text-gray-400 py-8">Tidak ada data</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
     @endif
 
     {{-- Circulation Tab --}}

@@ -198,4 +198,65 @@
         </td>
     </tr>
 </table>
+
+@if(count($byDepartment) > 0 || count($byInputYear) > 0)
+<div class="page-break"></div>
+
+@if(count($byDepartment) > 0)
+<div class="section">
+    <div class="section-title">KOLEKSI PER PRODI/SUBJEK</div>
+    <table class="data-table">
+        <tr>
+            <th style="width:8%">No</th>
+            <th style="width:62%">Program Studi / Subjek</th>
+            <th style="width:15%">Jumlah</th>
+            <th style="width:15%">%</th>
+        </tr>
+        @php $totalDept = array_sum(array_column($byDepartment, 'count')); @endphp
+        @foreach($byDepartment as $i => $item)
+        <tr>
+            <td>{{ $i + 1 }}</td>
+            <td>{{ $item['department'] }}</td>
+            <td class="number">{{ number_format($item['count']) }}</td>
+            <td class="number">{{ $totalDept > 0 ? round(($item['count'] / $totalDept) * 100, 1) : 0 }}%</td>
+        </tr>
+        @endforeach
+        <tr class="total-row">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td class="number">{{ number_format($totalDept) }}</td>
+            <td class="number">100%</td>
+        </tr>
+    </table>
+</div>
+@endif
+
+@if(count($byInputYear) > 0)
+<div class="section">
+    <div class="section-title">KOLEKSI PER TAHUN INPUT</div>
+    <p style="font-size:8px;color:#666;margin-bottom:8px;">Data berdasarkan tahun buku diinput ke sistem</p>
+    <table class="data-table">
+        <tr>
+            <th style="width:8%">No</th>
+            <th style="width:30%">Tahun Input</th>
+            <th style="width:30%">Jumlah Buku</th>
+            <th style="width:32%">%</th>
+        </tr>
+        @php $totalInput = array_sum(array_column($byInputYear, 'count')); @endphp
+        @foreach($byInputYear as $i => $item)
+        <tr>
+            <td>{{ $i + 1 }}</td>
+            <td>{{ $item['input_year'] }}</td>
+            <td class="number">{{ number_format($item['count']) }}</td>
+            <td class="number">{{ $totalInput > 0 ? round(($item['count'] / $totalInput) * 100, 1) : 0 }}%</td>
+        </tr>
+        @endforeach
+        <tr class="total-row">
+            <td colspan="2"><strong>TOTAL</strong></td>
+            <td class="number">{{ number_format($totalInput) }}</td>
+            <td class="number">100%</td>
+        </tr>
+    </table>
+</div>
+@endif
+@endif
 @endsection

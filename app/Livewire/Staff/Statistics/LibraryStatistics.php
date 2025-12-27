@@ -39,6 +39,8 @@ class LibraryStatistics extends Component
     public array $byYear = [];
     public array $bySubject = [];
     public array $byAuthor = [];
+    public array $byDepartment = [];
+    public array $byInputYear = [];
 
     protected $queryString = ['selectedBranch', 'activeTab'];
 
@@ -87,6 +89,8 @@ class LibraryStatistics extends Component
         $this->byYear = $data['byYear'];
         $this->bySubject = $data['bySubject'];
         $this->byAuthor = $data['byAuthor'];
+        $this->byDepartment = $data['byDepartment'] ?? [];
+        $this->byInputYear = $data['byInputYear'] ?? [];
     }
 
     protected function fetchAllStatistics(?int $branchId): array
@@ -271,6 +275,27 @@ class LibraryStatistics extends Component
             ->map(fn($a) => ['id' => $a->id, 'name' => $a->name, 'count' => $a->books_count])
             ->toArray();
 
+        // By Department/Prodi (from subjects that represent departments)
+        $byDepartment = $this->queryWithBranch(Book::query(), $branchId)
+            ->join('book_subject', 'books.id', '=', 'book_subject.book_id')
+            ->join('subjects', 'subjects.id', '=', 'book_subject.subject_id')
+            ->select('subjects.name as department', DB::raw('COUNT(DISTINCT books.id) as count'))
+            ->groupBy('subjects.name')
+            ->orderByDesc('count')
+            ->limit(20)
+            ->get()
+            ->toArray();
+
+        // By Input Year (when books were added to system)
+        $byInputYear = $this->queryWithBranch(Book::query(), $branchId)
+            ->selectRaw('YEAR(created_at) as input_year, COUNT(*) as count')
+            ->whereNotNull('created_at')
+            ->groupBy('input_year')
+            ->orderByDesc('input_year')
+            ->limit(10)
+            ->get()
+            ->toArray();
+
         return [
             'stats' => $stats,
             'branchStats' => $branchStats,
@@ -296,6 +321,8 @@ class LibraryStatistics extends Component
             'byYear' => $byYear,
             'bySubject' => $bySubject,
             'byAuthor' => $byAuthor,
+            'byDepartment' => $byDepartment,
+            'byInputYear' => $byInputYear,
         ];
     }
 

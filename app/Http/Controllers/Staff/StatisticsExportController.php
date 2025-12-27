@@ -40,6 +40,8 @@ class StatisticsExportController extends Controller
                 'byYear' => $component->byYear,
                 'bySubject' => $component->bySubject,
                 'byAuthor' => $component->byAuthor,
+                'byDepartment' => $component->byDepartment,
+                'byInputYear' => $component->byInputYear,
             ],
             [
                 'monthlyTrend' => $component->monthlyTrend,

@@ -44,6 +44,8 @@ class StatisticsReportService
             'byYear' => $this->sanitizeArray($this->collectionData['byYear']),
             'bySubject' => $this->sanitizeArray($this->collectionData['bySubject']),
             'byAuthor' => $this->sanitizeArray($this->collectionData['byAuthor']),
+            'byDepartment' => $this->sanitizeArray($this->collectionData['byDepartment'] ?? []),
+            'byInputYear' => $this->sanitizeArray($this->collectionData['byInputYear'] ?? []),
         ]);
         
         $pdf = Pdf::loadView('reports.statistics.collection', $data);
@@ -72,6 +74,8 @@ class StatisticsReportService
             'byYear' => $this->sanitizeArray($this->collectionData['byYear']),
             'bySubject' => $this->sanitizeArray($this->collectionData['bySubject']),
             'byAuthor' => $this->sanitizeArray($this->collectionData['byAuthor']),
+            'byDepartment' => $this->sanitizeArray($this->collectionData['byDepartment'] ?? []),
+            'byInputYear' => $this->sanitizeArray($this->collectionData['byInputYear'] ?? []),
             'monthlyTrend' => $this->sanitizeArray($this->circulationData['monthlyTrend']),
             'branchStats' => $this->sanitizeArray($this->circulationData['branchStats']),
         ]);
