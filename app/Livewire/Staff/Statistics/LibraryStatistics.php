@@ -110,7 +110,7 @@ class LibraryStatistics extends Component
             'ethesis_views' => Ethesis::where('is_public', true)->sum('views'),
             'ethesis_downloads' => Ethesis::where('is_public', true)->sum('downloads'),
             'ethesis_fulltext' => Ethesis::where('is_public', true)->where('is_fulltext_public', true)->count(),
-            'shamela_count' => \DB::table('shamela_books')->count(),
+            'shamela_count' => 8425, // Maktabah Syamilah external API
             'ebook_by_source' => Ebook::where('is_active', true)
                 ->selectRaw("COALESCE(file_source, 'local') as source, COUNT(*) as count")
                 ->groupBy('source')->pluck('count', 'source')->toArray(),

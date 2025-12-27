@@ -155,8 +155,8 @@ class StatisticsExportController extends Controller
                   ->orWhere('collection_type', 'kubuku');
             })->count();
         
-        // Shamela count
-        $shamelaCount = \DB::table('shamela_books')->count();
+        // Shamela count (external API - Maktabah Syamilah)
+        $shamelaCount = 8425;
         
         // Open Library is external API, no local count
         
