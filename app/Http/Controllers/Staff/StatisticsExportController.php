@@ -155,8 +155,8 @@ class StatisticsExportController extends Controller
                   ->orWhere('collection_type', 'kubuku');
             })->count();
         
-        // Shamela count (external API - Maktabah Syamilah)
-        $shamelaCount = 8425;
+        // Shamela count from local SQLite database
+        $shamelaCount = app(\App\Services\ShamelaLocalService::class)->getStats()['total_books'] ?? 0;
         
         // Open Library is external API, no local count
         
