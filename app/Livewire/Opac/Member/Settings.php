@@ -18,6 +18,8 @@ class Settings extends Component
     public string $name = '';
     public string $phone = '';
     public string $gender = '';
+    public string $nim = '';
+    public bool $canEditNim = false;
     public $photo;
     
     public $branches;
@@ -30,6 +32,10 @@ class Settings extends Component
         $this->name = $this->member->name ?? '';
         $this->phone = $this->member->phone ?? '';
         $this->gender = $this->member->gender ?? '';
+        $this->nim = $this->member->member_id ?? '';
+        
+        // Allow NIM edit if it's auto-generated (starts with M2025, M2024, etc)
+        $this->canEditNim = preg_match('/^M20\d{2}/', $this->nim);
         
         $this->branches = Branch::where('is_active', true)->orderBy('name')->get();
         $this->faculties = Faculty::orderBy('name')->get();
@@ -38,12 +44,18 @@ class Settings extends Component
 
     protected function rules()
     {
-        return [
+        $rules = [
             'name' => 'required|string|max:150',
             'phone' => 'required|string|max:20',
             'gender' => 'required|in:M,F',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
+        
+        if ($this->canEditNim) {
+            $rules['nim'] = 'required|string|max:30|unique:members,member_id,' . $this->member->id;
+        }
+        
+        return $rules;
     }
 
     protected $messages = [
@@ -51,6 +63,8 @@ class Settings extends Component
         'phone.required' => 'Nomor Telepon/WA wajib diisi',
         'photo.image' => 'File harus berupa gambar',
         'photo.max' => 'Ukuran foto maksimal 2MB',
+        'nim.required' => 'NIM wajib diisi',
+        'nim.unique' => 'NIM sudah terdaftar',
     ];
 
     public function save()
@@ -62,9 +76,13 @@ class Settings extends Component
             'phone' => $this->phone,
             'gender' => $this->gender,
         ];
+        
+        if ($this->canEditNim && $this->nim) {
+            $data['member_id'] = $this->nim;
+            $data['nim_nidn'] = $this->nim;
+        }
 
         if ($this->photo) {
-            // Delete old photo if exists
             if ($this->member->photo && Storage::disk('public')->exists($this->member->photo)) {
                 Storage::disk('public')->delete($this->member->photo);
             }
@@ -72,6 +90,9 @@ class Settings extends Component
         }
 
         $this->member->update($data);
+        
+        // Refresh canEditNim after save
+        $this->canEditNim = preg_match('/^M20\d{2}/', $this->nim);
 
         $this->dispatch('notify', type: 'success', message: 'Profil berhasil diperbarui.');
     }

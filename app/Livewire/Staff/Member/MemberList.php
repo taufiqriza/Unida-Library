@@ -159,9 +159,6 @@ class MemberList extends Component
             ->when($this->filterLinked === 'unlinked', fn($q) => $q->where(fn($q2) => $q2->whereNull('email')->orWhere('email', '=', '')->orWhere('profile_completed', 0)))
             ->latest()
             ->paginate(15);
-        
-        // Debug log
-        \Log::info('MemberList filter', ['filterLinked' => $this->filterLinked, 'count' => $members->total()]);
 
         return view('livewire.staff.member.member-list', [
             'members' => $members,
