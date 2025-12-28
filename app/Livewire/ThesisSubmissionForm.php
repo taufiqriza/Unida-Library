@@ -369,7 +369,7 @@ class ThesisSubmissionForm extends Component
 
         // Handle file uploads - store in private thesis disk for security
         $storageDisk = 'thesis';
-        $needsWatermark = [];
+        $needsPreviewWatermark = false;
         
         if ($this->cover_file) {
             $data['cover_file'] = $this->cover_file->store('covers', $storageDisk);
@@ -379,11 +379,10 @@ class ThesisSubmissionForm extends Component
         }
         if ($this->preview_file) {
             $data['preview_file'] = $this->preview_file->store('previews', $storageDisk);
-            $needsWatermark[] = 'preview';
+            $needsPreviewWatermark = true;
         }
         if ($this->fulltext_file) {
             $data['fulltext_file'] = $this->fulltext_file->store('fulltext', $storageDisk);
-            $needsWatermark[] = 'fulltext';
         }
 
         if ($this->isEdit && $this->submission) {
@@ -393,9 +392,9 @@ class ThesisSubmissionForm extends Component
             $submission = ThesisSubmission::create($data);
         }
 
-        // Dispatch watermark jobs for PDF files
-        foreach ($needsWatermark as $fileType) {
-            \App\Jobs\WatermarkPdfJob::dispatch($submission->fresh(), $fileType);
+        // Watermark only preview (BAB 1-3) - public access file
+        if ($needsPreviewWatermark) {
+            \App\Jobs\WatermarkPdfJob::dispatch($submission->fresh());
         }
 
         return $submission;
