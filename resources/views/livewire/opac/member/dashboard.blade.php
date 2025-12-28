@@ -80,7 +80,7 @@
                     <div class="flex flex-col gap-2 items-end">
                         {{-- Google Connect Notice --}}
                         @if(!$member->google_id)
-                        <div x-data="{ show: !sessionStorage.getItem('hideGoogleNoticeMember') }" x-show="show" x-cloak
+                        <div x-data="{ show: !localStorage.getItem('hideGoogleNotice_{{ $member->id }}_{{ today()->format('Ymd') }}') }" x-show="show" x-cloak
                              class="flex items-center gap-2 px-3 py-2 bg-white/10 border border-white/20 rounded-xl backdrop-blur-sm">
                             <svg class="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
                                 <path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -92,7 +92,7 @@
                                 <span class="text-white/70">Mahasiswa UNIDA?</span>
                                 <a href="{{ route('auth.google') }}" class="text-white font-semibold hover:underline">Hubungkan Google UNIDA →</a>
                             </div>
-                            <button @click="show = false; sessionStorage.setItem('hideGoogleNoticeMember', '1')" class="ml-1 text-white/50 hover:text-white">
+                            <button @click="show = false; localStorage.setItem('hideGoogleNotice_{{ $member->id }}_{{ today()->format('Ymd') }}', '1')" class="ml-1 text-white/50 hover:text-white">
                                 <i class="fas fa-times text-xs"></i>
                             </button>
                         </div>
