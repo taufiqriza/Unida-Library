@@ -69,13 +69,10 @@
                             </div>
 
                             {{-- Student Info Notice --}}
-                            <div x-show="registerType === 'member'" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
-                                <div class="flex gap-3">
-                                    <i class="fas fa-graduation-cap text-blue-500 mt-0.5"></i>
-                                    <div class="text-sm text-blue-800">
-                                        <p class="font-medium">Mahasiswa UNIDA Gontor?</p>
-                                        <p class="text-blue-600 mt-1">Gunakan email kampus Anda (contoh: <span class="font-mono text-xs">NIM@student.unida.gontor.ac.id</span>) untuk menghubungkan dengan data SIAKAD secara otomatis.</p>
-                                    </div>
+                            <div x-show="registerType === 'member'" x-data="{ showInfo: true }">
+                                <div x-show="showInfo" x-collapse class="bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mb-4 flex items-center justify-between gap-2">
+                                    <p class="text-xs text-blue-700"><i class="fas fa-graduation-cap mr-1"></i> <strong>Mahasiswa UNIDA?</strong> Gunakan email kampus (<span class="font-mono">NIM@student.unida.gontor.ac.id</span>) untuk link otomatis dengan SIAKAD.</p>
+                                    <button type="button" @click="showInfo = false" class="text-blue-400 hover:text-blue-600 p-1"><i class="fas fa-times"></i></button>
                                 </div>
                             </div>
 
