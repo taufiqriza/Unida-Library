@@ -65,14 +65,14 @@
                     <i class="fas fa-arrow-right-from-bracket text-sm opacity-80"></i>
                     <span class="text-xs opacity-80">Pinjam</span>
                 </div>
-                <p class="text-2xl font-bold">{{ $stats['loans_today'] ?? 0 }}</p>
+                <p class="text-2xl font-bold">{{ $stats['loans_month'] ?? 0 }}</p>
             </div>
             <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white">
                 <div class="flex items-center gap-2 mb-1">
                     <i class="fas fa-arrow-right-to-bracket text-sm opacity-80"></i>
                     <span class="text-xs opacity-80">Kembali</span>
                 </div>
-                <p class="text-2xl font-bold">{{ $stats['returns_today'] ?? 0 }}</p>
+                <p class="text-2xl font-bold">{{ $stats['returns_month'] ?? 0 }}</p>
             </div>
             <div class="flex-1 bg-white/20 backdrop-blur rounded-2xl p-3 text-white {{ ($stats['overdue'] ?? 0) > 0 ? 'ring-2 ring-red-400' : '' }}">
                 <div class="flex items-center gap-2 mb-1">
@@ -84,17 +84,17 @@
         </div>
     </div>
 
-    {{-- Desktop Quick Stats - Today (hidden on mobile) --}}
+    {{-- Desktop Quick Stats - This Month (hidden on mobile) --}}
     <div class="hidden lg:grid lg:grid-cols-4 gap-4">
         <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                     <i class="fas fa-arrow-right-from-bracket"></i>
                 </div>
-                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Hari Ini</span>
+                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Bulan Ini</span>
             </div>
             <p class="text-blue-100 text-xs mb-1">Peminjaman</p>
-            <p class="text-3xl font-bold">{{ $stats['loans_today'] ?? 0 }}</p>
+            <p class="text-3xl font-bold">{{ $stats['loans_month'] ?? 0 }}</p>
         </div>
 
         <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
@@ -102,10 +102,10 @@
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                     <i class="fas fa-arrow-right-to-bracket"></i>
                 </div>
-                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Hari Ini</span>
+                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Bulan Ini</span>
             </div>
             <p class="text-emerald-100 text-xs mb-1">Pengembalian</p>
-            <p class="text-3xl font-bold">{{ $stats['returns_today'] ?? 0 }}</p>
+            <p class="text-3xl font-bold">{{ $stats['returns_month'] ?? 0 }}</p>
         </div>
 
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">

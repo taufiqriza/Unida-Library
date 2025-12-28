@@ -32,9 +32,10 @@ class StaffDashboard extends Component
 
         // Cache stats for 2 minutes
         $this->stats = cache()->remember("dashboard_stats_{$branchId}", 120, function () use ($branchId) {
+            $startOfMonth = now()->startOfMonth();
             return [
-                'loans_today' => Loan::where('branch_id', $branchId)->whereDate('loan_date', today())->count(),
-                'returns_today' => Loan::where('branch_id', $branchId)->whereDate('return_date', today())->count(),
+                'loans_month' => Loan::where('branch_id', $branchId)->where('loan_date', '>=', $startOfMonth)->count(),
+                'returns_month' => Loan::where('branch_id', $branchId)->where('return_date', '>=', $startOfMonth)->count(),
                 'overdue' => Loan::where('branch_id', $branchId)->where('is_returned', false)->where('due_date', '<', now())->count(),
                 'unpaid_fines' => Fine::whereHas('loan', fn($q) => $q->where('branch_id', $branchId))->where('is_paid', false)->sum('amount'),
                 'total_books' => Book::where('branch_id', $branchId)->count(),
