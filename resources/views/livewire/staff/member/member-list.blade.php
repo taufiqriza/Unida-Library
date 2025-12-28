@@ -259,11 +259,11 @@
                                                 <i class="fas fa-rotate"></i>
                                             </button>
                                         @endif
-                                        <a href="{{ route('staff.member.show', $member->id) }}" 
+                                        <button wire:click="showDetail({{ $member->id }})" 
                                            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
                                            title="Detail">
                                             <i class="fas fa-eye"></i>
-                                        </a>
+                                        </button>
                                         <a href="{{ route('staff.member.edit', $member->id) }}" 
                                            class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
                                            title="Edit">
@@ -314,4 +314,139 @@
             </div>
         @endif
     </div>
+
+    {{-- Member Detail Modal --}}
+    @if($showDetailModal && $selectedMember)
+    <div class="fixed inset-0 z-50 overflow-y-auto" x-data x-init="document.body.classList.add('overflow-hidden')" x-on:remove="document.body.classList.remove('overflow-hidden')">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" wire:click="closeDetail"></div>
+            
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-auto overflow-hidden">
+                {{-- Header --}}
+                <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 text-white">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Detail Anggota</h3>
+                        <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Content --}}
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    {{-- Photo & Name --}}
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            @if($selectedMember->photo)
+                                <img src="{{ Storage::url($selectedMember->photo) }}" class="w-full h-full object-cover rounded-xl">
+                            @else
+                                {{ strtoupper(substr($selectedMember->name, 0, 1)) }}
+                            @endif
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">{{ $selectedMember->name }}</h4>
+                            <p class="text-sm text-gray-500">{{ $selectedMember->member_id }}</p>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 {{ $selectedMember->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                                {{ $selectedMember->is_active ? 'Aktif' : 'Nonaktif' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Info Grid --}}
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Tipe</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->memberType?->name ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Cabang</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">NIM/NIDN</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->nim_nidn ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Jenis Kelamin</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->gender == 'L' ? 'Laki-laki' : ($selectedMember->gender == 'P' ? 'Perempuan' : '-') }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3 col-span-2">
+                            <p class="text-gray-500 text-xs mb-1">Email</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->email ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Fakultas</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->faculty?->name ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Prodi</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->department?->name ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Tgl Daftar</p>
+                            <p class="font-medium text-gray-900">{{ $selectedMember->register_date?->format('d M Y') ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Tgl Kadaluarsa</p>
+                            <p class="font-medium {{ $selectedMember->expire_date && $selectedMember->expire_date < now() ? 'text-red-600' : 'text-gray-900' }}">
+                                {{ $selectedMember->expire_date?->format('d M Y') ?? '-' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Google Account Info --}}
+                    <div class="border-t pt-4">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                            Akun Google
+                        </h5>
+                        @if($selectedMember->profile_completed && $selectedMember->email)
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                                <div class="flex items-center gap-2 text-emerald-700">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span class="text-sm font-medium">Terhubung</span>
+                                </div>
+                                <p class="text-xs text-emerald-600 mt-1">{{ $selectedMember->email }}</p>
+                                @if($selectedMember->updated_at)
+                                    <p class="text-xs text-emerald-500 mt-1">Terhubung: {{ $selectedMember->updated_at->format('d M Y H:i') }}</p>
+                                @endif
+                            </div>
+                        @else
+                            <div class="bg-gray-50 border border-gray-200 rounded-xl p-3">
+                                <div class="flex items-center gap-2 text-gray-500">
+                                    <i class="fas fa-times-circle"></i>
+                                    <span class="text-sm font-medium">Belum Terhubung</span>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Last Login --}}
+                    <div class="border-t pt-4">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                            <i class="fas fa-clock text-gray-400"></i>
+                            Aktivitas Login
+                        </h5>
+                        <div class="bg-gray-50 rounded-xl p-3">
+                            <p class="text-gray-500 text-xs mb-1">Terakhir Login</p>
+                            <p class="font-medium text-gray-900">
+                                {{ $selectedMember->last_login_at ? $selectedMember->last_login_at->format('d M Y H:i') : 'Belum pernah login' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="px-6 py-4 bg-gray-50 border-t flex justify-end gap-2">
+                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
+                        <i class="fas fa-edit mr-1"></i> Edit
+                    </a>
+                    <button wire:click="closeDetail" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

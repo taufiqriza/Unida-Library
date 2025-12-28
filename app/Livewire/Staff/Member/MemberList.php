@@ -20,6 +20,8 @@ class MemberList extends Component
     public $filterExpired = '';
     public $filterLinked = '';
     public $filterBranchId = ''; // For super admin branch filter
+    public $showDetailModal = false;
+    public $selectedMember = null;
     
     protected $queryString = [
         'search' => ['except' => ''],
@@ -43,6 +45,18 @@ class MemberList extends Component
     public function updatingFilterLinked()
     {
         $this->resetPage();
+    }
+
+    public function showDetail($memberId)
+    {
+        $this->selectedMember = Member::with(['memberType', 'branch', 'faculty', 'department'])->find($memberId);
+        $this->showDetailModal = true;
+    }
+
+    public function closeDetail()
+    {
+        $this->showDetailModal = false;
+        $this->selectedMember = null;
     }
 
     public function extendMembership($memberId)
