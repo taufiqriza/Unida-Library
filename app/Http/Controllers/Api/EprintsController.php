@@ -113,6 +113,29 @@ class EprintsController extends Controller
         ]);
     }
 
+    /**
+     * Redirect member to EPrints with SSO token
+     */
+    public function redirectToEprints(Request $request)
+    {
+        $member = auth('member')->user();
+        
+        if (!$member) {
+            return redirect()->route('opac.login');
+        }
+
+        $token = Str::random(64);
+        $cacheKey = 'eprints_login_' . $token;
+        
+        Cache::put($cacheKey, ['email' => $member->email, 'created_at' => now()], 1800);
+        
+        \Log::info('EPrints SSO redirect', ['email' => $member->email, 'token' => substr($token, 0, 10) . '...']);
+
+        $eprintsUrl = config('services.eprints.base_url', 'https://repo.unida.gontor.ac.id');
+        
+        return redirect($eprintsUrl . '/cgi/library_sso?token=' . $token);
+    }
+
     private function mapUserType(?string $code): string
     {
         return match ($code) {

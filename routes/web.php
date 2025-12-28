@@ -43,6 +43,7 @@ Route::get('/shamela', \App\Livewire\Opac\ShamelaBrowse::class)->name('opac.sham
 Route::get('/shamela/{id}', \App\Livewire\Opac\ShamelaShow::class)->name('opac.shamela.show')->where('id', '[0-9]+');
 Route::get('/database-access', \App\Livewire\Opac\DatabaseAccess::class)->name('opac.database-access');
 Route::get('/repository', \App\Livewire\Opac\Repository::class)->name('opac.repository');
+Route::get('/repository/sso', [App\Http\Controllers\Api\EprintsController::class, 'redirectToEprints'])->name('opac.repository.sso')->middleware('auth:member');
 Route::get('/universitaria', \App\Livewire\Opac\UniversitariaBrowse::class)->name('opac.universitaria.index');
 Route::get('/survey', \App\Livewire\Opac\SurveyList::class)->name('opac.survey.index');
 Route::get('/survey/{slug}', \App\Livewire\Opac\SurveyRespond::class)->name('opac.survey.show');

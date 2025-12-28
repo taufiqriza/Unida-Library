@@ -29,12 +29,12 @@
                 Anda sudah login sebagai <strong>{{ auth('member')->user()->name }}</strong>. 
                 Klik tombol di bawah untuk langsung masuk ke Repository tanpa perlu login ulang.
             </p>
-            <button onclick="ssoLogin()" id="sso-btn"
+            <a href="{{ route('opac.repository.sso') }}" target="_blank" id="sso-btn"
                     class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl p-4 font-semibold hover:shadow-lg transition">
                 <i class="fas fa-sign-in-alt text-xl"></i>
                 <span>Masuk ke Repository</span>
                 <i class="fas fa-external-link-alt text-sm opacity-70"></i>
-            </button>
+            </a>
             <p class="text-xs text-green-600 mt-2 text-center">
                 <i class="fas fa-shield-alt"></i> Login aman menggunakan akun perpustakaan Anda
             </p>
