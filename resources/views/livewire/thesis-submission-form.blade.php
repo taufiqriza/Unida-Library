@@ -335,7 +335,7 @@
                                 <span class="text-white text-xs font-medium">Ganti File</span>
                             </div>
                         @elseif($isEdit && $submission?->cover_file)
-                            <img src="{{ Storage::url($submission->cover_file) }}" class="absolute inset-0 w-full h-full object-cover">
+                            <img src="{{ route('thesis.file', [$submission, 'cover']) }}" class="absolute inset-0 w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                                 <span class="text-white text-xs font-medium">Ganti File</span>
                             </div>
