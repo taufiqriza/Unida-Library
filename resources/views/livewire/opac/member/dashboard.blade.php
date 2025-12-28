@@ -4,17 +4,19 @@
         <div class="lg:hidden sticky top-0 z-50 bg-gradient-to-r from-primary-600 to-primary-800 safe-area-top">
             <div class="flex items-center justify-between px-4 py-3">
                 <div class="flex items-center gap-3">
-                    <label class="relative w-10 h-10 bg-white/20 rounded-full flex items-center justify-center overflow-hidden cursor-pointer group">
-                        @if($member->photo)
-                            <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
-                        @else
-                            <i class="fas fa-user text-white/80"></i>
-                        @endif
-                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-active:opacity-100">
-                            <i class="fas fa-camera text-white text-xs"></i>
+                    <label class="relative w-10 h-10 cursor-pointer">
+                        <div class="w-full h-full bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
+                            @if($member->photo)
+                                <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
+                            @else
+                                <i class="fas fa-user text-white/80"></i>
+                            @endif
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow">
+                            <i class="fas fa-pencil-alt text-primary-600 text-[8px]"></i>
                         </div>
                         <input type="file" wire:model="photo" accept="image/*" class="hidden">
-                        <div wire:loading wire:target="photo" class="absolute inset-0 bg-black/70 flex items-center justify-center">
+                        <div wire:loading wire:target="photo" class="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center">
                             <i class="fas fa-spinner fa-spin text-white text-xs"></i>
                         </div>
                     </label>
@@ -54,8 +56,8 @@
                                     <i class="fas fa-user text-2xl text-white/80"></i>
                                 @endif
                             </div>
-                            <label class="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition">
-                                <i class="fas fa-camera text-white"></i>
+                            <label class="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-gray-100 transition">
+                                <i class="fas fa-pencil-alt text-primary-600 text-xs"></i>
                                 <input type="file" wire:model="photo" accept="image/*" class="hidden">
                             </label>
                             <div wire:loading wire:target="photo" class="absolute inset-0 bg-black/70 rounded-xl flex items-center justify-center">
