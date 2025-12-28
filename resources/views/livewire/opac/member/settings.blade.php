@@ -57,6 +57,10 @@
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-100">
                             <i class="fab fa-google"></i> Terhubung dengan Google
                         </div>
+                        @else
+                        <a href="{{ route('auth.google') }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition">
+                            <i class="fab fa-google"></i> Hubungkan Google UNIDA
+                        </a>
                         @endif
                     </div>
                 </div>

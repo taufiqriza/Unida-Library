@@ -22,6 +22,8 @@ class SocialAuthController extends Controller
         // Store intent in session
         if (request('link_staff')) {
             session(['google_intent' => 'link_staff', 'link_user_id' => auth()->id()]);
+        } elseif (Auth::guard('member')->check()) {
+            session(['google_intent' => 'link_member', 'link_member_id' => Auth::guard('member')->id()]);
         }
         
         // Use prompt=select_account to force account picker
@@ -51,6 +53,11 @@ class SocialAuthController extends Controller
         // Handle staff linking
         if (session('google_intent') === 'link_staff') {
             return $this->handleStaffLinking($googleUser);
+        }
+
+        // Handle member linking
+        if (session('google_intent') === 'link_member') {
+            return $this->handleMemberLinking($googleUser);
         }
 
         return $this->handleNormalLogin($googleUser);
@@ -281,6 +288,39 @@ class SocialAuthController extends Controller
         }
 
         return redirect()->route('staff.profile')->with('success', 'Akun Google berhasil dihubungkan!');
+    }
+
+    protected function handleMemberLinking($googleUser)
+    {
+        $memberId = session('link_member_id');
+        session()->forget(['google_intent', 'link_member_id']);
+
+        $member = Member::find($memberId);
+        if (!$member) {
+            return redirect()->route('opac.member.settings')->with('error', 'Sesi tidak valid.');
+        }
+
+        // Check if Google already linked to another member
+        $existing = SocialAccount::where('provider', 'google')
+            ->where('provider_id', $googleUser->getId())
+            ->whereNotNull('member_id')
+            ->where('member_id', '!=', $member->id)
+            ->first();
+
+        if ($existing) {
+            return redirect()->route('opac.member.settings')->with('error', 'Akun Google sudah terhubung ke member lain.');
+        }
+
+        // Link Google to member
+        SocialAccount::updateOrCreate(
+            ['provider' => 'google', 'provider_id' => $googleUser->getId(), 'member_id' => $member->id],
+            ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
+        );
+
+        $member->update(['google_id' => $googleUser->getId()]);
+
+        Auth::guard('member')->login($member);
+        return redirect()->route('opac.member.settings')->with('success', 'Akun Google UNIDA berhasil dihubungkan!');
     }
 
     protected function isAllowedDomain(string $email): bool
