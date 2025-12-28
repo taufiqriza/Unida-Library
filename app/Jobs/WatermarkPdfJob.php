@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use setasign\Fpdi\Fpdi;
+use TCPDF;
 
 class WatermarkPdfJob implements ShouldQueue
 {
@@ -33,10 +33,7 @@ class WatermarkPdfJob implements ShouldQueue
             default => null,
         };
 
-        if (!$filePath) {
-            Log::warning("No {$this->fileType} file for submission #{$this->submission->id}");
-            return;
-        }
+        if (!$filePath) return;
 
         $sourcePath = storage_path('app/thesis/' . $filePath);
         if (!file_exists($sourcePath)) {
@@ -45,87 +42,95 @@ class WatermarkPdfJob implements ShouldQueue
         }
 
         try {
-            // Backup original
             $backupPath = str_replace('.pdf', '_original.pdf', $sourcePath);
             if (!file_exists($backupPath)) {
                 copy($sourcePath, $backupPath);
             }
 
-            // Decompress PDF first for FPDI compatibility
-            $decompressedPath = $this->decompressPdf($backupPath);
-            if (!$decompressedPath) {
-                Log::error("Failed to decompress PDF for submission #{$this->submission->id}");
+            // Get page count and size from original
+            $pageInfo = $this->getPdfInfo($backupPath);
+            if (!$pageInfo) {
+                Log::error("Cannot get PDF info for submission #{$this->submission->id}");
                 return;
             }
 
-            // Apply watermark with FPDI
-            $watermarkedPath = $this->applyWatermark($decompressedPath);
+            // Create watermark PDF with same page count
+            $watermarkPdf = $this->createWatermarkPdf($pageInfo['pages'], $pageInfo['width'], $pageInfo['height']);
             
-            if ($watermarkedPath && file_exists($watermarkedPath)) {
-                copy($watermarkedPath, $sourcePath);
-                @unlink($watermarkedPath);
-                @unlink($decompressedPath);
+            // Use pdftk to stamp watermark onto original
+            $outputPath = sys_get_temp_dir() . '/stamped_' . uniqid() . '.pdf';
+            $cmd = sprintf(
+                'pdftk %s stamp %s output %s 2>&1',
+                escapeshellarg($backupPath),
+                escapeshellarg($watermarkPdf),
+                escapeshellarg($outputPath)
+            );
+            
+            exec($cmd, $output, $returnCode);
+            @unlink($watermarkPdf);
+            
+            if ($returnCode === 0 && file_exists($outputPath)) {
+                copy($outputPath, $sourcePath);
+                @unlink($outputPath);
                 Log::info("Watermark applied to {$this->fileType} for submission #{$this->submission->id}");
+            } else {
+                Log::error("pdftk failed: " . implode("\n", $output));
             }
 
         } catch (\Exception $e) {
-            Log::error("Watermark failed for submission #{$this->submission->id}: " . $e->getMessage());
+            Log::error("Watermark failed: " . $e->getMessage());
             throw $e;
         }
     }
 
-    protected function decompressPdf(string $sourcePath): ?string
+    protected function getPdfInfo(string $path): ?array
     {
-        $outputPath = sys_get_temp_dir() . '/decomp_' . uniqid() . '.pdf';
+        // Use pdfinfo or pdftk to get page count
+        exec("pdftk " . escapeshellarg($path) . " dump_data 2>/dev/null | grep -E 'NumberOfPages|PageMediaDimensions'", $output);
         
-        // Use Ghostscript to decompress/normalize PDF
-        $cmd = sprintf(
-            'gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dNOPAUSE -dQUIET -dBATCH ' .
-            '-dCompressFonts=false -dCompressPages=false ' .
-            '-sOutputFile=%s %s 2>&1',
-            escapeshellarg($outputPath),
-            escapeshellarg($sourcePath)
-        );
+        $pages = 1;
+        $width = 595; // A4 default
+        $height = 842;
         
-        exec($cmd, $output, $returnCode);
-        
-        if ($returnCode !== 0 || !file_exists($outputPath)) {
-            Log::error("GS decompress failed: " . implode("\n", $output));
-            return null;
+        foreach ($output as $line) {
+            if (preg_match('/NumberOfPages:\s*(\d+)/', $line, $m)) {
+                $pages = (int)$m[1];
+            }
+            if (preg_match('/PageMediaDimensions:\s*([\d.]+)\s+([\d.]+)/', $line, $m)) {
+                $width = (float)$m[1];
+                $height = (float)$m[2];
+            }
         }
         
-        return $outputPath;
+        return ['pages' => $pages, 'width' => $width, 'height' => $height];
     }
 
-    protected function applyWatermark(string $sourcePath): ?string
+    protected function createWatermarkPdf(int $pages, float $width, float $height): string
     {
-        $outputPath = sys_get_temp_dir() . '/wm_' . uniqid() . '.pdf';
-        
-        $pdf = new Fpdi();
+        $pdf = new TCPDF('P', 'pt', [$width, $height], true, 'UTF-8', false);
+        $pdf->SetCreator('Perpustakaan UNIDA');
         $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->SetPrintHeader(false);
+        $pdf->SetPrintFooter(false);
         
-        $pageCount = $pdf->setSourceFile($sourcePath);
+        $text = 'Perpustakaan UNIDA Gontor - library.unida.gontor.ac.id';
         
-        for ($i = 1; $i <= $pageCount; $i++) {
-            $tplId = $pdf->importPage($i);
-            $size = $pdf->getTemplateSize($tplId);
-            
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($tplId, 0, 0, $size['width'], $size['height']);
-            
-            // Add footer watermark
-            $pdf->SetFont('Helvetica', '', 8);
+        for ($i = 0; $i < $pages; $i++) {
+            $pdf->AddPage();
+            $pdf->SetFont('helvetica', '', 8);
             $pdf->SetTextColor(128, 128, 128);
-            $text = 'Perpustakaan UNIDA Gontor - library.unida.gontor.ac.id';
+            
+            // Footer text centered
             $textWidth = $pdf->GetStringWidth($text);
-            $x = ($size['width'] - $textWidth) / 2;
-            $y = $size['height'] - 10;
-            $pdf->SetXY($x, $y);
-            $pdf->Cell($textWidth, 5, $text, 0, 0, 'C');
+            $x = ($width - $textWidth) / 2;
+            $pdf->SetXY($x, $height - 25);
+            $pdf->Cell($textWidth, 10, $text, 0, 0, 'C');
         }
         
+        $outputPath = sys_get_temp_dir() . '/watermark_' . uniqid() . '.pdf';
         $pdf->Output($outputPath, 'F');
         
-        return file_exists($outputPath) ? $outputPath : null;
+        return $outputPath;
     }
 }
