@@ -42,7 +42,7 @@
                                        class="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition">
                                 @endfor
                             </div>
-                            <input type="hidden" wire:model="otp" x-model="otpValue">
+                            <input type="hidden" x-model="otpValue" x-init="$watch('otpValue', v => $wire.otp = v)">
                         </div>
 
                         <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
