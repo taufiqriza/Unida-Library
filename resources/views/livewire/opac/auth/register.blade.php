@@ -89,16 +89,70 @@
                             </div>
                             @endif
 
+                            {{-- SIAKAD Member Detected Confirmation --}}
+                            @if($showConfirmation && $detectedMember)
+                            <div x-show="registerType === 'member'" class="space-y-4">
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                                    <div class="flex gap-3">
+                                        <div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-user-check text-emerald-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-emerald-800">Data Mahasiswa Ditemukan!</p>
+                                            <p class="text-sm text-emerald-700 mt-1">Kami menemukan data Anda di sistem SIAKAD:</p>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 bg-white rounded-lg p-3 border border-emerald-100">
+                                        <div class="grid grid-cols-2 gap-2 text-sm">
+                                            <div><span class="text-gray-500">NIM:</span> <span class="font-medium">{{ $detectedMember->member_id }}</span></div>
+                                            <div><span class="text-gray-500">Nama:</span> <span class="font-medium">{{ $detectedMember->name }}</span></div>
+                                            @if($detectedMember->faculty)
+                                            <div><span class="text-gray-500">Fakultas:</span> <span class="font-medium">{{ $detectedMember->faculty->name }}</span></div>
+                                            @endif
+                                            @if($detectedMember->department)
+                                            <div><span class="text-gray-500">Prodi:</span> <span class="font-medium">{{ $detectedMember->department->name }}</span></div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-emerald-700 mt-3">Apakah ini data Anda? Klik "Hubungkan Akun" untuk melanjutkan.</p>
+                                </div>
+
+                                <form wire:submit="confirmLinkAccount" class="space-y-3">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                            <input type="password" wire:model="password" required placeholder="Min. 8 karakter"
+                                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
+                                            @error('password') <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
+                                            <input type="password" wire:model="password_confirmation" required placeholder="Ulangi password"
+                                                class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button type="button" wire:click="cancelLinkAccount" class="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition">
+                                            <i class="fas fa-times mr-1"></i> Bukan Saya
+                                        </button>
+                                        <button type="submit" wire:loading.attr="disabled" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition disabled:opacity-50">
+                                            <span wire:loading wire:target="confirmLinkAccount"><i class="fas fa-spinner fa-spin"></i></span>
+                                            <span wire:loading.remove wire:target="confirmLinkAccount"><i class="fas fa-link mr-1"></i> Hubungkan Akun</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            @else
                             {{-- Member Form (Livewire) --}}
                             <form x-show="registerType === 'member'" wire:submit="register" class="space-y-3" x-data="memberForm()">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.full_name') }}</label>
-                                    <input type="text" wire:model="name" required placeholder="{{ __('opac.auth.register.full_name_placeholder') }}"
+                                    <input type="text" wire:model.blur="name" required placeholder="{{ __('opac.auth.register.full_name_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('opac.auth.register.email') }}</label>
-                                    <input type="email" wire:model="email" x-model="email" @input="checkEmail()" required placeholder="{{ __('opac.auth.register.email_placeholder') }}"
+                                    <input type="email" wire:model.blur="email" x-model="email" @input="checkEmail()" required placeholder="{{ __('opac.auth.register.email_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 transition">
                                     <p x-show="emailType === 'internal'" class="text-xs text-emerald-600 mt-1"><i class="fas fa-check-circle mr-1"></i>{{ __('opac.auth.register.email_unida_detected') }}</p>
                                     <p x-show="emailType === 'external'" class="text-xs text-blue-600 mt-1"><i class="fas fa-university mr-1"></i>{{ __('opac.auth.register.email_campus_detected') }}</p>
@@ -139,6 +193,7 @@
                                     {{ __('opac.auth.register.register_member_btn') }}
                                 </button>
                             </form>
+                            @endif
 
                             {{-- Staff Form --}}
                             <form x-show="registerType === 'staff'" action="{{ route('opac.register.staff') }}" method="POST" class="space-y-3">

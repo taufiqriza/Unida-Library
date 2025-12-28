@@ -20,12 +20,16 @@ class Register extends Component
     public string $institution_city = '';
     public string $password = '';
     public string $password_confirmation = '';
+    
+    // SIAKAD member detection
+    public ?Member $detectedMember = null;
+    public bool $showConfirmation = false;
 
     protected function rules()
     {
         return [
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:members,email',
+            'email' => 'required|email',
             'phone' => 'nullable|max:20',
             'institution' => 'nullable|max:255',
             'institution_city' => 'nullable|max:100',
@@ -39,9 +43,145 @@ class Register extends Component
         'password.confirmed' => 'Konfirmasi password tidak cocok',
     ];
 
+    public function updatedEmail()
+    {
+        $this->detectSiakadMember();
+    }
+
+    public function updatedName()
+    {
+        // Only check by name if email doesn't match
+        if (!$this->detectedMember) {
+            $this->detectSiakadMember();
+        }
+    }
+
+    protected function detectSiakadMember()
+    {
+        $this->detectedMember = null;
+        $this->showConfirmation = false;
+
+        // 1. Check if email already registered
+        $existingByEmail = Member::where('email', $this->email)->first();
+        if ($existingByEmail) {
+            return; // Will be handled by validation
+        }
+
+        // 2. Extract NIM from campus email (e.g., 432022413017@student.unida.gontor.ac.id)
+        $nim = $this->extractNimFromEmail($this->email);
+        if ($nim) {
+            $member = Member::where('member_id', $nim)->whereNull('email')->first();
+            if ($member) {
+                $this->detectedMember = $member;
+                $this->showConfirmation = true;
+                return;
+            }
+        }
+
+        // 3. Check by exact name match (for SIAKAD members without email)
+        if (strlen($this->name) >= 5) {
+            $member = Member::whereRaw('UPPER(name) = ?', [strtoupper($this->name)])
+                ->whereNull('email')
+                ->where('member_id', 'not like', 'M%') // Exclude manual registrations
+                ->first();
+            if ($member) {
+                $this->detectedMember = $member;
+                $this->showConfirmation = true;
+            }
+        }
+    }
+
+    protected function extractNimFromEmail(string $email): ?string
+    {
+        $campusDomains = [
+            'student.unida.gontor.ac.id', 'student.cs.unida.gontor.ac.id', 
+            'student.iqt.unida.gontor.ac.id', 'student.ilkom.unida.gontor.ac.id',
+            'student.hi.unida.gontor.ac.id', 'student.hes.unida.gontor.ac.id',
+            'student.gizi.unida.gontor.ac.id', 'student.fk.unida.gontor.ac.id',
+            'student.farmasi.unida.gontor.ac.id', 'student.ei.unida.gontor.ac.id',
+            'student.agro.unida.gontor.ac.id', 'student.afi.unida.gontor.ac.id',
+            'student.k3.unida.gontor.ac.id', 'student.mgt.unida.gontor.ac.id',
+            'student.pai.unida.gontor.ac.id', 'student.pba.unida.gontor.ac.id',
+            'student.pm.unida.gontor.ac.id', 'student.saa.unida.gontor.ac.id',
+            'student.tbi.unida.gontor.ac.id', 'student.tip.unida.gontor.ac.id',
+            'mhs.unida.gontor.ac.id', 'stu.unida.gontor.ac.id',
+        ];
+        
+        $domain = strtolower(substr(strrchr($email, '@'), 1));
+        if (in_array($domain, $campusDomains)) {
+            $nim = explode('@', $email)[0];
+            // Validate NIM format (numeric, 9-15 digits)
+            if (preg_match('/^\d{9,15}$/', $nim)) {
+                return $nim;
+            }
+        }
+        return null;
+    }
+
+    public function confirmLinkAccount()
+    {
+        if (!$this->detectedMember) {
+            return;
+        }
+
+        $this->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $otpService = app(OtpService::class);
+        $registrationType = $otpService->detectRegistrationType($this->email);
+        $isTrusted = $registrationType === 'internal';
+
+        // Update existing SIAKAD member
+        $this->detectedMember->update([
+            'email' => $this->email,
+            'phone' => $this->phone ?: $this->detectedMember->phone,
+            'password' => Hash::make($this->password),
+            'profile_completed' => true,
+            'email_verified' => $isTrusted ? 'verified' : 'pending',
+            'email_verified_at' => $isTrusted ? now() : null,
+        ]);
+
+        Log::channel('daily')->info('SIAKAD member linked via registration', [
+            'member_id' => $this->detectedMember->member_id,
+            'email' => $this->email,
+            'ip' => request()->ip(),
+        ]);
+
+        if ($isTrusted) {
+            Auth::guard('member')->login($this->detectedMember);
+            return redirect()->route('opac.member.dashboard')
+                ->with('success', 'Akun berhasil dihubungkan dengan data SIAKAD!');
+        }
+
+        // Send OTP for verification
+        $otpService->sendOtp($this->email, $this->detectedMember->name);
+        session(['pending_member_id' => $this->detectedMember->id]);
+        
+        return redirect()->route('opac.verify-email');
+    }
+
+    public function cancelLinkAccount()
+    {
+        $this->detectedMember = null;
+        $this->showConfirmation = false;
+    }
+
     public function register(OtpService $otpService)
     {
         $this->validate();
+
+        // Check if email already exists
+        if (Member::where('email', $this->email)->exists()) {
+            $this->addError('email', 'Email sudah terdaftar');
+            return;
+        }
+
+        // Re-check SIAKAD detection
+        $this->detectSiakadMember();
+        if ($this->showConfirmation) {
+            return; // Show confirmation dialog
+        }
 
         $registrationType = $otpService->detectRegistrationType($this->email);
         $isTrusted = $registrationType === 'internal';
