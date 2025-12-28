@@ -53,9 +53,11 @@
                         <p class="text-sm text-gray-500 mb-4">{{ auth('member')->user()->member_id }}</p>
                         <p class="text-xs text-gray-400 mb-2">{{ auth('member')->user()->memberType?->name ?? 'Mahasiswa' }}</p>
                         
+                        @if(auth('member')->user()->google_id)
                         <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 text-xs font-medium border border-blue-100">
                             <i class="fab fa-google"></i> Terhubung dengan Google
                         </div>
+                        @endif
                     </div>
                 </div>
 
