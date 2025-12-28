@@ -100,8 +100,8 @@ class EprintsController extends Controller
         $token = Str::random(64);
         $cacheKey = 'eprints_login_' . $token;
         
-        // Store token for 5 minutes
-        Cache::put($cacheKey, ['email' => $member->email, 'created_at' => now()], 300);
+        // Store token for 30 minutes
+        Cache::put($cacheKey, ['email' => $member->email, 'created_at' => now()], 1800);
 
         $eprintsUrl = config('services.eprints.base_url', 'https://repo.unida.gontor.ac.id');
         
