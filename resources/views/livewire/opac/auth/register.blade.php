@@ -68,6 +68,17 @@
                                 <p class="text-gray-500 text-sm" x-text="registerType === 'member' ? '{{ __('opac.auth.register.member_subtitle') }}' : '{{ __('opac.auth.register.staff_subtitle') }}'"></p>
                             </div>
 
+                            {{-- Student Info Notice --}}
+                            <div x-show="registerType === 'member'" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
+                                <div class="flex gap-3">
+                                    <i class="fas fa-graduation-cap text-blue-500 mt-0.5"></i>
+                                    <div class="text-sm text-blue-800">
+                                        <p class="font-medium">Mahasiswa UNIDA Gontor?</p>
+                                        <p class="text-blue-600 mt-1">Gunakan email kampus Anda (contoh: <span class="font-mono text-xs">NIM@student.unida.gontor.ac.id</span>) untuk menghubungkan dengan data SIAKAD secara otomatis.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             {{-- Staff Notice --}}
                             <div x-show="registerType === 'staff'" class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5">
                                 <div class="flex gap-3">
