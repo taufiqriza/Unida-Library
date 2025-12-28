@@ -71,6 +71,7 @@ class VerifyEmail extends Component
         $this->resendInfo = $otpService->canResendOtp($this->member->email);
         
         $this->dispatch('notify', type: 'success', message: 'Kode verifikasi telah dikirim ulang');
+        $this->dispatch('otp-resent');
     }
 
     public function render()

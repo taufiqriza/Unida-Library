@@ -29,8 +29,7 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('opac.verify-email') }}" method="POST" x-data="otpForm()">
-                        @csrf
+                    <form wire:submit="verify" x-data="otpForm()">
                         <div class="mb-5">
                             <label class="block text-sm font-medium text-gray-700 mb-3 text-center">{{ __('opac.auth.verify_email.enter_code') }}</label>
                             <div class="flex justify-center gap-2" dir="ltr">
@@ -43,7 +42,7 @@
                                        class="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition">
                                 @endfor
                             </div>
-                            <input type="hidden" name="otp" x-model="otpValue">
+                            <input type="hidden" wire:model="otp" x-model="otpValue">
                         </div>
 
                         <button type="submit" class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
@@ -116,6 +115,11 @@
             loading: false,
             init() {
                 if (this.countdown > 0) this.startTimer();
+                Livewire.on('otp-resent', () => {
+                    this.countdown = 60;
+                    this.startTimer();
+                    this.loading = false;
+                });
             },
             startTimer() {
                 const interval = setInterval(() => {
@@ -123,26 +127,9 @@
                     if (this.countdown <= 0) clearInterval(interval);
                 }, 1000);
             },
-            async resendOtp() {
+            resendOtp() {
                 this.loading = true;
-                try {
-                    const res = await fetch('{{ route("opac.resend-otp") }}', {
-                        method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        this.countdown = 60;
-                        this.startTimer();
-                        alert('✓ ' + data.message);
-                    } else {
-                        if (data.wait_seconds) this.countdown = data.wait_seconds;
-                        alert('⚠ ' + data.message);
-                    }
-                } catch (e) {
-                    alert('⚠ {{ __("opac.auth.verify_email.resend_failed") }}');
-                }
-                this.loading = false;
+                @this.resendOtp();
             }
         }
     }
