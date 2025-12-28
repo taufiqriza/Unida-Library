@@ -94,6 +94,7 @@ class EprintsController extends Controller
         $member = auth('member')->user();
         
         if (!$member) {
+            \Log::error('EPrints generateLoginToken: No member authenticated');
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -102,6 +103,8 @@ class EprintsController extends Controller
         
         // Store token for 30 minutes
         Cache::put($cacheKey, ['email' => $member->email, 'created_at' => now()], 1800);
+        
+        \Log::info('EPrints token generated', ['email' => $member->email, 'token' => substr($token, 0, 10) . '...']);
 
         $eprintsUrl = config('services.eprints.base_url', 'https://repo.unida.gontor.ac.id');
         
