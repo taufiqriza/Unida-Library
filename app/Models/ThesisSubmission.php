@@ -163,6 +163,11 @@ class ThesisSubmission extends Model
             return true;
         }
 
+        // Cover is always accessible (it's just a book cover image)
+        if ($fileType === 'cover') {
+            return true;
+        }
+
         // Not published yet - only owner and admin
         if (!$this->isPublished()) {
             return false;
@@ -170,7 +175,6 @@ class ThesisSubmission extends Model
 
         // Check visibility settings
         return match($fileType) {
-            'cover' => $this->cover_visible,
             'approval' => $this->approval_visible,
             'preview' => $this->preview_visible,
             'fulltext' => $this->fulltext_visible || $this->allow_fulltext_public,
