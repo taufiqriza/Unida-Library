@@ -260,8 +260,12 @@ class ThesisSubmissionForm extends Component
             $rules['preview_file'] = 'nullable|mimes:pdf|max:20480';
         }
 
-        // Fulltext - always optional
-        $rules['fulltext_file'] = 'nullable|mimes:pdf|max:51200';
+        // Fulltext - required if new or not exists
+        if (!$this->isEdit || !$this->submission?->fulltext_file) {
+            $rules['fulltext_file'] = 'required|mimes:pdf|max:51200';
+        } else {
+            $rules['fulltext_file'] = 'nullable|mimes:pdf|max:51200';
+        }
 
         $this->validate($rules, $this->messages());
 
