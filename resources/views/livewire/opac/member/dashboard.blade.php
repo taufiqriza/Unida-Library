@@ -226,6 +226,7 @@
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
                                     <p class="text-teal-200 text-[10px] lg:text-xs truncate">Kuota: {{ $plagiarismRemaining }}/{{ $plagiarismQuota }}</p>
+                                    <p class="text-teal-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-certificate mr-0.5"></i>Dapatkan sertifikat</p>
                                 </div>
                             </div>
                         </a>
@@ -240,6 +241,7 @@
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-xs lg:text-sm">Upload TA</h3>
                                     <p class="text-violet-200 text-[10px] lg:text-xs truncate">Skripsi/Tesis</p>
+                                    <p class="text-violet-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-file-signature mr-0.5"></i>Surat bebas pustaka</p>
                                 </div>
                             </div>
                         </a>

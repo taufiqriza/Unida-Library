@@ -317,7 +317,10 @@ class SocialAuthController extends Controller
             ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
         );
 
-        $member->update(['google_id' => $googleUser->getId()]);
+        $member->update([
+            'google_id' => $googleUser->getId(),
+            'email' => $googleUser->getEmail(),
+        ]);
 
         Auth::guard('member')->login($member);
         return redirect()->route('opac.member.settings')->with('success', 'Akun Google UNIDA berhasil dihubungkan!');
