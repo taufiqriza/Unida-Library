@@ -4,16 +4,21 @@ namespace App\Livewire\Opac\Member;
 
 use App\Models\ClearanceLetter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Dashboard extends Component
 {
+    use WithFileUploads;
+
     public $member;
     public $loans;
     public $history;
     public $fines;
     public $submissions;
     public $clearanceLetters;
+    public $photo;
 
     public function mount()
     {
@@ -31,6 +36,21 @@ class Dashboard extends Component
             ->with('thesisSubmission')
             ->latest()
             ->get();
+    }
+
+    public function updatedPhoto()
+    {
+        $this->validate(['photo' => 'image|max:2048']);
+        
+        if ($this->member->photo) {
+            Storage::disk('public')->delete($this->member->photo);
+        }
+        
+        $path = $this->photo->store('members/photos', 'public');
+        $this->member->update(['photo' => $path]);
+        $this->photo = null;
+        
+        $this->dispatch('notify', type: 'success', message: 'Foto profil berhasil diperbarui');
     }
 
     public function render()
