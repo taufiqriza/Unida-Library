@@ -285,11 +285,11 @@ class StaffChat extends Component
         if (!$this->activeRoomId || !$base64) return;
         
         // Extract mime type and decode
-        preg_match('#^data:(audio/\w+);base64,#i', $base64, $matches);
+        preg_match('#^data:(audio/[^;]+)#i', $base64, $matches);
         $mimeType = $matches[1] ?? 'audio/webm';
-        $ext = $mimeType === 'audio/mp4' ? 'mp4' : 'webm';
+        $ext = str_contains($mimeType, 'mp4') ? 'mp4' : 'webm';
         
-        $data = base64_decode(preg_replace('#^data:audio/\w+;base64,#i', '', $base64));
+        $data = base64_decode(preg_replace('#^data:[^;]+;base64,#i', '', $base64));
         $filename = 'voice-notes/' . uniqid() . '.' . $ext;
         
         \Storage::disk('public')->makeDirectory('voice-notes');
