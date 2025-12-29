@@ -102,6 +102,7 @@ class SecurityHeaders
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' " . 
                 "https://cdn.jsdelivr.net " .
                 "https://cdnjs.cloudflare.com " .
+                "https://unpkg.com " .
                 "https://www.google.com " .
                 "https://www.gstatic.com " .
                 "https://accounts.google.com " .
@@ -132,6 +133,7 @@ class SecurityHeaders
             // Connect: API calls, Livewire, etc.
             "connect-src 'self' " .
                 "https://api.qrserver.com " .
+                "https://cdn.jsdelivr.net " .
                 "https://accounts.google.com " .
                 "https://www.google-analytics.com " .
                 "https://region1.google-analytics.com " .
