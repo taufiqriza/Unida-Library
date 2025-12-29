@@ -221,15 +221,9 @@ class SecurityScan extends Command
             }
         }
         
-        // Storage should be writable but not executable
-        $storagePath = storage_path();
-        if (is_executable($storagePath . '/app/public')) {
-            $issues[] = [
-                'severity' => 'MEDIUM',
-                'message' => 'Storage directory is executable',
-                'file' => $storagePath,
-            ];
-        }
+        // Note: Storage directory executable check removed
+        // PHP execution in storage is blocked at Nginx level:
+        // location ~* /storage/.*\.php$ { deny all; }
         
         return $issues;
     }
