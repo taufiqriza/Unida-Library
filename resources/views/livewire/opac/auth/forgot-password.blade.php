@@ -72,9 +72,24 @@
                     {{-- Step 2: OTP Verification --}}
                     @if($step === 'otp')
                     <form wire:submit="verifyOtp" class="space-y-4">
-                        <div class="bg-blue-50 border border-blue-200 text-blue-700 text-sm p-3 rounded-xl flex items-start gap-2">
-                            <i class="fas fa-info-circle mt-0.5"></i>
-                            <span>Kode OTP telah dikirim ke <strong>{{ $email }}</strong></span>
+                        <div class="bg-blue-50 border border-blue-200 text-blue-700 text-sm p-3 rounded-xl">
+                            <p class="flex items-start gap-2">
+                                <i class="fas fa-info-circle mt-0.5"></i>
+                                <span>Kode OTP telah dikirim ke <strong>{{ $email }}</strong></span>
+                            </p>
+                            @if($accountType === 'both')
+                            <p class="mt-2 text-xs text-blue-600">
+                                <i class="fas fa-user-friends mr-1"></i> Email terdaftar di Member Portal & Staff Portal
+                            </p>
+                            @elseif($accountType === 'staff')
+                            <p class="mt-2 text-xs text-blue-600">
+                                <i class="fas fa-user-tie mr-1"></i> Akun Staff Portal
+                            </p>
+                            @else
+                            <p class="mt-2 text-xs text-blue-600">
+                                <i class="fas fa-user mr-1"></i> Akun Member Portal
+                            </p>
+                            @endif
                         </div>
 
                         @if($errors->has('otp'))

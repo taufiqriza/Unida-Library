@@ -3,6 +3,7 @@
 namespace App\Livewire\Opac\Auth;
 
 use App\Models\Member;
+use App\Models\User;
 use App\Models\PasswordReset;
 use App\Services\OtpService;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +20,8 @@ class ForgotPassword extends Component
     
     public int $countdown = 0;
     public ?string $resetToken = null;
+    public ?string $accountType = null; // 'member' or 'staff'
+    public ?string $accountName = null;
 
     protected OtpService $otpService;
 
@@ -36,11 +39,29 @@ class ForgotPassword extends Component
             'email.email' => 'Format email tidak valid',
         ]);
 
+        // Check both Member and Staff tables
         $member = Member::where('email', $this->email)->first();
+        $staff = User::where('email', $this->email)
+            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+            ->first();
         
-        if (!$member) {
+        if (!$member && !$staff) {
             $this->addError('email', 'Email tidak terdaftar di sistem kami');
             return;
+        }
+
+        // Determine account type and name
+        if ($member && $staff) {
+            // Email registered in both - prioritize based on context or let user choose
+            // For simplicity, we'll reset both with same password
+            $this->accountType = 'both';
+            $this->accountName = $member->name;
+        } elseif ($member) {
+            $this->accountType = 'member';
+            $this->accountName = $member->name;
+        } else {
+            $this->accountType = 'staff';
+            $this->accountName = $staff->name;
         }
 
         // Check resend cooldown
@@ -56,7 +77,7 @@ class ForgotPassword extends Component
         
         try {
             Mail::send('emails.password-reset', [
-                'name' => $member->name,
+                'name' => $this->accountName,
                 'code' => $otp,
             ], function ($message) {
                 $message->to($this->email)
@@ -127,14 +148,30 @@ class ForgotPassword extends Component
             return;
         }
 
-        // Update password
+        $hashedPassword = Hash::make($this->password);
+        $updated = [];
+
+        // Update Member password if exists
         $member = Member::where('email', $this->email)->first();
-        $member->update(['password' => Hash::make($this->password)]);
+        if ($member) {
+            $member->update(['password' => $hashedPassword]);
+            $updated[] = 'Member Portal';
+        }
+
+        // Update Staff password if exists
+        $staff = User::where('email', $this->email)
+            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+            ->first();
+        if ($staff) {
+            $staff->update(['password' => $hashedPassword]);
+            $updated[] = 'Staff Portal';
+        }
 
         // Cleanup
         $reset->delete();
 
-        session()->flash('success', 'Password berhasil diubah. Silakan login dengan password baru.');
+        $portals = implode(' dan ', $updated);
+        session()->flash('success', "Password berhasil diubah untuk {$portals}. Silakan login dengan password baru.");
         return redirect()->route('login');
     }
 
@@ -149,6 +186,8 @@ class ForgotPassword extends Component
     {
         $this->step = 'email';
         $this->otp = '';
+        $this->accountType = null;
+        $this->accountName = null;
         $this->resetValidation();
     }
 
