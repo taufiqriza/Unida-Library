@@ -492,16 +492,40 @@
                     </div>
 
                     {{-- Voice Recorder --}}
-                    <div x-data="voiceRecorder()" x-init="init()">
+                    <div x-data="voiceRecorder()" x-init="init()" class="relative">
+                        {{-- Mic Button --}}
                         <button type="button" @click="handleMicClick()" 
-                                :class="recording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 hover:bg-gray-200 text-gray-500'"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center transition" 
-                                :title="recording ? 'Stop Recording' : 'Voice Note'">
-                            <i :class="recording ? 'fas fa-stop' : 'fas fa-microphone'" class="text-xs"></i>
+                                x-show="!recording && !hasRecording"
+                                class="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg flex items-center justify-center transition" 
+                                title="Voice Note">
+                            <i class="fas fa-microphone text-xs"></i>
                         </button>
-                        <template x-if="recording">
-                            <span class="text-xs text-red-500 ml-1" x-text="formatTime(recordingTime)"></span>
-                        </template>
+                        
+                        {{-- Recording UI --}}
+                        <div x-show="recording" x-transition class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl">
+                            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            <span class="text-xs font-medium text-red-600" x-text="formatTime(recordingTime)"></span>
+                            <button @click="stopRecording()" class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
+                                <i class="fas fa-stop text-[10px]"></i>
+                            </button>
+                        </div>
+                        
+                        {{-- Preview UI --}}
+                        <div x-show="hasRecording && !recording" x-transition class="flex items-center gap-2 px-2 py-1 bg-blue-50 border border-blue-200 rounded-xl">
+                            <button @click="playPreview()" class="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center">
+                                <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-[10px]"></i>
+                            </button>
+                            <span class="text-xs font-medium text-blue-600" x-text="formatTime(finalDuration)"></span>
+                            <button @click="cancelRecording()" class="w-5 h-5 text-gray-400 hover:text-red-500">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                            <button @click="sendVoice()" class="w-6 h-6 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center">
+                                <i class="fas fa-paper-plane text-[10px]"></i>
+                            </button>
+                        </div>
+                        
+                        {{-- Hidden audio for preview --}}
+                        <audio x-ref="previewAudio" @ended="isPlaying = false" class="hidden"></audio>
                         
                         {{-- Denied Modal --}}
                         <div x-show="showDeniedModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showDeniedModal = false">
@@ -1232,45 +1256,40 @@ Alpine.data('voiceRecorder', () => ({
     recording: false,
     recordingTime: 0,
     mediaRecorder: null,
+    stream: null,
     chunks: [],
     timer: null,
     maxDuration: 180,
     showDeniedModal: false,
+    hasRecording: false,
+    audioBlob: null,
+    audioUrl: null,
+    isPlaying: false,
+    finalDuration: 0,
     
     init() {},
     
     handleMicClick() {
-        if (this.recording) {
-            this.stopRecording();
-        } else {
-            this.startRecording();
-        }
+        this.startRecording();
     },
     
     async startRecording() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             
-            // Check supported mimeType
-            let mimeType = 'audio/webm';
-            if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = 'audio/mp4';
-                if (!MediaRecorder.isTypeSupported(mimeType)) {
-                    mimeType = '';
-                }
-            }
+            let mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 
+                           MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
             
-            this.mediaRecorder = mimeType 
-                ? new MediaRecorder(stream, { mimeType }) 
-                : new MediaRecorder(stream);
+            this.mediaRecorder = mimeType ? new MediaRecorder(this.stream, { mimeType }) : new MediaRecorder(this.stream);
             this.chunks = [];
             
             this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data);
-            this.mediaRecorder.onstop = () => this.sendVoice(stream, this.mediaRecorder.mimeType);
+            this.mediaRecorder.onstop = () => this.onRecordingStop();
             
             this.mediaRecorder.start();
             this.recording = true;
             this.recordingTime = 0;
+            this.hasRecording = false;
             
             this.timer = setInterval(() => {
                 this.recordingTime++;
@@ -1278,30 +1297,53 @@ Alpine.data('voiceRecorder', () => ({
             }, 1000);
         } catch (e) {
             console.error('Mic error:', e.name, e.message);
-            if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
-                this.showDeniedModal = true;
-            } else {
-                alert('Error: ' + e.message);
-            }
+            this.showDeniedModal = e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError';
+            if (!this.showDeniedModal) alert('Error: ' + e.message);
         }
     },
     
     stopRecording() {
         if (this.mediaRecorder && this.recording) {
+            this.finalDuration = this.recordingTime;
             this.mediaRecorder.stop();
             this.recording = false;
             clearInterval(this.timer);
         }
     },
     
-    sendVoice(stream, mimeType) {
-        stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(this.chunks, { type: mimeType || 'audio/webm' });
+    onRecordingStop() {
+        this.stream.getTracks().forEach(t => t.stop());
+        this.audioBlob = new Blob(this.chunks, { type: this.mediaRecorder.mimeType || 'audio/webm' });
+        this.audioUrl = URL.createObjectURL(this.audioBlob);
+        this.$refs.previewAudio.src = this.audioUrl;
+        this.hasRecording = true;
+    },
+    
+    playPreview() {
+        if (this.isPlaying) {
+            this.$refs.previewAudio.pause();
+            this.isPlaying = false;
+        } else {
+            this.$refs.previewAudio.play();
+            this.isPlaying = true;
+        }
+    },
+    
+    cancelRecording() {
+        this.hasRecording = false;
+        this.audioBlob = null;
+        if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
+        this.audioUrl = null;
+        this.finalDuration = 0;
+    },
+    
+    sendVoice() {
         const reader = new FileReader();
         reader.onloadend = () => {
-            this.$wire.sendVoice(reader.result, this.recordingTime);
+            this.$wire.sendVoice(reader.result, this.finalDuration);
+            this.cancelRecording();
         };
-        reader.readAsDataURL(blob);
+        reader.readAsDataURL(this.audioBlob);
     },
     
     formatTime(s) {
