@@ -26,6 +26,9 @@ class AnalyticsDashboard extends Component
     public array $devices = [];
     public array $trafficSources = [];
     
+    // Realtime
+    public array $realtime = [];
+    
     // Visit stats
     public array $visitStats = [];
     public array $visitDaily = [];
@@ -34,6 +37,10 @@ class AnalyticsDashboard extends Component
     public array $visitTopMembers = [];
     public array $visitRecent = [];
     
+    // Hardcoded GA config
+    const GA_PROPERTY_ID = '347806816';
+    const GA_MEASUREMENT_ID = 'G-2P730CT760';
+    
     public function mount()
     {
         $this->checkConfiguration();
@@ -41,10 +48,8 @@ class AnalyticsDashboard extends Component
     
     public function checkConfiguration(): void
     {
-        $propertyId = Setting::get('ga_property_id');
         $serviceAccount = Setting::get('ga_service_account_json');
-        
-        $this->isConfigured = !empty($propertyId) && !empty($serviceAccount);
+        $this->isConfigured = !empty($serviceAccount);
     }
     
     public function loadData()
@@ -70,7 +75,106 @@ class AnalyticsDashboard extends Component
         $this->devices = $data['devices'] ?? [];
         $this->trafficSources = $data['trafficSources'] ?? [];
         
+        // Load realtime separately (no cache)
+        $this->loadRealtime();
+        
         $this->isLoading = false;
+    }
+    
+    public function loadRealtime()
+    {
+        if (!$this->isConfigured) {
+            $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+            return;
+        }
+        
+        try {
+            $serviceAccountJson = Setting::get('ga_service_account_json');
+            $accessToken = $this->getAccessToken($serviceAccountJson);
+            
+            if (!$accessToken) {
+                $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+                return;
+            }
+            
+            $propertyId = self::GA_PROPERTY_ID;
+            
+            // Realtime active users
+            $response = Http::withToken($accessToken)
+                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                    'metrics' => [['name' => 'activeUsers']],
+                ]);
+            
+            $activeUsers = 0;
+            if ($response->successful()) {
+                $data = $response->json();
+                $activeUsers = (int) ($data['rows'][0]['metricValues'][0]['value'] ?? 0);
+            }
+            
+            // Realtime by page
+            $pagesResponse = Http::withToken($accessToken)
+                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                    'dimensions' => [['name' => 'unifiedScreenName']],
+                    'metrics' => [['name' => 'activeUsers']],
+                    'limit' => 5,
+                ]);
+            
+            $pages = [];
+            if ($pagesResponse->successful()) {
+                foreach ($pagesResponse->json()['rows'] ?? [] as $row) {
+                    $pages[] = [
+                        'page' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
+                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    ];
+                }
+            }
+            
+            // Realtime by country
+            $countryResponse = Http::withToken($accessToken)
+                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                    'dimensions' => [['name' => 'country']],
+                    'metrics' => [['name' => 'activeUsers']],
+                    'limit' => 5,
+                ]);
+            
+            $countries = [];
+            if ($countryResponse->successful()) {
+                foreach ($countryResponse->json()['rows'] ?? [] as $row) {
+                    $countries[] = [
+                        'country' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
+                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    ];
+                }
+            }
+            
+            // Realtime by device
+            $deviceResponse = Http::withToken($accessToken)
+                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                    'dimensions' => [['name' => 'deviceCategory']],
+                    'metrics' => [['name' => 'activeUsers']],
+                ]);
+            
+            $devices = [];
+            if ($deviceResponse->successful()) {
+                foreach ($deviceResponse->json()['rows'] ?? [] as $row) {
+                    $devices[] = [
+                        'device' => ucfirst($row['dimensionValues'][0]['value'] ?? 'Unknown'),
+                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    ];
+                }
+            }
+            
+            $this->realtime = [
+                'activeUsers' => $activeUsers,
+                'pages' => $pages,
+                'countries' => $countries,
+                'devices' => $devices,
+            ];
+            
+        } catch (\Exception $e) {
+            \Log::error('GA Realtime Error', ['error' => $e->getMessage()]);
+            $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+        }
     }
     
     public function updatedPeriod()
@@ -82,10 +186,10 @@ class AnalyticsDashboard extends Component
     protected function fetchAnalyticsData(): array
     {
         try {
-            $propertyId = Setting::get('ga_property_id');
+            $propertyId = self::GA_PROPERTY_ID;
             $serviceAccountJson = Setting::get('ga_service_account_json');
             
-            if (empty($propertyId) || empty($serviceAccountJson)) {
+            if (empty($serviceAccountJson)) {
                 return $this->getDemoData();
             }
             

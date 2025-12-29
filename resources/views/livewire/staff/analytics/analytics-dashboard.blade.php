@@ -25,6 +25,64 @@
     @if($activeTab === 'online')
     {{-- ONLINE TAB --}}
     <div wire:init="loadData">
+        {{-- Realtime Section --}}
+        @if($isConfigured && !empty($realtime))
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 mb-6 text-white" wire:poll.30s="loadRealtime">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                    <h3 class="font-bold text-lg">Realtime</h3>
+                </div>
+                <span class="text-xs text-green-100">Update setiap 30 detik</span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-green-100 text-xs mb-1">Pengunjung Aktif</p>
+                    <p class="text-4xl font-bold">{{ $realtime['activeUsers'] ?? 0 }}</p>
+                </div>
+                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-green-100 text-xs mb-2">Halaman Aktif</p>
+                    <div class="space-y-1">
+                        @forelse(array_slice($realtime['pages'] ?? [], 0, 3) as $page)
+                        <div class="flex justify-between text-sm">
+                            <span class="truncate flex-1 text-green-50">{{ Str::limit($page['page'], 20) }}</span>
+                            <span class="font-bold ml-2">{{ $page['users'] }}</span>
+                        </div>
+                        @empty
+                        <p class="text-green-200 text-xs">-</p>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-green-100 text-xs mb-2">Negara</p>
+                    <div class="space-y-1">
+                        @forelse(array_slice($realtime['countries'] ?? [], 0, 3) as $country)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-green-50">{{ $country['country'] }}</span>
+                            <span class="font-bold">{{ $country['users'] }}</span>
+                        </div>
+                        @empty
+                        <p class="text-green-200 text-xs">-</p>
+                        @endforelse
+                    </div>
+                </div>
+                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                    <p class="text-green-100 text-xs mb-2">Perangkat</p>
+                    <div class="space-y-1">
+                        @forelse($realtime['devices'] ?? [] as $device)
+                        <div class="flex justify-between text-sm">
+                            <span class="text-green-50">{{ $device['device'] }}</span>
+                            <span class="font-bold">{{ $device['users'] }}</span>
+                        </div>
+                        @empty
+                        <p class="text-green-200 text-xs">-</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="flex items-center gap-3 mb-6">
             <select wire:model.live="period" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
                 <option value="7d">7 Hari Terakhir</option>
