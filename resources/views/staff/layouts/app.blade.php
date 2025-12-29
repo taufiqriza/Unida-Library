@@ -716,30 +716,21 @@
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeGlobalImage();});
     </script>
     
+    {{-- Global Voice Bar (outside Livewire) --}}
+    <div id="globalVoiceBar" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-80"></div>
+    
     {{-- Global Voice Recorder --}}
     <script>
     window.VoiceRecorder = {
-        recording: false,
-        hasRecording: false,
-        mediaRecorder: null,
-        stream: null,
-        chunks: [],
-        timer: null,
-        recordingTime: 0,
-        finalDuration: 0,
-        audioBlob: null,
-        audioUrl: null,
-        audio: new Audio(),
-        isPlaying: false,
-        wire: null,
+        recording: false, hasRecording: false, mediaRecorder: null, stream: null, chunks: [], timer: null,
+        recordingTime: 0, finalDuration: 0, audioBlob: null, audioUrl: null, audio: new Audio(), isPlaying: false, wire: null,
         
         init(wire) { this.wire = wire; },
         
         start() {
             navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
                 this.stream = stream;
-                let mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-                this.mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+                this.mediaRecorder = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4' });
                 this.chunks = [];
                 this.mediaRecorder.ondataavailable = e => { if(e.data.size > 0) this.chunks.push(e.data); };
                 this.mediaRecorder.onstop = () => this.onStop();
@@ -751,57 +742,26 @@
             }).catch(e => alert('Tidak dapat mengakses mikrofon'));
         },
         
-        stop() {
-            if(this.mediaRecorder && this.recording) {
-                this.finalDuration = this.recordingTime;
-                this.mediaRecorder.stop();
-                this.recording = false;
-                clearInterval(this.timer);
-            }
-        },
+        stop() { if(this.mediaRecorder && this.recording) { this.finalDuration = this.recordingTime; this.mediaRecorder.stop(); this.recording = false; clearInterval(this.timer); } },
         
-        onStop() {
-            this.stream.getTracks().forEach(t => t.stop());
-            this.audioBlob = new Blob(this.chunks, { type: this.mediaRecorder.mimeType });
-            this.audioUrl = URL.createObjectURL(this.audioBlob);
-            this.audio.src = this.audioUrl;
-            this.hasRecording = true;
-            this.showBar();
-        },
+        onStop() { this.stream.getTracks().forEach(t => t.stop()); this.audioBlob = new Blob(this.chunks, { type: this.mediaRecorder.mimeType }); this.audioUrl = URL.createObjectURL(this.audioBlob); this.audio.src = this.audioUrl; this.hasRecording = true; this.showBar(); },
         
-        play() {
-            if(this.isPlaying) { this.audio.pause(); this.isPlaying = false; }
-            else { this.audio.play(); this.isPlaying = true; }
-            this.audio.onended = () => { this.isPlaying = false; this.showBar(); };
-            this.showBar();
-        },
+        play() { if(this.isPlaying) { this.audio.pause(); this.isPlaying = false; } else { this.audio.play(); this.isPlaying = true; } this.audio.onended = () => { this.isPlaying = false; this.showBar(); }; this.showBar(); },
         
-        cancel() {
-            if(this.recording) { this.mediaRecorder?.stop(); this.stream?.getTracks().forEach(t => t.stop()); clearInterval(this.timer); this.recording = false; }
-            this.hasRecording = false;
-            if(this.audioUrl) URL.revokeObjectURL(this.audioUrl);
-            this.audioBlob = null;
-            this.audioUrl = null;
-            this.hideBar();
-        },
+        cancel() { if(this.recording) { this.mediaRecorder?.stop(); this.stream?.getTracks().forEach(t => t.stop()); clearInterval(this.timer); this.recording = false; } this.hasRecording = false; if(this.audioUrl) URL.revokeObjectURL(this.audioUrl); this.audioBlob = null; this.audioUrl = null; this.hideBar(); },
         
-        send() {
-            const reader = new FileReader();
-            reader.onloadend = () => { this.wire?.sendVoice(reader.result, this.finalDuration); this.cancel(); };
-            reader.readAsDataURL(this.audioBlob);
-        },
+        send() { const reader = new FileReader(); reader.onloadend = () => { this.wire?.sendVoice(reader.result, this.finalDuration); this.cancel(); }; reader.readAsDataURL(this.audioBlob); },
         
         showBar() {
             const bar = document.getElementById('globalVoiceBar');
-            if(!bar) return;
             bar.classList.remove('hidden');
             bar.innerHTML = this.recording ? 
-                `<div class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl"><div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div><span id="vTime" class="text-sm font-bold text-red-600">${this.fmt(this.recordingTime)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.stop()" class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button></div>` :
-                `<div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl"><button onclick="VoiceRecorder.play()" class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-${this.isPlaying?'pause':'play'} text-xs"></i></button><span class="text-sm font-bold text-blue-600">${this.fmt(this.finalDuration)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.send()" class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button></div>`;
+                `<div class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl shadow-lg"><div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div><span id="vTime" class="text-sm font-bold text-red-600">${this.fmt(this.recordingTime)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.stop()" class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button></div>` :
+                `<div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl shadow-lg"><button onclick="VoiceRecorder.play()" class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-${this.isPlaying?'pause':'play'} text-xs"></i></button><span class="text-sm font-bold text-blue-600">${this.fmt(this.finalDuration)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.send()" class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button></div>`;
         },
         
         updateTime() { const el = document.getElementById('vTime'); if(el) el.textContent = this.fmt(this.recordingTime); },
-        hideBar() { const bar = document.getElementById('globalVoiceBar'); if(bar) bar.classList.add('hidden'); },
+        hideBar() { document.getElementById('globalVoiceBar').classList.add('hidden'); },
         fmt(s) { return Math.floor(s/60).toString().padStart(2,'0') + ':' + (s%60).toString().padStart(2,'0'); }
     };
     </script>

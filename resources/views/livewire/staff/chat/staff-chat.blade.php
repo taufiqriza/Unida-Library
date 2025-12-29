@@ -431,9 +431,6 @@
             </div>
             @endif
             
-            {{-- Voice Bar (above form) --}}
-            <div id="globalVoiceBar" class="hidden mb-2"></div>
-            
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
                 <div class="relative" x-data="{ showEmoji: false }">
