@@ -1284,10 +1284,12 @@ Alpine.data('voiceRecorder', () => ({
             this.mediaRecorder = mimeType ? new MediaRecorder(this.stream, { mimeType }) : new MediaRecorder(this.stream);
             this.chunks = [];
             
-            this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data);
+            this.mediaRecorder.ondataavailable = e => {
+                if (e.data.size > 0) this.chunks.push(e.data);
+            };
             this.mediaRecorder.onstop = () => this.onRecordingStop();
             
-            this.mediaRecorder.start();
+            this.mediaRecorder.start(1000); // collect data every 1 second
             this.recording = true;
             this.recordingTime = 0;
             this.hasRecording = false;
