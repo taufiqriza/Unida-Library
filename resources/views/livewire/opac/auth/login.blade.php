@@ -119,7 +119,10 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('opac.auth.login.password') }}</label>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('opac.auth.login.password') }}</label>
+                                        <a href="{{ route('opac.forgot-password') }}" class="text-xs text-primary-600 hover:text-primary-700 font-medium">Lupa Password?</a>
+                                    </div>
                                     <div class="relative" x-data="{ show: false }">
                                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                             <i class="fas fa-lock"></i>
