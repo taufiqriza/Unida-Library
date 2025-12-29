@@ -287,6 +287,9 @@ class StaffChat extends Component
         // Decode and save
         $data = base64_decode(preg_replace('#^data:audio/\w+;base64,#i', '', $base64));
         $filename = 'voice-notes/' . uniqid() . '.webm';
+        
+        // Ensure directory exists
+        \Storage::disk('public')->makeDirectory('voice-notes');
         \Storage::disk('public')->put($filename, $data);
         
         $chatMessage = ChatMessage::create([
