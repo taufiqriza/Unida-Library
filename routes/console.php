@@ -61,3 +61,6 @@ Schedule::command('kubuku:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+
+// Cleanup old voice notes (older than 5 months) daily at 4:00 AM
+Schedule::command('voice:cleanup')->dailyAt('04:00');

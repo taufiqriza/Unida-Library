@@ -8,11 +8,13 @@ class ChatMessage extends Model
 {
     protected $fillable = [
         'chat_room_id', 'sender_id', 'message', 'attachment', 
-        'attachment_type', 'attachment_name', 'type', 'is_deleted', 'task_id', 'book_id'
+        'attachment_type', 'attachment_name', 'type', 'is_deleted', 'task_id', 'book_id',
+        'voice_path', 'voice_duration'
     ];
 
     protected $casts = [
         'is_deleted' => 'boolean',
+        'voice_duration' => 'integer',
     ];
 
     // Relationships

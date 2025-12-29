@@ -28,6 +28,7 @@ class StaffChat extends Component
     public $selectedBranch = null;
     public $message = '';
     public $attachment;
+    public $voiceNote;
     public $messages = [];
     public $searchQuery = '';
     
@@ -152,7 +153,7 @@ class StaffChat extends Component
         // Get latest 50 messages (ordered by newest first, then reverse for display)
         $this->messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->where('is_deleted', false)
-            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'type', 'created_at'])
+            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'type', 'voice_path', 'voice_duration', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',
                 'sender.branch:id,name',
@@ -247,7 +248,7 @@ class StaffChat extends Component
         $roomName = $room->isDirect() ? $sender->name : $room->name;
         $msgPreview = $message->message 
             ? \Str::limit($message->message, 50) 
-            : ($message->attachment ? '📎 File' : ($message->task_id ? '📋 Task' : '📚 Buku'));
+            : ($message->voice_path ? '🎤 Voice note' : ($message->attachment ? '📎 File' : ($message->task_id ? '📋 Task' : '📚 Buku')));
         
         // Create notification for each member
         foreach ($memberIds as $userId) {
@@ -277,6 +278,33 @@ class StaffChat extends Component
     public function removeAttachment()
     {
         $this->attachment = null;
+    }
+
+    public function sendVoice($base64, $duration)
+    {
+        if (!$this->activeRoomId || !$base64) return;
+        
+        // Decode and save
+        $data = base64_decode(preg_replace('#^data:audio/\w+;base64,#i', '', $base64));
+        $filename = 'voice-notes/' . uniqid() . '.webm';
+        \Storage::disk('public')->put($filename, $data);
+        
+        $chatMessage = ChatMessage::create([
+            'chat_room_id' => $this->activeRoomId,
+            'sender_id' => auth()->id(),
+            'voice_path' => $filename,
+            'voice_duration' => min($duration, 180), // max 3 min
+            'type' => 'voice',
+        ]);
+
+        ChatRoomMember::where('chat_room_id', $this->activeRoomId)
+            ->where('user_id', auth()->id())
+            ->update(['last_read_at' => now()]);
+
+        $this->sendChatNotifications($chatMessage);
+        cache()->forget("chat_rooms_" . auth()->id());
+        $this->loadMessages();
+        $this->dispatch('scrollToBottom');
     }
 
     // Task Picker Methods

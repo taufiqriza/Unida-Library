@@ -250,6 +250,16 @@
                                 @endif
                             </div>
                             @endif
+
+                            {{-- Voice Note --}}
+                            @if($msg['voice_path'])
+                            <div class="mb-1 flex items-center gap-2 px-3 py-2 {{ $msg['sender_id'] === auth()->id() ? 'bg-blue-500/20' : 'bg-gray-100' }} rounded-xl">
+                                <audio controls class="h-8 max-w-[200px]">
+                                    <source src="{{ asset('storage/' . $msg['voice_path']) }}" type="audio/webm">
+                                </audio>
+                                <span class="text-xs text-gray-500">{{ gmdate('i:s', $msg['voice_duration'] ?? 0) }}</span>
+                            </div>
+                            @endif
                             
                             {{-- Message Bubble --}}
                             @if($msg['message'])
@@ -479,6 +489,19 @@
                                 <i class="fas fa-book text-green-500 w-4"></i> Buku
                             </button>
                         </div>
+                    </div>
+
+                    {{-- Voice Recorder --}}
+                    <div x-data="voiceRecorder()" x-init="init()">
+                        <button type="button" @click="toggleRecording()" 
+                                :class="recording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 hover:bg-gray-200 text-gray-500'"
+                                class="w-8 h-8 rounded-lg flex items-center justify-center transition" 
+                                :title="recording ? 'Stop Recording' : 'Voice Note'">
+                            <i :class="recording ? 'fas fa-stop' : 'fas fa-microphone'" class="text-xs"></i>
+                        </button>
+                        <template x-if="recording">
+                            <span class="text-xs text-red-500 ml-1" x-text="formatTime(recordingTime)"></span>
+                        </template>
                     </div>
                     
                     <button type="submit" class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
@@ -1185,3 +1208,70 @@
     </div>
     @endif
 </div>
+
+@script
+<script>
+Alpine.data('voiceRecorder', () => ({
+    recording: false,
+    recordingTime: 0,
+    mediaRecorder: null,
+    chunks: [],
+    timer: null,
+    maxDuration: 180,
+    
+    init() {},
+    
+    async toggleRecording() {
+        if (this.recording) {
+            this.stopRecording();
+        } else {
+            await this.startRecording();
+        }
+    },
+    
+    async startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            this.chunks = [];
+            
+            this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data);
+            this.mediaRecorder.onstop = () => this.sendVoice(stream);
+            
+            this.mediaRecorder.start();
+            this.recording = true;
+            this.recordingTime = 0;
+            
+            this.timer = setInterval(() => {
+                this.recordingTime++;
+                if (this.recordingTime >= this.maxDuration) this.stopRecording();
+            }, 1000);
+        } catch (e) {
+            alert('Tidak dapat mengakses mikrofon');
+        }
+    },
+    
+    stopRecording() {
+        if (this.mediaRecorder && this.recording) {
+            this.mediaRecorder.stop();
+            this.recording = false;
+            clearInterval(this.timer);
+        }
+    },
+    
+    sendVoice(stream) {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(this.chunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            this.$wire.sendVoice(reader.result, this.recordingTime);
+        };
+        reader.readAsDataURL(blob);
+    },
+    
+    formatTime(s) {
+        return Math.floor(s/60).toString().padStart(2,'0') + ':' + (s%60).toString().padStart(2,'0');
+    }
+}));
+</script>
+@endscript
