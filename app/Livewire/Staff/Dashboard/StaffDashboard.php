@@ -3,6 +3,7 @@
 namespace App\Livewire\Staff\Dashboard;
 
 use App\Models\Book;
+use App\Models\Branch;
 use App\Models\Fine;
 use App\Models\Item;
 use App\Models\Loan;
@@ -14,8 +15,15 @@ class StaffDashboard extends Component
 {
     public array $stats = [];
     public array $chartData = [];
+    public ?int $selectedBranchId = null;
 
     public function mount()
+    {
+        $this->selectedBranchId = $this->getBranchId();
+        $this->loadData();
+    }
+
+    public function updatedSelectedBranchId()
     {
         $this->loadData();
     }
@@ -23,7 +31,10 @@ class StaffDashboard extends Component
     protected function getBranchId(): ?int
     {
         $user = auth()->user();
-        return $user->branch_id ?? session('staff_branch_id') ?? 1;
+        if ($user->role === 'super_admin' && $this->selectedBranchId) {
+            return $this->selectedBranchId;
+        }
+        return $user->branch_id ?? 1;
     }
 
     public function loadData()
@@ -154,9 +165,14 @@ class StaffDashboard extends Component
 
     public function render()
     {
+        $user = auth()->user();
+        $branches = $user->role === 'super_admin' ? Branch::orderBy('name')->get() : collect();
+        
         return view('livewire.staff.dashboard.staff-dashboard', [
             'recentLoans' => $this->recentLoans,
             'overdueLoans' => $this->overdueLoans,
+            'branches' => $branches,
+            'isSuperAdmin' => $user->role === 'super_admin',
         ])->extends('staff.layouts.app')->section('content');
     }
 }
