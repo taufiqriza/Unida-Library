@@ -419,30 +419,90 @@
             </div>
             @endif
             
-            <form wire:submit="sendMessage" class="flex items-center gap-2">
+            <form wire:submit="sendMessage" class="flex items-center gap-2" x-data="chatInput()">
+                {{-- Emoji Picker --}}
+                <div class="relative" x-data="{ showEmoji: false }">
+                    <button type="button" @click="showEmoji = !showEmoji" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
+                        <i class="fas fa-smile text-gray-500 text-xs"></i>
+                    </button>
+                    <div x-show="showEmoji" @click.away="showEmoji = false" x-transition
+                         class="absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                        <div class="grid grid-cols-8 gap-1">
+                            @foreach(['😀','😂','😊','😍','🥰','😎','🤔','😅','😢','😭','😤','😱','🙏','👍','👎','👏','🎉','❤️','🔥','⭐','✅','❌','📚','📖','💡','🎯','📝','💪'] as $emoji)
+                            <button type="button" @click="insertEmoji('{{ $emoji }}'); showEmoji = false" 
+                                    class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-lg">{{ $emoji }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="flex-1 relative">
                     <textarea wire:model="message" 
+                              x-ref="messageInput"
                               placeholder="Ketik pesan..." 
                               rows="1"
                               class="w-full px-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm resize-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition"
+                              @paste="handlePaste($event)"
                               onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); $wire.sendMessage(); }"></textarea>
                 </div>
+                
                 <div class="flex items-center gap-1 flex-shrink-0">
-                    <label class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center cursor-pointer transition" title="Attach File">
-                        <i class="fas fa-image text-gray-500 text-xs"></i>
-                        <input type="file" wire:model="attachment" class="hidden" accept="image/*,.pdf,.doc,.docx">
-                    </label>
-                    <button type="button" wire:click="openTaskPicker" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Attach Task">
-                        <i class="fas fa-clipboard-list text-gray-500 text-xs"></i>
-                    </button>
-                    <button type="button" wire:click="openBookPicker" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Share Buku">
-                        <i class="fas fa-book text-gray-500 text-xs"></i>
-                    </button>
+                    {{-- More Options Dropdown --}}
+                    <div class="relative" x-data="{ open: false }">
+                        <button type="button" @click="open = !open" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Lainnya">
+                            <i class="fas fa-ellipsis-v text-gray-500 text-xs"></i>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition
+                             class="absolute bottom-10 right-0 bg-white rounded-xl shadow-xl border py-1 z-50 w-40">
+                            <label class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700">
+                                <i class="fas fa-image text-blue-500 w-4"></i> Gambar
+                                <input type="file" wire:model="attachment" class="hidden" accept="image/*,.pdf,.doc,.docx" @change="open = false">
+                            </label>
+                            <button type="button" wire:click="openTaskPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-sm text-gray-700 text-left">
+                                <i class="fas fa-clipboard-list text-violet-500 w-4"></i> Task
+                            </button>
+                            <button type="button" wire:click="openBookPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-sm text-gray-700 text-left">
+                                <i class="fas fa-book text-green-500 w-4"></i> Buku
+                            </button>
+                        </div>
+                    </div>
+                    
                     <button type="submit" class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
                         <i class="fas fa-paper-plane text-xs"></i>
                     </button>
                 </div>
             </form>
+            
+            <script>
+            function chatInput() {
+                return {
+                    insertEmoji(emoji) {
+                        const input = this.$refs.messageInput;
+                        const start = input.selectionStart;
+                        const end = input.selectionEnd;
+                        const text = input.value;
+                        input.value = text.substring(0, start) + emoji + text.substring(end);
+                        input.selectionStart = input.selectionEnd = start + emoji.length;
+                        input.dispatchEvent(new Event('input'));
+                        input.focus();
+                    },
+                    handlePaste(e) {
+                        const items = e.clipboardData?.items;
+                        if (!items) return;
+                        for (let item of items) {
+                            if (item.type.indexOf('image') !== -1) {
+                                e.preventDefault();
+                                const file = item.getAsFile();
+                                const dt = new DataTransfer();
+                                dt.items.add(file);
+                                this.$wire.uploadAttachment(file);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            </script>
         </div>
 
         {{-- Task Picker Modal --}}

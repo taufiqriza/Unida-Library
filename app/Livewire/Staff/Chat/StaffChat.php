@@ -70,6 +70,12 @@ class StaffChat extends Component
         $this->updateOnlineStatus();
     }
 
+    public function uploadAttachment($file)
+    {
+        // Handle pasted image from clipboard
+        $this->attachment = $file;
+    }
+
     public function updateOnlineStatus()
     {
         auth()->user()->update([
