@@ -363,9 +363,6 @@
 
         {{-- Input Area --}}
         <div class="p-3 border-t border-gray-100 bg-white flex-shrink-0">
-            {{-- Voice Bar Container --}}
-            <div id="voiceBarContainer"></div>
-            
             {{-- Attachment Preview --}}
             @if($attachment)
             <div class="mb-2 p-2 bg-gray-50 rounded-lg flex items-center justify-between">
@@ -496,7 +493,7 @@
                     </div>
 
                     {{-- Voice Recorder --}}
-                    <div x-data="voiceRecorder()" x-init="init()" class="flex items-center gap-1">
+                    <div x-data="voiceRecorder()" x-init="init()" class="flex items-center gap-1" wire:ignore>
                         {{-- Mic Button --}}
                         <button type="button" @click="handleMicClick()" 
                                 x-show="!recording && !hasRecording"
@@ -505,44 +502,33 @@
                             <i class="fas fa-microphone text-xs"></i>
                         </button>
                         
-                        {{-- Recording/Preview Bar - above form --}}
-                        <template x-teleport="#voiceBarContainer">
-                            <div x-show="recording || hasRecording" x-transition class="mb-2">
-                                {{-- Recording UI --}}
-                                <div x-show="recording" class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl">
-                                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse flex-shrink-0"></div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="text-xs text-red-600 font-medium">Merekam...</div>
-                                        <div class="text-sm font-bold text-red-700" x-text="formatTime(recordingTime)"></div>
-                                    </div>
-                                    <button @click="cancelRecording()" class="w-8 h-8 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                    <button @click="stopRecording()" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-stop text-xs"></i>
-                                    </button>
-                                </div>
-                                
-                                {{-- Preview UI --}}
-                                <div x-show="hasRecording && !recording" class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
-                                    <button @click="playPreview()" class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-xs"></i>
-                                    </button>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="text-xs text-blue-600">Voice Note</div>
-                                        <div class="text-sm font-bold text-blue-700" x-text="formatTime(finalDuration)"></div>
-                                    </div>
-                                    <button @click="cancelRecording()" class="w-8 h-8 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </template>
+                        {{-- Recording UI --}}
+                        <div x-show="recording" x-transition class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl">
+                            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            <span class="text-xs font-medium text-red-600" x-text="formatTime(recordingTime)"></span>
+                            <button type="button" @click="cancelRecording()" class="w-6 h-6 text-gray-400 hover:text-red-500">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                            <button type="button" @click="stopRecording()" class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
+                                <i class="fas fa-stop text-[10px]"></i>
+                            </button>
+                        </div>
                         
-                        {{-- Hidden audio for preview --}}
+                        {{-- Preview UI --}}
+                        <div x-show="hasRecording && !recording" x-transition class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl">
+                            <button type="button" @click="playPreview()" class="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center">
+                                <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-[10px]"></i>
+                            </button>
+                            <span class="text-xs font-medium text-blue-600" x-text="formatTime(finalDuration)"></span>
+                            <button type="button" @click="cancelRecording()" class="w-6 h-6 text-gray-400 hover:text-red-500">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        {{-- Hidden audio --}}
                         <audio x-ref="previewAudio" @ended="isPlaying = false" class="hidden"></audio>
                         
-                        {{-- Main Send Button --}}
+                        {{-- Send Button --}}
                         <button type="button" 
                                 @click="hasRecording ? sendVoice() : $wire.sendMessage()"
                                 class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
@@ -557,11 +543,11 @@
                                         <i class="fas fa-microphone-slash text-red-600 text-2xl"></i>
                                     </div>
                                     <h3 class="font-bold text-lg text-gray-800 mb-2">Akses Ditolak</h3>
-                                    <p class="text-sm text-gray-500 mb-2">Mikrofon diblokir. Untuk mengaktifkan:</p>
-                                    <p class="text-xs text-gray-400">Klik ikon 🔒 di address bar → Site settings → Microphone → Allow</p>
+                                    <p class="text-sm text-gray-500 mb-2">Mikrofon diblokir.</p>
+                                    <p class="text-xs text-gray-400">Klik 🔒 → Site settings → Microphone → Allow</p>
                                 </div>
                                 <div class="border-t">
-                                    <button @click="showDeniedModal = false" class="w-full py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">Mengerti</button>
+                                    <button @click="showDeniedModal = false" class="w-full py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">OK</button>
                                 </div>
                             </div>
                         </div>
