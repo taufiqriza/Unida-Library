@@ -431,6 +431,9 @@
             </div>
             @endif
             
+            {{-- Voice Bar (above form) --}}
+            <div id="voiceBar" class="hidden mb-2"></div>
+            
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
                 <div class="relative" x-data="{ showEmoji: false }">
@@ -494,61 +497,21 @@
 
                     {{-- Voice Recorder --}}
                     <div x-data="voiceRecorder()" x-init="init()" class="flex items-center gap-1" wire:ignore>
-                        {{-- Mic Button --}}
-                        <button type="button" @click="handleMicClick()" 
-                                x-show="!recording && !hasRecording"
-                                class="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg flex items-center justify-center transition" 
-                                title="Voice Note">
+                        <button type="button" @click="handleMicClick()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg flex items-center justify-center transition" title="Voice Note">
                             <i class="fas fa-microphone text-xs"></i>
                         </button>
-                        
-                        {{-- Recording UI --}}
-                        <div x-show="recording" x-transition class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl">
-                            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                            <span class="text-xs font-medium text-red-600" x-text="formatTime(recordingTime)"></span>
-                            <button type="button" @click="cancelRecording()" class="w-6 h-6 text-gray-400 hover:text-red-500">
-                                <i class="fas fa-trash text-xs"></i>
-                            </button>
-                            <button type="button" @click="stopRecording()" class="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
-                                <i class="fas fa-stop text-[10px]"></i>
-                            </button>
-                        </div>
-                        
-                        {{-- Preview UI --}}
-                        <div x-show="hasRecording && !recording" x-transition class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl">
-                            <button type="button" @click="playPreview()" class="w-6 h-6 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center">
-                                <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-[10px]"></i>
-                            </button>
-                            <span class="text-xs font-medium text-blue-600" x-text="formatTime(finalDuration)"></span>
-                            <button type="button" @click="cancelRecording()" class="w-6 h-6 text-gray-400 hover:text-red-500">
-                                <i class="fas fa-trash text-xs"></i>
-                            </button>
-                        </div>
-                        
-                        {{-- Hidden audio --}}
-                        <audio x-ref="previewAudio" @ended="isPlaying = false" class="hidden"></audio>
-                        
-                        {{-- Send Button --}}
-                        <button type="button" 
-                                @click="hasRecording ? sendVoice() : $wire.sendMessage()"
-                                class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
+                        <button type="submit" class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
                             <i class="fas fa-paper-plane text-xs"></i>
                         </button>
+                        <audio x-ref="previewAudio" @ended="isPlaying = false" class="hidden"></audio>
                         
                         {{-- Denied Modal --}}
                         <div x-show="showDeniedModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showDeniedModal = false">
-                            <div class="bg-white rounded-2xl shadow-2xl w-80 overflow-hidden" @click.stop>
-                                <div class="p-6 text-center">
-                                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-microphone-slash text-red-600 text-2xl"></i>
-                                    </div>
-                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Akses Ditolak</h3>
-                                    <p class="text-sm text-gray-500 mb-2">Mikrofon diblokir.</p>
-                                    <p class="text-xs text-gray-400">Klik 🔒 → Site settings → Microphone → Allow</p>
-                                </div>
-                                <div class="border-t">
-                                    <button @click="showDeniedModal = false" class="w-full py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">OK</button>
-                                </div>
+                            <div class="bg-white rounded-2xl shadow-2xl w-80 p-6 text-center" @click.stop>
+                                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-microphone-slash text-red-600 text-2xl"></i></div>
+                                <h3 class="font-bold text-lg mb-2">Akses Ditolak</h3>
+                                <p class="text-sm text-gray-500 mb-4">Klik 🔒 → Site settings → Microphone → Allow</p>
+                                <button @click="showDeniedModal = false" class="px-6 py-2 bg-blue-600 text-white rounded-lg">OK</button>
                             </div>
                         </div>
                     </div>
@@ -1292,19 +1255,59 @@ Alpine.data('voiceRecorder', () => ({
             };
             this.mediaRecorder.onstop = () => this.onRecordingStop();
             
-            this.mediaRecorder.start(1000); // collect data every 1 second
+            this.mediaRecorder.start(1000);
             this.recording = true;
             this.recordingTime = 0;
             this.hasRecording = false;
+            this.showBar();
             
             this.timer = setInterval(() => {
                 this.recordingTime++;
+                this.updateBar();
                 if (this.recordingTime >= this.maxDuration) this.stopRecording();
             }, 1000);
         } catch (e) {
             console.error('Mic error:', e.name, e.message);
             this.showDeniedModal = e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError';
             if (!this.showDeniedModal) alert('Error: ' + e.message);
+        }
+    },
+    
+    showBar() {
+        const bar = document.getElementById('voiceBar');
+        if (bar) {
+            bar.classList.remove('hidden');
+            bar.innerHTML = this.getBarHTML();
+        }
+    },
+    
+    updateBar() {
+        const timeEl = document.getElementById('voiceTime');
+        if (timeEl) timeEl.textContent = this.formatTime(this.recordingTime);
+    },
+    
+    hideBar() {
+        const bar = document.getElementById('voiceBar');
+        if (bar) bar.classList.add('hidden');
+    },
+    
+    getBarHTML() {
+        if (this.recording) {
+            return `<div class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl">
+                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                <span id="voiceTime" class="text-sm font-bold text-red-600">${this.formatTime(this.recordingTime)}</span>
+                <div class="flex-1"></div>
+                <button type="button" onclick="window.vr.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                <button type="button" onclick="window.vr.stop()" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button>
+            </div>`;
+        } else {
+            return `<div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
+                <button type="button" onclick="window.vr.play()" class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center"><i class="${this.isPlaying ? 'fas fa-pause' : 'fas fa-play'} text-xs"></i></button>
+                <span class="text-sm font-bold text-blue-600">${this.formatTime(this.finalDuration)}</span>
+                <div class="flex-1"></div>
+                <button type="button" onclick="window.vr.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                <button type="button" onclick="window.vr.send()" class="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button>
+            </div>`;
         }
     },
     
@@ -1323,6 +1326,7 @@ Alpine.data('voiceRecorder', () => ({
         this.audioUrl = URL.createObjectURL(this.audioBlob);
         this.$refs.previewAudio.src = this.audioUrl;
         this.hasRecording = true;
+        this.showBar();
     },
     
     playPreview() {
@@ -1333,14 +1337,22 @@ Alpine.data('voiceRecorder', () => ({
             this.$refs.previewAudio.play();
             this.isPlaying = true;
         }
+        this.showBar();
     },
     
     cancelRecording() {
+        if (this.recording) {
+            this.mediaRecorder?.stop();
+            this.stream?.getTracks().forEach(t => t.stop());
+            clearInterval(this.timer);
+            this.recording = false;
+        }
         this.hasRecording = false;
         this.audioBlob = null;
         if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
         this.audioUrl = null;
         this.finalDuration = 0;
+        this.hideBar();
     },
     
     sendVoice() {
@@ -1356,5 +1368,20 @@ Alpine.data('voiceRecorder', () => ({
         return Math.floor(s/60).toString().padStart(2,'0') + ':' + (s%60).toString().padStart(2,'0');
     }
 }));
+
+// Global reference for onclick handlers
+document.addEventListener('alpine:init', () => {
+    Alpine.effect(() => {
+        const el = document.querySelector('[x-data*="voiceRecorder"]');
+        if (el && el._x_dataStack) {
+            window.vr = {
+                stop: () => el._x_dataStack[0].stopRecording(),
+                cancel: () => el._x_dataStack[0].cancelRecording(),
+                play: () => el._x_dataStack[0].playPreview(),
+                send: () => el._x_dataStack[0].sendVoice()
+            };
+        }
+    });
+});
 </script>
 @endscript
