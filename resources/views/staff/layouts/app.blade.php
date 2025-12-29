@@ -717,7 +717,7 @@
     </script>
     
     {{-- Global Voice Bar (outside Livewire) --}}
-    <div id="globalVoiceBar" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-80"></div>
+    <div id="globalVoiceBar" class="hidden"></div>
     
     {{-- Global Voice Recorder --}}
     <script>
@@ -753,15 +753,18 @@
         send() { const reader = new FileReader(); reader.onloadend = () => { this.wire?.sendVoice(reader.result, this.finalDuration); this.cancel(); }; reader.readAsDataURL(this.audioBlob); },
         
         showBar() {
-            const bar = document.getElementById('globalVoiceBar');
-            bar.classList.remove('hidden');
+            let bar = document.getElementById('globalVoiceBar');
+            // Move bar above chat form if anchor exists
+            const anchor = document.getElementById('voiceBarAnchor');
+            if(anchor && bar.parentNode !== anchor) anchor.appendChild(bar);
+            bar.className = 'mb-2';
             bar.innerHTML = this.recording ? 
                 `<div class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl shadow-lg"><div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div><span id="vTime" class="text-sm font-bold text-red-600">${this.fmt(this.recordingTime)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.stop()" class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button></div>` :
                 `<div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl shadow-lg"><button onclick="VoiceRecorder.play()" class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-${this.isPlaying?'pause':'play'} text-xs"></i></button><span class="text-sm font-bold text-blue-600">${this.fmt(this.finalDuration)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.send()" class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button></div>`;
         },
         
         updateTime() { const el = document.getElementById('vTime'); if(el) el.textContent = this.fmt(this.recordingTime); },
-        hideBar() { document.getElementById('globalVoiceBar').classList.add('hidden'); },
+        hideBar() { document.getElementById('globalVoiceBar').className = 'hidden'; },
         fmt(s) { return Math.floor(s/60).toString().padStart(2,'0') + ':' + (s%60).toString().padStart(2,'0'); }
     };
     </script>
