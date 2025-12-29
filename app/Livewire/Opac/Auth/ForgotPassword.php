@@ -135,7 +135,7 @@ class ForgotPassword extends Component
         $reset->delete();
 
         session()->flash('success', 'Password berhasil diubah. Silakan login dengan password baru.');
-        return redirect()->route('opac.login');
+        return redirect()->route('login');
     }
 
     public function resendOtp()

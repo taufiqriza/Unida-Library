@@ -179,7 +179,7 @@
 
                     {{-- Back to Login --}}
                     <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-                        <a href="{{ route('opac.login') }}" class="text-sm text-gray-500 hover:text-primary-600">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-500 hover:text-primary-600">
                             <i class="fas fa-arrow-left mr-1"></i> Kembali ke Login
                         </a>
                     </div>
