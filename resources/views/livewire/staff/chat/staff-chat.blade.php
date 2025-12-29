@@ -420,17 +420,16 @@
             </div>
             @endif
             
-            <form wire:submit="sendMessage" class="flex items-center gap-2" x-data="chatInput()">
+            <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
-                <div class="relative">
-                    <button type="button" @click="showEmoji = !showEmoji" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
+                <div class="relative" id="emojiContainer">
+                    <button type="button" onclick="toggleEmoji()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
                         <i class="fas fa-smile text-gray-500 text-xs"></i>
                     </button>
-                    <div x-show="showEmoji" @click.outside="showEmoji = false" x-transition
-                         class="absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-72 max-h-56 overflow-y-auto">
+                    <div id="emojiPicker" class="hidden absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-72 max-h-56 overflow-y-auto">
                         <div class="grid grid-cols-9 gap-1">
-                            @foreach(['😀','😃','😄','😁','😂','🤣','😊','😇','🙂','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😜','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','☹️','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','👍','👎','👏','🙌','🤝','🙏','💪','🎉','🎊','❤️','🧡','💛','💚','💙','💜','🖤','🤍','💯','✅','❌','⭐','🔥','💡','📚','📖','📝','🎯','💼','📌','🔔','💬','💭'] as $emoji)
-                            <button type="button" @click="insertEmoji('{{ $emoji }}')" 
+                            @foreach(['😀','😃','😄','😁','😂','🤣','😊','😇','🙂','😉','😍','🥰','😘','😋','😛','😜','🤔','😏','😒','🙄','😴','😎','🤓','🥳','😢','😭','😤','😡','👍','👎','👏','🙌','🤝','🙏','💪','🎉','❤️','🔥','⭐','✅','❌','💯','📚','📖','📝','🎯','💡','💬'] as $emoji)
+                            <button type="button" onclick="addEmoji('{{ $emoji }}')" 
                                     class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">{{ $emoji }}</button>
                             @endforeach
                         </div>
@@ -439,12 +438,11 @@
                 
                 <div class="flex-1 relative">
                     <textarea wire:model="message" 
-                              x-ref="messageInput"
+                              id="chatMessageInput"
                               placeholder="Ketik pesan..." 
                               rows="1"
                               class="w-full px-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm resize-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition"
-                              @paste="handlePaste($event)"
-                              onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); $wire.sendMessage(); }"></textarea>
+                              onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); @this.sendMessage(); }"></textarea>
                 </div>
                 
                 <div class="flex items-center gap-1 flex-shrink-0">
@@ -478,17 +476,6 @@
             function chatInput() {
                 return {
                     showEmoji: false,
-                    insertEmoji(emoji) {
-                        const input = this.$refs.messageInput;
-                        const start = input.selectionStart;
-                        const end = input.selectionEnd;
-                        const text = input.value;
-                        input.value = text.substring(0, start) + emoji + text.substring(end);
-                        input.selectionStart = input.selectionEnd = start + emoji.length;
-                        input.dispatchEvent(new Event('input'));
-                        input.focus();
-                        this.$wire.set('message', input.value);
-                    },
                     handlePaste(e) {
                         const items = e.clipboardData?.items;
                         if (!items) return;
@@ -496,8 +483,6 @@
                             if (item.type.indexOf('image') !== -1) {
                                 e.preventDefault();
                                 const file = item.getAsFile();
-                                const dt = new DataTransfer();
-                                dt.items.add(file);
                                 this.$wire.uploadAttachment(file);
                                 break;
                             }
@@ -505,6 +490,32 @@
                     }
                 }
             }
+            
+            function toggleEmoji() {
+                const picker = document.getElementById('emojiPicker');
+                picker.classList.toggle('hidden');
+            }
+            
+            function addEmoji(emoji) {
+                const input = document.getElementById('chatMessageInput');
+                const start = input.selectionStart;
+                const end = input.selectionEnd;
+                const text = input.value;
+                input.value = text.substring(0, start) + emoji + text.substring(end);
+                input.selectionStart = input.selectionEnd = start + emoji.length;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.focus();
+                document.getElementById('emojiPicker').classList.add('hidden');
+            }
+            
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', function(e) {
+                const container = document.getElementById('emojiContainer');
+                const picker = document.getElementById('emojiPicker');
+                if (container && picker && !container.contains(e.target)) {
+                    picker.classList.add('hidden');
+                }
+            });
             </script>
         </div>
 
@@ -1205,28 +1216,24 @@
     </div>
     @endif
 
-    {{-- Image Preview Modal --}}
-    <div id="imagePreviewModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/90" onclick="if(event.target === this) closeImagePreview()">
-        <button onclick="closeImagePreview()" class="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white text-2xl transition z-10">
-            <i class="fas fa-times"></i>
-        </button>
-        <img id="previewImage" src="" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl object-contain">
+    {{-- Image Preview Modal - Outside main container --}}
+    <div id="imagePreviewModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.9); align-items:center; justify-content:center;">
+        <button onclick="closeImagePreview()" style="position:absolute; top:20px; right:20px; width:48px; height:48px; background:rgba(255,255,255,0.2); border:none; border-radius:50%; color:white; font-size:24px; cursor:pointer;">✕</button>
+        <img id="previewImage" src="" style="max-width:90vw; max-height:90vh; border-radius:8px; object-fit:contain;">
     </div>
 
     <script>
         function showImagePreview(src) {
-            const modal = document.getElementById('imagePreviewModal');
+            var modal = document.getElementById('imagePreviewModal');
             document.getElementById('previewImage').src = src;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
+            modal.style.display = 'flex';
         }
         function closeImagePreview() {
-            const modal = document.getElementById('imagePreviewModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = '';
+            document.getElementById('imagePreviewModal').style.display = 'none';
         }
+        document.getElementById('imagePreviewModal').addEventListener('click', function(e) {
+            if (e.target === this) closeImagePreview();
+        });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeImagePreview();
         });
