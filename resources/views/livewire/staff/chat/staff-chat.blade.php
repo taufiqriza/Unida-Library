@@ -1341,8 +1341,10 @@ Alpine.data('voiceRecorder', () => ({
     },
     
     sendVoice() {
+        console.log('Blob size:', this.audioBlob.size, 'type:', this.audioBlob.type);
         const reader = new FileReader();
         reader.onloadend = () => {
+            console.log('Base64 length:', reader.result.length, 'prefix:', reader.result.substring(0, 50));
             this.$wire.sendVoice(reader.result, this.finalDuration);
             this.cancelRecording();
         };
