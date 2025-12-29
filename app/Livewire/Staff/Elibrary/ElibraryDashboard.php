@@ -110,20 +110,22 @@ class ElibraryDashboard extends Component
         
         // Auto-create clearance letter if member has no active loans and fines
         if ($member && !$hasWarnings) {
-            \App\Models\ClearanceLetter::updateOrCreate(
-                [
+            $existingLetter = \App\Models\ClearanceLetter::where('member_id', $member->id)
+                ->where('thesis_submission_id', $this->selectedItem->id)
+                ->first();
+            
+            if (!$existingLetter) {
+                \App\Models\ClearanceLetter::create([
                     'member_id' => $member->id,
                     'thesis_submission_id' => $this->selectedItem->id,
-                ],
-                [
                     'letter_number' => \App\Models\ClearanceLetter::generateLetterNumber(),
                     'purpose' => 'Bebas Pustaka - ' . ucfirst($this->selectedItem->type),
                     'status' => 'approved',
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                     'notes' => 'Otomatis disetujui bersamaan dengan persetujuan tugas akhir.',
-                ]
-            );
+                ]);
+            }
         }
         
         $message = 'Submission disetujui';
