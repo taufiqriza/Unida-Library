@@ -48,12 +48,12 @@ class ElibraryDashboard extends Component
 
     /**
      * Check if current user can review thesis submissions
-     * Only Super Admin and Admin can review (not regular Librarian)
+     * Super Admin, Admin, and Librarian can review
      */
     public function canReviewThesis(): bool
     {
         $user = auth()->user();
-        return $user->isAdmin(); // Super Admin or Admin only
+        return in_array($user->role, ['super_admin', 'admin', 'librarian']);
     }
 
     public function viewDetail($id, $type)
