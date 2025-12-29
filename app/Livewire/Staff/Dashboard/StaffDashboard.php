@@ -19,7 +19,9 @@ class StaffDashboard extends Component
 
     public function mount()
     {
-        $this->selectedBranchId = $this->getBranchId();
+        $user = auth()->user();
+        // Super admin default: null (semua cabang), others: their branch
+        $this->selectedBranchId = $user->role === 'super_admin' ? null : $user->branch_id;
         $this->loadData();
     }
 
@@ -28,77 +30,99 @@ class StaffDashboard extends Component
         $this->loadData();
     }
 
-    protected function getBranchId(): ?int
-    {
-        $user = auth()->user();
-        if ($user->role === 'super_admin' && $this->selectedBranchId) {
-            return $this->selectedBranchId;
-        }
-        return $user->branch_id ?? 1;
-    }
-
     public function loadData()
     {
-        $branchId = $this->getBranchId();
+        $user = auth()->user();
+        $branchId = $user->role === 'super_admin' ? $this->selectedBranchId : $user->branch_id;
+        $cacheKey = $branchId ?? 'all';
 
         // Cache stats for 2 minutes
-        $this->stats = cache()->remember("dashboard_stats_{$branchId}", 120, function () use ($branchId) {
+        $this->stats = cache()->remember("dashboard_stats_{$cacheKey}", 120, function () use ($branchId) {
             $startOfMonth = now()->startOfMonth();
+            
+            $loanQuery = Loan::query();
+            $bookQuery = Book::query();
+            $itemQuery = Item::query();
+            $memberQuery = Member::query();
+            $fineQuery = Fine::query();
+            
+            if ($branchId) {
+                $loanQuery->where('branch_id', $branchId);
+                $bookQuery->where('branch_id', $branchId);
+                $itemQuery->where('branch_id', $branchId);
+                $memberQuery->where('branch_id', $branchId);
+                $fineQuery->whereHas('loan', fn($q) => $q->where('branch_id', $branchId));
+            }
+            
             return [
-                'loans_month' => Loan::where('branch_id', $branchId)->where('loan_date', '>=', $startOfMonth)->count(),
-                'returns_month' => Loan::where('branch_id', $branchId)->where('return_date', '>=', $startOfMonth)->count(),
-                'overdue' => Loan::where('branch_id', $branchId)->where('is_returned', false)->where('due_date', '<', now())->count(),
-                'unpaid_fines' => Fine::whereHas('loan', fn($q) => $q->where('branch_id', $branchId))->where('is_paid', false)->sum('amount'),
-                'total_books' => Book::where('branch_id', $branchId)->count(),
-                'total_items' => Item::where('branch_id', $branchId)->count(),
-                'total_members' => Member::where('branch_id', $branchId)->count(),
-                'active_loans' => Loan::where('branch_id', $branchId)->where('is_returned', false)->count(),
+                'loans_month' => (clone $loanQuery)->where('loan_date', '>=', $startOfMonth)->count(),
+                'returns_month' => (clone $loanQuery)->whereNotNull('return_date')->where('return_date', '>=', $startOfMonth)->count(),
+                'overdue' => (clone $loanQuery)->where('is_returned', false)->where('due_date', '<', now())->count(),
+                'unpaid_fines' => (clone $fineQuery)->where('is_paid', false)->sum('amount'),
+                'total_books' => $bookQuery->count(),
+                'total_items' => $itemQuery->count(),
+                'total_members' => $memberQuery->count(),
+                'active_loans' => (clone $loanQuery)->where('is_returned', false)->count(),
             ];
         });
 
         // Cache chart data for 10 minutes
-        $this->chartData = cache()->remember("dashboard_chart_{$branchId}", 600, function () use ($branchId) {
+        $this->chartData = cache()->remember("dashboard_chart_{$cacheKey}", 600, function () use ($branchId) {
             return $this->getChartData($branchId);
         });
     }
 
+    protected function getCurrentBranchId(): ?int
+    {
+        $user = auth()->user();
+        return $user->role === 'super_admin' ? $this->selectedBranchId : $user->branch_id;
+    }
+
     public function getRecentLoansProperty()
     {
-        $branchId = $this->getBranchId();
+        $branchId = $this->getCurrentBranchId();
+        $cacheKey = $branchId ?? 'all';
         
-        return cache()->remember("recent_loans_{$branchId}", 60, function () use ($branchId) {
-            return Loan::query()
-                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date', 'is_returned'])
+        return cache()->remember("recent_loans_{$cacheKey}", 60, function () use ($branchId) {
+            $query = Loan::query()
+                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date', 'is_returned', 'branch_id'])
                 ->with([
                     'member:id,name',
                     'item:id,book_id,barcode',
-                    'item.book:id,title'
-                ])
-                ->where('branch_id', $branchId)
-                ->latest('loan_date')
-                ->limit(10)
-                ->get();
+                    'item.book:id,title',
+                    'branch:id,name'
+                ]);
+            
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+            
+            return $query->latest('loan_date')->limit(10)->get();
         });
     }
 
     public function getOverdueLoansProperty()
     {
-        $branchId = $this->getBranchId();
+        $branchId = $this->getCurrentBranchId();
+        $cacheKey = $branchId ?? 'all';
         
-        return cache()->remember("overdue_loans_{$branchId}", 60, function () use ($branchId) {
-            return Loan::query()
-                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date'])
+        return cache()->remember("overdue_loans_{$cacheKey}", 60, function () use ($branchId) {
+            $query = Loan::query()
+                ->select(['id', 'member_id', 'item_id', 'loan_date', 'due_date', 'branch_id'])
                 ->with([
                     'member:id,name',
                     'item:id,book_id,barcode',
-                    'item.book:id,title'
+                    'item.book:id,title',
+                    'branch:id,name'
                 ])
-                ->where('branch_id', $branchId)
                 ->where('is_returned', false)
-                ->where('due_date', '<', now())
-                ->orderBy('due_date')
-                ->limit(5)
-                ->get();
+                ->where('due_date', '<', now());
+            
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+            
+            return $query->orderBy('due_date')->limit(5)->get();
         });
     }
 
@@ -108,14 +132,19 @@ class StaffDashboard extends Component
         $endDate = Carbon::now()->endOfDay();
         
         // Single query for daily data
-        $dailyLoans = Loan::where('branch_id', $branchId)
+        $loanQuery = Loan::query();
+        if ($branchId) {
+            $loanQuery->where('branch_id', $branchId);
+        }
+        
+        $dailyLoans = (clone $loanQuery)
             ->whereBetween('loan_date', [$startDate, $endDate])
             ->selectRaw('DATE(loan_date) as date, COUNT(*) as count')
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
             
-        $dailyReturns = Loan::where('branch_id', $branchId)
+        $dailyReturns = (clone $loanQuery)
             ->whereBetween('return_date', [$startDate, $endDate])
             ->selectRaw('DATE(return_date) as date, COUNT(*) as count')
             ->groupBy('date')
@@ -135,7 +164,7 @@ class StaffDashboard extends Component
         }
 
         // Single query for monthly data
-        $monthlyLoans = Loan::where('branch_id', $branchId)
+        $monthlyLoans = (clone $loanQuery)
             ->whereYear('loan_date', now()->year)
             ->selectRaw('MONTH(loan_date) as month, COUNT(*) as count')
             ->groupBy('month')

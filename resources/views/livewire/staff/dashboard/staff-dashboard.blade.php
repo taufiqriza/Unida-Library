@@ -21,7 +21,7 @@
             <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition shadow-sm">
                     <i class="fas fa-building text-blue-500"></i>
-                    <span class="max-w-[150px] truncate">{{ $branches->firstWhere('id', $selectedBranchId)?->name ?? 'Semua Cabang' }}</span>
+                    <span class="max-w-[150px] truncate">{{ $selectedBranchId ? $branches->firstWhere('id', $selectedBranchId)?->name : 'Semua Cabang' }}</span>
                     <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform" :class="{ 'rotate-180': open }"></i>
                 </button>
                 <div x-show="open" @click.away="open = false" x-transition
@@ -29,6 +29,18 @@
                     <div class="px-3 py-2 border-b border-gray-100">
                         <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Pilih Cabang</p>
                     </div>
+                    {{-- All Branches Option --}}
+                    <button wire:click="$set('selectedBranchId', null)" @click="open = false"
+                            class="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-50 transition flex items-center gap-3 {{ !$selectedBranchId ? 'bg-blue-50 text-blue-700' : 'text-gray-700' }}">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ !$selectedBranchId ? 'bg-blue-100' : 'bg-gray-100' }}">
+                            <i class="fas fa-globe text-xs {{ !$selectedBranchId ? 'text-blue-600' : 'text-gray-500' }}"></i>
+                        </div>
+                        <span class="flex-1">Semua Cabang</span>
+                        @if(!$selectedBranchId)
+                        <i class="fas fa-check text-blue-600 text-xs"></i>
+                        @endif
+                    </button>
+                    <div class="border-t border-gray-100 my-1"></div>
                     @foreach($branches as $branch)
                     <button wire:click="$set('selectedBranchId', {{ $branch->id }})" @click="open = false"
                             class="w-full px-3 py-2.5 text-left text-sm hover:bg-blue-50 transition flex items-center gap-3 {{ $selectedBranchId == $branch->id ? 'bg-blue-50 text-blue-700' : 'text-gray-700' }}">
