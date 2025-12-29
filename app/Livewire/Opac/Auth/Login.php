@@ -31,6 +31,8 @@ class Login extends Component
 
     public function login()
     {
+        \Log::info('LOGIN CALLED', ['identifier' => $this->identifier]);
+        
         $this->validate();
 
         $staff = null;
