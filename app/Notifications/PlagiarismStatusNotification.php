@@ -5,8 +5,8 @@ namespace App\Notifications;
 use App\Models\PlagiarismCheck;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 
 class PlagiarismStatusNotification extends Notification implements ShouldQueue
 {
@@ -19,24 +19,28 @@ class PlagiarismStatusNotification extends Notification implements ShouldQueue
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        $message = (new MailMessage)
-            ->subject("Hasil Cek Plagiasi - Perpustakaan UNIDA")
-            ->greeting("Assalamu'alaikum {$notifiable->name},");
+        $data = [
+            'name' => $notifiable->name,
+            'status' => $this->check->status,
+            'documentTitle' => $this->check->title ?? $this->check->document_title ?? 'Dokumen',
+            'score' => $this->check->similarity_score ?? 0,
+            'errorMessage' => $this->check->error_message,
+            'detailUrl' => url('/member/plagiarism/' . $this->check->id),
+        ];
 
-        if ($this->check->status === 'completed') {
-            $similarity = $this->check->similarity_score ?? 0;
-            $message->line("Pengecekan plagiasi dokumen Anda telah **selesai**.")
-                ->line("**Dokumen:** {$this->check->title}")
-                ->line("**Tingkat Kemiripan:** {$similarity}%")
-                ->action('Lihat Hasil', url("/member/plagiarism/{$this->check->id}"));
-        } else {
-            $message->line("Status pengecekan plagiasi: **" . ucfirst($this->check->status) . "**")
-                ->line("**Dokumen:** {$this->check->title}")
-                ->action('Lihat Detail', url("/member/plagiarism/{$this->check->id}"));
-        }
+        $score = $this->check->similarity_score ?? 0;
+        
+        Mail::send('emails.plagiarism-result', $data, function ($message) use ($notifiable, $score) {
+            $subject = $this->check->status === 'completed' 
+                ? "📊 Hasil Cek Plagiasi: {$score}% - UNIDA Library"
+                : "❌ Cek Plagiasi Gagal - UNIDA Library";
+            
+            $message->to($notifiable->email)
+                ->subject($subject);
+        });
 
-        return $message->line('Terima kasih telah menggunakan layanan Perpustakaan UNIDA Gontor.');
+        return null;
     }
 }

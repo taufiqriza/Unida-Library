@@ -121,6 +121,46 @@ class TestAllEmails extends Command
             $this->error('   ✗ Failed: ' . $e->getMessage());
         }
 
+        sleep(2);
+
+        // 7. Plagiarism Result - Completed (Low)
+        $this->info('7. Sending Plagiarism Result (Low Score) email...');
+        try {
+            Mail::send('emails.plagiarism-result', [
+                'name' => 'Test User',
+                'status' => 'completed',
+                'documentTitle' => 'Implementasi Machine Learning untuk Deteksi Plagiarisme',
+                'score' => 12,
+                'errorMessage' => null,
+                'detailUrl' => url('/member/plagiarism/1'),
+            ], function ($m) use ($email) {
+                $m->to($email)->subject('📊 Hasil Cek Plagiasi: 12% - UNIDA Library');
+            });
+            $this->info('   ✓ Plagiarism Result (Low) email sent');
+        } catch (\Exception $e) {
+            $this->error('   ✗ Failed: ' . $e->getMessage());
+        }
+
+        sleep(2);
+
+        // 8. Plagiarism Result - Completed (High)
+        $this->info('8. Sending Plagiarism Result (High Score) email...');
+        try {
+            Mail::send('emails.plagiarism-result', [
+                'name' => 'Test User',
+                'status' => 'completed',
+                'documentTitle' => 'Analisis Pengaruh Media Sosial Terhadap Perilaku Konsumen',
+                'score' => 45,
+                'errorMessage' => null,
+                'detailUrl' => url('/member/plagiarism/2'),
+            ], function ($m) use ($email) {
+                $m->to($email)->subject('📊 Hasil Cek Plagiasi: 45% - UNIDA Library');
+            });
+            $this->info('   ✓ Plagiarism Result (High) email sent');
+        } catch (\Exception $e) {
+            $this->error('   ✗ Failed: ' . $e->getMessage());
+        }
+
         $this->newLine();
         $this->info('✅ All test emails sent! Check your inbox.');
     }
