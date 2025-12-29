@@ -1289,11 +1289,23 @@ Alpine.data('voiceRecorder', () => ({
     async startRecording() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            
+            // Check supported mimeType
+            let mimeType = 'audio/webm';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'audio/mp4';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = '';
+                }
+            }
+            
+            this.mediaRecorder = mimeType 
+                ? new MediaRecorder(stream, { mimeType }) 
+                : new MediaRecorder(stream);
             this.chunks = [];
             
             this.mediaRecorder.ondataavailable = e => this.chunks.push(e.data);
-            this.mediaRecorder.onstop = () => this.sendVoice(stream);
+            this.mediaRecorder.onstop = () => this.sendVoice(stream, this.mediaRecorder.mimeType);
             
             this.mediaRecorder.start();
             this.recording = true;
@@ -1304,6 +1316,7 @@ Alpine.data('voiceRecorder', () => ({
                 if (this.recordingTime >= this.maxDuration) this.stopRecording();
             }, 1000);
         } catch (e) {
+            console.error('Mic error:', e);
             this.showDeniedModal = true;
         }
     },
@@ -1316,9 +1329,9 @@ Alpine.data('voiceRecorder', () => ({
         }
     },
     
-    sendVoice(stream) {
+    sendVoice(stream, mimeType) {
         stream.getTracks().forEach(t => t.stop());
-        const blob = new Blob(this.chunks, { type: 'audio/webm' });
+        const blob = new Blob(this.chunks, { type: mimeType || 'audio/webm' });
         const reader = new FileReader();
         reader.onloadend = () => {
             this.$wire.sendVoice(reader.result, this.recordingTime);
