@@ -704,5 +704,16 @@
 
     {{-- Filament Notifications --}}
     @livewire('notifications')
+    
+    {{-- Global Image Preview Modal --}}
+    <div id="globalImageModal" onclick="if(event.target===this)closeGlobalImage()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.9);justify-content:center;align-items:center;">
+        <img id="globalImageSrc" style="max-width:90vw;max-height:90vh;border-radius:8px;">
+        <button onclick="closeGlobalImage()" style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,0.2);border:none;width:44px;height:44px;border-radius:50%;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <script>
+    function openGlobalImage(src){document.getElementById('globalImageSrc').src=src;document.getElementById('globalImageModal').style.display='flex';}
+    function closeGlobalImage(){document.getElementById('globalImageModal').style.display='none';}
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeGlobalImage();});
+    </script>
 </body>
 </html>

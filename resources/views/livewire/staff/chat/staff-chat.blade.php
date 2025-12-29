@@ -238,7 +238,7 @@
                                 @if($msg['attachment_type'] === 'image')
                                 <img src="{{ asset('storage/' . $msg['attachment']) }}" 
                                      class="rounded-xl max-w-full cursor-pointer hover:opacity-90 transition" 
-                                     onclick="showImagePreview(this.src)"
+                                     onclick="openGlobalImage(this.src)"
                                      alt="Image">
                                 @else
                                 <a href="{{ asset('storage/' . $msg['attachment']) }}" 
@@ -422,17 +422,12 @@
             
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
-                <div class="relative" id="emojiContainer">
-                    <button type="button" onclick="toggleEmoji()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
+                <div class="relative" wire:ignore>
+                    <button type="button" id="emojiBtn" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
                         <i class="fas fa-smile text-gray-500 text-xs"></i>
                     </button>
                     <div id="emojiPicker" class="hidden absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-72 max-h-56 overflow-y-auto">
-                        <div class="grid grid-cols-9 gap-1">
-                            @foreach(['😀','😃','😄','😁','😂','🤣','😊','😇','🙂','😉','😍','🥰','😘','😋','😛','😜','🤔','😏','😒','🙄','😴','😎','🤓','🥳','😢','😭','😤','😡','👍','👎','👏','🙌','🤝','🙏','💪','🎉','❤️','🔥','⭐','✅','❌','💯','📚','📖','📝','🎯','💡','💬'] as $emoji)
-                            <button type="button" onclick="addEmoji('{{ $emoji }}')" 
-                                    class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">{{ $emoji }}</button>
-                            @endforeach
-                        </div>
+                        <div class="grid grid-cols-9 gap-1" id="emojiGrid"></div>
                     </div>
                 </div>
                 
@@ -473,49 +468,43 @@
             </form>
             
             <script>
-            function chatInput() {
-                return {
-                    showEmoji: false,
-                    handlePaste(e) {
-                        const items = e.clipboardData?.items;
-                        if (!items) return;
-                        for (let item of items) {
-                            if (item.type.indexOf('image') !== -1) {
-                                e.preventDefault();
-                                const file = item.getAsFile();
-                                this.$wire.uploadAttachment(file);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            function toggleEmoji() {
+            (function(){
+                const emojis = ['😀','😃','😄','😁','😂','🤣','😊','😇','🙂','😉','😍','🥰','😘','😋','😛','😜','🤔','😏','😒','🙄','😴','😎','🤓','🥳','😢','😭','😤','😡','👍','👎','👏','🙌','🤝','🙏','💪','🎉','❤️','🔥','⭐','✅','❌','💯','📚','📖','📝','🎯','💡','💬'];
+                const grid = document.getElementById('emojiGrid');
                 const picker = document.getElementById('emojiPicker');
-                picker.classList.toggle('hidden');
-            }
+                const btn = document.getElementById('emojiBtn');
+                
+                if(grid && !grid.hasChildNodes()){
+                    emojis.forEach(e => {
+                        const b = document.createElement('button');
+                        b.type = 'button';
+                        b.className = 'w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base';
+                        b.textContent = e;
+                        b.onclick = function(){ addEmojiToChat(e); };
+                        grid.appendChild(b);
+                    });
+                }
+                
+                if(btn) btn.onclick = function(){ picker.classList.toggle('hidden'); };
+                
+                document.addEventListener('click', function(e){
+                    if(picker && btn && !picker.contains(e.target) && !btn.contains(e.target)){
+                        picker.classList.add('hidden');
+                    }
+                });
+            })();
             
-            function addEmoji(emoji) {
+            function addEmojiToChat(emoji){
                 const input = document.getElementById('chatMessageInput');
-                const start = input.selectionStart;
-                const end = input.selectionEnd;
-                const text = input.value;
-                input.value = text.substring(0, start) + emoji + text.substring(end);
-                input.selectionStart = input.selectionEnd = start + emoji.length;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
+                if(!input) return;
+                const pos = input.selectionStart || 0;
+                const val = input.value;
+                input.value = val.slice(0,pos) + emoji + val.slice(pos);
                 input.focus();
+                input.selectionStart = input.selectionEnd = pos + emoji.length;
+                input.dispatchEvent(new Event('input',{bubbles:true}));
                 document.getElementById('emojiPicker').classList.add('hidden');
             }
-            
-            // Close emoji picker when clicking outside
-            document.addEventListener('click', function(e) {
-                const container = document.getElementById('emojiContainer');
-                const picker = document.getElementById('emojiPicker');
-                if (container && picker && !container.contains(e.target)) {
-                    picker.classList.add('hidden');
-                }
-            });
             </script>
         </div>
 
@@ -1215,27 +1204,4 @@
         </div>
     </div>
     @endif
-
-    {{-- Image Preview Modal - Outside main container --}}
-    <div id="imagePreviewModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.9); align-items:center; justify-content:center;">
-        <button onclick="closeImagePreview()" style="position:absolute; top:20px; right:20px; width:48px; height:48px; background:rgba(255,255,255,0.2); border:none; border-radius:50%; color:white; font-size:24px; cursor:pointer;">✕</button>
-        <img id="previewImage" src="" style="max-width:90vw; max-height:90vh; border-radius:8px; object-fit:contain;">
-    </div>
-
-    <script>
-        function showImagePreview(src) {
-            var modal = document.getElementById('imagePreviewModal');
-            document.getElementById('previewImage').src = src;
-            modal.style.display = 'flex';
-        }
-        function closeImagePreview() {
-            document.getElementById('imagePreviewModal').style.display = 'none';
-        }
-        document.getElementById('imagePreviewModal').addEventListener('click', function(e) {
-            if (e.target === this) closeImagePreview();
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeImagePreview();
-        });
-    </script>
 </div>
