@@ -494,7 +494,7 @@
 
                     {{-- Voice Recorder - wraps mic button and main send --}}
                     <div x-data="voiceRecorder()" x-init="init()" class="flex items-center gap-1">
-                        {{-- Mic Button --}}
+                        {{-- Mic Button - hidden when recording --}}
                         <button type="button" @click="handleMicClick()" 
                                 x-show="!recording && !hasRecording"
                                 class="w-8 h-8 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg flex items-center justify-center transition" 
@@ -502,43 +502,35 @@
                             <i class="fas fa-microphone text-xs"></i>
                         </button>
                         
-                        {{-- Recording/Preview Bar - appears above input --}}
-                        <div x-show="recording || hasRecording" x-transition
-                             class="absolute bottom-full left-0 right-0 mb-2 mx-3">
-                            {{-- Recording UI --}}
-                            <div x-show="recording" class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl">
-                                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                                <div class="flex-1">
-                                    <div class="text-xs text-red-600 font-medium">Merekam...</div>
-                                    <div class="text-sm font-bold text-red-700" x-text="formatTime(recordingTime)"></div>
-                                </div>
-                                <button @click="cancelRecording()" class="w-8 h-8 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                                <button @click="stopRecording()" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center">
-                                    <i class="fas fa-stop text-xs"></i>
-                                </button>
+                        {{-- Recording UI - inline --}}
+                        <div x-show="recording" x-transition class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200 rounded-xl">
+                                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-medium text-red-600" x-text="formatTime(recordingTime)"></span>
                             </div>
-                            
-                            {{-- Preview UI --}}
-                            <div x-show="hasRecording && !recording" class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl">
-                                <button @click="playPreview()" class="w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center flex-shrink-0">
-                                    <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-xs"></i>
-                                </button>
-                                <div class="flex-1">
-                                    <div class="text-xs text-blue-600">Voice Note</div>
-                                    <div class="text-sm font-bold text-blue-700" x-text="formatTime(finalDuration)"></div>
-                                </div>
-                                <button @click="cancelRecording()" class="w-8 h-8 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </div>
+                            <button @click="cancelRecording()" class="w-7 h-7 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                            <button @click="stopRecording()" class="w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-lg flex items-center justify-center">
+                                <i class="fas fa-stop text-xs"></i>
+                            </button>
+                        </div>
+                        
+                        {{-- Preview UI - inline --}}
+                        <div x-show="hasRecording && !recording" x-transition class="flex items-center gap-2">
+                            <button @click="playPreview()" class="w-7 h-7 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center">
+                                <i :class="isPlaying ? 'fas fa-pause' : 'fas fa-play'" class="text-xs"></i>
+                            </button>
+                            <span class="text-xs font-medium text-blue-600 min-w-[35px]" x-text="formatTime(finalDuration)"></span>
+                            <button @click="cancelRecording()" class="w-7 h-7 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
                         </div>
                         
                         {{-- Hidden audio for preview --}}
                         <audio x-ref="previewAudio" @ended="isPlaying = false" class="hidden"></audio>
                         
-                        {{-- Main Send Button - sends voice if has recording, else sends message --}}
+                        {{-- Main Send Button --}}
                         <button type="button" 
                                 @click="hasRecording ? sendVoice() : $wire.sendMessage()"
                                 class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
