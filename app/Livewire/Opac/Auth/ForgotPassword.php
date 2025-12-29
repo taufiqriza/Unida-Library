@@ -102,23 +102,28 @@ class ForgotPassword extends Component
             'otp.digits' => 'Kode OTP harus 6 digit',
         ]);
 
-        $result = $this->otpService->verifyOtp($this->email, $this->otp);
+        try {
+            $result = $this->otpService->verifyOtp($this->email, $this->otp);
 
-        if (!$result['success']) {
-            $this->addError('otp', $result['message']);
-            return;
+            if (!$result['success']) {
+                $this->addError('otp', $result['message']);
+                return;
+            }
+
+            // Generate reset token
+            $this->resetToken = bin2hex(random_bytes(32));
+            
+            PasswordReset::updateOrCreate(
+                ['email' => $this->email],
+                ['token' => Hash::make($this->resetToken), 'created_at' => now()]
+            );
+
+            $this->step = 'reset';
+            $this->dispatch('notify', type: 'success', message: 'Verifikasi berhasil. Silakan buat password baru.');
+        } catch (\Exception $e) {
+            \Log::error('OTP verification error: ' . $e->getMessage());
+            $this->addError('otp', 'Terjadi kesalahan. Silakan coba lagi.');
         }
-
-        // Generate reset token
-        $this->resetToken = bin2hex(random_bytes(32));
-        
-        PasswordReset::updateOrCreate(
-            ['email' => $this->email],
-            ['token' => Hash::make($this->resetToken), 'created_at' => now()]
-        );
-
-        $this->step = 'reset';
-        $this->dispatch('notify', type: 'success', message: 'Verifikasi berhasil. Silakan buat password baru.');
     }
 
     public function resetPassword()

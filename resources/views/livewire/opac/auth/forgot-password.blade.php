@@ -100,19 +100,53 @@
                         @endif
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Kode OTP</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <i class="fas fa-shield-alt"></i>
-                                </span>
-                                <input type="text" wire:model="otp" required autofocus
-                                    maxlength="6" inputmode="numeric" pattern="[0-9]*"
-                                    placeholder="Masukkan 6 digit kode"
-                                    class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition text-center text-2xl tracking-[0.5em] font-mono">
+                            <label class="block text-sm font-medium text-gray-700 mb-3 text-center">Masukkan Kode OTP</label>
+                            <div x-data="{
+                                otp: ['', '', '', '', '', ''],
+                                focusNext(index) {
+                                    if (this.otp[index] && index < 5) {
+                                        this.$refs['otp' + (index + 1)].focus();
+                                    }
+                                    this.updateOtp();
+                                },
+                                focusPrev(index, event) {
+                                    if (event.key === 'Backspace' && !this.otp[index] && index > 0) {
+                                        this.$refs['otp' + (index - 1)].focus();
+                                    }
+                                    this.updateOtp();
+                                },
+                                handlePaste(event) {
+                                    event.preventDefault();
+                                    const paste = (event.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+                                    for (let i = 0; i < 6; i++) {
+                                        this.otp[i] = paste[i] || '';
+                                    }
+                                    this.updateOtp();
+                                    if (paste.length === 6) this.$refs.otp5.focus();
+                                },
+                                updateOtp() {
+                                    $wire.set('otp', this.otp.join(''));
+                                }
+                            }" class="flex justify-center gap-2">
+                                <template x-for="(digit, index) in otp" :key="index">
+                                    <input type="text" 
+                                        x-ref="'otp' + index"
+                                        :x-ref="'otp' + index"
+                                        x-model="otp[index]"
+                                        @input="focusNext(index)"
+                                        @keydown.backspace="focusPrev(index, $event)"
+                                        @paste="handlePaste"
+                                        maxlength="1"
+                                        inputmode="numeric"
+                                        pattern="[0-9]"
+                                        class="w-11 h-12 text-center text-xl font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                                        :class="otp[index] ? 'border-primary-400 bg-primary-50' : ''">
+                                </template>
                             </div>
+                            <input type="hidden" wire:model="otp">
                         </div>
 
-                        <button type="submit" wire:loading.attr="disabled" 
+                        <button type="submit" wire:loading.attr="disabled" wire:target="verifyOtp"
                             class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition flex items-center justify-center gap-2 disabled:opacity-50">
                             <span wire:loading wire:target="verifyOtp"><i class="fas fa-spinner fa-spin"></i></span>
                             <span wire:loading.remove wire:target="verifyOtp"><i class="fas fa-check"></i></span>
@@ -123,7 +157,7 @@
                             <button type="button" wire:click="backToEmail" class="text-gray-500 hover:text-gray-700">
                                 <i class="fas fa-arrow-left mr-1"></i> Ubah Email
                             </button>
-                            <button type="button" wire:click="resendOtp" wire:loading.attr="disabled"
+                            <button type="button" wire:click="resendOtp" wire:loading.attr="disabled" wire:target="resendOtp"
                                 class="text-primary-600 hover:text-primary-700 disabled:text-gray-400"
                                 x-data="{ countdown: @entangle('countdown') }"
                                 x-init="setInterval(() => { if(countdown > 0) countdown-- }, 1000)"
