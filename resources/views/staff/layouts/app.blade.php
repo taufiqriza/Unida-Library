@@ -753,11 +753,13 @@
         send() { const reader = new FileReader(); reader.onloadend = () => { this.wire?.sendVoice(reader.result, this.finalDuration); this.cancel(); }; reader.readAsDataURL(this.audioBlob); },
         
         showBar() {
-            let bar = document.getElementById('globalVoiceBar');
-            // Move bar above chat form if anchor exists
+            const bar = document.getElementById('globalVoiceBar');
             const anchor = document.getElementById('voiceBarAnchor');
-            if(anchor && bar.parentNode !== anchor) anchor.appendChild(bar);
-            bar.className = 'mb-2';
+            if(anchor) {
+                const rect = anchor.getBoundingClientRect();
+                bar.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top - 60}px;width:${rect.width || 400}px;z-index:9999;`;
+            }
+            bar.className = '';
             bar.innerHTML = this.recording ? 
                 `<div class="flex items-center gap-3 px-4 py-2.5 bg-red-50 border border-red-200 rounded-xl shadow-lg"><div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div><span id="vTime" class="text-sm font-bold text-red-600">${this.fmt(this.recordingTime)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.stop()" class="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-stop text-xs"></i></button></div>` :
                 `<div class="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl shadow-lg"><button onclick="VoiceRecorder.play()" class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-${this.isPlaying?'pause':'play'} text-xs"></i></button><span class="text-sm font-bold text-blue-600">${this.fmt(this.finalDuration)}</span><div class="flex-1"></div><button onclick="VoiceRecorder.cancel()" class="p-2 text-gray-400 hover:text-red-500"><i class="fas fa-trash"></i></button><button onclick="VoiceRecorder.send()" class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button></div>`;

@@ -431,7 +431,7 @@
             </div>
             @endif
             
-            <div id="voiceBarAnchor"></div>
+            <div id="voiceBarAnchor" class="relative"></div>
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
                 <div class="relative" x-data="{ showEmoji: false }">
