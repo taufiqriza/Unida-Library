@@ -1,4 +1,4 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="analyticsPage()">
     {{-- Header --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">
@@ -6,8 +6,8 @@
                 <i class="fas fa-chart-line text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Analytics</h1>
-                <p class="text-sm text-gray-500">Statistik kunjungan online & offline</p>
+                <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
+                <p class="text-sm text-gray-500">Statistik pengunjung website & perpustakaan</p>
             </div>
         </div>
     </div>
@@ -15,262 +15,241 @@
     {{-- Tabs --}}
     <div class="flex gap-2 border-b border-gray-200">
         <button wire:click="$set('activeTab', 'online')" class="px-6 py-3 font-semibold text-sm transition border-b-2 {{ $activeTab === 'online' ? 'text-blue-600 border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700' }}">
-            <i class="fas fa-globe mr-2"></i>Website (Online)
+            <i class="fas fa-globe mr-2"></i>Website Analytics
         </button>
         <button wire:click="$set('activeTab', 'offline')" class="px-6 py-3 font-semibold text-sm transition border-b-2 {{ $activeTab === 'offline' ? 'text-blue-600 border-blue-600' : 'text-gray-500 border-transparent hover:text-gray-700' }}">
-            <i class="fas fa-door-open mr-2"></i>Kunjungan (Offline)
+            <i class="fas fa-door-open mr-2"></i>Kunjungan Fisik
         </button>
     </div>
 
     @if($activeTab === 'online')
-    {{-- ONLINE TAB --}}
     <div wire:init="loadData">
-        {{-- Realtime Section --}}
+        {{-- REALTIME SECTION --}}
         @if($isConfigured && !empty($realtime))
-        <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 mb-6 text-white" wire:poll.30s="loadRealtime">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                    <h3 class="font-bold text-lg">Realtime</h3>
-                </div>
-                <span class="text-xs text-green-100">Update setiap 30 detik</span>
+        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 mb-6 text-white relative overflow-hidden" wire:poll.30s="loadRealtime">
+            {{-- Background pattern --}}
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=&quot;60&quot; height=&quot;60&quot; viewBox=&quot;0 0 60 60&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;%3E%3Cg fill=&quot;none&quot; fill-rule=&quot;evenodd&quot;%3E%3Cg fill=&quot;%23ffffff&quot; fill-opacity=&quot;0.4&quot;%3E%3Cpath d=&quot;M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z&quot;/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
             </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                    <p class="text-green-100 text-xs mb-1">Pengunjung Aktif</p>
-                    <p class="text-4xl font-bold">{{ $realtime['activeUsers'] ?? 0 }}</p>
-                </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                    <p class="text-green-100 text-xs mb-2">Halaman Aktif</p>
-                    <div class="space-y-1">
-                        @forelse(array_slice($realtime['pages'] ?? [], 0, 3) as $page)
-                        <div class="flex justify-between text-sm">
-                            <span class="truncate flex-1 text-green-50">{{ Str::limit($page['page'], 20) }}</span>
-                            <span class="font-bold ml-2">{{ $page['users'] }}</span>
+            
+            <div class="relative">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
+                            <div class="absolute inset-0 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
                         </div>
-                        @empty
-                        <p class="text-green-200 text-xs">-</p>
-                        @endforelse
+                        <h3 class="font-bold text-xl">Realtime Overview</h3>
+                        <span class="text-xs text-slate-400 bg-slate-700/50 px-3 py-1 rounded-full">Live • 30 menit terakhir</span>
                     </div>
                 </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                    <p class="text-green-100 text-xs mb-2">Negara</p>
-                    <div class="space-y-1">
-                        @forelse(array_slice($realtime['countries'] ?? [], 0, 3) as $country)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-green-50">{{ $country['country'] }}</span>
-                            <span class="font-bold">{{ $country['users'] }}</span>
+
+                {{-- Realtime Stats --}}
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-gradient-to-br from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-5 border border-green-500/30">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 bg-green-500/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-users text-green-400"></i>
+                            </div>
+                            <span class="text-slate-300 text-sm">Pengunjung Aktif</span>
                         </div>
-                        @empty
-                        <p class="text-green-200 text-xs">-</p>
-                        @endforelse
+                        <p class="text-5xl font-black text-green-400">{{ $realtime['activeUsers'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-eye text-blue-400"></i>
+                            </div>
+                            <span class="text-slate-300 text-sm">Pageviews</span>
+                        </div>
+                        <p class="text-4xl font-bold text-white">{{ $realtime['pageviews30min'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 bg-purple-500/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-bolt text-purple-400"></i>
+                            </div>
+                            <span class="text-slate-300 text-sm">Events</span>
+                        </div>
+                        <p class="text-4xl font-bold text-white">{{ $realtime['events30min'] ?? 0 }}</p>
+                    </div>
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 bg-amber-500/30 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-globe-asia text-amber-400"></i>
+                            </div>
+                            <span class="text-slate-300 text-sm">Negara</span>
+                        </div>
+                        <p class="text-4xl font-bold text-white">{{ count($realtime['countries'] ?? []) }}</p>
                     </div>
                 </div>
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                    <p class="text-green-100 text-xs mb-2">Perangkat</p>
-                    <div class="space-y-1">
-                        @forelse($realtime['devices'] ?? [] as $device)
-                        <div class="flex justify-between text-sm">
-                            <span class="text-green-50">{{ $device['device'] }}</span>
-                            <span class="font-bold">{{ $device['users'] }}</span>
+
+                {{-- Realtime Details Grid --}}
+                <div class="grid lg:grid-cols-3 gap-4">
+                    {{-- Active Pages --}}
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <h4 class="font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-alt text-blue-400"></i> Halaman Aktif
+                        </h4>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                            @forelse($realtime['pages'] ?? [] as $page)
+                            <div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                                <span class="text-slate-300 text-sm truncate flex-1 mr-3" title="{{ $page['name'] }}">{{ Str::limit($page['name'], 30) }}</span>
+                                <span class="bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-lg text-xs font-bold">{{ $page['users'] }}</span>
+                            </div>
+                            @empty
+                            <p class="text-slate-500 text-sm text-center py-4">Tidak ada aktivitas</p>
+                            @endforelse
                         </div>
-                        @empty
-                        <p class="text-green-200 text-xs">-</p>
-                        @endforelse
+                    </div>
+
+                    {{-- Countries with flags --}}
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <h4 class="font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-globe text-green-400"></i> Lokasi Pengunjung
+                        </h4>
+                        <div class="space-y-2 max-h-48 overflow-y-auto">
+                            @forelse($realtime['countries'] ?? [] as $country)
+                            <div class="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                                <div class="flex items-center gap-2">
+                                    @if($country['code'])
+                                    <img src="https://flagcdn.com/24x18/{{ strtolower($country['code']) }}.png" class="w-6 h-4 rounded shadow" alt="{{ $country['name'] }}" onerror="this.style.display='none'">
+                                    @endif
+                                    <span class="text-slate-300 text-sm">{{ $country['name'] }}</span>
+                                </div>
+                                <span class="bg-green-500/20 text-green-300 px-2.5 py-1 rounded-lg text-xs font-bold">{{ $country['users'] }}</span>
+                            </div>
+                            @empty
+                            <p class="text-slate-500 text-sm text-center py-4">Tidak ada data</p>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    {{-- Devices & Sources --}}
+                    <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
+                        <h4 class="font-semibold text-white mb-4 flex items-center gap-2">
+                            <i class="fas fa-laptop text-purple-400"></i> Perangkat & Sumber
+                        </h4>
+                        <div class="space-y-3">
+                            @foreach($realtime['devices'] ?? [] as $device)
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ $device['name'] === 'Desktop' ? 'bg-blue-500/20 text-blue-400' : ($device['name'] === 'Mobile' ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400') }}">
+                                    <i class="fas {{ $device['name'] === 'Desktop' ? 'fa-desktop' : ($device['name'] === 'Mobile' ? 'fa-mobile-alt' : 'fa-tablet-alt') }}"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-slate-300">{{ $device['name'] }}</span>
+                                        <span class="text-white font-bold">{{ $device['users'] }}</span>
+                                    </div>
+                                    @php $total = collect($realtime['devices'] ?? [])->sum('users') ?: 1; $pct = round($device['users'] / $total * 100); @endphp
+                                    <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" style="width: {{ $pct }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                            
+                            <div class="border-t border-white/10 pt-3 mt-3">
+                                <p class="text-xs text-slate-400 mb-2">Traffic Sources</p>
+                                @foreach(array_slice($realtime['sources'] ?? [], 0, 3) as $source)
+                                <div class="flex justify-between text-sm py-1">
+                                    <span class="text-slate-400">{{ $source['name'] }}</span>
+                                    <span class="text-slate-300">{{ $source['users'] }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         @endif
 
-        <div class="flex items-center gap-3 mb-6">
-            <select wire:model.live="period" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
-                <option value="7d">7 Hari Terakhir</option>
-                <option value="30d">30 Hari Terakhir</option>
-                <option value="90d">90 Hari Terakhir</option>
-            </select>
-            <button wire:click="loadData" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
-                <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i>
+        {{-- Period Filter --}}
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+            <div class="flex bg-gray-100 rounded-xl p-1">
+                @foreach(['7d' => '7 Hari', '30d' => '30 Hari', '90d' => '90 Hari'] as $key => $label)
+                <button wire:click="$set('period', '{{ $key }}')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $period === $key ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:text-gray-900' }}">
+                    {{ $label }}
+                </button>
+                @endforeach
+            </div>
+            <button wire:click="loadData" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 flex items-center gap-2">
+                <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadData"></i> Refresh
             </button>
-            @if(!$isConfigured)<span class="text-xs text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Mode Demo</span>@endif
+            @if(!$isConfigured)
+            <span class="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-xl flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i> Service Account belum dikonfigurasi
+            </span>
+            @endif
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white">
-                <p class="text-blue-100 text-xs mb-1">Total Pengguna</p>
-                <p class="text-3xl font-bold">{{ number_format($stats['users'] ?? 0) }}</p>
+        {{-- Main Stats Cards --}}
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/25">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-blue-100 text-xs font-medium">Total Pengguna</span>
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-users text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-black">{{ number_format($stats['users'] ?? 0) }}</p>
+                <p class="text-blue-200 text-xs mt-1">{{ number_format($stats['newUsers'] ?? 0) }} pengguna baru</p>
             </div>
-            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
-                <p class="text-emerald-100 text-xs mb-1">Pageviews</p>
-                <p class="text-3xl font-bold">{{ number_format($stats['pageviews'] ?? 0) }}</p>
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/25">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-emerald-100 text-xs font-medium">Pageviews</span>
+                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-eye text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-black">{{ number_format($stats['pageviews'] ?? 0) }}</p>
+                <p class="text-emerald-200 text-xs mt-1">{{ $stats['pagesPerSession'] ?? 0 }} halaman/sesi</p>
             </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Sesi</p>
-                <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['sessions'] ?? 0) }}</p>
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-gray-500 text-xs font-medium">Sesi</span>
+                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-gray-500 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-gray-900">{{ number_format($stats['sessions'] ?? 0) }}</p>
+                <p class="text-gray-400 text-xs mt-1">{{ number_format($stats['engagedSessions'] ?? 0) }} engaged</p>
             </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Pengguna Baru</p>
-                <p class="text-3xl font-bold text-gray-900">{{ number_format($stats['newUsers'] ?? 0) }}</p>
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-gray-500 text-xs font-medium">Bounce Rate</span>
+                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt text-gray-500 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-gray-900">{{ $stats['bounceRate'] ?? 0 }}%</p>
+                <p class="text-gray-400 text-xs mt-1">{{ ($stats['bounceRate'] ?? 0) < 50 ? 'Bagus' : 'Perlu perbaikan' }}</p>
             </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Bounce Rate</p>
-                <p class="text-3xl font-bold text-gray-900">{{ $stats['bounceRate'] ?? 0 }}%</p>
-            </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Durasi Rata-rata</p>
-                <p class="text-3xl font-bold text-gray-900">{{ gmdate('i:s', $stats['avgDuration'] ?? 0) }}</p>
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-gray-500 text-xs font-medium">Durasi Rata-rata</span>
+                    <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-gray-500 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-3xl font-black text-gray-900">{{ gmdate('i:s', $stats['avgDuration'] ?? 0) }}</p>
+                <p class="text-gray-400 text-xs mt-1">per sesi</p>
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Halaman Populer</h3>
-                <div class="space-y-3">
-                    @foreach($topPages as $page)
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600 truncate flex-1">{{ $page['path'] }}</span>
-                        <span class="text-sm font-bold text-gray-900 ml-4">{{ number_format($page['views']) }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 mb-4">Perangkat</h3>
-                <div class="space-y-3">
-                    @foreach($devices as $device)
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-gray-600">{{ $device['device'] }}</span>
-                        <span class="text-sm font-bold text-gray-900">{{ number_format($device['users']) }}</span>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
+        @include('livewire.staff.analytics.partials.charts')
+        @include('livewire.staff.analytics.partials.details')
     </div>
     @else
-    {{-- OFFLINE TAB --}}
-    <div>
-        <div class="flex flex-wrap items-center gap-3 mb-6">
-            <select wire:model.live="visitPeriod" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
-                <option value="today">Hari Ini</option>
-                <option value="7d">7 Hari Terakhir</option>
-                <option value="30d">30 Hari Terakhir</option>
-                <option value="90d">90 Hari Terakhir</option>
-            </select>
-            <select wire:model.live="visitBranch" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700">
-                <option value="">Semua Cabang</option>
-                @foreach($branches as $branch)<option value="{{ $branch->id }}">{{ $branch->name }}</option>@endforeach
-            </select>
-            <button wire:click="loadVisitData" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
-                <i class="fas fa-sync-alt" wire:loading.class="fa-spin" wire:target="loadVisitData"></i>
-            </button>
-        </div>
-
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white">
-                <p class="text-blue-100 text-xs mb-1">Total Kunjungan</p>
-                <p class="text-3xl font-bold">{{ number_format($visitStats['total'] ?? 0) }}</p>
-            </div>
-            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
-                <p class="text-emerald-100 text-xs mb-1">Anggota</p>
-                <p class="text-3xl font-bold">{{ number_format($visitStats['members'] ?? 0) }}</p>
-            </div>
-            <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
-                <p class="text-violet-100 text-xs mb-1">Tamu</p>
-                <p class="text-3xl font-bold">{{ number_format($visitStats['guests'] ?? 0) }}</p>
-            </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Hari Ini</p>
-                <p class="text-3xl font-bold text-gray-900">{{ number_format($visitStats['today'] ?? 0) }}</p>
-            </div>
-            <div class="bg-white rounded-2xl p-5 border border-gray-100">
-                <p class="text-gray-500 text-xs mb-1">Rata-rata/Hari</p>
-                <p class="text-3xl font-bold text-gray-900">{{ $visitStats['avg_daily'] ?? 0 }}</p>
-            </div>
-        </div>
-
-        <div class="grid lg:grid-cols-3 gap-6 mb-6">
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 mb-4"><i class="fas fa-bullseye text-blue-500 mr-2"></i>Berdasarkan Tujuan</h3>
-                <div class="space-y-3">
-                    @php $purposes = ['baca' => 'Membaca', 'pinjam' => 'Pinjam Buku', 'belajar' => 'Belajar', 'penelitian' => 'Penelitian', 'lainnya' => 'Lainnya']; @endphp
-                    @foreach($purposes as $key => $label)
-                    @php $count = $visitByPurpose[$key] ?? 0; $total = array_sum($visitByPurpose) ?: 1; $pct = round($count / $total * 100); @endphp
-                    <div>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">{{ $label }}</span>
-                            <span class="font-bold text-gray-900">{{ number_format($count) }}</span>
-                        </div>
-                        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: {{ $pct }}%"></div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 mb-4"><i class="fas fa-clock text-amber-500 mr-2"></i>Jam Sibuk</h3>
-                <div class="grid grid-cols-6 gap-1">
-                    @for($h = 7; $h <= 18; $h++)
-                    @php $count = $visitByHour[$h] ?? 0; $max = max($visitByHour) ?: 1; $intensity = round($count / $max * 100); @endphp
-                    <div class="text-center">
-                        <div class="h-16 flex items-end justify-center mb-1">
-                            <div class="w-full rounded-t" style="height: {{ max($intensity, 5) }}%; background: linear-gradient(to top, #3b82f6, #6366f1);"></div>
-                        </div>
-                        <span class="text-[10px] text-gray-500">{{ $h }}</span>
-                    </div>
-                    @endfor
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl border border-gray-100 p-6">
-                <h3 class="font-bold text-gray-900 mb-4"><i class="fas fa-trophy text-amber-500 mr-2"></i>Pengunjung Aktif</h3>
-                <div class="space-y-2">
-                    @forelse($visitTopMembers as $i => $v)
-                    <div class="flex items-center gap-3">
-                        <span class="w-6 h-6 rounded-full {{ $i < 3 ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600' }} text-xs font-bold flex items-center justify-center">{{ $i + 1 }}</span>
-                        <span class="flex-1 text-sm text-gray-700 truncate">{{ $v['member']['name'] ?? 'Unknown' }}</span>
-                        <span class="text-sm font-bold text-gray-900">{{ $v['visit_count'] }}x</span>
-                    </div>
-                    @empty
-                    <p class="text-gray-400 text-sm text-center py-4">Belum ada data</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="font-bold text-gray-900"><i class="fas fa-history text-blue-500 mr-2"></i>Kunjungan Terbaru</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Waktu</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Pengunjung</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tipe</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tujuan</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Cabang</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($visitRecent as $visit)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ \Carbon\Carbon::parse($visit['visited_at'])->format('d/m H:i') }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $visit['visitor_type'] === 'member' ? ($visit['member']['name'] ?? '-') : $visit['guest_name'] }}</td>
-                            <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-medium rounded-full {{ $visit['visitor_type'] === 'member' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700' }}">{{ $visit['visitor_type'] === 'member' ? 'Anggota' : 'Tamu' }}</span></td>
-                            <td class="px-6 py-4 text-sm text-gray-600 capitalize">{{ $visit['purpose'] }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $visit['branch']['name'] ?? '-' }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada data kunjungan</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    @include('livewire.staff.analytics.partials.offline')
     @endif
 </div>
+
+<script>
+function analyticsPage() {
+    return {
+        init() {}
+    }
+}
+</script>

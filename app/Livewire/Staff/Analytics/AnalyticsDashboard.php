@@ -7,7 +7,6 @@ use App\Models\Visit;
 use App\Models\Branch;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class AnalyticsDashboard extends Component
@@ -22,9 +21,13 @@ class AnalyticsDashboard extends Component
     public array $stats = [];
     public array $pageViews = [];
     public array $topPages = [];
-    public array $topCountries = [];
     public array $devices = [];
     public array $trafficSources = [];
+    public array $browsers = [];
+    public array $countries = [];
+    public array $cities = [];
+    public array $hourlyData = [];
+    public array $userTypes = [];
     
     // Realtime
     public array $realtime = [];
@@ -37,9 +40,7 @@ class AnalyticsDashboard extends Component
     public array $visitTopMembers = [];
     public array $visitRecent = [];
     
-    // Hardcoded GA config
     const GA_PROPERTY_ID = '347806816';
-    const GA_MEASUREMENT_ID = 'G-2P730CT760';
     
     public function mount()
     {
@@ -61,311 +62,378 @@ class AnalyticsDashboard extends Component
         
         $this->isLoading = true;
         
-        $cacheKey = "ga_data_{$this->period}";
-        $cacheTtl = 300; // 5 minutes
-        
-        $data = Cache::remember($cacheKey, $cacheTtl, function () {
-            return $this->fetchAnalyticsData();
-        });
+        $cacheKey = "ga_full_data_{$this->period}";
+        $data = Cache::remember($cacheKey, 300, fn() => $this->fetchAllAnalyticsData());
         
         $this->stats = $data['stats'] ?? [];
         $this->pageViews = $data['pageViews'] ?? [];
         $this->topPages = $data['topPages'] ?? [];
-        $this->topCountries = $data['topCountries'] ?? [];
         $this->devices = $data['devices'] ?? [];
         $this->trafficSources = $data['trafficSources'] ?? [];
+        $this->browsers = $data['browsers'] ?? [];
+        $this->countries = $data['countries'] ?? [];
+        $this->cities = $data['cities'] ?? [];
+        $this->hourlyData = $data['hourlyData'] ?? [];
+        $this->userTypes = $data['userTypes'] ?? [];
         
-        // Load realtime separately (no cache)
         $this->loadRealtime();
-        
         $this->isLoading = false;
     }
     
     public function loadRealtime()
     {
         if (!$this->isConfigured) {
-            $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+            $this->realtime = $this->getEmptyRealtime();
             return;
         }
         
         try {
-            $serviceAccountJson = Setting::get('ga_service_account_json');
-            $accessToken = $this->getAccessToken($serviceAccountJson);
-            
+            $accessToken = $this->getAccessToken();
             if (!$accessToken) {
-                $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+                $this->realtime = $this->getEmptyRealtime();
                 return;
             }
             
             $propertyId = self::GA_PROPERTY_ID;
             
-            // Realtime active users
-            $response = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
-                    'metrics' => [['name' => 'activeUsers']],
-                ]);
+            // Active users
+            $activeUsers = $this->fetchRealtimeMetric($accessToken, $propertyId, 'activeUsers');
             
-            $activeUsers = 0;
-            if ($response->successful()) {
-                $data = $response->json();
-                $activeUsers = (int) ($data['rows'][0]['metricValues'][0]['value'] ?? 0);
-            }
+            // By page
+            $pages = $this->fetchRealtimeDimension($accessToken, $propertyId, 'unifiedScreenName', 10);
             
-            // Realtime by page
-            $pagesResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
-                    'dimensions' => [['name' => 'unifiedScreenName']],
-                    'metrics' => [['name' => 'activeUsers']],
-                    'limit' => 5,
-                ]);
+            // By country with country code
+            $countries = $this->fetchRealtimeDimensionWithCode($accessToken, $propertyId, 'country', 'countryId', 20);
             
-            $pages = [];
-            if ($pagesResponse->successful()) {
-                foreach ($pagesResponse->json()['rows'] ?? [] as $row) {
-                    $pages[] = [
-                        'page' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
-                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
+            // By city
+            $cities = $this->fetchRealtimeDimension($accessToken, $propertyId, 'city', 10);
             
-            // Realtime by country
-            $countryResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
-                    'dimensions' => [['name' => 'country']],
-                    'metrics' => [['name' => 'activeUsers']],
-                    'limit' => 5,
-                ]);
+            // By device
+            $devices = $this->fetchRealtimeDimension($accessToken, $propertyId, 'deviceCategory', 5);
             
-            $countries = [];
-            if ($countryResponse->successful()) {
-                foreach ($countryResponse->json()['rows'] ?? [] as $row) {
-                    $countries[] = [
-                        'country' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
-                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
+            // By source
+            $sources = $this->fetchRealtimeDimension($accessToken, $propertyId, 'sessionSource', 5);
             
-            // Realtime by device
-            $deviceResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
-                    'dimensions' => [['name' => 'deviceCategory']],
-                    'metrics' => [['name' => 'activeUsers']],
-                ]);
+            // Events in last 30 min
+            $events = $this->fetchRealtimeMetric($accessToken, $propertyId, 'eventCount');
             
-            $devices = [];
-            if ($deviceResponse->successful()) {
-                foreach ($deviceResponse->json()['rows'] ?? [] as $row) {
-                    $devices[] = [
-                        'device' => ucfirst($row['dimensionValues'][0]['value'] ?? 'Unknown'),
-                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
+            // Page views in last 30 min
+            $pageviews = $this->fetchRealtimeMetric($accessToken, $propertyId, 'screenPageViews');
             
             $this->realtime = [
                 'activeUsers' => $activeUsers,
+                'pageviews30min' => $pageviews,
+                'events30min' => $events,
                 'pages' => $pages,
                 'countries' => $countries,
+                'cities' => $cities,
                 'devices' => $devices,
+                'sources' => $sources,
             ];
             
         } catch (\Exception $e) {
             \Log::error('GA Realtime Error', ['error' => $e->getMessage()]);
-            $this->realtime = ['activeUsers' => 0, 'pages' => [], 'countries' => [], 'devices' => []];
+            $this->realtime = $this->getEmptyRealtime();
         }
     }
     
-    public function updatedPeriod()
+    protected function fetchRealtimeMetric($token, $propertyId, $metric): int
     {
-        Cache::forget("ga_data_{$this->period}");
-        $this->loadData();
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                'metrics' => [['name' => $metric]],
+            ]);
+        
+        if ($response->successful()) {
+            return (int) ($response->json()['rows'][0]['metricValues'][0]['value'] ?? 0);
+        }
+        return 0;
     }
     
-    protected function fetchAnalyticsData(): array
+    protected function fetchRealtimeDimension($token, $propertyId, $dimension, $limit = 10): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                'dimensions' => [['name' => $dimension]],
+                'metrics' => [['name' => 'activeUsers']],
+                'limit' => $limit,
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $result[] = [
+                    'name' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
+                    'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function fetchRealtimeDimensionWithCode($token, $propertyId, $dimension, $codeDimension, $limit = 20): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                'dimensions' => [['name' => $dimension], ['name' => $codeDimension]],
+                'metrics' => [['name' => 'activeUsers']],
+                'limit' => $limit,
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $result[] = [
+                    'name' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
+                    'code' => $row['dimensionValues'][1]['value'] ?? '',
+                    'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function getEmptyRealtime(): array
+    {
+        return ['activeUsers' => 0, 'pageviews30min' => 0, 'events30min' => 0, 'pages' => [], 'countries' => [], 'cities' => [], 'devices' => [], 'sources' => []];
+    }
+    
+    protected function fetchAllAnalyticsData(): array
     {
         try {
+            $accessToken = $this->getAccessToken();
+            if (!$accessToken) return [];
+            
             $propertyId = self::GA_PROPERTY_ID;
-            $serviceAccountJson = Setting::get('ga_service_account_json');
-            
-            if (empty($serviceAccountJson)) {
-                return $this->getDemoData();
-            }
-            
-            $accessToken = $this->getAccessToken($serviceAccountJson);
-            if (!$accessToken) {
-                return $this->getDemoData();
-            }
-            
             $dateRange = $this->getDateRange();
             
-            // Fetch main report
-            $response = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
-                    'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
-                    'metrics' => [
-                        ['name' => 'activeUsers'],
-                        ['name' => 'sessions'],
-                        ['name' => 'screenPageViews'],
-                        ['name' => 'bounceRate'],
-                        ['name' => 'averageSessionDuration'],
-                        ['name' => 'newUsers'],
-                    ],
-                ]);
+            // Main stats
+            $stats = $this->fetchMainStats($accessToken, $propertyId, $dateRange);
             
-            if (!$response->successful()) {
-                \Log::warning('GA API Error', ['response' => $response->json()]);
-                return $this->getDemoData();
-            }
+            // Daily pageviews
+            $pageViews = $this->fetchDailyData($accessToken, $propertyId, $dateRange);
             
-            $mainData = $response->json();
-            $totals = $mainData['rows'][0]['metricValues'] ?? [];
+            // Top pages
+            $topPages = $this->fetchTopPages($accessToken, $propertyId, $dateRange);
             
-            $stats = [
-                'users' => (int) ($totals[0]['value'] ?? 0),
-                'sessions' => (int) ($totals[1]['value'] ?? 0),
-                'pageviews' => (int) ($totals[2]['value'] ?? 0),
-                'bounceRate' => round((float) ($totals[3]['value'] ?? 0) * 100, 1),
-                'avgDuration' => round((float) ($totals[4]['value'] ?? 0)),
-                'newUsers' => (int) ($totals[5]['value'] ?? 0),
-            ];
+            // Devices
+            $devices = $this->fetchByDimension($accessToken, $propertyId, $dateRange, 'deviceCategory', 'activeUsers');
             
-            // Fetch daily page views
-            $dailyResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
-                    'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
-                    'dimensions' => [['name' => 'date']],
-                    'metrics' => [['name' => 'screenPageViews'], ['name' => 'activeUsers']],
-                    'orderBys' => [['dimension' => ['dimensionName' => 'date']]],
-                ]);
+            // Browsers
+            $browsers = $this->fetchByDimension($accessToken, $propertyId, $dateRange, 'browser', 'activeUsers', 8);
             
-            $pageViews = [];
-            if ($dailyResponse->successful()) {
-                foreach ($dailyResponse->json()['rows'] ?? [] as $row) {
-                    $date = $row['dimensionValues'][0]['value'] ?? '';
-                    $pageViews[] = [
-                        'date' => substr($date, 4, 2) . '/' . substr($date, 6, 2),
-                        'views' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                        'users' => (int) ($row['metricValues'][1]['value'] ?? 0),
-                    ];
-                }
-            }
+            // Traffic sources
+            $trafficSources = $this->fetchByDimension($accessToken, $propertyId, $dateRange, 'sessionDefaultChannelGroup', 'sessions', 8);
             
-            // Fetch top pages
-            $pagesResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
-                    'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
-                    'dimensions' => [['name' => 'pagePath']],
-                    'metrics' => [['name' => 'screenPageViews']],
-                    'orderBys' => [['metric' => ['metricName' => 'screenPageViews'], 'desc' => true]],
-                    'limit' => 10,
-                ]);
+            // Countries
+            $countries = $this->fetchCountries($accessToken, $propertyId, $dateRange);
             
-            $topPages = [];
-            if ($pagesResponse->successful()) {
-                foreach ($pagesResponse->json()['rows'] ?? [] as $row) {
-                    $topPages[] = [
-                        'path' => $row['dimensionValues'][0]['value'] ?? '',
-                        'views' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
+            // Cities
+            $cities = $this->fetchByDimension($accessToken, $propertyId, $dateRange, 'city', 'activeUsers', 10);
             
-            // Fetch devices
-            $devicesResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
-                    'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
-                    'dimensions' => [['name' => 'deviceCategory']],
-                    'metrics' => [['name' => 'activeUsers']],
-                ]);
+            // Hourly data
+            $hourlyData = $this->fetchHourlyData($accessToken, $propertyId, $dateRange);
             
-            $devices = [];
-            if ($devicesResponse->successful()) {
-                foreach ($devicesResponse->json()['rows'] ?? [] as $row) {
-                    $devices[] = [
-                        'device' => ucfirst($row['dimensionValues'][0]['value'] ?? 'Unknown'),
-                        'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
+            // User types (new vs returning)
+            $userTypes = $this->fetchByDimension($accessToken, $propertyId, $dateRange, 'newVsReturning', 'activeUsers');
             
-            // Fetch traffic sources
-            $sourcesResponse = Http::withToken($accessToken)
-                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
-                    'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
-                    'dimensions' => [['name' => 'sessionDefaultChannelGroup']],
-                    'metrics' => [['name' => 'sessions']],
-                    'orderBys' => [['metric' => ['metricName' => 'sessions'], 'desc' => true]],
-                    'limit' => 5,
-                ]);
-            
-            $trafficSources = [];
-            if ($sourcesResponse->successful()) {
-                foreach ($sourcesResponse->json()['rows'] ?? [] as $row) {
-                    $trafficSources[] = [
-                        'source' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
-                        'sessions' => (int) ($row['metricValues'][0]['value'] ?? 0),
-                    ];
-                }
-            }
-            
-            return [
-                'stats' => $stats,
-                'pageViews' => $pageViews,
-                'topPages' => $topPages,
-                'devices' => $devices,
-                'trafficSources' => $trafficSources,
-            ];
+            return compact('stats', 'pageViews', 'topPages', 'devices', 'browsers', 'trafficSources', 'countries', 'cities', 'hourlyData', 'userTypes');
             
         } catch (\Exception $e) {
             \Log::error('GA Fetch Error', ['error' => $e->getMessage()]);
-            return $this->getDemoData();
+            return [];
         }
     }
     
-    protected function getAccessToken(string $serviceAccountJson): ?string
+    protected function fetchMainStats($token, $propertyId, $dateRange): array
     {
-        try {
-            $credentials = json_decode($serviceAccountJson, true);
-            if (!$credentials || !isset($credentials['private_key']) || !isset($credentials['client_email'])) {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'metrics' => [
+                    ['name' => 'activeUsers'],
+                    ['name' => 'sessions'],
+                    ['name' => 'screenPageViews'],
+                    ['name' => 'bounceRate'],
+                    ['name' => 'averageSessionDuration'],
+                    ['name' => 'newUsers'],
+                    ['name' => 'engagedSessions'],
+                    ['name' => 'screenPageViewsPerSession'],
+                    ['name' => 'userEngagementDuration'],
+                ],
+            ]);
+        
+        if (!$response->successful()) return [];
+        
+        $totals = $response->json()['rows'][0]['metricValues'] ?? [];
+        return [
+            'users' => (int) ($totals[0]['value'] ?? 0),
+            'sessions' => (int) ($totals[1]['value'] ?? 0),
+            'pageviews' => (int) ($totals[2]['value'] ?? 0),
+            'bounceRate' => round((float) ($totals[3]['value'] ?? 0) * 100, 1),
+            'avgDuration' => round((float) ($totals[4]['value'] ?? 0)),
+            'newUsers' => (int) ($totals[5]['value'] ?? 0),
+            'engagedSessions' => (int) ($totals[6]['value'] ?? 0),
+            'pagesPerSession' => round((float) ($totals[7]['value'] ?? 0), 2),
+            'totalEngagementTime' => round((float) ($totals[8]['value'] ?? 0)),
+        ];
+    }
+    
+    protected function fetchDailyData($token, $propertyId, $dateRange): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'dimensions' => [['name' => 'date']],
+                'metrics' => [['name' => 'screenPageViews'], ['name' => 'activeUsers'], ['name' => 'sessions']],
+                'orderBys' => [['dimension' => ['dimensionName' => 'date']]],
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $date = $row['dimensionValues'][0]['value'] ?? '';
+                $result[] = [
+                    'date' => substr($date, 6, 2) . '/' . substr($date, 4, 2),
+                    'fullDate' => substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2),
+                    'views' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    'users' => (int) ($row['metricValues'][1]['value'] ?? 0),
+                    'sessions' => (int) ($row['metricValues'][2]['value'] ?? 0),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function fetchTopPages($token, $propertyId, $dateRange): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'dimensions' => [['name' => 'pagePath'], ['name' => 'pageTitle']],
+                'metrics' => [['name' => 'screenPageViews'], ['name' => 'activeUsers'], ['name' => 'averageSessionDuration']],
+                'orderBys' => [['metric' => ['metricName' => 'screenPageViews'], 'desc' => true]],
+                'limit' => 15,
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $result[] = [
+                    'path' => $row['dimensionValues'][0]['value'] ?? '',
+                    'title' => $row['dimensionValues'][1]['value'] ?? '',
+                    'views' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    'users' => (int) ($row['metricValues'][1]['value'] ?? 0),
+                    'avgTime' => round((float) ($row['metricValues'][2]['value'] ?? 0)),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function fetchByDimension($token, $propertyId, $dateRange, $dimension, $metric, $limit = 10): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'dimensions' => [['name' => $dimension]],
+                'metrics' => [['name' => $metric]],
+                'orderBys' => [['metric' => ['metricName' => $metric], 'desc' => true]],
+                'limit' => $limit,
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $result[] = [
+                    'name' => ucfirst($row['dimensionValues'][0]['value'] ?? 'Unknown'),
+                    'value' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function fetchCountries($token, $propertyId, $dateRange): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'dimensions' => [['name' => 'country'], ['name' => 'countryId']],
+                'metrics' => [['name' => 'activeUsers'], ['name' => 'sessions']],
+                'orderBys' => [['metric' => ['metricName' => 'activeUsers'], 'desc' => true]],
+                'limit' => 20,
+            ]);
+        
+        $result = [];
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $result[] = [
+                    'name' => $row['dimensionValues'][0]['value'] ?? 'Unknown',
+                    'code' => $row['dimensionValues'][1]['value'] ?? '',
+                    'users' => (int) ($row['metricValues'][0]['value'] ?? 0),
+                    'sessions' => (int) ($row['metricValues'][1]['value'] ?? 0),
+                ];
+            }
+        }
+        return $result;
+    }
+    
+    protected function fetchHourlyData($token, $propertyId, $dateRange): array
+    {
+        $response = Http::withToken($token)
+            ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runReport", [
+                'dateRanges' => [['startDate' => $dateRange['start'], 'endDate' => $dateRange['end']]],
+                'dimensions' => [['name' => 'hour']],
+                'metrics' => [['name' => 'activeUsers']],
+                'orderBys' => [['dimension' => ['dimensionName' => 'hour']]],
+            ]);
+        
+        $result = array_fill(0, 24, 0);
+        if ($response->successful()) {
+            foreach ($response->json()['rows'] ?? [] as $row) {
+                $hour = (int) ($row['dimensionValues'][0]['value'] ?? 0);
+                $result[$hour] = (int) ($row['metricValues'][0]['value'] ?? 0);
+            }
+        }
+        return $result;
+    }
+    
+    protected function getAccessToken(): ?string
+    {
+        $serviceAccountJson = Setting::get('ga_service_account_json');
+        if (!$serviceAccountJson) return null;
+        
+        $cacheKey = 'ga_access_token';
+        return Cache::remember($cacheKey, 3500, function () use ($serviceAccountJson) {
+            try {
+                $credentials = json_decode($serviceAccountJson, true);
+                if (!$credentials || !isset($credentials['private_key'])) return null;
+                
+                $now = time();
+                $header = base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
+                $claim = base64_encode(json_encode([
+                    'iss' => $credentials['client_email'],
+                    'scope' => 'https://www.googleapis.com/auth/analytics.readonly',
+                    'aud' => 'https://oauth2.googleapis.com/token',
+                    'iat' => $now,
+                    'exp' => $now + 3600,
+                ]));
+                
+                $signature = '';
+                openssl_sign("$header.$claim", $signature, $credentials['private_key'], OPENSSL_ALGO_SHA256);
+                $jwt = "$header.$claim." . base64_encode($signature);
+                
+                $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
+                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'assertion' => $jwt,
+                ]);
+                
+                return $response->successful() ? ($response->json()['access_token'] ?? null) : null;
+            } catch (\Exception $e) {
                 return null;
             }
-            
-            $now = time();
-            $header = base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
-            $claim = base64_encode(json_encode([
-                'iss' => $credentials['client_email'],
-                'scope' => 'https://www.googleapis.com/auth/analytics.readonly',
-                'aud' => 'https://oauth2.googleapis.com/token',
-                'iat' => $now,
-                'exp' => $now + 3600,
-            ]));
-            
-            $signature = '';
-            openssl_sign(
-                "$header.$claim",
-                $signature,
-                $credentials['private_key'],
-                OPENSSL_ALGO_SHA256
-            );
-            
-            $jwt = "$header.$claim." . base64_encode($signature);
-            
-            $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion' => $jwt,
-            ]);
-            
-            if ($response->successful()) {
-                return $response->json()['access_token'] ?? null;
-            }
-            
-            return null;
-        } catch (\Exception $e) {
-            \Log::error('GA Token Error', ['error' => $e->getMessage()]);
-            return null;
-        }
+        });
     }
     
     protected function getDateRange(): array
@@ -378,50 +446,10 @@ class AnalyticsDashboard extends Component
         };
     }
     
-    protected function getDemoData(): array
+    public function updatedPeriod()
     {
-        // Generate demo data for preview
-        $days = $this->period === '30d' ? 30 : ($this->period === '90d' ? 90 : 7);
-        $pageViews = [];
-        
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $pageViews[] = [
-                'date' => $date->format('m/d'),
-                'views' => rand(50, 200),
-                'users' => rand(20, 80),
-            ];
-        }
-        
-        return [
-            'stats' => [
-                'users' => rand(500, 2000),
-                'sessions' => rand(800, 3000),
-                'pageviews' => rand(2000, 8000),
-                'bounceRate' => rand(30, 60),
-                'avgDuration' => rand(60, 180),
-                'newUsers' => rand(200, 800),
-            ],
-            'pageViews' => $pageViews,
-            'topPages' => [
-                ['path' => '/', 'views' => rand(500, 1000)],
-                ['path' => '/search', 'views' => rand(300, 600)],
-                ['path' => '/books', 'views' => rand(200, 400)],
-                ['path' => '/news', 'views' => rand(100, 300)],
-                ['path' => '/ethesis', 'views' => rand(50, 200)],
-            ],
-            'devices' => [
-                ['device' => 'Desktop', 'users' => rand(300, 600)],
-                ['device' => 'Mobile', 'users' => rand(400, 800)],
-                ['device' => 'Tablet', 'users' => rand(50, 150)],
-            ],
-            'trafficSources' => [
-                ['source' => 'Direct', 'sessions' => rand(200, 500)],
-                ['source' => 'Organic Search', 'sessions' => rand(300, 700)],
-                ['source' => 'Referral', 'sessions' => rand(100, 300)],
-                ['source' => 'Social', 'sessions' => rand(50, 150)],
-            ],
-        ];
+        Cache::forget("ga_full_data_{$this->period}");
+        $this->loadData();
     }
 
     public function loadVisitData()
@@ -437,7 +465,6 @@ class AnalyticsDashboard extends Component
             $query->where('branch_id', $this->visitBranch);
         }
         
-        // Main stats
         $this->visitStats = [
             'total' => (clone $query)->count(),
             'members' => (clone $query)->where('visitor_type', 'member')->count(),
@@ -447,60 +474,35 @@ class AnalyticsDashboard extends Component
             'avg_daily' => $days > 0 ? round((clone $query)->count() / $days, 1) : (clone $query)->count(),
         ];
         
-        // Daily trend
         $this->visitDaily = (clone $query)
             ->selectRaw('DATE(visited_at) as date, COUNT(*) as count')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('count', 'date')
-            ->toArray();
+            ->groupBy('date')->orderBy('date')
+            ->pluck('count', 'date')->toArray();
         
-        // By purpose
         $this->visitByPurpose = (clone $query)
             ->selectRaw('purpose, COUNT(*) as count')
-            ->groupBy('purpose')
-            ->pluck('count', 'purpose')
-            ->toArray();
+            ->groupBy('purpose')->pluck('count', 'purpose')->toArray();
         
-        // By hour (peak hours)
         $this->visitByHour = (clone $query)
             ->selectRaw('HOUR(visited_at) as hour, COUNT(*) as count')
-            ->groupBy('hour')
-            ->orderBy('hour')
-            ->pluck('count', 'hour')
-            ->toArray();
+            ->groupBy('hour')->orderBy('hour')
+            ->pluck('count', 'hour')->toArray();
         
-        // Top members
         $this->visitTopMembers = Visit::where('visited_at', '>=', $startDate)
             ->where('visitor_type', 'member')
             ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))
             ->selectRaw('member_id, COUNT(*) as visit_count')
-            ->groupBy('member_id')
-            ->orderByDesc('visit_count')
-            ->limit(10)
-            ->with('member:id,name,member_id')
-            ->get()
-            ->toArray();
+            ->groupBy('member_id')->orderByDesc('visit_count')->limit(10)
+            ->with('member:id,name,member_id')->get()->toArray();
         
-        // Recent visits
         $this->visitRecent = Visit::where('visited_at', '>=', $startDate)
             ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))
             ->with(['member:id,name,member_id', 'branch:id,name'])
-            ->orderByDesc('visited_at')
-            ->limit(20)
-            ->get()
-            ->toArray();
+            ->orderByDesc('visited_at')->limit(20)->get()->toArray();
     }
 
-    public function updatedVisitPeriod()
-    {
-        $this->loadVisitData();
-    }
-
-    public function updatedVisitBranch()
-    {
-        $this->loadVisitData();
-    }
+    public function updatedVisitPeriod() { $this->loadVisitData(); }
+    public function updatedVisitBranch() { $this->loadVisitData(); }
 
     public function render()
     {
@@ -512,7 +514,6 @@ class AnalyticsDashboard extends Component
         
         return view('livewire.staff.analytics.analytics-dashboard', [
             'branches' => $branches,
-        ])->extends('staff.layouts.app')
-            ->section('content');
+        ])->extends('staff.layouts.app')->section('content');
     }
 }
