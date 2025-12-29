@@ -254,8 +254,9 @@
                             {{-- Voice Note --}}
                             @if($msg['voice_path'])
                             <div class="mb-1 flex items-center gap-2 px-3 py-2 {{ $msg['sender_id'] === auth()->id() ? 'bg-blue-500/20' : 'bg-gray-100' }} rounded-xl">
-                                <audio controls class="h-8 max-w-[200px]">
-                                    <source src="{{ asset('storage/' . $msg['voice_path']) }}" type="audio/webm">
+                                <audio controls class="h-8 max-w-[200px]" preload="metadata">
+                                    <source src="{{ asset('storage/' . $msg['voice_path']) }}" type="{{ str_ends_with($msg['voice_path'], '.mp4') ? 'audio/mp4' : 'audio/webm' }}">
+                                    Your browser does not support audio.
                                 </audio>
                                 <span class="text-xs text-gray-500">{{ gmdate('i:s', $msg['voice_duration'] ?? 0) }}</span>
                             </div>

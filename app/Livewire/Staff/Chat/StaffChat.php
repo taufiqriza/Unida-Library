@@ -284,11 +284,14 @@ class StaffChat extends Component
     {
         if (!$this->activeRoomId || !$base64) return;
         
-        // Decode and save
-        $data = base64_decode(preg_replace('#^data:audio/\w+;base64,#i', '', $base64));
-        $filename = 'voice-notes/' . uniqid() . '.webm';
+        // Extract mime type and decode
+        preg_match('#^data:(audio/\w+);base64,#i', $base64, $matches);
+        $mimeType = $matches[1] ?? 'audio/webm';
+        $ext = $mimeType === 'audio/mp4' ? 'mp4' : 'webm';
         
-        // Ensure directory exists
+        $data = base64_decode(preg_replace('#^data:audio/\w+;base64,#i', '', $base64));
+        $filename = 'voice-notes/' . uniqid() . '.' . $ext;
+        
         \Storage::disk('public')->makeDirectory('voice-notes');
         \Storage::disk('public')->put($filename, $data);
         
@@ -296,7 +299,7 @@ class StaffChat extends Component
             'chat_room_id' => $this->activeRoomId,
             'sender_id' => auth()->id(),
             'voice_path' => $filename,
-            'voice_duration' => min($duration, 180), // max 3 min
+            'voice_duration' => min($duration, 180),
             'type' => 'voice',
         ]);
 
