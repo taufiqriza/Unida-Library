@@ -126,6 +126,9 @@ class SecurityHeaders
             // Images: allow data URIs for inline images, blob for file previews
             "img-src 'self' data: blob: https: http:",
             
+            // Media: allow blob for voice note preview
+            "media-src 'self' blob:",
+            
             // Connect: API calls, Livewire, etc.
             "connect-src 'self' " .
                 "https://api.qrserver.com " .

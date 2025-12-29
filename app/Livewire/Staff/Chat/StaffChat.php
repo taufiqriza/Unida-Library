@@ -284,12 +284,12 @@ class StaffChat extends Component
     {
         if (!$this->activeRoomId || !$base64) return;
         
-        // Remove data URL prefix properly
-        $base64Data = preg_replace('/^data:audio\/[^;]+;base64,/', '', $base64);
+        // Remove data URL prefix (handles codecs like audio/webm;codecs=opus)
+        $base64Data = preg_replace('/^data:audio\/[^;,]+[^,]*,/', '', $base64);
         $data = base64_decode($base64Data);
         
-        // Detect format from original mime
-        $ext = str_contains($base64, 'audio/mp4') ? 'mp4' : 'webm';
+        // Detect format
+        $ext = str_contains($base64, 'mp4') ? 'mp4' : 'webm';
         $filename = 'voice-notes/' . uniqid() . '.' . $ext;
         
         \Storage::disk('public')->makeDirectory('voice-notes');
