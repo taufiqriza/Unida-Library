@@ -53,7 +53,7 @@ class SecurityHeaders
         // Permissions Policy (formerly Feature-Policy)
         $response->headers->set('Permissions-Policy', implode(', ', [
             'camera=(self)',
-            'microphone=()',
+            'microphone=(self)',
             'geolocation=(self)',
             'payment=()',
             'usb=()',
