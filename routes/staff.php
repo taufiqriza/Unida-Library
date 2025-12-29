@@ -84,6 +84,11 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         // Analytics (Google Analytics)
         Route::get('/analytics', \App\Livewire\Staff\Analytics\AnalyticsDashboard::class)->name('analytics.index');
 
+        // Security Dashboard (Super Admin Only)
+        Route::get('/security', \App\Livewire\Staff\Security\SecurityDashboard::class)
+            ->middleware('can:manage-staff')
+            ->name('security.index');
+
         // Profile
         Route::get('/profile', \App\Livewire\Staff\Profile\StaffProfile::class)->name('profile');
 

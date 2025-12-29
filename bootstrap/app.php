@@ -16,10 +16,22 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
-        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         
-        // Add locale middleware to web group
+        // Security middleware - applied globally
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(\App\Http\Middleware\BlockSuspiciousUserAgents::class);
+        
+        // Web group middleware
         $middleware->appendToGroup('web', \App\Http\Middleware\SetLocale::class);
+        $middleware->appendToGroup('web', \App\Http\Middleware\ContentFilter::class);
+        
+        // Register named middleware aliases
+        $middleware->alias([
+            'throttle.login' => \App\Http\Middleware\BruteForceProtection::class,
+            'honeypot' => \App\Http\Middleware\HoneypotProtection::class,
+            'admin.ip' => \App\Http\Middleware\AdminIpWhitelist::class,
+            'content.filter' => \App\Http\Middleware\ContentFilter::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

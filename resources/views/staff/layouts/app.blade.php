@@ -133,8 +133,9 @@
             ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
             ['label' => 'Survey', 'icon' => 'fa-clipboard-question', 'route' => 'staff.survey.index', 'patterns' => ['staff.survey*']],
         ];
-        // Add Control menu for admin only
+        // Add Control & Security menu for admin only
         if (in_array($user->role, ['super_admin', 'admin'])) {
+            $navItems[] = ['label' => 'Security', 'icon' => 'fa-shield-alt', 'route' => 'staff.security.index', 'patterns' => ['staff.security*']];
             $navItems[] = ['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']];
         }
         // Note: Profil removed from sidebar, now in header dropdown
