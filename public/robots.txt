@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /staff/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://library.unida.gontor.ac.id/sitemap.xml
