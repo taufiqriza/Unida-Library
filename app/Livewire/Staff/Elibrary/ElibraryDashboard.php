@@ -235,40 +235,22 @@ class ElibraryDashboard extends Component
         if (!$submission->member?->email) return;
         
         try {
-            \Illuminate\Support\Facades\Mail::send([], [], function ($message) use ($submission) {
+            $data = [
+                'author' => $submission->author,
+                'title' => $submission->title,
+                'type' => ucfirst($submission->type),
+                'year' => $submission->year,
+                'nim' => $submission->nim ?? null,
+                'portalUrl' => route('opac.member.dashboard'),
+            ];
+            
+            \Illuminate\Support\Facades\Mail::send('emails.publication-approved', $data, function ($message) use ($submission) {
                 $message->to($submission->member->email)
-                    ->subject('Karya Ilmiah Anda Telah Dipublikasikan - ' . config('app.name'))
-                    ->html($this->getEmailTemplate($submission));
+                    ->subject('🎉 Karya Ilmiah Anda Telah Dipublikasikan - UNIDA Library');
             });
         } catch (\Exception $e) {
             \Log::error('Failed to send publish notification: ' . $e->getMessage());
         }
-    }
-
-    protected function getEmailTemplate($submission)
-    {
-        $portalUrl = route('opac.member.dashboard');
-        return "
-        <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;'>
-                <h1 style='color: white; margin: 0;'>🎉 Selamat!</h1>
-            </div>
-            <div style='padding: 30px; background: #f8fafc;'>
-                <p style='font-size: 16px; color: #334155;'>Halo <strong>{$submission->author}</strong>,</p>
-                <p style='font-size: 16px; color: #334155;'>Karya ilmiah Anda telah berhasil dipublikasikan di E-Library:</p>
-                <div style='background: white; border-radius: 12px; padding: 20px; margin: 20px 0; border-left: 4px solid #667eea;'>
-                    <h3 style='margin: 0 0 10px 0; color: #1e293b;'>{$submission->title}</h3>
-                    <p style='margin: 0; color: #64748b; font-size: 14px;'>Jenis: " . ucfirst($submission->type) . " • Tahun: {$submission->year}</p>
-                </div>
-                <p style='font-size: 16px; color: #334155;'>Anda dapat melihat dan mengunduh sertifikat publikasi melalui Member Portal.</p>
-                <div style='text-align: center; margin: 30px 0;'>
-                    <a href='{$portalUrl}' style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;'>Buka Member Portal</a>
-                </div>
-            </div>
-            <div style='padding: 20px; text-align: center; color: #94a3b8; font-size: 12px;'>
-                " . config('app.name') . " • Email ini dikirim otomatis
-            </div>
-        </div>";
     }
 
     public function render()

@@ -8,22 +8,22 @@
                 Halo <strong style="color: #1e293b;">{{ $name }}</strong>,
             </p>
             <p style="margin: 0 0 24px 0; color: #475569; font-size: 15px; line-height: 1.6;">
-                Gunakan kode verifikasi berikut untuk melanjutkan proses pendaftaran akun Anda:
+                Anda menerima permintaan reset password untuk akun UNIDA Library Anda. Gunakan kode berikut:
             </p>
         </td>
     </tr>
     
-    {{-- OTP Box --}}
+    {{-- Reset Code Box --}}
     <tr>
         <td align="center" style="padding: 8px 0 24px 0;">
             <table role="presentation" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px; border: 1px solid #bfdbfe;">
                 <tr>
                     <td style="padding: 24px 40px;">
                         <p style="margin: 0 0 8px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
-                            Kode Verifikasi
+                            Kode Reset Password
                         </p>
                         <p style="margin: 0; color: #1e40af; font-size: 36px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">
-                            {{ $otp }}
+                            {{ $code }}
                         </p>
                     </td>
                 </tr>
@@ -37,7 +37,7 @@
                 <tr>
                     <td style="padding: 12px 16px;">
                         <p style="margin: 0; color: #854d0e; font-size: 13px;">
-                            ⏱️ Kode ini berlaku selama <strong>15 menit</strong>
+                            ⏱️ Kode ini berlaku selama <strong>30 menit</strong>
                         </p>
                     </td>
                 </tr>
@@ -48,7 +48,7 @@
     <tr>
         <td style="padding-top: 24px;">
             <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.6;">
-                Jika Anda tidak melakukan pendaftaran di UNIDA Library, abaikan email ini. Akun tidak akan dibuat tanpa verifikasi.
+                Jika Anda tidak meminta reset password, abaikan email ini. Password Anda akan tetap aman.
             </p>
         </td>
     </tr>
