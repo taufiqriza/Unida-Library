@@ -493,7 +493,7 @@
 
                     {{-- Voice Recorder --}}
                     <div x-data="voiceRecorder()" x-init="init()">
-                        <button type="button" @click="toggleRecording()" 
+                        <button type="button" @click="handleMicClick()" 
                                 :class="recording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-100 hover:bg-gray-200 text-gray-500'"
                                 class="w-8 h-8 rounded-lg flex items-center justify-center transition" 
                                 :title="recording ? 'Stop Recording' : 'Voice Note'">
@@ -502,6 +502,40 @@
                         <template x-if="recording">
                             <span class="text-xs text-red-500 ml-1" x-text="formatTime(recordingTime)"></span>
                         </template>
+                        
+                        {{-- Permission Modal --}}
+                        <div x-show="showPermissionModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showPermissionModal = false">
+                            <div class="bg-white rounded-2xl shadow-2xl w-80 overflow-hidden" @click.stop>
+                                <div class="p-6 text-center">
+                                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-microphone text-blue-600 text-2xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Izinkan Mikrofon</h3>
+                                    <p class="text-sm text-gray-500 mb-4">Untuk mengirim voice note, izinkan akses mikrofon di browser Anda.</p>
+                                </div>
+                                <div class="flex border-t">
+                                    <button @click="showPermissionModal = false" class="flex-1 py-3 text-gray-600 hover:bg-gray-50 font-medium text-sm border-r">Batal</button>
+                                    <button @click="requestPermission()" class="flex-1 py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">Izinkan</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Denied Modal --}}
+                        <div x-show="showDeniedModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showDeniedModal = false">
+                            <div class="bg-white rounded-2xl shadow-2xl w-80 overflow-hidden" @click.stop>
+                                <div class="p-6 text-center">
+                                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-microphone-slash text-red-600 text-2xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Akses Ditolak</h3>
+                                    <p class="text-sm text-gray-500 mb-2">Mikrofon diblokir. Untuk mengaktifkan:</p>
+                                    <p class="text-xs text-gray-400">Klik ikon 🔒 di address bar → Site settings → Microphone → Allow</p>
+                                </div>
+                                <div class="border-t">
+                                    <button @click="showDeniedModal = false" class="w-full py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">Mengerti</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <button type="submit" class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-500/30 transition">
@@ -1218,14 +1252,37 @@ Alpine.data('voiceRecorder', () => ({
     chunks: [],
     timer: null,
     maxDuration: 180,
+    hasPermission: null,
+    showPermissionModal: false,
+    showDeniedModal: false,
     
-    init() {},
+    init() {
+        // Check existing permission
+        navigator.permissions?.query({ name: 'microphone' }).then(p => {
+            this.hasPermission = p.state === 'granted';
+        }).catch(() => {});
+    },
     
-    async toggleRecording() {
+    handleMicClick() {
         if (this.recording) {
             this.stopRecording();
+        } else if (this.hasPermission) {
+            this.startRecording();
         } else {
-            await this.startRecording();
+            this.showPermissionModal = true;
+        }
+    },
+    
+    async requestPermission() {
+        this.showPermissionModal = false;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(t => t.stop());
+            this.hasPermission = true;
+            this.startRecording();
+        } catch (e) {
+            this.hasPermission = false;
+            this.showDeniedModal = true;
         }
     },
     
@@ -1247,7 +1304,7 @@ Alpine.data('voiceRecorder', () => ({
                 if (this.recordingTime >= this.maxDuration) this.stopRecording();
             }, 1000);
         } catch (e) {
-            alert('Tidak dapat mengakses mikrofon');
+            this.showDeniedModal = true;
         }
     },
     
