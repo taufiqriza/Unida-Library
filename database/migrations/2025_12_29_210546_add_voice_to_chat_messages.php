@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->string('voice_path')->nullable()->after('image_path');
+            $table->string('voice_path')->nullable()->after('attachment_name');
             $table->integer('voice_duration')->nullable()->after('voice_path');
         });
     }
