@@ -422,48 +422,18 @@
             
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
-                <div class="relative" wire:ignore.self>
-                    <button type="button" onclick="toggleEmojiPicker()" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
+                <div class="relative" x-data="{ showEmoji: false }">
+                    <button type="button" @click="showEmoji = !showEmoji" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition" title="Emoji">
                         <i class="fas fa-smile text-gray-500 text-xs"></i>
                     </button>
-                    <div id="emojiPickerBox" style="display:none" class="absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-72 max-h-56 overflow-y-auto">
-                        <div class="grid grid-cols-9 gap-1">
-                            <button type="button" onclick="insertEmoji('😀')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😀</button>
-                            <button type="button" onclick="insertEmoji('😃')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😃</button>
-                            <button type="button" onclick="insertEmoji('😄')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😄</button>
-                            <button type="button" onclick="insertEmoji('😁')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😁</button>
-                            <button type="button" onclick="insertEmoji('😂')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😂</button>
-                            <button type="button" onclick="insertEmoji('🤣')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🤣</button>
-                            <button type="button" onclick="insertEmoji('😊')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😊</button>
-                            <button type="button" onclick="insertEmoji('😇')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😇</button>
-                            <button type="button" onclick="insertEmoji('🙂')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🙂</button>
-                            <button type="button" onclick="insertEmoji('😉')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😉</button>
-                            <button type="button" onclick="insertEmoji('😍')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😍</button>
-                            <button type="button" onclick="insertEmoji('🥰')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🥰</button>
-                            <button type="button" onclick="insertEmoji('😘')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😘</button>
-                            <button type="button" onclick="insertEmoji('😋')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😋</button>
-                            <button type="button" onclick="insertEmoji('😎')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😎</button>
-                            <button type="button" onclick="insertEmoji('🤔')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🤔</button>
-                            <button type="button" onclick="insertEmoji('😢')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😢</button>
-                            <button type="button" onclick="insertEmoji('😭')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😭</button>
-                            <button type="button" onclick="insertEmoji('😤')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😤</button>
-                            <button type="button" onclick="insertEmoji('😡')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">😡</button>
-                            <button type="button" onclick="insertEmoji('👍')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">👍</button>
-                            <button type="button" onclick="insertEmoji('👎')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">👎</button>
-                            <button type="button" onclick="insertEmoji('👏')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">👏</button>
-                            <button type="button" onclick="insertEmoji('🙏')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🙏</button>
-                            <button type="button" onclick="insertEmoji('💪')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">💪</button>
-                            <button type="button" onclick="insertEmoji('🎉')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🎉</button>
-                            <button type="button" onclick="insertEmoji('❤️')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">❤️</button>
-                            <button type="button" onclick="insertEmoji('🔥')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">🔥</button>
-                            <button type="button" onclick="insertEmoji('⭐')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">⭐</button>
-                            <button type="button" onclick="insertEmoji('✅')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">✅</button>
-                            <button type="button" onclick="insertEmoji('❌')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">❌</button>
-                            <button type="button" onclick="insertEmoji('💯')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">💯</button>
-                            <button type="button" onclick="insertEmoji('📚')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">📚</button>
-                            <button type="button" onclick="insertEmoji('📝')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">📝</button>
-                            <button type="button" onclick="insertEmoji('💡')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">💡</button>
-                            <button type="button" onclick="insertEmoji('💬')" class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-base">💬</button>
+                    <div x-show="showEmoji" @click.away="showEmoji = false" x-transition
+                         class="absolute bottom-10 left-0 bg-white rounded-xl shadow-xl border p-2 z-50 w-64 max-h-48 overflow-y-auto">
+                        <div class="grid grid-cols-8 gap-1">
+                            @foreach(['😀','😂','😊','😍','🥰','😎','🤔','😅','😢','😭','😤','😱','🙏','👍','👎','👏','🎉','❤️','🔥','⭐','✅','❌','📚','📖','💡','🎯','📝','💪'] as $emoji)
+                            <button type="button" 
+                                    @click="$wire.set('message', ($wire.get('message') || '') + '{{ $emoji }}'); showEmoji = false"
+                                    class="w-7 h-7 hover:bg-gray-100 rounded flex items-center justify-center text-lg">{{ $emoji }}</button>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -503,30 +473,6 @@
                     </button>
                 </div>
             </form>
-            
-            <script>
-            function toggleEmojiPicker() {
-                var box = document.getElementById('emojiPickerBox');
-                box.style.display = box.style.display === 'none' ? 'block' : 'none';
-            }
-            function insertEmoji(emoji) {
-                var input = document.getElementById('chatMessageInput');
-                if (!input) return;
-                var start = input.selectionStart || 0;
-                var val = input.value || '';
-                input.value = val.slice(0, start) + emoji + val.slice(start);
-                input.focus();
-                input.selectionStart = input.selectionEnd = start + emoji.length;
-                input.dispatchEvent(new Event('input', {bubbles: true}));
-                document.getElementById('emojiPickerBox').style.display = 'none';
-            }
-            document.addEventListener('click', function(e) {
-                var box = document.getElementById('emojiPickerBox');
-                if (box && !e.target.closest('.relative')) {
-                    box.style.display = 'none';
-                }
-            });
-            </script>
         </div>
 
         {{-- Task Picker Modal --}}
