@@ -238,7 +238,8 @@
                                 @if($msg['attachment_type'] === 'image')
                                 <img src="{{ asset('storage/' . $msg['attachment']) }}" 
                                      class="rounded-xl max-w-full cursor-pointer hover:opacity-90 transition" 
-                                     onclick="window.open(this.src)">
+                                     onclick="showImagePreview(this.src)"
+                                     alt="Image">
                                 @else
                                 <a href="{{ asset('storage/' . $msg['attachment']) }}" 
                                    target="_blank" 
@@ -1201,4 +1202,27 @@
         </div>
     </div>
     @endif
+
+    {{-- Image Preview Modal --}}
+    <div id="imagePreviewModal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/80" onclick="closeImagePreview()">
+        <button onclick="closeImagePreview()" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white text-xl transition">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="previewImage" src="" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl" onclick="event.stopPropagation()">
+    </div>
+
+    <script>
+        function showImagePreview(src) {
+            document.getElementById('previewImage').src = src;
+            document.getElementById('imagePreviewModal').classList.remove('hidden');
+            document.getElementById('imagePreviewModal').classList.add('flex');
+        }
+        function closeImagePreview() {
+            document.getElementById('imagePreviewModal').classList.add('hidden');
+            document.getElementById('imagePreviewModal').classList.remove('flex');
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeImagePreview();
+        });
+    </script>
 </div>
