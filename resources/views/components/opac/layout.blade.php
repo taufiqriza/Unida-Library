@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ $locale ?? 'id' }}" dir="{{ $textDirection ?? 'ltr' }}">
 <head>
+    <x-google-analytics />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
