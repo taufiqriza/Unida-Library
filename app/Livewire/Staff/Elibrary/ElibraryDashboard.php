@@ -6,6 +6,8 @@ use App\Models\Ebook;
 use App\Models\Ethesis;
 use App\Models\PlagiarismCheck;
 use App\Models\ThesisSubmission;
+use App\Notifications\ThesisStatusNotification;
+use App\Notifications\ClearanceLetterNotification;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -108,6 +110,9 @@ class ElibraryDashboard extends Component
             'review_notes' => $this->reviewNotes,
         ]);
         
+        // Send notification
+        $member?->notify(new ThesisStatusNotification($this->selectedItem, 'approved'));
+        
         // Auto-create clearance letter if member has no active loans and fines
         if ($member && !$hasWarnings) {
             $existingLetter = \App\Models\ClearanceLetter::where('member_id', $member->id)
@@ -115,7 +120,7 @@ class ElibraryDashboard extends Component
                 ->first();
             
             if (!$existingLetter) {
-                \App\Models\ClearanceLetter::create([
+                $letter = \App\Models\ClearanceLetter::create([
                     'member_id' => $member->id,
                     'thesis_submission_id' => $this->selectedItem->id,
                     'letter_number' => \App\Models\ClearanceLetter::generateLetterNumber(),
@@ -125,6 +130,7 @@ class ElibraryDashboard extends Component
                     'approved_at' => now(),
                     'notes' => 'Otomatis disetujui bersamaan dengan persetujuan tugas akhir.',
                 ]);
+                $member->notify(new ClearanceLetterNotification($letter));
             }
         }
         
@@ -148,6 +154,9 @@ class ElibraryDashboard extends Component
             'reviewed_at' => now(),
             'rejection_reason' => $this->reviewNotes,
         ]);
+        
+        $this->selectedItem->member?->notify(new ThesisStatusNotification($this->selectedItem, 'rejected'));
+        
         $this->dispatch('notify', type: 'success', message: 'Submission ditolak');
         $this->closeModal();
     }
@@ -162,6 +171,9 @@ class ElibraryDashboard extends Component
             'reviewed_at' => now(),
             'review_notes' => $this->reviewNotes,
         ]);
+        
+        $this->selectedItem->member?->notify(new ThesisStatusNotification($this->selectedItem, 'revision'));
+        
         $this->dispatch('notify', type: 'success', message: 'Permintaan revisi dikirim');
         $this->closeModal();
     }
