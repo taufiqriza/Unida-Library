@@ -1143,5 +1143,7 @@
             });
         });
     </script>
+    
+    @livewireScripts
 </body>
 </html>
