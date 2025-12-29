@@ -288,8 +288,8 @@ class StaffChat extends Component
         $base64Data = preg_replace('/^data:audio\/[^;,]+[^,]*,/', '', $base64);
         $data = base64_decode($base64Data);
         
-        // Detect format
-        $ext = str_contains($base64, 'mp4') ? 'mp4' : 'webm';
+        // Detect format from actual content (WebM starts with 0x1A45DFA3)
+        $ext = (substr($data, 0, 4) === "\x1A\x45\xDF\xA3") ? 'webm' : 'mp4';
         $filename = 'voice-notes/' . uniqid() . '.' . $ext;
         
         \Storage::disk('public')->makeDirectory('voice-notes');
