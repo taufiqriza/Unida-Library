@@ -162,7 +162,7 @@
                 <div class="p-2 hover:bg-blue-50 cursor-pointer text-left">
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-xs font-medium text-gray-800">{{ $result['sender']['name'] ?? 'Unknown' }}</span>
-                        <span class="text-[10px] text-gray-400">{{ \Carbon\Carbon::parse($result['created_at'])->format('d M H:i') }}</span>
+                        <span class="text-[10px] text-gray-400">{{ \Carbon\Carbon::parse($result['created_at'])->setTimezone('Asia/Jakarta')->format('d M H:i') }}</span>
                     </div>
                     <p class="text-xs text-gray-600 mt-0.5 line-clamp-2">{!! preg_replace('/(' . preg_quote($messageSearchQuery, '/') . ')/i', '<mark class="bg-yellow-200">$1</mark>', e($result['message'])) !!}</p>
                 </div>
@@ -280,7 +280,7 @@
                                         <div class="flex items-center gap-2 mt-1 text-[10px] text-gray-500">
                                             <span><i class="fas fa-user mr-0.5"></i>{{ $msg['task']['assignee']['name'] ?? 'Unassigned' }}</span>
                                             @if(isset($msg['task']['due_date']) && $msg['task']['due_date'])
-                                            <span><i class="fas fa-calendar mr-0.5"></i>{{ \Carbon\Carbon::parse($msg['task']['due_date'])->format('d M') }}</span>
+                                            <span><i class="fas fa-calendar mr-0.5"></i>{{ \Carbon\Carbon::parse($msg['task']['due_date'])->setTimezone('Asia/Jakarta')->format('d M') }}</span>
                                             @endif
                                         </div>
                                         <button wire:click="openTaskModal({{ $msg['task']['id'] }})" 
@@ -332,7 +332,7 @@
                             
                             {{-- Time --}}
                             <p class="text-[10px] text-gray-400 mt-1 {{ $msg['sender_id'] === auth()->id() ? 'text-right' : '' }}">
-                                {{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}
+                                {{ \Carbon\Carbon::parse($msg['created_at'])->setTimezone('Asia/Jakarta')->format('H:i') }}
                             </p>
                         </div>
                     </div>
