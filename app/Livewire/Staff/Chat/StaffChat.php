@@ -149,6 +149,7 @@ class StaffChat extends Component
     {
         if (!$this->activeRoomId) return;
 
+        // Get latest 50 messages (ordered by newest first, then reverse for display)
         $this->messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->where('is_deleted', false)
             ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'type', 'created_at'])
@@ -161,9 +162,11 @@ class StaffChat extends Component
                 'book:id,title,isbn,image',
                 'book.authors:id,name'
             ])
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->take(50)
             ->get()
+            ->reverse()
+            ->values()
             ->toArray();
     }
 
