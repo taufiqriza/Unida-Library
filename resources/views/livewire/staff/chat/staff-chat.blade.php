@@ -503,23 +503,6 @@
                             <span class="text-xs text-red-500 ml-1" x-text="formatTime(recordingTime)"></span>
                         </template>
                         
-                        {{-- Permission Modal --}}
-                        <div x-show="showPermissionModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showPermissionModal = false">
-                            <div class="bg-white rounded-2xl shadow-2xl w-80 overflow-hidden" @click.stop>
-                                <div class="p-6 text-center">
-                                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-microphone text-blue-600 text-2xl"></i>
-                                    </div>
-                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Izinkan Mikrofon</h3>
-                                    <p class="text-sm text-gray-500 mb-4">Untuk mengirim voice note, izinkan akses mikrofon di browser Anda.</p>
-                                </div>
-                                <div class="flex border-t">
-                                    <button @click="showPermissionModal = false" class="flex-1 py-3 text-gray-600 hover:bg-gray-50 font-medium text-sm border-r">Batal</button>
-                                    <button @click="requestPermission()" class="flex-1 py-3 text-blue-600 hover:bg-blue-50 font-medium text-sm">Izinkan</button>
-                                </div>
-                            </div>
-                        </div>
-                        
                         {{-- Denied Modal --}}
                         <div x-show="showDeniedModal" x-transition class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center" @click.self="showDeniedModal = false">
                             <div class="bg-white rounded-2xl shadow-2xl w-80 overflow-hidden" @click.stop>
@@ -1252,37 +1235,15 @@ Alpine.data('voiceRecorder', () => ({
     chunks: [],
     timer: null,
     maxDuration: 180,
-    hasPermission: null,
-    showPermissionModal: false,
     showDeniedModal: false,
     
-    init() {
-        // Check existing permission
-        navigator.permissions?.query({ name: 'microphone' }).then(p => {
-            this.hasPermission = p.state === 'granted';
-        }).catch(() => {});
-    },
+    init() {},
     
     handleMicClick() {
         if (this.recording) {
             this.stopRecording();
-        } else if (this.hasPermission) {
-            this.startRecording();
         } else {
-            this.showPermissionModal = true;
-        }
-    },
-    
-    async requestPermission() {
-        this.showPermissionModal = false;
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach(t => t.stop());
-            this.hasPermission = true;
             this.startRecording();
-        } catch (e) {
-            this.hasPermission = false;
-            this.showDeniedModal = true;
         }
     },
     
@@ -1316,8 +1277,12 @@ Alpine.data('voiceRecorder', () => ({
                 if (this.recordingTime >= this.maxDuration) this.stopRecording();
             }, 1000);
         } catch (e) {
-            console.error('Mic error:', e);
-            this.showDeniedModal = true;
+            console.error('Mic error:', e.name, e.message);
+            if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+                this.showDeniedModal = true;
+            } else {
+                alert('Error: ' + e.message);
+            }
         }
     },
     
