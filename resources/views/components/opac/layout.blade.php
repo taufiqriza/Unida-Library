@@ -7,7 +7,8 @@
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
     
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
     {{-- Preconnect to CDNs for faster loading --}}
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
