@@ -5,52 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'OPAC' }} - Perpustakaan UNIDA Gontor</title>
-    <meta name="description" content="{{ $metaDescription ?? 'Perpustakaan Digital Universitas Darussalam Gontor - Katalog Online, E-Library, Cek Plagiasi, dan Layanan Peminjaman Buku' }}">
     
     {{-- Favicon --}}
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
-    
-    {{-- Structured Data for Google Sitelinks --}}
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "Perpustakaan UNIDA Gontor",
-        "alternateName": "UNIDA Library",
-        "url": "https://library.unida.gontor.ac.id",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://library.unida.gontor.ac.id/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Perpustakaan Universitas Darussalam Gontor",
-        "url": "https://library.unida.gontor.ac.id",
-        "logo": "https://library.unida.gontor.ac.id/favicon.png",
-        "sameAs": ["https://unida.gontor.ac.id"]
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SiteNavigationElement",
-        "name": ["Katalog", "E-Library", "Cek Plagiasi", "Panduan", "Login"],
-        "url": [
-            "https://library.unida.gontor.ac.id/search",
-            "https://library.unida.gontor.ac.id/elibrary",
-            "https://library.unida.gontor.ac.id/cek-plagiasi",
-            "https://library.unida.gontor.ac.id/panduan",
-            "https://library.unida.gontor.ac.id/login"
-        ]
-    }
-    </script>
     {{-- Preconnect to CDNs for faster loading --}}
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
