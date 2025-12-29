@@ -134,14 +134,27 @@ class Login extends Component
             return;
         }
 
-        Log::channel('daily')->info('Staff login success', [
+        Log::channel('daily')->info('Staff login attempt', [
             'user_id' => $user->id,
             'email' => $user->email,
             'ip' => request()->ip(),
         ]);
         
         Auth::guard('web')->login($user, $this->remember);
+        
+        Log::channel('daily')->info('After Auth::login', [
+            'auth_check' => Auth::guard('web')->check(),
+            'auth_id' => Auth::guard('web')->id(),
+            'session_id' => session()->getId(),
+        ]);
+        
         session()->regenerate();
+        
+        Log::channel('daily')->info('After session regenerate', [
+            'auth_check' => Auth::guard('web')->check(),
+            'new_session_id' => session()->getId(),
+        ]);
+        
         return redirect()->route('staff.dashboard');
     }
 
