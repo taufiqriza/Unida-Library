@@ -73,13 +73,7 @@ class SetLocale
             return $request->cookie('locale');
         }
         
-        // 5. Check browser preference
-        $browserLocale = $request->getPreferredLanguage($this->availableLocales);
-        if ($browserLocale) {
-            return $browserLocale;
-        }
-        
-        // 6. Default
+        // 5. Default
         return config('app.locale', 'id');
     }
     
