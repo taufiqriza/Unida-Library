@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Rate Limiters
         RateLimiter::for('login', function (Request $request) {
-            return Limit::perMinute(5)->by($request->ip())->response(function () {
+            return Limit::perMinute(10)->by($request->ip())->response(function () {
                 Log::warning('Rate limit exceeded for login', ['ip' => request()->ip()]);
                 return response('Terlalu banyak percobaan login. Coba lagi dalam 1 menit.', 429);
             });
