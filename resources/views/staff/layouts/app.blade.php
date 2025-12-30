@@ -811,6 +811,27 @@
     .swal2-popup.swal-custom .swal2-icon {
         margin: 1rem auto !important;
     }
+    /* Toast styling */
+    .swal2-popup.swal-toast {
+        padding: 0.75rem 1rem !important;
+        border-radius: 0.75rem !important;
+        font-size: 0.875rem !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+    .swal2-popup.swal-toast .swal2-title {
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        margin: 0 !important;
+    }
+    .swal2-popup.swal-toast .swal2-icon {
+        width: 1.5rem !important;
+        height: 1.5rem !important;
+        margin: 0 0.5rem 0 0 !important;
+        border-width: 2px !important;
+    }
+    .swal2-popup.swal-toast .swal2-icon .swal2-icon-content {
+        font-size: 0.875rem !important;
+    }
     </style>
     <script>
     // Custom SweetAlert config
@@ -827,7 +848,7 @@
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-        customClass: { popup: 'swal-custom' }
+        customClass: { popup: 'swal-toast' }
     });
     
     // Global confirm function for Livewire

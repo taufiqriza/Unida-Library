@@ -206,12 +206,24 @@ class ElibraryDashboard extends Component
         $this->closeModal();
     }
     
+    public function quickPublish($id)
+    {
+        $this->selectedItem = ThesisSubmission::find($id);
+        if ($this->selectedItem && $this->selectedItem->status === 'approved') {
+            $this->publishSubmission();
+        }
+    }
+    
     protected function createClearanceLetter($submission)
     {
-        $member = $submission->member;
-        if (!$member) return null;
+        // Load member without branch scope
+        $member = \App\Models\Member::withoutGlobalScope('branch')->find($submission->member_id);
+        if (!$member) {
+            \Log::error('Clearance: member not found for submission ' . $submission->id);
+            return null;
+        }
         
-        // Check if already has clearance (fresh query)
+        // Check if already has clearance
         $existing = \App\Models\ClearanceLetter::where('thesis_submission_id', $submission->id)->first();
         if ($existing) return $existing;
         
