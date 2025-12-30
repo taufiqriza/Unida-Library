@@ -20,28 +20,15 @@ class ImportBwiItems extends Command
         // Load data
         require base_path('scripts/bwi_data_clean.php');
 
-        $this->info("Biblios: " . count($biblioMap));
         $this->info("Items to import: " . count($slimsItems));
 
-        // Get books
-        $books = Book::where('branch_id', $branchId)->get(['id', 'title']);
-        $this->info("Books in branch: " . $books->count());
+        // Get existing book IDs for this branch
+        $existingBookIds = Book::where('branch_id', $branchId)->pluck('id')->toArray();
+        $this->info("Books in branch: " . count($existingBookIds));
 
-        // Create title mapping
-        $bookByTitle = [];
-        foreach ($books as $book) {
-            $bookByTitle[mb_strtolower(trim($book->title))] = $book->id;
-        }
-
-        // Map biblio_id to book_id
-        $biblioToBook = [];
-        foreach ($biblioMap as $biblioId => $title) {
-            $key = mb_strtolower(trim($title));
-            if (isset($bookByTitle[$key])) {
-                $biblioToBook[$biblioId] = $bookByTitle[$key];
-            }
-        }
-        $this->info("Mapped: " . count($biblioToBook));
+        // Book ID pattern: book_id = 2000000 + slims_biblio_id
+        // This was used during initial migration
+        $idOffset = 2000000;
 
         // Get/create location
         $locationId = DB::table('locations')->where('branch_id', $branchId)->value('id');
@@ -64,8 +51,12 @@ class ImportBwiItems extends Command
         foreach ($slimsItems as $item) {
             $biblioId = $item['biblio_id'];
             $barcode = $item['barcode'];
+            
+            // Calculate book_id from biblio_id
+            $bookId = $idOffset + $biblioId;
 
-            if (!isset($biblioToBook[$biblioId])) {
+            // Check if book exists
+            if (!in_array($bookId, $existingBookIds)) {
                 $skipped++;
                 continue;
             }
@@ -77,7 +68,7 @@ class ImportBwiItems extends Command
 
             if (!$dryRun) {
                 Item::create([
-                    'book_id' => $biblioToBook[$biblioId],
+                    'book_id' => $bookId,
                     'branch_id' => $branchId,
                     'barcode' => $barcode,
                     'call_number' => $item['call_number'] ?: null,
