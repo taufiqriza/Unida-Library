@@ -32,6 +32,7 @@ class SecurityScan extends Command
         'NotificationService.php', // Uses system() for legitimate purposes
         'ShamelaContentService.php', // Uses exec() for PDF processing
         'ChatMessage.php', // Uses system() for notifications
+        'StaffChat.php', // Uses base64_decode for voice note upload
     ];
 
     protected array $safeUploadFiles = [
