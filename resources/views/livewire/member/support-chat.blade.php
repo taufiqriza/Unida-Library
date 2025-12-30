@@ -124,7 +124,7 @@
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer" 
-                                     onclick="window.open(this.src)">
+                                     @click="$dispatch('show-image', '{{ Storage::url($msg['attachment']) }}')">
                             @endif
                             @if($msg['message'])
                             <div class="bg-blue-500 text-white px-4 py-2.5 rounded-2xl rounded-br-sm text-sm">
@@ -146,7 +146,7 @@
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer"
-                                     onclick="window.open(this.src)">
+                                     @click="$dispatch('show-image', '{{ Storage::url($msg['attachment']) }}')">
                             @endif
                             @if(!empty($msg['voice_path']))
                                 <audio controls class="h-10 mb-1 w-full">
@@ -223,4 +223,18 @@
         @endif
     </div>
     @endif
+    
+    {{-- Image Modal --}}
+    <div x-data="{ show: false, src: '' }" 
+         @show-image.window="src = $event.detail; show = true"
+         @keydown.escape.window="show = false">
+        <template x-if="show">
+            <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4" @click="show = false">
+                <img :src="src" class="max-w-full max-h-full rounded-lg" @click.stop>
+                <button @click="show = false" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </template>
+    </div>
 </div>
