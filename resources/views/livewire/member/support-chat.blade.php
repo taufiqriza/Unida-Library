@@ -221,20 +221,20 @@
             </form>
         </div>
         @endif
+        
+        {{-- Image Modal --}}
+        <div x-data="{ show: false, src: '' }" 
+             x-on:show-image.window="src = $event.detail; show = true"
+             x-show="show"
+             x-cloak
+             class="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-4"
+             @click="show = false"
+             @keydown.escape.window="show = false">
+            <img :src="src" class="max-w-full max-h-full rounded-lg shadow-2xl" @click.stop>
+            <button @click="show = false" class="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
     </div>
     @endif
-    
-    {{-- Image Modal --}}
-    <div x-data="{ show: false, src: '' }" 
-         @show-image.window="src = $event.detail; show = true"
-         @keydown.escape.window="show = false">
-        <template x-if="show">
-            <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-4" @click="show = false">
-                <img :src="src" class="max-w-full max-h-full rounded-lg" @click.stop>
-                <button @click="show = false" class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-        </template>
-    </div>
 </div>
