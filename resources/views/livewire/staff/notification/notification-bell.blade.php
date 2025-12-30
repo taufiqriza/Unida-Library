@@ -1,4 +1,4 @@
-<div class="relative" x-data @click.outside="$wire.closeDropdown()">
+<div class="relative" x-data @click.outside="$wire.closeDropdown()" wire:poll.10s="updateCount">
     {{-- Bell Button --}}
     <button wire:click="toggleDropdown" 
             type="button"

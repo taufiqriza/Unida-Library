@@ -662,6 +662,15 @@ class StaffChat extends Component
             'support' => $support,
         ];
     }
+    
+    public function getUnreadCountProperty()
+    {
+        $rooms = $this->rooms;
+        $total = $rooms['directs']->sum('unread_count') 
+               + $rooms['groups']->sum('unread_count')
+               + $rooms['support']->sum('unread_count');
+        return $total;
+    }
 
     public function getBranchesProperty()
     {
