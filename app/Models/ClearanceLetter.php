@@ -43,9 +43,19 @@ class ClearanceLetter extends Model
     {
         $year = date('Y');
         $month = date('m');
-        $count = static::whereYear('created_at', $year)->count() + 1;
+        $prefix = sprintf('SBP/%s/%s/', $month, $year);
         
-        return sprintf('SBP/%s/%s/%04d', $month, $year, $count);
+        $lastNumber = static::where('letter_number', 'like', $prefix . '%')
+            ->orderByDesc('letter_number')
+            ->value('letter_number');
+        
+        $nextSeq = 1;
+        if ($lastNumber) {
+            $lastSeq = (int) substr($lastNumber, -4);
+            $nextSeq = $lastSeq + 1;
+        }
+        
+        return sprintf('%s%04d', $prefix, $nextSeq);
     }
 
     public function isPending(): bool
