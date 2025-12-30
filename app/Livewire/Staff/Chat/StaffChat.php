@@ -642,11 +642,9 @@ class StaffChat extends Component
         
         // Support rooms (all staff can see) - unread = messages from member not yet seen
         $support = ChatRoom::where('type', 'support')
-            ->with(['member:id,name,member_id,photo,branch_id', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
+            ->with(['member', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
             ->orderByDesc('updated_at')
             ->get();
-        
-        \Log::info('Support rooms loaded', ['count' => $support->count(), 'ids' => $support->pluck('id')->toArray()]);
         
         $support = $support
             ->map(function ($room) use ($userId) {
