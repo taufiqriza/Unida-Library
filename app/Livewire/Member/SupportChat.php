@@ -190,11 +190,12 @@ class SupportChat extends Component
             
         foreach ($staffUsers as $staff) {
             // Database notification
+            $topicLabel = $this->topics[$this->room->topic]['label'] ?? 'Support';
             StaffNotification::create([
                 'user_id' => $staff->id,
                 'type' => 'support_message',
                 'title' => 'Pesan Support Baru',
-                'message' => "{$member->name} ({$this->topics[$this->room->topic]['label'] ?? 'Support'})",
+                'message' => "{$member->name} ({$topicLabel})",
                 'data' => json_encode(['room_id' => $this->room->id, 'member_id' => $member->id]),
                 'url' => '/staff/chat?support=' . $this->room->id,
             ]);
