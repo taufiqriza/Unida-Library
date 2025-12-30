@@ -798,10 +798,9 @@
                     class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }}">
                 <div class="relative flex-shrink-0">
                     @if($member->photo)
-                        <img src="{{ $member->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
+                        <img src="{{ Storage::url($member->photo) }}" class="w-11 h-11 rounded-full object-cover">
                     @else
-                        <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold" 
-                             style="background: linear-gradient(135deg, #{{ $member->getAvatarColor() }} 0%, #{{ $member->getAvatarColor() }}dd 100%);">
+                        <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold bg-gradient-to-br from-orange-500 to-red-600">
                             {{ strtoupper(substr($member->name, 0, 1)) }}
                         </div>
                     @endif
