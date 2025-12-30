@@ -17,37 +17,43 @@
             </div>
         </div>
         @elseif(count($pageViews) > 0)
-        <div class="h-64" 
-             x-data="{ init() {
-                const ctx = this.$refs.canvas.getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: {{ Js::from(collect($pageViews)->pluck('date')) }},
-                        datasets: [{
-                            label: 'Pageviews',
-                            data: {{ Js::from(collect($pageViews)->pluck('views')) }},
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                        }, {
-                            label: 'Users', 
-                            data: {{ Js::from(collect($pageViews)->pluck('users')) }},
-                            borderColor: '#10b981',
-                            tension: 0.4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
-                    }
-                });
-             }}">
-            <canvas x-ref="canvas"></canvas>
+        <div class="h-64" wire:key="traffic-chart-{{ count($pageViews) }}">
+            <canvas id="trafficChart{{ count($pageViews) }}"></canvas>
         </div>
+        <script>
+        (function(){
+            setTimeout(function() {
+                var el = document.getElementById('trafficChart{{ count($pageViews) }}');
+                if (el && window.Chart) {
+                    new Chart(el, {
+                        type: 'line',
+                        data: {
+                            labels: @json(collect($pageViews)->pluck('date')),
+                            datasets: [{
+                                label: 'Pageviews',
+                                data: @json(collect($pageViews)->pluck('views')),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                            }, {
+                                label: 'Users', 
+                                data: @json(collect($pageViews)->pluck('users')),
+                                borderColor: '#10b981',
+                                tension: 0.4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+                        }
+                    });
+                }
+            }, 100);
+        })();
+        </script>
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
