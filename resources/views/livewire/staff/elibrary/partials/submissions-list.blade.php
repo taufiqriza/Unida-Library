@@ -88,12 +88,12 @@
                 <button wire:click="viewDetail({{ $item->id }}, 'submission')" class="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Lihat Detail">
                     <i class="fas fa-eye"></i>
                 </button>
-                @if($isMainBranch && $item->status === 'submitted')
+                @if($item->status === 'submitted')
                 <button wire:click="viewDetail({{ $item->id }}, 'submission')" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Review">
                     <i class="fas fa-clipboard-check"></i>
                 </button>
                 @endif
-                @if($isMainBranch && $item->status === 'approved')
+                @if($item->status === 'approved')
                 <button onclick="confirmAction({title:'Publikasikan ke E-Thesis?',text:'{{ Str::limit(addslashes($item->title), 60) }}',icon:'info',confirmText:'Ya, Publikasikan',confirmColor:'#3b82f6'},()=>Livewire.find('{{ $_instance->getId() }}').quickPublish({{ $item->id }}))" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Publikasikan">
                     <i class="fas fa-globe"></i>
                 </button>
