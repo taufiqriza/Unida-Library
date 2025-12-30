@@ -329,7 +329,7 @@
                     File BAB 1-3 <strong>wajib diberi watermark</strong> logo UNIDA sebelum diunggah karena akan diakses publik.
                 </p>
                 <div class="mt-3 flex flex-wrap gap-2">
-                    <a href="{{ url('storage/logo.png') }}" download="logo-unida.png" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-medium rounded-lg transition">
+                    <a href="{{ url('storage/logo-unida.png') }}" download="logo-unida.png" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-medium rounded-lg transition">
                         <i class="fas fa-download"></i> Download Logo UNIDA
                     </a>
                     <a href="https://www.sejda.com/watermark-pdf" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-medium rounded-lg transition">
