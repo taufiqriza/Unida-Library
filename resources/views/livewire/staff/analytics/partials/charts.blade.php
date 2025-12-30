@@ -17,43 +17,24 @@
             </div>
         </div>
         @elseif(count($pageViews) > 0)
-        <div class="h-64" wire:key="traffic-chart-{{ count($pageViews) }}">
-            <canvas id="trafficChart{{ count($pageViews) }}"></canvas>
+        @php 
+            $maxViews = max(collect($pageViews)->pluck('views')->toArray()) ?: 1;
+            $maxUsers = max(collect($pageViews)->pluck('users')->toArray()) ?: 1;
+        @endphp
+        <div class="h-64 flex items-end gap-1 px-2">
+            @foreach($pageViews as $day)
+            <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full flex flex-col gap-0.5" style="height: 200px;">
+                    <div class="w-full bg-blue-500 rounded-t transition-all" style="height: {{ ($day['views'] / $maxViews) * 100 }}%" title="{{ $day['views'] }} views"></div>
+                </div>
+                <span class="text-[10px] text-gray-500">{{ $day['date'] }}</span>
+            </div>
+            @endforeach
         </div>
-        <script>
-        (function(){
-            setTimeout(function() {
-                var el = document.getElementById('trafficChart{{ count($pageViews) }}');
-                if (el && window.Chart) {
-                    new Chart(el, {
-                        type: 'line',
-                        data: {
-                            labels: @json(collect($pageViews)->pluck('date')),
-                            datasets: [{
-                                label: 'Pageviews',
-                                data: @json(collect($pageViews)->pluck('views')),
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                fill: true,
-                                tension: 0.4,
-                            }, {
-                                label: 'Users', 
-                                data: @json(collect($pageViews)->pluck('users')),
-                                borderColor: '#10b981',
-                                tension: 0.4,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
-                        }
-                    });
-                }
-            }, 100);
-        })();
-        </script>
+        <div class="flex justify-center gap-6 mt-2 text-xs">
+            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> Pageviews: {{ number_format(collect($pageViews)->sum('views')) }}</span>
+            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-emerald-500 rounded"></span> Users: {{ number_format(collect($pageViews)->sum('users')) }}</span>
+        </div>
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
