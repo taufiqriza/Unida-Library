@@ -308,7 +308,10 @@
         </div>
         <div class="p-4 lg:p-6 space-y-5">
             {{-- File Requirements Info --}}
-            <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <div x-data="{ showInfo: true }" x-show="showInfo" x-cloak class="p-4 bg-blue-50 border border-blue-200 rounded-xl relative">
+                <button @click="showInfo = false" class="absolute top-2 right-2 w-6 h-6 text-blue-400 hover:text-blue-600 hover:bg-blue-100 rounded-full flex items-center justify-center transition">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
                 <h4 class="text-sm font-semibold text-blue-800 flex items-center gap-2">
                     <i class="fas fa-info-circle"></i> Ketentuan File
                 </h4>
@@ -321,7 +324,10 @@
             </div>
             
             {{-- Watermark Notice --}}
-            <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div x-data="{ showWatermark: true }" x-show="showWatermark" x-cloak class="p-4 bg-amber-50 border border-amber-200 rounded-xl relative">
+                <button @click="showWatermark = false" class="absolute top-2 right-2 w-6 h-6 text-amber-400 hover:text-amber-600 hover:bg-amber-100 rounded-full flex items-center justify-center transition">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
                 <h4 class="text-sm font-semibold text-amber-800 flex items-center gap-2">
                     <i class="fas fa-stamp"></i> Wajib Watermark untuk BAB 1-3
                 </h4>
