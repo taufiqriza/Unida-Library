@@ -55,15 +55,18 @@
         }
         
         .institution {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: white;
             margin: 8px 0 3px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
         }
         
         .sub-institution {
-            font-size: 10px;
-            color: #bfdbfe;
+            font-size: 11px;
+            color: #e0f2fe;
+            font-weight: 500;
         }
         
         /* Content Body */

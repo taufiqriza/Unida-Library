@@ -4,34 +4,44 @@
     <meta charset="UTF-8">
     <title>Surat Bebas Pustaka - {{ $letter->letter_number }}</title>
     <style>
-        @page { margin: 15mm; }
-        body { font-family: 'Times New Roman', Times, serif; color: #1f2937; font-size: 11px; line-height: 1.5; }
+        @page { margin: 0; }
+        body { 
+            font-family: 'Times New Roman', Times, serif; 
+            color: #1f2937; 
+            font-size: 11px; 
+            line-height: 1.5; 
+            margin: 0;
+            padding: 15mm;
+            background-color: #e0f2fe;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
         .header { width: 100%; margin-bottom: 8px; border-bottom: 3px solid #1e40af; padding-bottom: 8px; }
         .header-table { width: 100%; border-collapse: collapse; }
         .header-logo { width: 70px; vertical-align: middle; }
         .header-logo img { width: 60px; height: 60px; }
         .header-text { text-align: center; vertical-align: middle; }
         .header-receipt { width: 80px; text-align: right; vertical-align: top; }
-        .receipt-badge { background-color: #dbeafe; color: #1e40af; padding: 4px 10px; font-size: 9px; font-weight: bold; border: 1px solid #93c5fd; display: inline-block; }
+        .receipt-badge { background-color: #1e40af; color: white; padding: 4px 10px; font-size: 9px; font-weight: bold; border-radius: 4px; display: inline-block; }
         .institution-name { font-size: 18px; font-weight: bold; color: #1e40af; margin: 0; text-transform: uppercase; }
         .sub-institution { font-size: 13px; font-weight: bold; color: #1f2937; margin: 2px 0 0 0; }
         .institution-address { font-size: 9px; color: #4b5563; margin-top: 3px; }
-        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: bold; text-transform: uppercase; background-color: #d1fae5; color: #065f46; margin-left: 8px; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 8px; font-weight: bold; text-transform: uppercase; background-color: #065f46; color: white; margin-left: 8px; }
         .main-title { text-align: center; font-size: 14px; font-weight: bold; margin: 15px 0 3px 0; color: #111827; text-transform: uppercase; text-decoration: underline; }
         .letter-number { text-align: center; font-size: 11px; color: #4b5563; margin-bottom: 15px; }
         .content-text { margin-bottom: 10px; text-align: justify; }
-        .info-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; margin: 12px 0; }
+        .info-card { background-color: rgba(255,255,255,0.8); border: 1px solid #93c5fd; border-radius: 6px; padding: 10px; margin: 12px 0; }
         .info-table { width: 100%; border-collapse: collapse; }
         .info-table td { padding: 3px 6px; font-size: 11px; color: #374151; vertical-align: top; }
         .info-label { width: 110px; font-weight: 600; }
         .info-sep { width: 12px; }
-        .requirements-box { background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 10px 12px; margin: 12px 0; }
+        .requirements-box { background-color: rgba(255,255,255,0.9); border: 1px solid #86efac; border-radius: 6px; padding: 10px 12px; margin: 12px 0; }
         .requirement-item { margin: 6px 0; padding-left: 4px; font-size: 11px; }
         .req-num { font-weight: bold; margin-right: 6px; color: #059669; }
-        .thesis-box { background-color: #eff6ff; border-left: 3px solid #3b82f6; padding: 8px 12px; margin: 12px 0; }
+        .thesis-box { background-color: rgba(255,255,255,0.9); border-left: 3px solid #1e40af; padding: 8px 12px; margin: 12px 0; }
         .thesis-title { font-weight: bold; font-style: italic; color: #1f2937; font-size: 11px; line-height: 1.4; }
         .thesis-meta { font-size: 9px; color: #6b7280; margin-top: 5px; }
-        .thesis-badge { display: inline-block; background-color: #dbeafe; color: #1e40af; padding: 1px 6px; font-size: 8px; font-weight: bold; margin-right: 6px; }
+        .thesis-badge { display: inline-block; background-color: #1e40af; color: white; padding: 1px 6px; font-size: 8px; font-weight: bold; margin-right: 6px; border-radius: 3px; }
         .signature-area { margin-top: 25px; width: 100%; }
         .clearfix::after { content: ""; clear: both; display: table; }
         .signature-box { width: 46%; text-align: center; float: left; }
@@ -39,10 +49,10 @@
         .signature-label { font-size: 10px; margin-bottom: 3px; color: #374151; }
         .qr-code { margin-bottom: 3px; }
         .qr-code img { width: 55px; height: 55px; }
-        .signature-line { border-top: 1px solid #9ca3af; padding-top: 3px; width: 85%; margin: 0 auto; }
+        .signature-line { border-top: 1px solid #1e40af; padding-top: 3px; width: 85%; margin: 0 auto; }
         .signature-name { font-weight: bold; font-size: 11px; color: #111827; }
         .signature-role { font-size: 9px; color: #6b7280; }
-        .footer-note { margin-top: 30px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 8px; color: #9ca3af; text-align: center; }
+        .footer-note { margin-top: 30px; padding-top: 8px; border-top: 1px solid #93c5fd; font-size: 8px; color: #64748b; text-align: center; }
     </style>
 </head>
 <body>
