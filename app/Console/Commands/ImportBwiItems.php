@@ -50,10 +50,7 @@ class ImportBwiItems extends Command
 
         foreach ($slimsItems as $item) {
             $biblioId = $item['biblio_id'];
-            $originalBarcode = $item['barcode'];
-            
-            // Add G6- prefix to make barcode unique for this branch
-            $barcode = 'G6-' . $originalBarcode;
+            $barcode = $item['barcode']; // Use original barcode - same barcode allowed across branches
             
             // Calculate book_id from biblio_id
             $bookId = $idOffset + $biblioId;
@@ -64,7 +61,8 @@ class ImportBwiItems extends Command
                 continue;
             }
 
-            if (Item::where('barcode', $barcode)->exists()) {
+            // Check if this exact item already exists in THIS branch
+            if (Item::where('barcode', $barcode)->where('branch_id', $branchId)->exists()) {
                 $skipped++;
                 continue;
             }
