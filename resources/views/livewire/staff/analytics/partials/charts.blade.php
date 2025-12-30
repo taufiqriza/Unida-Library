@@ -9,9 +9,22 @@
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-500 rounded-full"></span> Users</span>
             </div>
         </div>
-        <div class="h-64" x-data="trafficChart(@js($pageViews))" x-init="initChart()">
+        @if($isLoading)
+        <div class="h-64 flex items-center justify-center">
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-2xl text-gray-300 mb-2"></i>
+                <p class="text-sm text-gray-400">Memuat data...</p>
+            </div>
+        </div>
+        @elseif(count($pageViews) > 0)
+        <div class="h-64" wire:ignore x-data="trafficChart(@js($pageViews))" x-init="initChart()">
             <canvas x-ref="chart"></canvas>
         </div>
+        @else
+        <div class="h-64 flex items-center justify-center">
+            <p class="text-gray-400">Tidak ada data</p>
+        </div>
+        @endif
     </div>
 
     {{-- Hourly Heatmap --}}

@@ -98,37 +98,35 @@ class AnalyticsDashboard extends Component
             
             $propertyId = self::GA_PROPERTY_ID;
             
-            // Active users
-            $activeUsers = $this->fetchRealtimeMetric($accessToken, $propertyId, 'activeUsers');
+            // Single request for all metrics
+            $metricsResponse = Http::withToken($accessToken)
+                ->post("https://analyticsdata.googleapis.com/v1beta/properties/{$propertyId}:runRealtimeReport", [
+                    'metrics' => [
+                        ['name' => 'activeUsers'],
+                        ['name' => 'screenPageViews'],
+                        ['name' => 'eventCount'],
+                    ],
+                ]);
             
-            // By page
+            $metrics = $metricsResponse->successful() ? ($metricsResponse->json()['rows'][0]['metricValues'] ?? []) : [];
+            
+            // Single request for pages
             $pages = $this->fetchRealtimeDimension($accessToken, $propertyId, 'unifiedScreenName', 10);
             
-            // By country with country code
-            $countries = $this->fetchRealtimeDimensionWithCode($accessToken, $propertyId, 'country', 'countryId', 20);
+            // Single request for countries with code
+            $countries = $this->fetchRealtimeDimensionWithCode($accessToken, $propertyId, 'country', 'countryId', 15);
             
-            // By city
-            $cities = $this->fetchRealtimeDimension($accessToken, $propertyId, 'city', 10);
-            
-            // By device
+            // Single request for devices & sources combined
             $devices = $this->fetchRealtimeDimension($accessToken, $propertyId, 'deviceCategory', 5);
-            
-            // By source
             $sources = $this->fetchRealtimeDimension($accessToken, $propertyId, 'sessionSource', 5);
             
-            // Events in last 30 min
-            $events = $this->fetchRealtimeMetric($accessToken, $propertyId, 'eventCount');
-            
-            // Page views in last 30 min
-            $pageviews = $this->fetchRealtimeMetric($accessToken, $propertyId, 'screenPageViews');
-            
             $this->realtime = [
-                'activeUsers' => $activeUsers,
-                'pageviews30min' => $pageviews,
-                'events30min' => $events,
+                'activeUsers' => (int) ($metrics[0]['value'] ?? 0),
+                'pageviews30min' => (int) ($metrics[1]['value'] ?? 0),
+                'events30min' => (int) ($metrics[2]['value'] ?? 0),
                 'pages' => $pages,
                 'countries' => $countries,
-                'cities' => $cities,
+                'cities' => [],
                 'devices' => $devices,
                 'sources' => $sources,
             ];
