@@ -121,8 +121,8 @@
                     {{-- Member Message --}}
                     <div class="flex justify-end">
                         <div class="max-w-[75%]">
-                            @if(!empty($msg['attachment_path']))
-                                <img src="{{ Storage::url($msg['attachment_path']) }}" 
+                            @if(!empty($msg['attachment']))
+                                <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer" 
                                      onclick="window.open(this.src)">
                             @endif
@@ -143,8 +143,8 @@
                             <p class="text-[10px] text-blue-600 mb-1 font-medium">
                                 {{ $msg['sender']['name'] ?? 'Staff' }}
                             </p>
-                            @if(!empty($msg['attachment_path']))
-                                <img src="{{ Storage::url($msg['attachment_path']) }}" 
+                            @if(!empty($msg['attachment']))
+                                <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer"
                                      onclick="window.open(this.src)">
                             @endif

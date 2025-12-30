@@ -156,7 +156,7 @@ class SupportChat extends Component
 
         if ($this->image) {
             $path = $this->image->store('chat-attachments', 'public');
-            $data['attachment_path'] = $path;
+            $data['attachment'] = $path;
             $data['attachment_name'] = $this->image->getClientOriginalName();
             $data['attachment_type'] = 'image';
             $data['message'] = trim($this->newMessage) ?: null;

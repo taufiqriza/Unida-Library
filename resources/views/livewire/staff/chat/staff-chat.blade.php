@@ -13,8 +13,8 @@
 
     {{-- Chat Panel --}}
     @if($isOpen)
-    <div class="fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999] animate-slideUp transition-all duration-300
-        {{ $isExpanded ? 'w-[32rem] h-[42rem]' : 'w-96 h-[32rem]' }}">
+    <div class="fixed bottom-4 right-4 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999] animate-slideUp transition-all duration-300
+        {{ $isExpanded ? 'w-[36rem] h-[44rem]' : 'w-[420px] h-[600px]' }}">
         
         {{-- Header --}}
         <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
