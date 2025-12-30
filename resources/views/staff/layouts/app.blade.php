@@ -122,13 +122,20 @@
         $isStaffOnly = $user->role === 'staff';
         $isAdminOrAbove = in_array($user->role, ['super_admin', 'admin', 'librarian']);
         
+        // E-Library pending counts
+        $pendingSubmissions = \App\Models\ThesisSubmission::where('status', 'pending')->count();
+        $pendingPlagiarism = \App\Models\PlagiarismCheck::where('status', 'pending')->where('check_type', 'external')->count();
+        $elibraryBadges = [];
+        if ($pendingSubmissions > 0) $elibraryBadges[] = ['icon' => 'fa-upload', 'count' => $pendingSubmissions, 'color' => 'amber'];
+        if ($pendingPlagiarism > 0) $elibraryBadges[] = ['icon' => 'fa-search', 'count' => $pendingPlagiarism, 'color' => 'violet'];
+        
         $navItems = [
             ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'staff.dashboard', 'patterns' => ['staff.dashboard*']],
             ['label' => 'Tasks', 'icon' => 'fa-clipboard-list', 'route' => 'staff.task.index', 'patterns' => ['staff.task*']],
             ['label' => 'Kehadiran', 'icon' => 'fa-fingerprint', 'route' => 'staff.attendance.index', 'patterns' => ['staff.attendance*']],
             ['label' => 'Sirkulasi', 'icon' => 'fa-arrows-rotate', 'route' => 'staff.circulation.index', 'patterns' => ['staff.circulation*']],
             ['label' => 'Katalog', 'icon' => 'fa-book', 'route' => 'staff.biblio.index', 'patterns' => ['staff.biblio*']],
-            ['label' => 'E-Library', 'icon' => 'fa-cloud', 'route' => 'staff.elibrary.index', 'patterns' => ['staff.elibrary*']],
+            ['label' => 'E-Library', 'icon' => 'fa-cloud', 'route' => 'staff.elibrary.index', 'patterns' => ['staff.elibrary*'], 'badges' => $elibraryBadges],
             ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
             ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
@@ -260,13 +267,33 @@
                         @if($active)
                             <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
                         @endif
-                        <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all
+                        <div class="relative w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all
                             {{ $active ? 'bg-white/20 text-white shadow-lg' : 'text-blue-200 group-hover:text-white' }}"
                             :class="!{{ $active ? 'true' : 'false' }} && !darkMode ? 'bg-white/10' : ''">
                             <i class="fas {{ $item['icon'] }} text-sm"></i>
+                            {{-- Badge indicator when collapsed --}}
+                            @if(!empty($item['badges']))
+                            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border border-blue-800 animate-pulse"
+                                  :class="sidebarCollapsed ? 'block' : 'hidden'"></span>
+                            @endif
                         </div>
                         <span class="text-sm font-medium transition-all duration-300"
                               :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">{{ $item['label'] }}</span>
+                        {{-- Badges when expanded --}}
+                        @if(!empty($item['badges']))
+                        <div class="flex items-center gap-1 ml-auto transition-all duration-300"
+                             :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">
+                            @foreach($item['badges'] as $badge)
+                            <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold rounded-full
+                                @if($badge['color'] === 'amber') bg-amber-400 text-amber-900
+                                @elseif($badge['color'] === 'violet') bg-violet-400 text-violet-900
+                                @else bg-blue-400 text-blue-900 @endif">
+                                <i class="fas {{ $badge['icon'] }} text-[8px]"></i>
+                                {{ $badge['count'] }}
+                            </span>
+                            @endforeach
+                        </div>
+                        @endif
                     </a>
                 @endforeach
             </nav>
@@ -628,17 +655,32 @@
                         @php $active = request()->routeIs($item['patterns']); @endphp
                         <a href="{{ route($item['route']) }}" 
                            @click="menuOpen = false"
-                           class="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-200"
+                           class="relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-200"
                            :class="'{{ $active }}' === '1' 
                                ? (darkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-50 text-blue-600') 
                                : (darkMode ? 'hover:bg-slate-700 text-slate-300' : 'hover:bg-gray-50 text-gray-600')">
-                            <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all"
+                            <div class="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all"
                                  :class="'{{ $active }}' === '1' 
                                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' 
                                      : (darkMode ? 'bg-slate-700' : 'bg-gray-100')">
                                 <i class="fas {{ $item['icon'] }} text-lg"></i>
+                                @if(!empty($item['badges']))
+                                <span class="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full border-2 border-white animate-pulse"></span>
+                                @endif
                             </div>
                             <span class="text-[11px] font-medium text-center leading-tight">{{ $item['label'] }}</span>
+                            @if(!empty($item['badges']))
+                            <div class="flex items-center gap-0.5">
+                                @foreach($item['badges'] as $badge)
+                                <span class="inline-flex items-center gap-0.5 px-1 py-0.5 text-[8px] font-bold rounded
+                                    @if($badge['color'] === 'amber') bg-amber-100 text-amber-700
+                                    @elseif($badge['color'] === 'violet') bg-violet-100 text-violet-700
+                                    @else bg-blue-100 text-blue-700 @endif">
+                                    <i class="fas {{ $badge['icon'] }}"></i>{{ $badge['count'] }}
+                                </span>
+                                @endforeach
+                            </div>
+                            @endif
                         </a>
                     @endforeach
                 </div>
