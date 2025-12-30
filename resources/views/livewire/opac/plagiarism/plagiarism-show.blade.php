@@ -20,7 +20,34 @@
             @if($check->isPending() || $check->isProcessing())
             @php $statusInfo = $check->status_info; @endphp
             
-            @if($statusInfo['status'] === 'stuck')
+            @if($check->check_type === 'external')
+            {{-- EXTERNAL - Waiting for staff review --}}
+            <div class="bg-white rounded-2xl border border-violet-200 p-8 text-center">
+                <div class="w-20 h-20 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-clock text-3xl text-violet-600"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Menunggu Review Pustakawan</h2>
+                <p class="text-gray-600 mb-4">Pengajuan Anda sedang direview oleh pustakawan. Sertifikat akan diterbitkan jika memenuhi syarat.</p>
+                
+                <div class="bg-violet-50 rounded-xl p-4 mb-6 max-w-md mx-auto text-left">
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                            <p class="text-gray-500">Platform</p>
+                            <p class="font-semibold text-gray-900">{{ ucfirst($check->external_platform) }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-500">Skor Similarity</p>
+                            <p class="font-semibold text-gray-900">{{ $check->similarity_score }}%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-center gap-4 text-sm text-gray-500">
+                    <span><i class="fas fa-calendar mr-1"></i> Diajukan {{ $check->created_at->diffForHumans() }}</span>
+                </div>
+            </div>
+            
+            @elseif($statusInfo['status'] === 'stuck')
             {{-- STUCK - Process seems to have stopped --}}
             <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
                 <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
