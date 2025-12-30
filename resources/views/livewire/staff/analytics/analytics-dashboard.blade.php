@@ -25,7 +25,7 @@
     @if($activeTab === 'online')
     <div wire:init="loadData">
         {{-- REALTIME SECTION --}}
-        @if($isConfigured && !empty($realtime))
+        @if($isConfigured)
         <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 mb-6 text-white relative overflow-hidden" wire:poll.30s="loadRealtime">
             {{-- Background pattern --}}
             <div class="absolute inset-0 opacity-10">
@@ -53,7 +53,11 @@
                             </div>
                             <span class="text-slate-300 text-sm">Pengunjung Aktif</span>
                         </div>
+                        @if($isLoading)
+                        <div class="h-12 bg-white/10 rounded-lg animate-pulse"></div>
+                        @else
                         <p class="text-5xl font-black text-green-400">{{ $realtime['activeUsers'] ?? 0 }}</p>
+                        @endif
                     </div>
                     <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
                         <div class="flex items-center gap-3 mb-2">
@@ -62,7 +66,11 @@
                             </div>
                             <span class="text-slate-300 text-sm">Pageviews</span>
                         </div>
+                        @if($isLoading)
+                        <div class="h-10 bg-white/10 rounded-lg animate-pulse"></div>
+                        @else
                         <p class="text-4xl font-bold text-white">{{ $realtime['pageviews30min'] ?? 0 }}</p>
+                        @endif
                     </div>
                     <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
                         <div class="flex items-center gap-3 mb-2">
@@ -71,7 +79,11 @@
                             </div>
                             <span class="text-slate-300 text-sm">Events</span>
                         </div>
+                        @if($isLoading)
+                        <div class="h-10 bg-white/10 rounded-lg animate-pulse"></div>
+                        @else
                         <p class="text-4xl font-bold text-white">{{ $realtime['events30min'] ?? 0 }}</p>
+                        @endif
                     </div>
                     <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
                         <div class="flex items-center gap-3 mb-2">
@@ -80,7 +92,11 @@
                             </div>
                             <span class="text-slate-300 text-sm">Negara</span>
                         </div>
+                        @if($isLoading)
+                        <div class="h-10 bg-white/10 rounded-lg animate-pulse"></div>
+                        @else
                         <p class="text-4xl font-bold text-white">{{ count($realtime['countries'] ?? []) }}</p>
+                        @endif
                     </div>
                 </div>
 

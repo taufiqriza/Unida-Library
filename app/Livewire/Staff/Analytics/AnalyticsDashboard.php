@@ -62,8 +62,11 @@ class AnalyticsDashboard extends Component
         
         $this->isLoading = true;
         
+        // Load realtime first (faster)
+        $this->loadRealtime();
+        
         $cacheKey = "ga_full_data_{$this->period}";
-        $data = Cache::remember($cacheKey, 300, fn() => $this->fetchAllAnalyticsData());
+        $data = Cache::remember($cacheKey, 180, fn() => $this->fetchAllAnalyticsData());
         
         $this->stats = $data['stats'] ?? [];
         $this->pageViews = $data['pageViews'] ?? [];
@@ -76,7 +79,6 @@ class AnalyticsDashboard extends Component
         $this->hourlyData = $data['hourlyData'] ?? [];
         $this->userTypes = $data['userTypes'] ?? [];
         
-        $this->loadRealtime();
         $this->isLoading = false;
     }
     
