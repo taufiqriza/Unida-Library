@@ -14,7 +14,7 @@
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-150"
                      @click.away="showOptions = false"
-                     class="absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border p-2 w-56">
+                     class="absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border p-2 w-64">
                     <p class="text-xs text-gray-500 px-3 py-2 font-medium">Hubungi Kami</p>
                     
                     <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank"
@@ -92,7 +92,7 @@
         {{-- Topic Selector --}}
         @if($showTopicSelector)
         <div class="flex-1 p-4 overflow-y-auto">
-            <p class="text-gray-600 text-sm mb-4">Pilih topik pertanyaan Anda:</p>
+            <p class="text-gray-600 text-sm mb-4">Pilih keperluan Anda:</p>
             <div class="space-y-2">
                 @foreach($topics as $key => $topic)
                 <button wire:click="selectTopic('{{ $key }}')"

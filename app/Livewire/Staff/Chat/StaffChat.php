@@ -122,7 +122,12 @@ class StaffChat extends Component
     public function openRoom($roomId)
     {
         $this->activeRoomId = $roomId;
-        $this->activeRoom = ChatRoom::with(['branch', 'members.user', 'member.branch'])->find($roomId);
+        $this->activeRoom = ChatRoom::with([
+            'branch',
+            'members.user',
+            'member' => fn($q) => $q->withoutGlobalScope('branch'),
+            'member.branch'
+        ])->find($roomId);
         $this->activeView = 'chat';
         $this->loadMessages();
         $this->markAsRead();
