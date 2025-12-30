@@ -716,11 +716,6 @@ class StaffChat extends Component
         return $query->groupBy(fn($user) => $user->branch?->name ?? 'Super Admin / Pusat');
     }
 
-    public function getUnreadCountProperty()
-    {
-        return $this->chatService->getTotalUnreadCount(auth()->id());
-    }
-
     public function getRoomMembersProperty()
     {
         if (!$this->activeRoom) return collect();
