@@ -33,7 +33,6 @@ class SupportMessagePushNotification extends Notification
             ->title('Pesan Support Baru')
             ->icon('/images/logo-icon.png')
             ->body("{$this->memberName} - " . ($topicLabels[$this->topic] ?? 'Support'))
-            ->action('Lihat', '/staff/chat?support=' . $this->roomId)
-            ->options(['TTL' => 1000]);
+            ->data(['url' => '/staff/chat?support=' . $this->roomId]);
     }
 }

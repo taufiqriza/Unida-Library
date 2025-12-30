@@ -1,4 +1,4 @@
-<div @if($isOpen) wire:poll.5s="refreshData" @endif class="staff-chat-widget">
+<div wire:poll.30s="$refresh" class="staff-chat-widget">
     {{-- Floating Button - raised on mobile to avoid bottom nav --}}
     <button wire:click="toggle" 
             class="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 z-[9998]"
