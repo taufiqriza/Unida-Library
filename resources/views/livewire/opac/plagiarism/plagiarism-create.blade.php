@@ -72,6 +72,26 @@
                     </div>
                     @endif
                 </div>
+                
+                {{-- External Option Banner --}}
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-external-link-alt text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-blue-800 text-sm">Sudah Punya Hasil Cek Plagiasi?</h4>
+                            <p class="text-blue-700 text-xs mt-1">
+                                Jika Anda sudah melakukan cek plagiasi menggunakan Turnitin, iThenticate, atau Copyscape, 
+                                Anda dapat langsung submit hasil report untuk direview pustakawan.
+                            </p>
+                            <a href="{{ route('opac.member.plagiarism.external') }}" 
+                               class="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition">
+                                <i class="fas fa-upload"></i> Submit Hasil Eksternal
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <form wire:submit="submit" class="space-y-4">

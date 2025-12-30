@@ -29,6 +29,9 @@ class PlagiarismCheck extends Model
         'word_count',
         'page_count',
         'status',
+        'check_type',
+        'external_platform',
+        'external_report_file',
         'similarity_score',
         'similarity_sources',
         'detailed_report',
@@ -41,6 +44,9 @@ class PlagiarismCheck extends Model
         'started_at',
         'completed_at',
         'error_message',
+        'review_notes',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     protected $casts = [
@@ -50,6 +56,7 @@ class PlagiarismCheck extends Model
         'certificate_generated_at' => 'datetime',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'reviewed_at' => 'datetime',
     ];
 
     // ========== Relationships ==========
@@ -67,6 +74,33 @@ class PlagiarismCheck extends Model
     public function fingerprint(): MorphOne
     {
         return $this->morphOne(DocumentFingerprint::class, 'documentable');
+    }
+    
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    // ========== Type Helpers ==========
+    
+    public function isExternal(): bool
+    {
+        return $this->check_type === 'external';
+    }
+    
+    public function isSystem(): bool
+    {
+        return $this->check_type === 'system';
+    }
+    
+    public function getExternalPlatformLabel(): string
+    {
+        return match($this->external_platform) {
+            'turnitin' => 'Turnitin',
+            'ithenticate' => 'iThenticate',
+            'copyscape' => 'Copyscape',
+            default => $this->external_platform ?? '-',
+        };
     }
 
     // ========== Status Helpers ==========

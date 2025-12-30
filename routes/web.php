@@ -103,6 +103,7 @@ Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileComple
     Route::prefix('plagiarism')->name('plagiarism.')->group(function () {
         Route::get('/', \App\Livewire\Opac\Plagiarism\PlagiarismIndex::class)->name('index');
         Route::get('/create', \App\Livewire\Opac\Plagiarism\PlagiarismCreate::class)->name('create');
+        Route::get('/external', \App\Livewire\Opac\Plagiarism\ExternalPlagiarismSubmit::class)->name('external');
         Route::get('/{check}', \App\Livewire\Opac\Plagiarism\PlagiarismShow::class)->name('show');
         Route::get('/{check}/status', [App\Http\Controllers\Opac\PlagiarismController::class, 'status'])->name('status'); // AJAX
         Route::get('/{check}/report', [App\Http\Controllers\Opac\PlagiarismController::class, 'viewReport'])->name('report'); // Redirect
