@@ -17,7 +17,42 @@
             </div>
         </div>
         @elseif(count($pageViews) > 0)
-        <div style="height: 220px;"><canvas id="gaTrafficChart"></canvas></div>
+        @php 
+            $data = collect($pageViews);
+            $maxVal = max($data->max('views'), $data->max('users')) ?: 1;
+            $count = $data->count();
+            $stepX = 100 / max($count - 1, 1);
+        @endphp
+        <div class="h-56">
+            <svg viewBox="0 0 100 60" class="w-full h-full" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(59,130,246,0.3)"/>
+                        <stop offset="100%" stop-color="rgba(59,130,246,0.02)"/>
+                    </linearGradient>
+                </defs>
+                
+                {{-- Area --}}
+                <path d="M 0,{{ 55 - ($data[0]['views'] / $maxVal * 50) }} @foreach($data as $i => $d) L {{ $i * $stepX }},{{ 55 - ($d['views'] / $maxVal * 50) }} @endforeach L 100,55 L 0,55 Z" fill="url(#blueGrad)"/>
+                
+                {{-- Pageviews line --}}
+                <path d="M @foreach($data as $i => $d){{ $i > 0 ? ' L ' : '' }}{{ $i * $stepX }},{{ 55 - ($d['views'] / $maxVal * 50) }}@endforeach" fill="none" stroke="#3b82f6" stroke-width="0.5" stroke-linecap="round"/>
+                
+                {{-- Users line --}}
+                <path d="M @foreach($data as $i => $d){{ $i > 0 ? ' L ' : '' }}{{ $i * $stepX }},{{ 55 - ($d['users'] / $maxVal * 50) }}@endforeach" fill="none" stroke="#10b981" stroke-width="0.5" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="flex justify-between text-[10px] text-gray-400 px-1 -mt-1">
+            @foreach($pageViews as $i => $day)
+            @if($i === 0 || $i === count($pageViews) - 1 || $i % 2 === 0)
+            <span>{{ $day['date'] }}</span>
+            @endif
+            @endforeach
+        </div>
+        <div class="flex justify-center gap-6 mt-3 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> Pageviews: {{ number_format($data->sum('views')) }}</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-500 rounded-full"></span> Users: {{ number_format($data->sum('users')) }}</span>
+        </div>
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
