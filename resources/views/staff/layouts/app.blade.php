@@ -123,8 +123,8 @@
         $isAdminOrAbove = in_array($user->role, ['super_admin', 'admin', 'librarian']);
         
         // E-Library pending counts
-        $pendingSubmissions = \App\Models\ThesisSubmission::where('status', 'pending')->count();
-        $pendingPlagiarism = \App\Models\PlagiarismCheck::where('status', 'pending')->where('check_type', 'external')->count();
+        $pendingSubmissions = \App\Models\ThesisSubmission::where('status', 'submitted')->count();
+        $pendingPlagiarism = \App\Models\PlagiarismCheck::where('status', 'pending')->count();
         $elibraryBadges = [];
         if ($pendingSubmissions > 0) $elibraryBadges[] = ['icon' => 'fa-upload', 'count' => $pendingSubmissions, 'color' => 'amber'];
         if ($pendingPlagiarism > 0) $elibraryBadges[] = ['icon' => 'fa-search', 'count' => $pendingPlagiarism, 'color' => 'violet'];
