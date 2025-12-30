@@ -20,18 +20,50 @@
         @php 
             $maxViews = max(collect($pageViews)->pluck('views')->toArray()) ?: 1;
             $maxUsers = max(collect($pageViews)->pluck('users')->toArray()) ?: 1;
+            $maxVal = max($maxViews, $maxUsers);
+            $width = 100 / count($pageViews);
+            $viewsPoints = [];
+            $usersPoints = [];
+            foreach($pageViews as $i => $day) {
+                $x = ($i * $width) + ($width / 2);
+                $yViews = 100 - (($day['views'] / $maxVal) * 85);
+                $yUsers = 100 - (($day['users'] / $maxVal) * 85);
+                $viewsPoints[] = "$x,$yViews";
+                $usersPoints[] = "$x,$yUsers";
+            }
         @endphp
-        <div class="h-64 flex items-end gap-1 px-2">
-            @foreach($pageViews as $day)
-            <div class="flex-1 flex flex-col items-center gap-1">
-                <div class="w-full flex flex-col gap-0.5" style="height: 200px;">
-                    <div class="w-full bg-blue-500 rounded-t transition-all" style="height: {{ ($day['views'] / $maxViews) * 100 }}%" title="{{ $day['views'] }} views"></div>
-                </div>
-                <span class="text-[10px] text-gray-500">{{ $day['date'] }}</span>
+        <div class="h-64 relative">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-52">
+                {{-- Grid lines --}}
+                @for($i = 0; $i <= 4; $i++)
+                <line x1="0" y1="{{ 15 + ($i * 21.25) }}" x2="100" y2="{{ 15 + ($i * 21.25) }}" stroke="#f3f4f6" stroke-width="0.3"/>
+                @endfor
+                
+                {{-- Area fill for pageviews --}}
+                <polygon points="{{ $viewsPoints[0] }} {{ implode(' ', $viewsPoints) }} {{ end($viewsPoints) }},100 {{ $viewsPoints[0] }},100" fill="rgba(59, 130, 246, 0.1)"/>
+                
+                {{-- Pageviews line --}}
+                <polyline points="{{ implode(' ', $viewsPoints) }}" fill="none" stroke="#3b82f6" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+                
+                {{-- Users line --}}
+                <polyline points="{{ implode(' ', $usersPoints) }}" fill="none" stroke="#10b981" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round"/>
+                
+                {{-- Data points --}}
+                @foreach($viewsPoints as $point)
+                <circle cx="{{ explode(',', $point)[0] }}" cy="{{ explode(',', $point)[1] }}" r="1" fill="#3b82f6"/>
+                @endforeach
+                @foreach($usersPoints as $point)
+                <circle cx="{{ explode(',', $point)[0] }}" cy="{{ explode(',', $point)[1] }}" r="1" fill="#10b981"/>
+                @endforeach
+            </svg>
+            {{-- X-axis labels --}}
+            <div class="flex justify-between px-1 text-[10px] text-gray-400">
+                @foreach($pageViews as $day)
+                <span>{{ $day['date'] }}</span>
+                @endforeach
             </div>
-            @endforeach
         </div>
-        <div class="flex justify-center gap-6 mt-2 text-xs">
+        <div class="flex justify-center gap-6 text-xs">
             <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded"></span> Pageviews: {{ number_format(collect($pageViews)->sum('views')) }}</span>
             <span class="flex items-center gap-1"><span class="w-3 h-3 bg-emerald-500 rounded"></span> Users: {{ number_format(collect($pageViews)->sum('users')) }}</span>
         </div>
