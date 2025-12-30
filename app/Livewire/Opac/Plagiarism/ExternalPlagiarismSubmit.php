@@ -63,7 +63,7 @@ class ExternalPlagiarismSubmit extends Component
 
         session()->flash('success', 'Pengajuan berhasil dikirim! Silakan tunggu review dari pustakawan.');
         
-        return redirect()->route('opac.plagiarism.show', $check);
+        return redirect()->route('opac.member.plagiarism.show', $check);
     }
 
     public function render()
