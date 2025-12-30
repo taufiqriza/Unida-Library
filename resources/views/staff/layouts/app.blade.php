@@ -774,7 +774,7 @@
     {{-- SweetAlert2 Custom Styling --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-    .swal2-container { z-index: 99999 !important; }
+    .swal2-container { z-index: 9999999 !important; }
     .swal2-popup.swal-custom {
         border-radius: 1.5rem !important;
         padding: 2rem !important;
