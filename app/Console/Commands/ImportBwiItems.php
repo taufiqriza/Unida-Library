@@ -50,7 +50,10 @@ class ImportBwiItems extends Command
 
         foreach ($slimsItems as $item) {
             $biblioId = $item['biblio_id'];
-            $barcode = $item['barcode'];
+            $originalBarcode = $item['barcode'];
+            
+            // Add G6- prefix to make barcode unique for this branch
+            $barcode = 'G6-' . $originalBarcode;
             
             // Calculate book_id from biblio_id
             $bookId = $idOffset + $biblioId;
