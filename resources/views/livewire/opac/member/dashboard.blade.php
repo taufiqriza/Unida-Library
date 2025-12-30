@@ -247,6 +247,20 @@
                             </div>
                         </a>
                     </div>
+                    
+                    {{-- External Plagiarism Banner --}}
+                    <a href="{{ route('opac.member.plagiarism.external') }}" class="block p-3 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-external-link-alt text-blue-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-blue-800 text-xs">Punya Hasil Cek Plagiasi Eksternal?</h4>
+                                <p class="text-blue-600 text-[10px]">Submit hasil Turnitin/iThenticate untuk surat bebas plagiasi</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-blue-400 text-xs"></i>
+                        </div>
+                    </a>
 
                     {{-- Shamela, Database & Repository Cards Grid --}}
                     <div class="grid grid-cols-3 gap-2 lg:gap-3">

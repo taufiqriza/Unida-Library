@@ -45,6 +45,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/ethesis/{id}/edit', \App\Livewire\Staff\Elibrary\EthesisForm::class)->name('ethesis.edit');
         });
 
+        // Plagiarism Review
+        Route::get('/plagiarism', \App\Livewire\Staff\PlagiarismReview::class)->name('plagiarism.index');
+
         // Circulation
         Route::prefix('circulation')->name('circulation.')->group(function () {
             Route::get('/', \App\Livewire\Staff\Circulation\CirculationTransaction::class)->name('index');
