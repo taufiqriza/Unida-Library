@@ -133,6 +133,13 @@ class StaffChat extends Component
                 'chat_room_id' => $roomId,
                 'user_id' => auth()->id(),
             ], ['role' => 'staff']);
+            
+            // Mark support notifications as read
+            StaffNotification::where('user_id', auth()->id())
+                ->where('type', 'support_message')
+                ->where('data', 'like', '%"room_id":' . $roomId . '%')
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
         }
         
         $this->dispatch('scrollToBottom');
@@ -247,9 +254,10 @@ class StaffChat extends Component
             ->where('user_id', auth()->id())
             ->update(['last_read_at' => now()]);
             
-        // Update last_staff_id for support chat
+        // Update last_staff_id for support chat and notify member
         if ($this->activeRoom && $this->activeRoom->type === 'support') {
             $this->activeRoom->update(['last_staff_id' => auth()->id(), 'status' => 'open']);
+            $this->notifyMember($chatMessage);
         }
 
         // Send notification to other room members
@@ -264,6 +272,22 @@ class StaffChat extends Component
         $this->selectedBookId = null;
         $this->loadMessages();
         $this->dispatch('scrollToBottom');
+    }
+    
+    protected function notifyMember(ChatMessage $message)
+    {
+        $member = $this->activeRoom->member;
+        if (!$member || !$member->email) return;
+        
+        try {
+            $member->notify(new \App\Notifications\SupportReplyNotification(
+                auth()->user()->name,
+                \Str::limit($message->message, 100),
+                $this->activeRoom->topic
+            ));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send support reply notification: ' . $e->getMessage());
+        }
     }
 
     protected function sendChatNotifications(ChatMessage $message)

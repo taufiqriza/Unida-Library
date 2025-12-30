@@ -4,7 +4,9 @@ namespace App\Livewire\Member;
 
 use App\Models\ChatMessage;
 use App\Models\ChatRoom;
-use App\Models\ChatRoomMember;
+use App\Models\StaffNotification;
+use App\Models\User;
+use App\Notifications\SupportReplyNotification;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -18,6 +20,7 @@ class SupportChat extends Component
     public $messages = [];
     public $newMessage = '';
     public $image;
+    public $lastReadAt = null;
     
     public $topics = [
         'unggah' => ['icon' => 'fa-upload', 'label' => 'Unggah Mandiri'],
@@ -49,6 +52,8 @@ class SupportChat extends Component
         
         if (!$this->room) {
             $this->showTopicSelector = true;
+        } else {
+            $this->markAsRead();
         }
         
         $this->isOpen = true;
@@ -57,7 +62,6 @@ class SupportChat extends Component
     public function selectTopic($topic)
     {
         if ($this->room) {
-            // Change topic for existing room
             $this->room->update(['topic' => $topic]);
             ChatMessage::create([
                 'chat_room_id' => $this->room->id,
@@ -81,6 +85,7 @@ class SupportChat extends Component
             ->first();
             
         if ($this->room) {
+            $this->lastReadAt = $this->room->member_last_read;
             $this->loadMessages();
         }
     }
@@ -95,15 +100,17 @@ class SupportChat extends Component
             'topic' => $topic,
             'name' => 'Support: ' . $member->name,
             'status' => 'open',
+            'member_last_read' => now(),
         ]);
 
-        // Send auto welcome message
         ChatMessage::create([
             'chat_room_id' => $this->room->id,
             'sender_id' => null,
             'message' => $this->getWelcomeMessage($topic),
             'type' => 'system',
         ]);
+        
+        $this->notifyStaff();
     }
 
     public function getWelcomeMessage($topic)
@@ -128,6 +135,14 @@ class SupportChat extends Component
             ->get()
             ->toArray();
     }
+    
+    public function markAsRead()
+    {
+        if ($this->room) {
+            $this->room->update(['member_last_read' => now()]);
+            $this->lastReadAt = now();
+        }
+    }
 
     public function sendMessage()
     {
@@ -135,9 +150,8 @@ class SupportChat extends Component
 
         $data = [
             'chat_room_id' => $this->room->id,
-            'sender_id' => null, // Member messages have null sender_id, identified by room's member_id
+            'sender_id' => null,
             'type' => 'text',
-            'is_from_member' => true,
         ];
 
         if ($this->image) {
@@ -152,12 +166,13 @@ class SupportChat extends Component
 
         ChatMessage::create($data);
         
-        // Reopen if resolved
         if ($this->room->status === 'resolved') {
             $this->room->update(['status' => 'open']);
         }
         
-        $this->room->touch(); // Update updated_at
+        $this->room->touch();
+        $this->markAsRead();
+        $this->notifyStaff();
 
         $this->newMessage = '';
         $this->image = null;
@@ -165,9 +180,31 @@ class SupportChat extends Component
         
         $this->dispatch('message-sent');
     }
+    
+    protected function notifyStaff()
+    {
+        $member = $this->member();
+        $topicLabel = $this->topics[$this->room->topic]['label'] ?? 'Support';
+        
+        // Notify all staff/admin
+        $staffIds = User::whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])
+            ->pluck('id');
+            
+        foreach ($staffIds as $staffId) {
+            StaffNotification::create([
+                'user_id' => $staffId,
+                'type' => 'support_message',
+                'title' => 'Pesan Support Baru',
+                'message' => "{$member->name} ({$topicLabel})",
+                'data' => json_encode(['room_id' => $this->room->id, 'member_id' => $member->id]),
+                'url' => '/staff/chat?support=' . $this->room->id,
+            ]);
+        }
+    }
 
     public function closeChat()
     {
+        $this->markAsRead();
         $this->isOpen = false;
     }
 
@@ -175,9 +212,9 @@ class SupportChat extends Component
     {
         if (!$this->room || !auth('member')->check()) return 0;
         
-        // Count staff messages (sender_id is not null and is_from_member is false/null)
         return ChatMessage::where('chat_room_id', $this->room->id)
             ->whereNotNull('sender_id')
+            ->where('type', '!=', 'system')
             ->where('created_at', '>', $this->room->member_last_read ?? '1970-01-01')
             ->count();
     }
