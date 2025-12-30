@@ -56,7 +56,18 @@ class SupportChat extends Component
 
     public function selectTopic($topic)
     {
-        $this->createRoom($topic);
+        if ($this->room) {
+            // Change topic for existing room
+            $this->room->update(['topic' => $topic]);
+            ChatMessage::create([
+                'chat_room_id' => $this->room->id,
+                'sender_id' => null,
+                'message' => 'Topik diubah ke: ' . ($this->topics[$topic]['label'] ?? $topic),
+                'type' => 'system',
+            ]);
+        } else {
+            $this->createRoom($topic);
+        }
         $this->showTopicSelector = false;
         $this->loadMessages();
     }

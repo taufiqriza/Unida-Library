@@ -76,13 +76,14 @@
                 </div>
                 <div>
                     <h3 class="font-semibold">Layanan Perpustakaan</h3>
-                    <p class="text-xs text-blue-100">
-                        @if($room && $room->topic)
-                            {{ $topics[$room->topic]['label'] ?? 'Support' }}
-                        @else
-                            Online
-                        @endif
-                    </p>
+                    @if($room && $room->topic && !$showTopicSelector)
+                    <button wire:click="$set('showTopicSelector', true)" class="text-xs text-blue-100 hover:text-white flex items-center gap-1">
+                        {{ $topics[$room->topic]['label'] ?? 'Support' }}
+                        <i class="fas fa-pen text-[8px]"></i>
+                    </button>
+                    @else
+                    <p class="text-xs text-blue-100">Online</p>
+                    @endif
                 </div>
             </div>
             <button wire:click="closeChat" class="w-8 h-8 hover:bg-white/20 rounded-full flex items-center justify-center transition">

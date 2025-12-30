@@ -31,7 +31,7 @@
                         @if($member)
                         <div class="relative">
                             @if($member->photo)
-                                <img src="{{ $member->getAvatarUrl(80) }}" class="w-9 h-9 rounded-full object-cover">
+                                <img src="{{ Storage::url($member->photo) }}" class="w-9 h-9 rounded-full object-cover">
                             @else
                                 <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-sm font-bold">
                                     {{ strtoupper(substr($member->name, 0, 1)) }}
