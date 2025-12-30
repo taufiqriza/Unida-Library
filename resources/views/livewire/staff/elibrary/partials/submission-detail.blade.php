@@ -49,9 +49,11 @@
         </div>
         <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-emerald-800">Surat Bebas Pustaka Terbit</p>
-            <p class="text-xs text-emerald-600">No. {{ $selectedItem->clearanceLetter->letter_number }} • Tersedia di dashboard member</p>
+            <p class="text-xs text-emerald-600">No. {{ $selectedItem->clearanceLetter->letter_number }}</p>
         </div>
-        <i class="fas fa-check-circle text-emerald-500"></i>
+        <a href="{{ route('staff.clearance-letter.download', $selectedItem->clearanceLetter) }}" class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition flex items-center gap-1">
+            <i class="fas fa-download"></i> PDF
+        </a>
     </div>
     @endif
 

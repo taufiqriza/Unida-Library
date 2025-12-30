@@ -44,6 +44,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/ethesis/create', \App\Livewire\Staff\Elibrary\EthesisForm::class)->name('ethesis.create');
             Route::get('/ethesis/{id}/edit', \App\Livewire\Staff\Elibrary\EthesisForm::class)->name('ethesis.edit');
         });
+        
+        // Clearance Letter Download (Staff)
+        Route::get('/clearance-letter/{letter}/download', [App\Http\Controllers\Staff\ClearanceLetterController::class, 'download'])->name('clearance-letter.download');
 
         // Circulation
         Route::prefix('circulation')->name('circulation.')->group(function () {
