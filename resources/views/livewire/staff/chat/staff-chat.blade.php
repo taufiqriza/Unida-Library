@@ -201,37 +201,30 @@
         {{-- Member Info Panel (Support Chat) --}}
         @if($activeRoom && $activeRoom->type === 'support' && $activeRoom->member)
         @php $member = $activeRoom->member; @endphp
-        <div class="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 px-4 py-3">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-semibold rounded-full">
-                            {{ ['unggah_mandiri' => 'Unggah Mandiri', 'plagiasi' => 'Cek Plagiasi', 'bebas_pustaka' => 'Bebas Pustaka', 'peminjaman' => 'Peminjaman', 'lainnya' => 'Lainnya'][$activeRoom->topic] ?? $activeRoom->topic }}
-                        </span>
-                        @if($activeRoom->status === 'resolved')
-                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full">
-                            <i class="fas fa-check mr-1"></i>Selesai
-                        </span>
-                        @endif
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-200 px-4 py-2.5">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="px-2.5 py-1 bg-orange-100 text-orange-700 text-[10px] font-bold rounded-full whitespace-nowrap">
+                        {{ ['unggah' => 'Unggah', 'plagiasi' => 'Plagiasi', 'bebas' => 'Bebas Pustaka', 'pinjam' => 'Peminjaman', 'lainnya' => 'Lainnya'][$activeRoom->topic] ?? $activeRoom->topic }}
+                    </span>
+                    <div class="text-xs text-gray-600 truncate">
+                        <span class="font-semibold">{{ $member->member_id ?? '-' }}</span>
+                        <span class="text-gray-400 mx-1">•</span>
+                        <span>{{ $member->branch->name ?? '-' }}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                        <div><span class="text-gray-400">NIM:</span> <span class="text-gray-700 font-medium">{{ $member->member_id ?? '-' }}</span></div>
-                        <div><span class="text-gray-400">Cabang:</span> <span class="text-gray-700 font-medium">{{ $member->branch->name ?? '-' }}</span></div>
-                        @if($member->study_program)
-                        <div><span class="text-gray-400">Prodi:</span> <span class="text-gray-700 font-medium">{{ $member->study_program }}</span></div>
-                        @endif
-                        @if($member->semester)
-                        <div><span class="text-gray-400">Semester:</span> <span class="text-gray-700 font-medium">{{ $member->semester }}</span></div>
-                        @endif
-                    </div>
+                    @if($activeRoom->status === 'resolved')
+                    <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">
+                        <i class="fas fa-check mr-0.5"></i>Selesai
+                    </span>
+                    @endif
                 </div>
                 @if($activeRoom->status !== 'resolved')
-                <button wire:click="markSupportResolved" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-lg transition">
+                <button wire:click="markSupportResolved" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-[10px] font-bold rounded-lg transition whitespace-nowrap">
                     <i class="fas fa-check mr-1"></i>Selesai
                 </button>
                 @else
-                <button wire:click="reopenSupport" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition">
-                    <i class="fas fa-redo mr-1"></i>Buka Lagi
+                <button wire:click="reopenSupport" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-bold rounded-lg transition whitespace-nowrap">
+                    <i class="fas fa-redo mr-1"></i>Buka
                 </button>
                 @endif
             </div>
@@ -252,12 +245,15 @@
                 @else
                     {{-- Regular Message --}}
                     @php
+                        $isSupportChat = $activeRoom->type === 'support';
+                        $isMemberMessage = $isSupportChat && is_null($msg['sender_id']);
                         $isOwnMessage = $msg['sender_id'] === auth()->id();
                         $isGroupChat = $activeRoom->isGroup();
+                        $showSenderInfo = ($isGroupChat || $isSupportChat) && !$isOwnMessage && !$isMemberMessage;
                     @endphp
-                    <div class="flex {{ $isOwnMessage ? 'justify-end' : 'justify-start' }} gap-2">
-                        {{-- Sender Avatar (for groups, not own message) --}}
-                        @if($isGroupChat && !$isOwnMessage)
+                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} gap-2">
+                        {{-- Sender Avatar (for groups/support, not own message) --}}
+                        @if($showSenderInfo)
                         <div class="flex-shrink-0 mt-4">
                             @if(isset($msg['sender']['photo']) && $msg['sender']['photo'])
                                 <img src="{{ asset('storage/' . $msg['sender']['photo']) }}" 
@@ -284,15 +280,17 @@
                         @endif
 
                         <div class="max-w-[75%]">
-                            {{-- Sender Name + Branch (for groups, not own message) --}}
-                            @if($isGroupChat && !$isOwnMessage)
+                            {{-- Sender Name (for groups/support) --}}
+                            @if($showSenderInfo)
                                 <p class="text-[10px] mb-1 ml-1 flex items-center gap-1.5">
                                     <span class="font-semibold text-gray-700">{{ $msg['sender']['name'] ?? 'Unknown' }}</span>
                                     @if(isset($msg['sender']['branch']['name']))
                                     <span class="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded text-[9px]">{{ $msg['sender']['branch']['name'] }}</span>
-                                    @else
-                                    <span class="px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded text-[9px]">Pusat</span>
                                     @endif
+                                </p>
+                            @elseif($isMemberMessage)
+                                <p class="text-[10px] mb-1 ml-1">
+                                    <span class="font-semibold text-orange-600">{{ $activeRoom->member->name ?? 'Member' }}</span>
                                 </p>
                             @endif
                             
