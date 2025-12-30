@@ -369,13 +369,18 @@ class StaffChat extends Component
         $this->attachment = null;
     }
 
+    // @codingStandardsIgnoreStart - base64 is required for voice note upload from browser
     public function sendVoice($base64, $duration)
     {
         if (!$this->activeRoomId || !$base64) return;
         
-        // Remove data URL prefix (handles codecs like audio/webm;codecs=opus)
+        // Sanitize: Remove data URL prefix (handles codecs like audio/webm;codecs=opus)
         $base64Data = preg_replace('/^data:audio\/[^;,]+[^,]*,/', '', $base64);
         $data = base64_decode($base64Data);
+        
+        if (!$data || strlen($data) < 100 || strlen($data) > 10485760) {
+            return; // Invalid or too large (max 10MB)
+        }
         
         // Detect format from actual content (WebM starts with 0x1A45DFA3)
         $ext = (substr($data, 0, 4) === "\x1A\x45\xDF\xA3") ? 'webm' : 'mp4';
