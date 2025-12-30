@@ -119,8 +119,20 @@ class StaffChat extends Component
         $this->selectedBranch = null;
     }
 
+    public function canAccessSupportChat(): bool
+    {
+        return in_array(auth()->user()->role, ['super_admin', 'admin', 'librarian']);
+    }
+
     public function openRoom($roomId)
     {
+        $room = ChatRoom::find($roomId);
+        
+        // Staff hanya bisa lihat list support, tidak bisa buka chat
+        if ($room && $room->type === 'support' && !$this->canAccessSupportChat()) {
+            return;
+        }
+
         $this->activeRoomId = $roomId;
         $this->activeRoom = ChatRoom::with([
             'branch',

@@ -789,11 +789,12 @@
             {{-- Sub-tab Content --}}
             @if(($chatSubTab ?? 'personal') === 'support')
             {{-- Support (Member) Chats --}}
+            @php $canAccessSupport = in_array(auth()->user()->role, ['super_admin', 'admin', 'librarian']); @endphp
             @forelse(($this->rooms['support'] ?? collect()) as $room)
             @php $member = $room->member; @endphp
             @if($member)
-            <button wire:click="openRoom({{ $room->id }})" 
-                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }}">
+            <div @if($canAccessSupport) wire:click="openRoom({{ $room->id }})" @endif
+                    class="w-full px-4 py-3 flex items-center gap-3 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }} {{ $canAccessSupport ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default' }}">
                 <div class="relative flex-shrink-0">
                     @if($member->photo)
                         <img src="{{ Storage::url($member->photo) }}" class="w-11 h-11 rounded-full object-cover">
@@ -832,7 +833,7 @@
                     {{ $room->unread_count > 9 ? '9+' : $room->unread_count }}
                 </span>
                 @endif
-            </button>
+            </div>
             @endif
             @empty
             <div class="p-8 text-center text-gray-400">
@@ -840,6 +841,11 @@
                 <p class="text-sm">Belum ada chat support</p>
             </div>
             @endforelse
+            @if(!$canAccessSupport && ($this->rooms['support'] ?? collect())->count() > 0)
+            <div class="px-4 py-2 bg-amber-50 border-t border-amber-100">
+                <p class="text-[10px] text-amber-600"><i class="fas fa-info-circle mr-1"></i>Hanya Admin/Pustakawan yang dapat membalas</p>
+            </div>
+            @endif
             @elseif(($chatSubTab ?? 'personal') === 'personal')
             {{-- Personal (Direct Messages) List --}}
             @forelse($this->rooms['directs'] as $room)
