@@ -771,45 +771,86 @@
     };
     </script>
     
-    {{-- SweetAlert2 --}}
+    {{-- SweetAlert2 Custom Styling --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+    .swal2-container { z-index: 99999 !important; }
+    .swal2-popup.swal-custom {
+        border-radius: 1.5rem !important;
+        padding: 2rem !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    }
+    .swal2-popup.swal-custom .swal2-title {
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #1f2937 !important;
+    }
+    .swal2-popup.swal-custom .swal2-html-container {
+        font-size: 0.95rem !important;
+        color: #6b7280 !important;
+    }
+    .swal2-popup.swal-custom .swal2-actions {
+        gap: 0.75rem !important;
+        margin-top: 1.5rem !important;
+    }
+    .swal2-popup.swal-custom .swal2-confirm,
+    .swal2-popup.swal-custom .swal2-cancel {
+        border-radius: 0.75rem !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        min-width: 100px !important;
+    }
+    .swal2-popup.swal-custom .swal2-cancel {
+        background-color: #f3f4f6 !important;
+        color: #4b5563 !important;
+    }
+    .swal2-popup.swal-custom .swal2-cancel:hover {
+        background-color: #e5e7eb !important;
+    }
+    .swal2-popup.swal-custom .swal2-icon {
+        margin: 1rem auto !important;
+    }
+    </style>
     <script>
-    // Custom SweetAlert theme
+    // Custom SweetAlert config
+    const SwalCustom = Swal.mixin({
+        customClass: { popup: 'swal-custom' },
+        buttonsStyling: true,
+        reverseButtons: true,
+        focusCancel: true,
+    });
+    
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
+        customClass: { popup: 'swal-custom' }
     });
+    
+    // Global confirm function for Livewire
+    window.confirmAction = function(options, callback) {
+        SwalCustom.fire({
+            title: options.title || 'Konfirmasi',
+            text: options.text || '',
+            icon: options.icon || 'question',
+            showCancelButton: true,
+            confirmButtonColor: options.confirmColor || '#10b981',
+            cancelButtonColor: '#9ca3af',
+            confirmButtonText: options.confirmText || 'Ya, Lanjutkan',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed && callback) callback();
+        });
+    };
     
     // Listen for Livewire notifications
     document.addEventListener('livewire:initialized', () => {
         Livewire.on('notify', (data) => {
             const config = data[0] || data;
-            Toast.fire({
-                icon: config.type || 'success',
-                title: config.message
-            });
-        });
-        
-        Livewire.on('swal:confirm', (data) => {
-            const config = data[0] || data;
-            Swal.fire({
-                title: config.title || 'Konfirmasi',
-                text: config.text || '',
-                icon: config.icon || 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#10b981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: config.confirmText || 'Ya, Lanjutkan',
-                cancelButtonText: config.cancelText || 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed && config.method) {
-                    Livewire.dispatch(config.method, config.params || []);
-                }
-            });
+            Toast.fire({ icon: config.type || 'success', title: config.message });
         });
     });
     </script>
