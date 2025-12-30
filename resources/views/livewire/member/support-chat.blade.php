@@ -1,8 +1,11 @@
 <div>
+    @php
+        $whatsappNumber = \App\Models\Setting::get('contact_whatsapp', '6285183053934');
+    @endphp
+    
     {{-- Floating Button --}}
     <div class="fixed bottom-6 right-6 z-50" x-data="{ showOptions: false }">
         @if(!$isOpen)
-            {{-- Main Button --}}
             <div class="relative">
                 {{-- Options Popup --}}
                 <div x-show="showOptions" x-cloak
@@ -10,14 +13,11 @@
                      x-transition:enter-start="opacity-0 translate-y-2"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 translate-y-0"
-                     x-transition:leave-end="opacity-0 translate-y-2"
                      @click.away="showOptions = false"
                      class="absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border p-2 w-56">
                     <p class="text-xs text-gray-500 px-3 py-2 font-medium">Hubungi Kami</p>
                     
-                    {{-- WhatsApp Option --}}
-                    <a href="https://wa.me/6285183053934" target="_blank"
+                    <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank"
                        class="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-lg transition">
                         <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                             <i class="fab fa-whatsapp text-white text-lg"></i>
@@ -28,7 +28,6 @@
                         </div>
                     </a>
                     
-                    {{-- System Chat Option --}}
                     <button wire:click="openChat" @click="showOptions = false"
                             class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-lg transition">
                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
@@ -47,7 +46,6 @@
                     </button>
                 </div>
                 
-                {{-- Floating Button --}}
                 <button @click="showOptions = !showOptions"
                         class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105">
                     <i class="fas fa-comment-dots text-xl"></i>
@@ -61,9 +59,9 @@
         @endif
     </div>
 
-    {{-- Chat Window --}}
+    {{-- Chat Window (Larger) --}}
     @if($isOpen)
-    <div class="fixed bottom-6 right-6 z-50 w-80 sm:w-96 h-[500px] bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden"
+    <div class="fixed bottom-4 right-4 z-50 w-[360px] sm:w-[420px] h-[600px] bg-white rounded-2xl shadow-2xl border flex flex-col overflow-hidden"
          x-data="{ scrollToBottom() { $nextTick(() => { const el = document.getElementById('supportMessages'); if(el) el.scrollTop = el.scrollHeight; }); } }"
          x-init="scrollToBottom()"
          @message-sent.window="scrollToBottom()">
@@ -113,21 +111,23 @@
         <div id="supportMessages" class="flex-1 p-4 overflow-y-auto space-y-3" wire:poll.5s="loadMessages">
             @forelse($messages as $msg)
                 @if($msg['type'] === 'system')
-                    {{-- System Message --}}
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 whitespace-pre-line">
-                        {{ $msg['message'] }}
+                    {{-- System Message (Compact) --}}
+                    <div class="flex justify-center">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                            {{ $msg['message'] }}
+                        </span>
                     </div>
                 @elseif(is_null($msg['sender_id']))
-                    {{-- Member Message (sender_id = null) --}}
+                    {{-- Member Message --}}
                     <div class="flex justify-end">
-                        <div class="max-w-[80%]">
+                        <div class="max-w-[75%]">
                             @if(!empty($msg['attachment_path']))
                                 <img src="{{ Storage::url($msg['attachment_path']) }}" 
-                                     class="rounded-xl mb-1 max-h-40 cursor-pointer" 
+                                     class="rounded-xl mb-1 max-h-48 cursor-pointer" 
                                      onclick="window.open(this.src)">
                             @endif
                             @if($msg['message'])
-                            <div class="bg-blue-500 text-white px-4 py-2 rounded-2xl rounded-br-md">
+                            <div class="bg-blue-500 text-white px-4 py-2.5 rounded-2xl rounded-br-sm text-sm">
                                 {{ $msg['message'] }}
                             </div>
                             @endif
@@ -139,22 +139,22 @@
                 @else
                     {{-- Staff Message --}}
                     <div class="flex justify-start">
-                        <div class="max-w-[80%]">
-                            <p class="text-xs text-gray-500 mb-1 font-medium">
+                        <div class="max-w-[75%]">
+                            <p class="text-[10px] text-blue-600 mb-1 font-medium">
                                 {{ $msg['sender']['name'] ?? 'Staff' }}
                             </p>
                             @if(!empty($msg['attachment_path']))
                                 <img src="{{ Storage::url($msg['attachment_path']) }}" 
-                                     class="rounded-xl mb-1 max-h-40 cursor-pointer"
+                                     class="rounded-xl mb-1 max-h-48 cursor-pointer"
                                      onclick="window.open(this.src)">
                             @endif
                             @if(!empty($msg['voice_path']))
-                                <audio controls class="h-10 mb-1">
+                                <audio controls class="h-10 mb-1 w-full">
                                     <source src="{{ Storage::url($msg['voice_path']) }}">
                                 </audio>
                             @endif
                             @if($msg['message'])
-                            <div class="bg-gray-100 text-gray-800 px-4 py-2 rounded-2xl rounded-bl-md">
+                            <div class="bg-gray-100 text-gray-800 px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm">
                                 {{ $msg['message'] }}
                             </div>
                             @endif
@@ -172,31 +172,51 @@
             @endforelse
         </div>
 
-        {{-- Input --}}
-        <div class="p-3 border-t bg-gray-50">
-            @if($image)
-            <div class="mb-2 relative inline-block">
-                <img src="{{ $image->temporaryUrl() }}" class="h-16 rounded-lg">
-                <button wire:click="$set('image', null)" 
-                        class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs">
-                    <i class="fas fa-times"></i>
+        {{-- Quick Questions + Input --}}
+        <div class="border-t bg-gray-50">
+            {{-- Quick Questions --}}
+            <div class="px-3 pt-2 flex gap-2 overflow-x-auto scrollbar-hide">
+                <button type="button" wire:click="$set('newMessage', 'Bagaimana cara unggah mandiri?')" 
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
+                    Cara unggah mandiri?
                 </button>
+                <button type="button" wire:click="$set('newMessage', 'Bagaimana cara cek plagiasi?')"
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
+                    Cara cek plagiasi?
+                </button>
+                <button type="button" wire:click="$set('newMessage', 'Syarat bebas pustaka apa saja?')"
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
+                    Syarat bebas pustaka?
+                </button>
+            </div>
+            
+            {{-- Image Preview --}}
+            @if($image)
+            <div class="px-3 pt-2">
+                <div class="relative inline-block">
+                    <img src="{{ $image->temporaryUrl() }}" class="h-16 rounded-lg">
+                    <button wire:click="$set('image', null)" 
+                            class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
             @endif
             
-            <form wire:submit="sendMessage" class="flex items-center gap-2">
-                <label class="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center cursor-pointer transition">
-                    <i class="fas fa-image text-gray-500 text-sm"></i>
+            {{-- Input --}}
+            <form wire:submit="sendMessage" class="p-3 flex items-center gap-2">
+                <label class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center cursor-pointer transition flex-shrink-0">
+                    <i class="fas fa-image text-gray-500"></i>
                     <input type="file" wire:model="image" accept="image/*" class="hidden">
                 </label>
                 
                 <input type="text" wire:model="newMessage" 
                        placeholder="Ketik pesan..." 
-                       class="flex-1 px-4 py-2 bg-white border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="flex-1 px-4 py-2.5 bg-white border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                 
                 <button type="submit" 
-                        class="w-9 h-9 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition">
-                    <i class="fas fa-paper-plane text-sm"></i>
+                        class="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition flex-shrink-0">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </form>
         </div>
