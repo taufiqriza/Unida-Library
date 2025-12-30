@@ -184,3 +184,10 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('stock-opname.scan');
 });
+
+
+// Push Subscription Routes (Staff)
+Route::middleware(['auth'])->prefix('staff')->group(function () {
+    Route::post('/push-subscription', [\App\Http\Controllers\Staff\PushSubscriptionController::class, 'store']);
+    Route::delete('/push-subscription', [\App\Http\Controllers\Staff\PushSubscriptionController::class, 'destroy']);
+});
