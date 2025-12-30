@@ -113,32 +113,9 @@ class ElibraryDashboard extends Component
         // Send notification
         $member?->notify(new ThesisStatusNotification($this->selectedItem, 'approved'));
         
-        // Auto-create clearance letter if member has no active loans and fines
-        if ($member && !$hasWarnings) {
-            $existingLetter = \App\Models\ClearanceLetter::where('member_id', $member->id)
-                ->where('thesis_submission_id', $this->selectedItem->id)
-                ->first();
-            
-            if (!$existingLetter) {
-                $letter = \App\Models\ClearanceLetter::create([
-                    'member_id' => $member->id,
-                    'thesis_submission_id' => $this->selectedItem->id,
-                    'letter_number' => \App\Models\ClearanceLetter::generateLetterNumber(),
-                    'purpose' => 'Bebas Pustaka - ' . ucfirst($this->selectedItem->type),
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
-                    'approved_at' => now(),
-                    'notes' => 'Otomatis disetujui bersamaan dengan persetujuan tugas akhir.',
-                ]);
-                $member->notify(new ClearanceLetterNotification($letter));
-            }
-        }
-        
         $message = 'Submission disetujui';
         if ($hasWarnings) {
             $message .= ' (dengan catatan peminjaman/denda)';
-        } else {
-            $message .= ' dan surat bebas pustaka telah diterbitkan';
         }
         $this->dispatch('notify', type: 'success', message: $message);
         $this->closeModal();
@@ -212,11 +189,42 @@ class ElibraryDashboard extends Component
             'reviewed_at' => now(),
         ]);
         
+        // Auto-create clearance letter on publish
+        $this->createClearanceLetter($this->selectedItem);
+        
         // Auto send notification
         $this->sendNotificationEmail($this->selectedItem);
         
         $this->dispatch('notify', type: 'success', message: 'Berhasil dipublikasikan ke E-Thesis');
         $this->closeModal();
+    }
+    
+    protected function createClearanceLetter($submission)
+    {
+        $member = $submission->member;
+        if (!$member) return null;
+        
+        // Check if already has clearance
+        if ($submission->clearanceLetter) return $submission->clearanceLetter;
+        
+        $letter = \App\Models\ClearanceLetter::create([
+            'member_id' => $member->id,
+            'thesis_submission_id' => $submission->id,
+            'letter_number' => \App\Models\ClearanceLetter::generateLetterNumber(),
+            'purpose' => 'Bebas Pustaka - ' . ucfirst($submission->type),
+            'status' => 'approved',
+            'approved_by' => auth()->id(),
+            'approved_at' => now(),
+            'notes' => 'Diterbitkan otomatis saat publikasi E-Thesis.',
+        ]);
+        
+        try {
+            $member->notify(new \App\Notifications\ClearanceLetterNotification($letter));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send clearance notification: ' . $e->getMessage());
+        }
+        
+        return $letter;
     }
 
     public function sendPublishNotification()

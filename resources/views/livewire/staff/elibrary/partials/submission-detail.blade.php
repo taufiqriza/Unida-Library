@@ -41,6 +41,20 @@
         </div>
     </div>
 
+    {{-- Clearance Letter Notice --}}
+    @if($selectedItem->clearanceLetter && $selectedItem->clearanceLetter->status === 'approved')
+    <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-file-certificate text-emerald-600"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-emerald-800">Surat Bebas Pustaka Terbit</p>
+            <p class="text-xs text-emerald-600">No. {{ $selectedItem->clearanceLetter->letter_number }} • Tersedia di dashboard member</p>
+        </div>
+        <i class="fas fa-check-circle text-emerald-500"></i>
+    </div>
+    @endif
+
     {{-- Title Section --}}
     <div class="bg-gray-50/50 rounded-xl p-4">
         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
