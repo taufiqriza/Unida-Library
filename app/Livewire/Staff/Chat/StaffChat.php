@@ -644,7 +644,11 @@ class StaffChat extends Component
         $support = ChatRoom::where('type', 'support')
             ->with(['member:id,name,member_id,photo,branch_id', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
             ->orderByDesc('updated_at')
-            ->get()
+            ->get();
+        
+        \Log::info('Support rooms loaded', ['count' => $support->count(), 'ids' => $support->pluck('id')->toArray()]);
+        
+        $support = $support
             ->map(function ($room) use ($userId) {
                 // Check if staff has opened this room before
                 $staffMember = ChatRoomMember::where('chat_room_id', $room->id)
