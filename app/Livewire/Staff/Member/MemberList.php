@@ -159,6 +159,7 @@ class MemberList extends Component
                 $query->where(function($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('member_id', 'like', '%' . $this->search . '%')
+                      ->orWhere('nim_nidn', 'like', '%' . $this->search . '%')
                       ->orWhere('email', 'like', '%' . $this->search . '%')
                       ->orWhere('phone', 'like', '%' . $this->search . '%');
                 });
