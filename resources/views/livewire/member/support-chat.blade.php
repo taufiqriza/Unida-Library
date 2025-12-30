@@ -193,9 +193,10 @@
 
         {{-- Quick Questions + Input --}}
         <div class="border-t bg-gray-50">
+            @if(!$connectedToStaff)
             {{-- Connect to Staff Button --}}
             <div class="px-3 pt-2">
-                <button type="button" wire:click="$set('newMessage', 'staff')" class="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition">
+                <button type="button" wire:click="connectToStaff" class="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition">
                     <i class="fas fa-headset"></i> Hubungi Pustakawan Langsung
                 </button>
             </div>
@@ -207,6 +208,15 @@
                 <button type="button" wire:click="$set('newMessage', 'pinjam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">📚 Pinjam</button>
                 <button type="button" wire:click="$set('newMessage', 'jam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">🕐 Jam</button>
             </div>
+            @else
+            {{-- Connected to Staff Indicator --}}
+            <div class="px-3 pt-2">
+                <div class="py-2 px-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2 text-green-700 text-sm">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Terhubung dengan pustakawan</span>
+                </div>
+            </div>
+            @endif
             {{-- Image Preview --}}
             @if($image)
             <div class="px-3 pt-2">

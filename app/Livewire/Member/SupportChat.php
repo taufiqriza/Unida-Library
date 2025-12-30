@@ -21,7 +21,7 @@ class SupportChat extends Component
     public $newMessage = '';
     public $image;
     public $lastReadAt = null;
-    public $isTyping = false;
+    public $connectedToStaff = false; // Flag: sudah terhubung ke staff
     
     public $topics = [
         'unggah' => ['icon' => 'fa-upload', 'label' => 'Unggah Mandiri'],
@@ -94,8 +94,31 @@ class SupportChat extends Component
             
         if ($this->room) {
             $this->lastReadAt = $this->room->member_last_read;
+            $this->connectedToStaff = $this->room->connected_to_staff ?? false;
             $this->loadMessages();
         }
+    }
+
+    public function connectToStaff()
+    {
+        if (!$this->room) {
+            $this->createRoom('lainnya');
+        }
+        
+        $this->connectedToStaff = true;
+        $this->room->update(['connected_to_staff' => true]);
+        
+        // System message
+        ChatMessage::create([
+            'chat_room_id' => $this->room->id,
+            'sender_id' => null,
+            'message' => "👨‍💼 Anda terhubung dengan pustakawan.\nMohon tunggu balasan dari tim kami.\n\n⏱️ Jam layanan: Senin-Kamis 08:00-16:00, Sabtu-Minggu 08:00-21:00",
+            'type' => 'bot',
+        ]);
+        
+        $this->notifyStaff();
+        $this->loadMessages();
+        $this->dispatch('message-sent');
     }
 
     public function createRoom($topic)
@@ -171,16 +194,20 @@ class SupportChat extends Component
         $this->newMessage = '';
         $this->image = null;
         
-        // Process with chatbot (only for text messages)
-        if ($messageText && !$this->image) {
+        // If connected to staff, skip bot and notify staff directly
+        if ($this->connectedToStaff) {
+            $this->notifyStaff();
+        } elseif ($messageText && !$this->image) {
+            // Process with chatbot (only for text messages)
             $botResponse = $this->chatbot->processMessage($this->room, $messageText);
             
             if ($botResponse) {
-                // Create bot response
                 $this->chatbot->createBotMessage($this->room, $botResponse['message']);
                 
-                // If not handled by bot, notify staff
+                // If not handled by bot (wants staff), connect to staff
                 if (!$botResponse['handled']) {
+                    $this->connectedToStaff = true;
+                    $this->room->update(['connected_to_staff' => true]);
                     $this->notifyStaff();
                 }
             }
