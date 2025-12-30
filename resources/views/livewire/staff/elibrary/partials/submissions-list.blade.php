@@ -48,6 +48,13 @@
                         @else bg-gray-100 text-gray-600 @endif">
                         {{ $item->status_label }}
                     </span>
+                    
+                    {{-- Clearance Badge --}}
+                    @if($item->clearanceLetter && $item->clearanceLetter->status === 'approved')
+                    <span class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full font-medium flex items-center gap-1">
+                        <i class="fas fa-file-certificate text-[10px]"></i> Bebas Pustaka
+                    </span>
+                    @endif
 
                     {{-- Faculty & Department --}}
                     @if($item->department)

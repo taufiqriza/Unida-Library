@@ -195,18 +195,18 @@
                         </div>
                         <div class="flex flex-wrap gap-2">
                             @if($selectedItem->status === 'submitted' || $selectedItem->status === 'under_review')
-                            <button wire:click="approveSubmission" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2">
+                            <button @click="$dispatch('swal:confirm', {title: 'Setujui Submission?', text: 'Submission akan disetujui dan siap dipublikasikan.', icon: 'question', confirmText: 'Ya, Setujui', method: 'approveSubmission'})" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2">
                                 <i class="fas fa-circle-check"></i> Setujui
                             </button>
-                            <button wire:click="requestRevision" class="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center gap-2">
+                            <button @click="$dispatch('swal:confirm', {title: 'Minta Revisi?', text: 'Mahasiswa akan diminta untuk merevisi submission.', icon: 'warning', confirmText: 'Ya, Minta Revisi', method: 'requestRevision'})" class="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-orange-500/30 transition-all flex items-center gap-2">
                                 <i class="fas fa-pen"></i> Minta Revisi
                             </button>
-                            <button wire:click="rejectSubmission" class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center gap-2">
+                            <button @click="$dispatch('swal:confirm', {title: 'Tolak Submission?', text: 'Submission akan ditolak dan tidak dapat dipublikasikan.', icon: 'error', confirmText: 'Ya, Tolak', method: 'rejectSubmission'})" class="px-5 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center gap-2">
                                 <i class="fas fa-circle-xmark"></i> Tolak
                             </button>
                             @endif
                             @if($selectedItem->status === 'approved')
-                            <button wire:click="publishSubmission" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
+                            <button @click="$dispatch('swal:confirm', {title: 'Publikasikan ke E-Thesis?', text: 'Karya akan dipublikasikan dan surat bebas pustaka akan diterbitkan otomatis.', icon: 'info', confirmText: 'Ya, Publikasikan', method: 'publishSubmission'})" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all flex items-center gap-2">
                                 <i class="fas fa-globe"></i> Publikasikan ke E-Thesis
                             </button>
                             <button wire:click="sendPublishNotification" class="px-5 py-2.5 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-violet-500/30 transition-all flex items-center gap-2">

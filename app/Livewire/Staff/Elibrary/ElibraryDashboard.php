@@ -8,6 +8,7 @@ use App\Models\PlagiarismCheck;
 use App\Models\ThesisSubmission;
 use App\Notifications\ThesisStatusNotification;
 use App\Notifications\ClearanceLetterNotification;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -28,6 +29,8 @@ class ElibraryDashboard extends Component
     public $reviewNotes = '';
 
     protected $queryString = ['activeTab' => ['except' => 'ebook'], 'search' => ['except' => ''], 'statusFilter' => ['except' => '']];
+    
+    protected $listeners = ['approveSubmission', 'rejectSubmission', 'requestRevision', 'publishSubmission'];
 
     public function updatingSearch() { $this->resetPage(); }
     public function updatingActiveTab() { $this->resetPage(); $this->search = ''; $this->statusFilter = ''; }
@@ -60,7 +63,7 @@ class ElibraryDashboard extends Component
     {
         $this->selectedType = $type;
         if ($type === 'submission') {
-            $this->selectedItem = ThesisSubmission::with(['member', 'department', 'department.faculty', 'reviewer'])->find($id);
+            $this->selectedItem = ThesisSubmission::with(['member', 'department', 'department.faculty', 'reviewer', 'clearanceLetter'])->find($id);
         } elseif ($type === 'plagiarism') {
             $this->selectedItem = PlagiarismCheck::with(['member', 'thesisSubmission'])->find($id);
         }
@@ -317,7 +320,7 @@ class ElibraryDashboard extends Component
                 ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%")->orWhere('author', 'like', "%{$this->search}%"))
                 ->latest()->paginate(10);
         } elseif ($this->activeTab === 'submissions') {
-            $query = ThesisSubmission::with(['member', 'department', 'department.faculty'])
+            $query = ThesisSubmission::with(['member', 'department', 'department.faculty', 'clearanceLetter'])
                 ->when($this->search, fn($q) => $q->where('title', 'like', "%{$this->search}%")->orWhere('author', 'like', "%{$this->search}%")->orWhere('nim', 'like', "%{$this->search}%"))
                 ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter));
             

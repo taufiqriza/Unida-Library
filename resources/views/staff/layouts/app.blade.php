@@ -771,6 +771,49 @@
     };
     </script>
     
+    {{-- SweetAlert2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    // Custom SweetAlert theme
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+    });
+    
+    // Listen for Livewire notifications
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('notify', (data) => {
+            const config = data[0] || data;
+            Toast.fire({
+                icon: config.type || 'success',
+                title: config.message
+            });
+        });
+        
+        Livewire.on('swal:confirm', (data) => {
+            const config = data[0] || data;
+            Swal.fire({
+                title: config.title || 'Konfirmasi',
+                text: config.text || '',
+                icon: config.icon || 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: config.confirmText || 'Ya, Lanjutkan',
+                cancelButtonText: config.cancelText || 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed && config.method) {
+                    Livewire.dispatch(config.method, config.params || []);
+                }
+            });
+        });
+    });
+    </script>
+    
     {{-- Push Notification Subscription --}}
     <script>
     const vapidPublicKey = '{{ config("webpush.vapid.public_key") }}';
