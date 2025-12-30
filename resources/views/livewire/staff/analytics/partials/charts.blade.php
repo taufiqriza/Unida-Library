@@ -17,9 +17,49 @@
             </div>
         </div>
         @elseif(count($pageViews) > 0)
-        <div class="h-64" wire:ignore x-data="trafficChart(@js($pageViews))" x-init="initChart()">
-            <canvas x-ref="chart"></canvas>
+        <div class="h-64">
+            <canvas id="trafficChart"></canvas>
         </div>
+        @push('scripts')
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('trafficChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: @json(collect($pageViews)->pluck('date')),
+                        datasets: [{
+                            label: 'Pageviews',
+                            data: @json(collect($pageViews)->pluck('views')),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 2,
+                        }, {
+                            label: 'Users',
+                            data: @json(collect($pageViews)->pluck('users')),
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            tension: 0.4,
+                            borderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { grid: { color: '#f3f4f6' } }
+                        }
+                    }
+                });
+            }
+        });
+        </script>
+        @endpush
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
@@ -166,49 +206,3 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-function trafficChart(data) {
-    return {
-        chart: null,
-        initChart() {
-            const ctx = this.$refs.chart.getContext('2d');
-            this.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => d.date),
-                    datasets: [{
-                        label: 'Pageviews',
-                        data: data.map(d => d.views),
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
-                    }, {
-                        label: 'Users',
-                        data: data.map(d => d.users),
-                        borderColor: '#10b981',
-                        backgroundColor: 'transparent',
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-                        y: { grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 } } }
-                    }
-                }
-            });
-        }
-    }
-}
-</script>
