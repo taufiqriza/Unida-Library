@@ -84,7 +84,7 @@
             </div>
 
             {{-- Actions --}}
-            <div class="flex items-center gap-1 flex-shrink-0" x-data>
+            <div class="flex items-center gap-1 flex-shrink-0">
                 <button wire:click="viewDetail({{ $item->id }}, 'submission')" class="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Lihat Detail">
                     <i class="fas fa-eye"></i>
                 </button>
@@ -94,7 +94,7 @@
                 </button>
                 @endif
                 @if($isMainBranch && $item->status === 'approved')
-                <button @click="confirmAction({title:'Publikasikan ke E-Thesis?',text:'{{ $item->title }}',icon:'info',confirmText:'Ya, Publikasikan',confirmColor:'#3b82f6'},()=>$wire.quickPublish({{ $item->id }}))" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Publikasikan">
+                <button wire:click="quickPublish({{ $item->id }})" wire:confirm="Publikasikan '{{ Str::limit($item->title, 50) }}' ke E-Thesis?" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Publikasikan">
                     <i class="fas fa-globe"></i>
                 </button>
                 @endif

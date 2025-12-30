@@ -319,6 +319,27 @@
                     <li><i class="fas fa-check mr-1.5 text-blue-500"></i> Full Text: Format PDF, maksimal 50MB (opsional)</li>
                 </ul>
             </div>
+            
+            {{-- Watermark Notice --}}
+            <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <h4 class="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                    <i class="fas fa-stamp"></i> Wajib Watermark untuk BAB 1-3
+                </h4>
+                <p class="mt-2 text-xs text-amber-700">
+                    File BAB 1-3 <strong>wajib diberi watermark</strong> logo UNIDA sebelum diunggah karena akan diakses publik.
+                </p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <a href="{{ url('storage/logo.png') }}" download="logo-unida.png" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-medium rounded-lg transition">
+                        <i class="fas fa-download"></i> Download Logo UNIDA
+                    </a>
+                    <a href="https://www.sejda.com/watermark-pdf" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs font-medium rounded-lg transition">
+                        <i class="fas fa-external-link-alt"></i> Buka Sejda Watermark
+                    </a>
+                </div>
+                <p class="mt-2 text-[10px] text-amber-600">
+                    <i class="fas fa-lightbulb mr-1"></i> Tips: Upload PDF ke Sejda → Add Image → Pilih logo UNIDA → Atur posisi & opacity → Download
+                </p>
+            </div>
 
             {{-- Required Files Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
