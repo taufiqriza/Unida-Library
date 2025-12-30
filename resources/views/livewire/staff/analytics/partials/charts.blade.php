@@ -17,8 +17,36 @@
             </div>
         </div>
         @elseif(count($pageViews) > 0)
-        <div class="h-64">
-            <canvas id="trafficChart"></canvas>
+        <div class="h-64" 
+             x-data="{ init() {
+                const ctx = this.$refs.canvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ Js::from(collect($pageViews)->pluck('date')) }},
+                        datasets: [{
+                            label: 'Pageviews',
+                            data: {{ Js::from(collect($pageViews)->pluck('views')) }},
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                        }, {
+                            label: 'Users', 
+                            data: {{ Js::from(collect($pageViews)->pluck('users')) }},
+                            borderColor: '#10b981',
+                            tension: 0.4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { display: false } }, y: { beginAtZero: true } }
+                    }
+                });
+             }}">
+            <canvas x-ref="canvas"></canvas>
         </div>
         @else
         <div class="h-64 flex items-center justify-center">
