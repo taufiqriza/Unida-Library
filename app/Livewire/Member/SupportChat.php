@@ -212,7 +212,6 @@ class SupportChat extends Component
             }
         }
     }
-    }
 
     public function closeChat()
     {
