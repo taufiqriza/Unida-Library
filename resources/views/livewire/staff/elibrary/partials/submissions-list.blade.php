@@ -94,7 +94,7 @@
                 </button>
                 @endif
                 @if($isMainBranch && $item->status === 'approved')
-                <button wire:click="quickPublish({{ $item->id }})" wire:confirm="Publikasikan '{{ Str::limit($item->title, 50) }}' ke E-Thesis?" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Publikasikan">
+                <button onclick="confirmAction({title:'Publikasikan ke E-Thesis?',text:'{{ Str::limit(addslashes($item->title), 60) }}',icon:'info',confirmText:'Ya, Publikasikan',confirmColor:'#3b82f6'},()=>Livewire.find('{{ $_instance->getId() }}').quickPublish({{ $item->id }}))" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Publikasikan">
                     <i class="fas fa-globe"></i>
                 </button>
                 @endif
