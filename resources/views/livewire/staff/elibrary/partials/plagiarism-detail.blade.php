@@ -90,6 +90,42 @@
         <p class="font-semibold text-gray-900">{{ $selectedItem->document_title }}</p>
     </div>
 
+    {{-- Preview Files for External Completed --}}
+    <div class="grid grid-cols-2 gap-2">
+        @if($selectedItem->file_path)
+        <button @click="showPreview = true; previewUrl = '{{ Storage::url($selectedItem->file_path) }}'; previewTitle = 'Dokumen'" 
+                class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl text-sm text-gray-700 hover:bg-gray-100 border transition">
+            <i class="fas fa-file-pdf text-red-500"></i> 
+            <span>Lihat Dokumen</span>
+        </button>
+        @endif
+        @if($selectedItem->external_report_file)
+        <button @click="showPreview = true; previewUrl = '{{ Storage::url($selectedItem->external_report_file) }}'; previewTitle = 'Laporan Plagiasi'" 
+                class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl text-sm text-gray-700 hover:bg-gray-100 border transition">
+            <i class="fas fa-file-alt text-blue-500"></i> 
+            <span>Lihat Report</span>
+        </button>
+        @endif
+    </div>
+
+    {{-- Reviewer Info --}}
+    @if($selectedItem->reviewed_at)
+    <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <p class="text-xs text-blue-600 font-medium mb-2">
+            <i class="fas fa-user-check mr-1"></i> Direview oleh
+        </p>
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-blue-600 text-sm"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-blue-800">{{ $selectedItem->reviewer?->name ?? 'Admin' }}</p>
+                <p class="text-xs text-blue-600">{{ $selectedItem->reviewed_at->format('d M Y, H:i') }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @if($selectedItem->review_notes)
     <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
         <p class="text-xs text-amber-600 font-medium mb-1">Catatan Review</p>
