@@ -628,17 +628,31 @@ class StaffChat extends Component
         $groups = $rooms->filter(fn($r) => $r->isGroup())->sortByDesc('latestMessage.created_at');
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
         
-        // Support rooms (all staff can see)
+        // Support rooms (all staff can see) - unread = messages from member not yet seen
         $support = ChatRoom::where('type', 'support')
             ->with(['member:id,name,member_id,photo,branch_id', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
             ->orderByDesc('updated_at')
             ->get()
             ->map(function ($room) use ($userId) {
-                $member = ChatRoomMember::where('chat_room_id', $room->id)->where('user_id', $userId)->first();
-                $room->unread_count = $member ? ChatMessage::where('chat_room_id', $room->id)
-                    ->where('created_at', '>', $member->last_read_at ?? '1970-01-01')
-                    ->where('sender_id', '!=', $userId)
-                    ->count() : ChatMessage::where('chat_room_id', $room->id)->where('sender_id', '!=', $userId)->count();
+                // Check if staff has opened this room before
+                $staffMember = ChatRoomMember::where('chat_room_id', $room->id)
+                    ->where('user_id', $userId)
+                    ->first();
+                
+                if ($staffMember && $staffMember->last_read_at) {
+                    // Count member messages (sender_id = null) after last read
+                    $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
+                        ->whereNull('sender_id')
+                        ->where('type', '!=', 'system')
+                        ->where('created_at', '>', $staffMember->last_read_at)
+                        ->count();
+                } else {
+                    // Never opened - count all member messages
+                    $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
+                        ->whereNull('sender_id')
+                        ->where('type', '!=', 'system')
+                        ->count();
+                }
                 return $room;
             });
 
