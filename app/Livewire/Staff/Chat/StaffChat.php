@@ -332,6 +332,18 @@ class StaffChat extends Component
                     'sender_name' => $sender->name,
                 ],
             ]);
+            
+            // Send push notification
+            $user = User::find($userId);
+            if ($user) {
+                try {
+                    $user->notify(new \App\Notifications\ChatPushNotification(
+                        $roomName,
+                        $room->isDirect() ? $msgPreview : "{$sender->name}: {$msgPreview}",
+                        $room->id
+                    ));
+                } catch (\Exception $e) {}
+            }
         }
     }
 

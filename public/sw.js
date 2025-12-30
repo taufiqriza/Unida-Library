@@ -5,12 +5,14 @@ self.addEventListener('push', function(event) {
     const options = {
         body: data.body || 'Ada pesan baru',
         icon: data.icon || '/images/logo-icon.png',
-        badge: '/images/logo-icon.png',
-        vibrate: [100, 50, 100],
+        badge: data.badge || '/images/logo-icon.png',
+        vibrate: [200, 100, 200],
+        tag: data.tag || 'default',
+        renotify: data.renotify || true,
+        requireInteraction: true, // Notifikasi tetap sampai user klik/dismiss
         data: {
-            url: data.actions?.[0]?.action || '/staff'
-        },
-        actions: data.actions || []
+            url: data.data?.url || '/staff'
+        }
     };
     
     event.waitUntil(
@@ -25,13 +27,11 @@ self.addEventListener('notificationclick', function(event) {
     
     event.waitUntil(
         clients.matchAll({type: 'window', includeUncontrolled: true}).then(function(clientList) {
-            // Check if there's already a window open
             for (let client of clientList) {
                 if (client.url.includes('/staff') && 'focus' in client) {
                     return client.focus();
                 }
             }
-            // Open new window
             if (clients.openWindow) {
                 return clients.openWindow(url);
             }
