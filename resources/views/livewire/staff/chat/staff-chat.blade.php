@@ -242,6 +242,17 @@
                             {{ $msg['message'] }}
                         </span>
                     </div>
+                @elseif($msg['type'] === 'bot')
+                    {{-- Bot Message (Compact) --}}
+                    <div class="flex justify-start gap-2">
+                        <div class="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white text-[10px]"></i>
+                        </div>
+                        <div class="max-w-[80%] bg-violet-50 border border-violet-100 rounded-xl px-3 py-2">
+                            <p class="text-[10px] text-violet-600 font-medium mb-1">Bot</p>
+                            <div class="text-xs text-gray-700 whitespace-pre-line leading-relaxed">{!! nl2br(preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', e(Str::limit($msg['message'], 300)))) !!}</div>
+                        </div>
+                    </div>
                 @else
                     {{-- Regular Message --}}
                     @php
