@@ -53,7 +53,7 @@ return [
     'jam' => [
         'keywords' => ['jam', 'buka', 'tutup', 'operasional', 'jadwal', 'waktu', 'libur', 'hari'],
         'responses' => [
-            'main' => "🕐 **Jam Operasional**\n\n📅 **Senin - Kamis**\n08:00 - 16:00 WIB\n\n📅 **Jumat**\n08:00 - 11:30 WIB\n13:30 - 16:00 WIB\n\n📅 **Sabtu & Minggu**\nTutup\n\n⚠️ Jam dapat berubah saat libur nasional",
+            'main' => "🕐 **Jam Operasional**\n\n📅 **Senin - Kamis**\n08:00 - 16:00 WIB\n\n📅 **Jumat**\nLibur\n\n📅 **Sabtu - Minggu**\n08:00 - 21:00 WIB\n\n💡 Perpustakaan buka sampai malam untuk mahasiswa asrama.",
         ],
     ],
     
@@ -61,7 +61,7 @@ return [
     'kontak' => [
         'keywords' => ['kontak', 'contact', 'hubungi', 'telepon', 'telp', 'hp', 'whatsapp', 'wa', 'email', 'alamat', 'lokasi', 'dimana'],
         'responses' => [
-            'main' => "📞 **Kontak Perpustakaan**\n\n📍 **Alamat:**\nGedung Perpustakaan UNIDA Gontor\nJl. Raya Siman Km. 6, Ponorogo\n\n📱 **WhatsApp:** 0851-8305-3934\n📧 **Email:** perpustakaan@unida.gontor.ac.id\n🌐 **Website:** lib.unida.gontor.ac.id",
+            'main' => "📞 **Kontak Perpustakaan**\n\n📍 **Alamat:**\nGedung Perpustakaan UNIDA Gontor\nJl. Raya Siman Km. 6, Ponorogo\n\n📱 **WhatsApp:** 0851-8305-3934\n📧 **Email:** perpustakaan@unida.gontor.ac.id\n🌐 **Website:** library.unida.gontor.ac.id",
         ],
     ],
     

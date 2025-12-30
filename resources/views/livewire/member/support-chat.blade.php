@@ -193,33 +193,21 @@
 
         {{-- Quick Questions + Input --}}
         <div class="border-t bg-gray-50">
-            {{-- Quick Questions --}}
-            <div class="px-3 pt-2 flex gap-2 overflow-x-auto scrollbar-hide">
-                <button type="button" wire:click="$set('newMessage', 'unggah')" 
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
-                    📤 Unggah
-                </button>
-                <button type="button" wire:click="$set('newMessage', 'plagiasi')"
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
-                    🔍 Plagiasi
-                </button>
-                <button type="button" wire:click="$set('newMessage', 'bebas pustaka')"
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
-                    📜 Bebas Pustaka
-                </button>
-                <button type="button" wire:click="$set('newMessage', 'pinjam')"
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
-                    📚 Pinjam
-                </button>
-                <button type="button" wire:click="$set('newMessage', 'staff')"
-                        class="px-3 py-1 bg-white border border-orange-200 rounded-full text-xs text-orange-600 hover:bg-orange-50 whitespace-nowrap">
-                    👨‍💼 Pustakawan
+            {{-- Connect to Staff Button --}}
+            <div class="px-3 pt-2">
+                <button type="button" wire:click="$set('newMessage', 'staff')" class="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition">
+                    <i class="fas fa-headset"></i> Hubungi Pustakawan Langsung
                 </button>
             </div>
-            
-            {{-- Image Preview --}}
-            @if($image)
-            <div class="px-3 pt-2">
+            {{-- Quick Questions --}}
+            <div class="px-3 pt-2 flex gap-2 overflow-x-auto scrollbar-hide">
+                <button type="button" wire:click="$set('newMessage', 'unggah')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">📤 Unggah</button>
+                <button type="button" wire:click="$set('newMessage', 'plagiasi')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">🔍 Plagiasi</button>
+                <button type="button" wire:click="$set('newMessage', 'bebas pustaka')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">📜 Bebas Pustaka</button>
+                <button type="button" wire:click="$set('newMessage', 'pinjam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">📚 Pinjam</button>
+                <button type="button" wire:click="$set('newMessage', 'jam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">🕐 Jam</button>
+            </div>
+            {{-- Image Preview --}}            <div class="px-3 pt-2">
                 <div class="relative inline-block">
                     <img src="{{ $image->temporaryUrl() }}" class="h-16 rounded-lg">
                     <button wire:click="$set('image', null)" 
