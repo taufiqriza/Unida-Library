@@ -641,8 +641,9 @@ class StaffChat extends Component
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
         
         // Support rooms (all staff can see) - unread = messages from member not yet seen
+        // Use withoutGlobalScope to bypass branch filter on Member model
         $support = ChatRoom::where('type', 'support')
-            ->with(['member', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
+            ->with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
             ->orderByDesc('updated_at')
             ->get();
         
