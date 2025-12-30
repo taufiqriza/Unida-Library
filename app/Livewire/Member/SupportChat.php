@@ -20,24 +20,29 @@ class SupportChat extends Component
     public $image;
     
     public $topics = [
-        'unggah_mandiri' => ['icon' => 'fa-upload', 'label' => 'Unggah Mandiri'],
+        'unggah' => ['icon' => 'fa-upload', 'label' => 'Unggah Mandiri'],
         'plagiasi' => ['icon' => 'fa-search', 'label' => 'Cek Plagiasi'],
-        'bebas_pustaka' => ['icon' => 'fa-clipboard-check', 'label' => 'Bebas Pustaka'],
-        'peminjaman' => ['icon' => 'fa-book', 'label' => 'Peminjaman/Pengembalian'],
+        'bebas' => ['icon' => 'fa-clipboard-check', 'label' => 'Bebas Pustaka'],
+        'pinjam' => ['icon' => 'fa-book', 'label' => 'Peminjaman'],
         'lainnya' => ['icon' => 'fa-question-circle', 'label' => 'Lainnya'],
     ];
 
+    protected function member()
+    {
+        return auth('member')->user();
+    }
+
     public function mount()
     {
-        if (auth()->check()) {
+        if (auth('member')->check()) {
             $this->loadRoom();
         }
     }
 
     public function openChat()
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
+        if (!auth('member')->check()) {
+            return redirect()->route('member.login');
         }
         
         $this->loadRoom();
@@ -58,8 +63,10 @@ class SupportChat extends Component
 
     public function loadRoom()
     {
+        if (!auth('member')->check()) return;
+        
         $this->room = ChatRoom::where('type', 'support')
-            ->where('member_id', auth()->id())
+            ->where('member_id', $this->member()->id)
             ->first();
             
         if ($this->room) {
@@ -69,21 +76,14 @@ class SupportChat extends Component
 
     public function createRoom($topic)
     {
-        $user = auth()->user();
+        $member = $this->member();
         
         $this->room = ChatRoom::create([
             'type' => 'support',
-            'member_id' => $user->id,
+            'member_id' => $member->id,
             'topic' => $topic,
-            'name' => 'Support: ' . $user->name,
+            'name' => 'Support: ' . $member->name,
             'status' => 'open',
-        ]);
-
-        // Add member to room
-        ChatRoomMember::create([
-            'chat_room_id' => $this->room->id,
-            'user_id' => $user->id,
-            'role' => 'member',
         ]);
 
         // Send auto welcome message
@@ -98,10 +98,10 @@ class SupportChat extends Component
     public function getWelcomeMessage($topic)
     {
         $topicLabel = $this->topics[$topic]['label'] ?? 'Lainnya';
-        $user = auth()->user();
+        $member = $this->member();
         
         return "Selamat datang di Layanan Perpustakaan UNIDA Gontor!\n\n" .
-               "Halo {$user->name}, terima kasih telah menghubungi kami.\n" .
+               "Halo {$member->name}, terima kasih telah menghubungi kami.\n" .
                "Topik: {$topicLabel}\n\n" .
                "Staff kami akan segera membalas pesan Anda.\n" .
                "Jam layanan: Senin-Jumat, 08:00-16:00 WIB";
@@ -116,11 +116,6 @@ class SupportChat extends Component
             ->orderBy('created_at', 'asc')
             ->get()
             ->toArray();
-            
-        // Mark as read
-        ChatRoomMember::where('chat_room_id', $this->room->id)
-            ->where('user_id', auth()->id())
-            ->update(['last_read_at' => now()]);
     }
 
     public function sendMessage()
@@ -129,8 +124,9 @@ class SupportChat extends Component
 
         $data = [
             'chat_room_id' => $this->room->id,
-            'sender_id' => auth()->id(),
+            'sender_id' => null, // Member messages have null sender_id, identified by room's member_id
             'type' => 'text',
+            'is_from_member' => true,
         ];
 
         if ($this->image) {
@@ -145,10 +141,12 @@ class SupportChat extends Component
 
         ChatMessage::create($data);
         
-        // Update room status if resolved
+        // Reopen if resolved
         if ($this->room->status === 'resolved') {
             $this->room->update(['status' => 'open']);
         }
+        
+        $this->room->touch(); // Update updated_at
 
         $this->newMessage = '';
         $this->image = null;
@@ -164,17 +162,12 @@ class SupportChat extends Component
 
     public function getUnreadCountProperty()
     {
-        if (!$this->room) return 0;
+        if (!$this->room || !auth('member')->check()) return 0;
         
-        $member = ChatRoomMember::where('chat_room_id', $this->room->id)
-            ->where('user_id', auth()->id())
-            ->first();
-            
-        if (!$member) return 0;
-        
+        // Count staff messages (sender_id is not null and is_from_member is false/null)
         return ChatMessage::where('chat_room_id', $this->room->id)
-            ->where('sender_id', '!=', auth()->id())
-            ->where('created_at', '>', $member->last_read_at ?? '1970-01-01')
+            ->whereNotNull('sender_id')
+            ->where('created_at', '>', $this->room->member_last_read ?? '1970-01-01')
             ->count();
     }
 

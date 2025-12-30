@@ -23,7 +23,7 @@ class ChatRoom extends Model
 
     public function member()
     {
-        return $this->belongsTo(User::class, 'member_id');
+        return $this->belongsTo(\App\Models\Member::class, 'member_id');
     }
 
     public function lastStaff()

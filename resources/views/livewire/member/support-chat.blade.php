@@ -37,7 +37,7 @@
                         <div class="text-left">
                             <p class="font-medium text-gray-800 text-sm">Chat System</p>
                             <p class="text-xs text-gray-500">
-                                @auth
+                                @auth('member')
                                     Terhubung dengan staff
                                 @else
                                     Login diperlukan
@@ -116,8 +116,8 @@
                     <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-sm text-blue-800 whitespace-pre-line">
                         {{ $msg['message'] }}
                     </div>
-                @elseif($msg['sender_id'] === auth()->id())
-                    {{-- My Message --}}
+                @elseif(is_null($msg['sender_id']))
+                    {{-- Member Message (sender_id = null) --}}
                     <div class="flex justify-end">
                         <div class="max-w-[80%]">
                             @if(!empty($msg['attachment_path']))
