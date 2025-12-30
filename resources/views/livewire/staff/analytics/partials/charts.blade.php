@@ -20,44 +20,6 @@
         <div class="h-64">
             <canvas id="trafficChart"></canvas>
         </div>
-        <script>
-        (function() {
-            const ctx = document.getElementById('trafficChart');
-            if (ctx && typeof Chart !== 'undefined') {
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: {!! json_encode(collect($pageViews)->pluck('date')) !!},
-                        datasets: [{
-                            label: 'Pageviews',
-                            data: {!! json_encode(collect($pageViews)->pluck('views')) !!},
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 2,
-                        }, {
-                            label: 'Users',
-                            data: {!! json_encode(collect($pageViews)->pluck('users')) !!},
-                            borderColor: '#10b981',
-                            backgroundColor: 'transparent',
-                            tension: 0.4,
-                            borderWidth: 2,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { display: false } },
-                            y: { grid: { color: '#f3f4f6' }, beginAtZero: true }
-                        }
-                    }
-                });
-            }
-        })();
-        </script>
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
@@ -202,5 +164,3 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
