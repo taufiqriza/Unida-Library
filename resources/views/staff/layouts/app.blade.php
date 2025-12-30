@@ -119,6 +119,9 @@
         $user = auth()->user();
         $branch = $user->branch;
         $currentDate = now()->locale('id')->isoFormat('dddd, D MMMM Y');
+        $isStaffOnly = $user->role === 'staff';
+        $isAdminOrAbove = in_array($user->role, ['super_admin', 'admin', 'librarian']);
+        
         $navItems = [
             ['label' => 'Dashboard', 'icon' => 'fa-house', 'route' => 'staff.dashboard', 'patterns' => ['staff.dashboard*']],
             ['label' => 'Tasks', 'icon' => 'fa-clipboard-list', 'route' => 'staff.task.index', 'patterns' => ['staff.task*']],
@@ -129,16 +132,20 @@
             ['label' => 'Anggota', 'icon' => 'fa-users', 'route' => 'staff.member.index', 'patterns' => ['staff.member*']],
             ['label' => 'Berita', 'icon' => 'fa-newspaper', 'route' => 'staff.news.index', 'patterns' => ['staff.news*']],
             ['label' => 'Stock Opname', 'icon' => 'fa-clipboard-check', 'route' => 'staff.stock-opname.index', 'patterns' => ['staff.stock-opname*']],
-            ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']],
-            ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']],
-            ['label' => 'Survey', 'icon' => 'fa-clipboard-question', 'route' => 'staff.survey.index', 'patterns' => ['staff.survey*']],
         ];
-        // Add Control & Security menu for admin only
+        
+        // Statistik, Analytics, Survey - only for admin/librarian
+        if ($isAdminOrAbove) {
+            $navItems[] = ['label' => 'Statistik', 'icon' => 'fa-chart-pie', 'route' => 'staff.statistics.index', 'patterns' => ['staff.statistics*']];
+            $navItems[] = ['label' => 'Analytics', 'icon' => 'fa-chart-line', 'route' => 'staff.analytics.index', 'patterns' => ['staff.analytics*']];
+            $navItems[] = ['label' => 'Survey', 'icon' => 'fa-clipboard-question', 'route' => 'staff.survey.index', 'patterns' => ['staff.survey*']];
+        }
+        
+        // Security & Pengaturan - only for super_admin/admin
         if (in_array($user->role, ['super_admin', 'admin'])) {
             $navItems[] = ['label' => 'Security', 'icon' => 'fa-shield-alt', 'route' => 'staff.security.index', 'patterns' => ['staff.security*']];
             $navItems[] = ['label' => 'Pengaturan', 'icon' => 'fa-cog', 'route' => 'staff.control.index', 'patterns' => ['staff.control*']];
         }
-        // Note: Profil removed from sidebar, now in header dropdown
     @endphp
 
     <link rel="stylesheet" href="{{ asset('css/staff-portal.css') }}">
