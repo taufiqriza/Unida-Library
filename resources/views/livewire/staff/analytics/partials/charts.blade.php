@@ -20,18 +20,17 @@
         <div class="h-64">
             <canvas id="trafficChart"></canvas>
         </div>
-        @push('scripts')
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        (function() {
             const ctx = document.getElementById('trafficChart');
-            if (ctx) {
+            if (ctx && typeof Chart !== 'undefined') {
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: @json(collect($pageViews)->pluck('date')),
+                        labels: {!! json_encode(collect($pageViews)->pluck('date')) !!},
                         datasets: [{
                             label: 'Pageviews',
-                            data: @json(collect($pageViews)->pluck('views')),
+                            data: {!! json_encode(collect($pageViews)->pluck('views')) !!},
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             fill: true,
@@ -39,7 +38,7 @@
                             borderWidth: 2,
                         }, {
                             label: 'Users',
-                            data: @json(collect($pageViews)->pluck('users')),
+                            data: {!! json_encode(collect($pageViews)->pluck('users')) !!},
                             borderColor: '#10b981',
                             backgroundColor: 'transparent',
                             tension: 0.4,
@@ -52,14 +51,13 @@
                         plugins: { legend: { display: false } },
                         scales: {
                             x: { grid: { display: false } },
-                            y: { grid: { color: '#f3f4f6' } }
+                            y: { grid: { color: '#f3f4f6' }, beginAtZero: true }
                         }
                     }
                 });
             }
-        });
+        })();
         </script>
-        @endpush
         @else
         <div class="h-64 flex items-center justify-center">
             <p class="text-gray-400">Tidak ada data</p>
