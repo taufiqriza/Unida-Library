@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class ChatRoom extends Model
 {
     protected $fillable = [
-        'type', 'name', 'description', 'icon', 'color', 'branch_id', 'is_archived'
+        'type', 'name', 'description', 'icon', 'color', 'branch_id', 'is_archived',
+        'member_id', 'topic', 'status', 'last_staff_id'
     ];
 
     protected $casts = [
@@ -18,6 +19,16 @@ class ChatRoom extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(User::class, 'member_id');
+    }
+
+    public function lastStaff()
+    {
+        return $this->belongsTo(User::class, 'last_staff_id');
     }
 
     public function members()

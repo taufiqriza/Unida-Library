@@ -1144,6 +1144,9 @@
         });
     </script>
     
+    {{-- Support Chat Widget --}}
+    @livewire('member.support-chat')
+    
     @livewireScripts
 </body>
 </html>

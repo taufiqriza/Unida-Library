@@ -25,7 +25,31 @@
                         <i class="fas fa-arrow-left text-white text-sm"></i>
                     </button>
                     
-                    @if($activeRoom->isGroup())
+                    @if($activeRoom->type === 'support')
+                        {{-- Support Chat Header --}}
+                        @php $member = $activeRoom->member; @endphp
+                        @if($member)
+                        <div class="relative">
+                            @if($member->photo)
+                                <img src="{{ $member->getAvatarUrl(80) }}" class="w-9 h-9 rounded-full object-cover">
+                            @else
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white text-sm font-bold">
+                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-headset text-white text-[8px]"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold text-sm">{{ $member->name }}</p>
+                            <p class="text-blue-200 text-xs">
+                                {{ $member->member_id ?? 'Member' }}
+                                @if($member->branch) • {{ $member->branch->name }} @endif
+                            </p>
+                        </div>
+                        @endif
+                    @elseif($activeRoom->isGroup())
                         {{-- Group Avatar --}}
                         <div class="w-9 h-9 rounded-full {{ $activeRoom->getColorClass() }} flex items-center justify-center text-white">
                             <i class="fas {{ $activeRoom->getIconClass() }}"></i>
@@ -171,6 +195,46 @@
             @elseif(strlen($messageSearchQuery) >= 2)
             <p class="mt-2 text-xs text-gray-400 text-center py-2">Tidak ditemukan hasil untuk "{{ $messageSearchQuery }}"</p>
             @endif
+        </div>
+        @endif
+        
+        {{-- Member Info Panel (Support Chat) --}}
+        @if($activeRoom && $activeRoom->type === 'support' && $activeRoom->member)
+        @php $member = $activeRoom->member; @endphp
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 border-b border-orange-100 px-4 py-3">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] font-semibold rounded-full">
+                            {{ ['unggah_mandiri' => 'Unggah Mandiri', 'plagiasi' => 'Cek Plagiasi', 'bebas_pustaka' => 'Bebas Pustaka', 'peminjaman' => 'Peminjaman', 'lainnya' => 'Lainnya'][$activeRoom->topic] ?? $activeRoom->topic }}
+                        </span>
+                        @if($activeRoom->status === 'resolved')
+                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-semibold rounded-full">
+                            <i class="fas fa-check mr-1"></i>Selesai
+                        </span>
+                        @endif
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                        <div><span class="text-gray-400">NIM:</span> <span class="text-gray-700 font-medium">{{ $member->member_id ?? '-' }}</span></div>
+                        <div><span class="text-gray-400">Cabang:</span> <span class="text-gray-700 font-medium">{{ $member->branch->name ?? '-' }}</span></div>
+                        @if($member->study_program)
+                        <div><span class="text-gray-400">Prodi:</span> <span class="text-gray-700 font-medium">{{ $member->study_program }}</span></div>
+                        @endif
+                        @if($member->semester)
+                        <div><span class="text-gray-400">Semester:</span> <span class="text-gray-700 font-medium">{{ $member->semester }}</span></div>
+                        @endif
+                    </div>
+                </div>
+                @if($activeRoom->status !== 'resolved')
+                <button wire:click="markSupportResolved" class="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-medium rounded-lg transition">
+                    <i class="fas fa-check mr-1"></i>Selesai
+                </button>
+                @else
+                <button wire:click="reopenSupport" class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition">
+                    <i class="fas fa-redo mr-1"></i>Buka Lagi
+                </button>
+                @endif
+            </div>
         </div>
         @endif
         
@@ -688,13 +752,13 @@
             {{-- CONVERSATIONS TAB with Sub-tabs (Grup + Personal) --}}
             {{-- =================================================== --}}
             
-            {{-- Pill Switcher for Personal / Grup --}}
+            {{-- Pill Switcher for Personal / Grup / Support --}}
             <div class="p-2 sticky top-0 bg-white z-20">
                 <div class="flex bg-gray-100 rounded-lg p-1">
                     <button wire:click="$set('chatSubTab', 'personal')" 
                             class="flex-1 py-1.5 text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md {{ ($chatSubTab ?? 'personal') === 'personal' ? 'bg-white shadow-sm text-green-600' : 'text-gray-500 hover:text-gray-700' }}">
                         <i class="fas fa-user {{ ($chatSubTab ?? 'personal') === 'personal' ? 'text-green-500' : 'text-gray-400' }}"></i>
-                        Personal
+                        <span class="hidden sm:inline">Personal</span>
                         @if($this->rooms['directs']->sum('unread_count') > 0)
                         <span class="w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">
                             {{ $this->rooms['directs']->sum('unread_count') > 9 ? '9+' : $this->rooms['directs']->sum('unread_count') }}
@@ -704,10 +768,20 @@
                     <button wire:click="$set('chatSubTab', 'groups')" 
                             class="flex-1 py-1.5 text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md {{ ($chatSubTab ?? 'personal') === 'groups' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700' }}">
                         <i class="fas fa-users {{ ($chatSubTab ?? 'personal') === 'groups' ? 'text-blue-500' : 'text-gray-400' }}"></i>
-                        Grup
+                        <span class="hidden sm:inline">Grup</span>
                         @if($this->rooms['groups']->sum('unread_count') > 0)
                         <span class="w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">
                             {{ $this->rooms['groups']->sum('unread_count') > 9 ? '9+' : $this->rooms['groups']->sum('unread_count') }}
+                        </span>
+                        @endif
+                    </button>
+                    <button wire:click="$set('chatSubTab', 'support')" 
+                            class="flex-1 py-1.5 text-xs font-medium transition-all duration-200 flex items-center justify-center gap-1.5 rounded-md {{ ($chatSubTab ?? 'personal') === 'support' ? 'bg-white shadow-sm text-orange-600' : 'text-gray-500 hover:text-gray-700' }}">
+                        <i class="fas fa-headset {{ ($chatSubTab ?? 'personal') === 'support' ? 'text-orange-500' : 'text-gray-400' }}"></i>
+                        <span class="hidden sm:inline">Support</span>
+                        @if(($this->rooms['support'] ?? collect())->sum('unread_count') > 0)
+                        <span class="w-4 h-4 bg-red-500 rounded-full text-[9px] text-white font-bold flex items-center justify-center">
+                            {{ ($this->rooms['support'] ?? collect())->sum('unread_count') > 9 ? '9+' : ($this->rooms['support'] ?? collect())->sum('unread_count') }}
                         </span>
                         @endif
                     </button>
@@ -715,7 +789,61 @@
             </div>
             
             {{-- Sub-tab Content --}}
-            @if(($chatSubTab ?? 'personal') === 'personal')
+            @if(($chatSubTab ?? 'personal') === 'support')
+            {{-- Support (Member) Chats --}}
+            @forelse(($this->rooms['support'] ?? collect()) as $room)
+            @php $member = $room->member; @endphp
+            @if($member)
+            <button wire:click="openRoom({{ $room->id }})" 
+                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }}">
+                <div class="relative flex-shrink-0">
+                    @if($member->photo)
+                        <img src="{{ $member->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
+                    @else
+                        <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold" 
+                             style="background: linear-gradient(135deg, #{{ $member->getAvatarColor() }} 0%, #{{ $member->getAvatarColor() }}dd 100%);">
+                            {{ strtoupper(substr($member->name, 0, 1)) }}
+                        </div>
+                    @endif
+                    @if($room->status === 'resolved')
+                        <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-[8px]"></i>
+                        </div>
+                    @endif
+                </div>
+                <div class="flex-1 min-w-0 text-left">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-gray-800 text-sm truncate">{{ $member->name }}</span>
+                        @if($room->latestMessage)
+                        <span class="text-[10px] text-gray-400">{{ $room->latestMessage->created_at->shortRelativeDiffForHumans() }}</span>
+                        @endif
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-1.5 py-0.5 bg-orange-100 text-orange-600 text-[9px] rounded font-medium">
+                            {{ ['unggah_mandiri' => 'Unggah', 'plagiasi' => 'Plagiasi', 'bebas_pustaka' => 'Bebas Pustaka', 'peminjaman' => 'Peminjaman', 'lainnya' => 'Lainnya'][$room->topic] ?? $room->topic }}
+                        </span>
+                        @if($member->member_id)
+                        <span class="text-[10px] text-gray-400">{{ $member->member_id }}</span>
+                        @endif
+                    </div>
+                    @if($room->latestMessage)
+                    <p class="text-xs text-gray-500 truncate mt-0.5">{{ Str::limit($room->latestMessage->message, 30) }}</p>
+                    @endif
+                </div>
+                @if($room->unread_count > 0)
+                <span class="w-5 h-5 bg-orange-500 rounded-full text-[10px] text-white font-bold flex items-center justify-center flex-shrink-0">
+                    {{ $room->unread_count > 9 ? '9+' : $room->unread_count }}
+                </span>
+                @endif
+            </button>
+            @endif
+            @empty
+            <div class="p-8 text-center text-gray-400">
+                <i class="fas fa-headset text-3xl mb-2"></i>
+                <p class="text-sm">Belum ada chat support</p>
+            </div>
+            @endforelse
+            @elseif(($chatSubTab ?? 'personal') === 'personal')
             {{-- Personal (Direct Messages) List --}}
             @forelse($this->rooms['directs'] as $room)
             @php $otherUser = $room->other_user; @endphp

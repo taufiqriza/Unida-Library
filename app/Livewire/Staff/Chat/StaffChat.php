@@ -122,11 +122,41 @@ class StaffChat extends Component
     public function openRoom($roomId)
     {
         $this->activeRoomId = $roomId;
-        $this->activeRoom = ChatRoom::with(['branch', 'members.user'])->find($roomId);
+        $this->activeRoom = ChatRoom::with(['branch', 'members.user', 'member.branch'])->find($roomId);
         $this->activeView = 'chat';
         $this->loadMessages();
         $this->markAsRead();
+        
+        // Add staff to support room if not member yet
+        if ($this->activeRoom && $this->activeRoom->type === 'support') {
+            ChatRoomMember::firstOrCreate([
+                'chat_room_id' => $roomId,
+                'user_id' => auth()->id(),
+            ], ['role' => 'staff']);
+        }
+        
         $this->dispatch('scrollToBottom');
+    }
+
+    public function markSupportResolved()
+    {
+        if ($this->activeRoom && $this->activeRoom->type === 'support') {
+            $this->activeRoom->update(['status' => 'resolved']);
+            ChatMessage::create([
+                'chat_room_id' => $this->activeRoomId,
+                'sender_id' => null,
+                'message' => 'Percakapan ditandai selesai oleh ' . auth()->user()->name,
+                'type' => 'system',
+            ]);
+            $this->loadMessages();
+        }
+    }
+
+    public function reopenSupport()
+    {
+        if ($this->activeRoom && $this->activeRoom->type === 'support') {
+            $this->activeRoom->update(['status' => 'open']);
+        }
     }
 
     public function openDirectChat($userId)
@@ -216,6 +246,11 @@ class StaffChat extends Component
         ChatRoomMember::where('chat_room_id', $this->activeRoomId)
             ->where('user_id', auth()->id())
             ->update(['last_read_at' => now()]);
+            
+        // Update last_staff_id for support chat
+        if ($this->activeRoom && $this->activeRoom->type === 'support') {
+            $this->activeRoom->update(['last_staff_id' => auth()->id(), 'status' => 'open']);
+        }
 
         // Send notification to other room members
         $this->sendChatNotifications($chatMessage);
@@ -538,6 +573,7 @@ class StaffChat extends Component
         
         $rooms = cache()->remember($cacheKey, 30, function () use ($userId) {
             return ChatRoom::forUser($userId)
+                ->where('type', '!=', 'support')
                 ->select(['id', 'name', 'type', 'branch_id'])
                 ->withCount('members')
                 ->with([
@@ -566,10 +602,25 @@ class StaffChat extends Component
         // Separate groups and direct
         $groups = $rooms->filter(fn($r) => $r->isGroup())->sortByDesc('latestMessage.created_at');
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
+        
+        // Support rooms (all staff can see)
+        $support = ChatRoom::where('type', 'support')
+            ->with(['member:id,name,member_id,photo,branch_id', 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
+            ->orderByDesc('updated_at')
+            ->get()
+            ->map(function ($room) use ($userId) {
+                $member = ChatRoomMember::where('chat_room_id', $room->id)->where('user_id', $userId)->first();
+                $room->unread_count = $member ? ChatMessage::where('chat_room_id', $room->id)
+                    ->where('created_at', '>', $member->last_read_at ?? '1970-01-01')
+                    ->where('sender_id', '!=', $userId)
+                    ->count() : ChatMessage::where('chat_room_id', $room->id)->where('sender_id', '!=', $userId)->count();
+                return $room;
+            });
 
         return [
             'groups' => $groups->values(),
             'directs' => $directs->values(),
+            'support' => $support,
         ];
     }
 
