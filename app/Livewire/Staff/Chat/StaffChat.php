@@ -657,32 +657,30 @@ class StaffChat extends Component
         $groups = $rooms->filter(fn($r) => $r->isGroup())->sortByDesc('latestMessage.created_at');
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
         
-        // Support rooms (all staff can see) - unread = messages from member not yet seen
-        // Use withoutGlobalScope to bypass branch filter on Member model
+        // Support rooms - only show rooms where member requested staff connection
         $support = ChatRoom::where('type', 'support')
+            ->where('connected_to_staff', true)
             ->with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
             ->orderByDesc('updated_at')
             ->get();
         
         $support = $support
             ->map(function ($room) use ($userId) {
-                // Check if staff has opened this room before
                 $staffMember = ChatRoomMember::where('chat_room_id', $room->id)
                     ->where('user_id', $userId)
                     ->first();
                 
                 if ($staffMember && $staffMember->last_read_at) {
-                    // Count member messages (sender_id = null) after last read
+                    // Count member messages (sender_id = null, type = text) after last read
                     $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
                         ->whereNull('sender_id')
-                        ->where('type', '!=', 'system')
+                        ->where('type', 'text')
                         ->where('created_at', '>', $staffMember->last_read_at)
                         ->count();
                 } else {
-                    // Never opened - count all member messages
                     $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
                         ->whereNull('sender_id')
-                        ->where('type', '!=', 'system')
+                        ->where('type', 'text')
                         ->count();
                 }
                 return $room;

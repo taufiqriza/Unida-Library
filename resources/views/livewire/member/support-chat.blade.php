@@ -118,19 +118,14 @@
                         </span>
                     </div>
                 @elseif($msg['type'] === 'bot')
-                    {{-- Bot Message --}}
-                    <div class="flex justify-start gap-2">
-                        <div class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <i class="fas fa-robot text-white text-xs"></i>
+                    {{-- Bot Message (Compact) --}}
+                    <div class="flex justify-start gap-1.5">
+                        <div class="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-robot text-white text-[10px]"></i>
                         </div>
-                        <div class="max-w-[80%]">
-                            <p class="text-[10px] text-violet-600 mb-1 font-medium">Asisten Virtual</p>
-                            <div class="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 text-gray-800 px-4 py-3 rounded-2xl rounded-tl-sm text-sm prose prose-sm max-w-none">
-                                {!! nl2br(preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', e($msg['message']))) !!}
-                            </div>
-                            <p class="text-[10px] text-gray-400 mt-1">
-                                {{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}
-                            </p>
+                        <div class="max-w-[85%] bg-violet-50 border border-violet-100 px-3 py-2 rounded-xl rounded-tl-sm">
+                            <div class="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{!! preg_replace('/\*\*(.+?)\*\*/', '<strong class="text-violet-700">$1</strong>', e($msg['message'])) !!}</div>
+                            <p class="text-[9px] text-violet-400 mt-1">{{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}</p>
                         </div>
                     </div>
                 @elseif(is_null($msg['sender_id']))
@@ -159,8 +154,8 @@
                             <i class="fas fa-user-tie text-white text-xs"></i>
                         </div>
                         <div class="max-w-[75%]">
-                            <p class="text-[10px] text-blue-600 mb-1 font-medium">
-                                {{ $msg['sender']['name'] ?? 'Pustakawan' }}
+                            <p class="text-[10px] text-blue-600 mb-0.5 font-semibold flex items-center gap-1">
+                                <i class="fas fa-user-tie text-[8px]"></i> {{ $msg['sender']['name'] ?? 'Pustakawan' }}
                             </p>
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
@@ -173,13 +168,11 @@
                                 </audio>
                             @endif
                             @if($msg['message'])
-                            <div class="bg-gray-100 text-gray-800 px-4 py-2.5 rounded-2xl rounded-tl-sm text-sm">
+                            <div class="bg-blue-50 border border-blue-100 text-gray-800 px-3 py-2 rounded-xl rounded-tl-sm text-sm">
                                 {{ $msg['message'] }}
                             </div>
                             @endif
-                            <p class="text-[10px] text-gray-400 mt-1">
-                                {{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}
-                            </p>
+                            <p class="text-[9px] text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}</p>
                         </div>
                     </div>
                 @endif
