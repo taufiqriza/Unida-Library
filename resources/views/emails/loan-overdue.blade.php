@@ -2,97 +2,77 @@
 
 @section('content')
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-    {{-- Alert Icon --}}
     <tr>
-        <td align="center" style="padding-bottom: 24px;">
-            <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: inline-block; line-height: 64px; font-size: 32px;">
-                ⚠️
-            </div>
-        </td>
-    </tr>
-
-    <tr>
-        <td align="center">
-            <h2 style="margin: 0 0 8px 0; color: #dc2626; font-size: 20px; font-weight: 600;">
-                Buku Terlambat Dikembalikan
-            </h2>
-            <p style="margin: 0 0 24px 0; color: #64748b; font-size: 14px;">
-                Segera kembalikan untuk menghindari denda lebih lanjut
+        <td style="padding-bottom: 16px;">
+            <p style="margin: 0; color: #1e293b; font-size: 15px; line-height: 1.6;">
+                Assalamu'alaikum <strong>{{ $name }}</strong>,
             </p>
         </td>
     </tr>
-
+    
     <tr>
-        <td>
-            <p style="margin: 0 0 20px 0; color: #334155; font-size: 15px; line-height: 1.6;">
-                Halo <strong style="color: #1e293b;">{{ $name }}</strong>,
+        <td style="padding-bottom: 20px;">
+            <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.6;">
+                Buku yang Anda pinjam sudah melewati batas waktu pengembalian. Mohon segera kembalikan.
             </p>
         </td>
     </tr>
     
     {{-- Book Card --}}
     <tr>
-        <td style="padding-bottom: 24px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef2f2; border-radius: 12px; border-left: 4px solid #dc2626;">
+        <td style="padding-bottom: 20px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef2f2; border-radius: 8px; border: 1px solid #fecaca;">
                 <tr>
-                    <td style="padding: 20px;">
-                        <h3 style="margin: 0 0 8px 0; color: #1e293b; font-size: 16px; font-weight: 600; line-height: 1.4;">
-                            {{ $bookTitle }}
-                        </h3>
-                        <p style="margin: 0 0 12px 0; color: #64748b; font-size: 13px;">
-                            {{ $bookAuthor }}
-                        </p>
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                    <td style="padding: 16px;">
+                        <p style="margin: 0 0 4px; font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Buku</p>
+                        <p style="margin: 0 0 6px; font-size: 14px; color: #1e293b; font-weight: 500;">{{ $bookTitle }}</p>
+                        <p style="margin: 0 0 12px; font-size: 12px; color: #64748b;">{{ $bookAuthor }}</p>
+                        
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 4px; border: 1px solid #fecaca;">
                             <tr>
-                                <td style="padding: 4px 0;">
-                                    <p style="margin: 0; color: #64748b; font-size: 13px;">
-                                        Jatuh tempo: <strong style="color: #dc2626;">{{ $dueDate }}</strong>
-                                    </p>
+                                <td style="padding: 10px 12px; border-right: 1px solid #fecaca;" width="50%">
+                                    <p style="margin: 0 0 2px; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Jatuh Tempo</p>
+                                    <p style="margin: 0; font-size: 13px; color: #dc2626; font-weight: 600;">{{ $dueDate }}</p>
+                                </td>
+                                <td style="padding: 10px 12px;" width="50%">
+                                    <p style="margin: 0 0 2px; font-size: 10px; color: #94a3b8; text-transform: uppercase;">Terlambat</p>
+                                    <p style="margin: 0; font-size: 13px; color: #dc2626; font-weight: 600;">{{ $daysOverdue }} hari</p>
                                 </td>
                             </tr>
-                            <tr>
-                                <td style="padding: 4px 0;">
-                                    <p style="margin: 0; color: #64748b; font-size: 13px;">
-                                        Keterlambatan: <strong style="color: #dc2626;">{{ $daysOverdue }} hari</strong>
-                                    </p>
-                                </td>
-                            </tr>
-                            @if(isset($fine) && $fine > 0)
-                            <tr>
-                                <td style="padding: 8px 0 0 0;">
-                                    <table role="presentation" cellspacing="0" cellpadding="0" style="background-color: #fee2e2; border-radius: 6px;">
-                                        <tr>
-                                            <td style="padding: 8px 12px;">
-                                                <p style="margin: 0; color: #dc2626; font-size: 14px; font-weight: 600;">
-                                                    💰 Denda: Rp {{ number_format($fine, 0, ',', '.') }}
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            @endif
                         </table>
+                        
+                        @if(isset($fine) && $fine > 0)
+                        <p style="margin: 12px 0 0; padding: 8px 12px; background-color: #fee2e2; border-radius: 4px; color: #dc2626; font-size: 13px; font-weight: 600;">
+                            💰 Denda: Rp {{ number_format($fine, 0, ',', '.') }}
+                        </p>
+                        @endif
                     </td>
                 </tr>
             </table>
         </td>
     </tr>
 
+    {{-- Button --}}
     <tr>
-        <td>
-            <p style="margin: 0 0 24px 0; color: #475569; font-size: 14px; line-height: 1.6;">
-                Mohon segera kembalikan buku ke perpustakaan untuk menghindari penambahan denda. Jika ada kendala, silakan hubungi petugas perpustakaan.
-            </p>
+        <td style="padding-bottom: 20px;">
+            <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-radius: 6px;">
+                        <a href="{{ $portalUrl }}" style="display: inline-block; color: #ffffff; padding: 10px 20px; text-decoration: none; font-weight: 500; font-size: 13px;">
+                            Lihat Detail →
+                        </a>
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
-
-    {{-- CTA Button --}}
+    
     <tr>
-        <td align="center">
-            <a href="{{ $portalUrl }}" style="display: inline-block; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-                Lihat Detail Peminjaman
-            </a>
+        <td>
+            <p style="margin: 0; color: #64748b; font-size: 13px; line-height: 1.5;">
+                Wassalamu'alaikum,<br>
+                <span style="color: #1e40af; font-weight: 500;">Tim Perpustakaan UNIDA</span>
+            </p>
         </td>
     </tr>
 </table>
