@@ -88,13 +88,13 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-user mr-1 text-primary-500"></i> Nama Lengkap Anda
+                                <i class="fas fa-search mr-1 text-primary-500"></i> Cari Data Anda
                             </label>
                             <div class="flex gap-2">
                                 <input type="text" 
                                     wire:model="searchName" 
                                     wire:keydown.enter="searchPddikti"
-                                    placeholder="Masukkan nama lengkap sesuai SIAKAD..."
+                                    placeholder="Masukkan Nama Lengkap atau NIM..."
                                     class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
                                 <button type="button" 
                                     wire:click="searchPddikti" 
@@ -108,7 +108,10 @@
                                     </span>
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-400 mt-1">Ketik minimal 3 karakter, lalu tekan Enter atau klik Cari</p>
+                            <p class="text-xs text-gray-500 mt-1.5">
+                                <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
+                                <strong>Tips:</strong> Gunakan NIM untuk hasil lebih akurat (contoh: 432022118144)
+                            </p>
                         </div>
 
                         {{-- Search Results --}}
@@ -159,10 +162,11 @@
                             </p>
                         </div>
                         @endif
-                        @elseif(count($searchResults) === 0 && strlen($searchName) >= 3 && !$isSearching)
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center">
+                        @elseif(count($searchResults) === 0 && strlen($searchName) >= 2 && !$isSearching)
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                             <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
-                            <p class="text-xs text-amber-600 mt-1">Nama tidak ditemukan di database SIAKAD.</p>
+                            <p class="text-xs text-amber-600 mt-2">Coba cari menggunakan <strong>NIM</strong> untuk hasil lebih akurat.</p>
+                            <p class="text-xs text-gray-500 mt-1">Contoh: 432022118144</p>
                         </div>
                         @endif
 

@@ -300,7 +300,7 @@ class CompleteProfile extends Component
     }
 
     /**
-     * Search student data by name in members table (SIAKAD data)
+     * Search student data by name or NIM in members table (SIAKAD data)
      */
     public function searchPddikti()
     {
@@ -309,32 +309,63 @@ class CompleteProfile extends Component
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
         
-        if (strlen(trim($this->searchName)) < 3) {
+        $search = trim($this->searchName);
+        
+        if (strlen($search) < 2) {
             $this->isSearching = false;
             return;
         }
 
-        // Search in members table (imported from SIAKAD) 
-        // Find members with similar name that haven't completed profile and no email yet
-        $searchName = trim($this->searchName);
-        $words = explode(' ', $searchName);
+        // Check if search is NIM (numeric, 10-15 digits)
+        $isNim = preg_match('/^\d{10,15}$/', $search);
         
-        $this->searchResults = Member::with(['department', 'branch'])
-            ->where(function($q) use ($searchName, $words) {
-                $q->where('name', 'like', "%{$searchName}%");
-                foreach ($words as $word) {
-                    if (strlen($word) >= 2) {
-                        $q->orWhere('name', 'like', "%{$word}%");
+        if ($isNim) {
+            // Exact NIM search - should return 1 result
+            $this->searchResults = Member::with(['department', 'branch'])
+                ->where(function($q) use ($search) {
+                    $q->where('member_id', $search)
+                      ->orWhere('nim_nidn', $search);
+                })
+                ->where(function($q) {
+                    $q->whereNull('email')->orWhere('email', '');
+                })
+                ->where('profile_completed', false)
+                ->limit(5)
+                ->get();
+        } else {
+            // Name search - more accurate matching
+            $searchUpper = strtoupper($search);
+            $words = array_filter(explode(' ', $searchUpper), fn($w) => strlen($w) >= 2);
+            
+            $this->searchResults = Member::with(['department', 'branch'])
+                ->where(function($q) {
+                    $q->whereNull('email')->orWhere('email', '');
+                })
+                ->where('profile_completed', false)
+                ->where(function($q) use ($searchUpper, $words) {
+                    // Exact match first
+                    $q->whereRaw('UPPER(name) = ?', [$searchUpper]);
+                    
+                    // Contains full search
+                    $q->orWhereRaw('UPPER(name) LIKE ?', ['%' . $searchUpper . '%']);
+                    
+                    // All words must match
+                    if (count($words) > 1) {
+                        $q->orWhere(function($sub) use ($words) {
+                            foreach ($words as $word) {
+                                $sub->whereRaw('UPPER(name) LIKE ?', ['%' . $word . '%']);
+                            }
+                        });
                     }
-                }
-            })
-            ->where(function($q) {
-                $q->whereNull('email')->orWhere('email', '');
-            })
-            ->where('profile_completed', false)
-            ->orderBy('name')
-            ->limit(20)
-            ->get();
+                })
+                ->orderByRaw("CASE 
+                    WHEN UPPER(name) = ? THEN 1 
+                    WHEN UPPER(name) LIKE ? THEN 2 
+                    ELSE 3 
+                END", [$searchUpper, $searchUpper . '%'])
+                ->limit(20)
+                ->get();
+        }
 
         $this->isSearching = false;
     }
