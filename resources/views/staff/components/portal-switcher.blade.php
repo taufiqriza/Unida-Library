@@ -1,7 +1,7 @@
 {{-- Portal Switcher --}}
 @php
     $user = auth()->user();
-    $memberAccount = \App\Models\Member::where('email', $user->email)->first();
+    $memberAccount = \App\Models\Member::withoutGlobalScope('branch')->where('email', $user->email)->first();
     $isSuperAdmin = $user->role === 'super_admin';
 @endphp
 

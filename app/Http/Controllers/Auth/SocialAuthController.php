@@ -214,7 +214,8 @@ class SocialAuthController extends Controller
         request()->session()->regenerateToken();
 
         if ($role === 'member') {
-            $member = Member::where('email', $email)->first();
+            // Bypass branch scope - member bisa di cabang berbeda dari staff
+            $member = Member::withoutGlobalScope('branch')->where('email', $email)->first();
             if ($member) {
                 Auth::guard('member')->login($member);
                 return redirect()->route('member.dashboard');
