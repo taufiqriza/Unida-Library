@@ -1071,9 +1071,6 @@
         </div>
     </div>
 
-    {{-- Floating Widgets: WhatsApp & Scroll to Top --}}
-    @include('partials.floating-widgets')
-
     {{-- SweetAlert2 for elegant notifications --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
