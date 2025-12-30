@@ -9,7 +9,7 @@
                     </a>
                     <div>
                         <h1 class="text-xl font-bold">Submit Hasil Cek Plagiasi Eksternal</h1>
-                        <p class="text-primary-200 text-sm">Upload hasil dari Turnitin, iThenticate, atau Copyscape</p>
+                        <p class="text-primary-200 text-sm">Upload hasil dari Turnitin, iThenticate, atau Copylakes</p>
                     </div>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                         Platform yang Digunakan <span class="text-red-500">*</span>
                     </label>
                     <div class="grid grid-cols-3 gap-3">
-                        @foreach(['turnitin' => 'Turnitin', 'ithenticate' => 'iThenticate', 'copyscape' => 'Copyscape'] as $value => $label)
+                        @foreach(['turnitin' => 'Turnitin', 'ithenticate' => 'iThenticate', 'copylakes' => 'Copylakes'] as $value => $label)
                         <label class="relative cursor-pointer">
                             <input type="radio" wire:model.live="platform" value="{{ $value }}" class="peer sr-only">
                             <div class="p-3 border-2 border-gray-200 rounded-xl text-center transition peer-checked:border-primary-500 peer-checked:bg-primary-50 hover:border-gray-300">

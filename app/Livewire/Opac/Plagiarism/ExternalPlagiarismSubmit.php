@@ -19,7 +19,7 @@ class ExternalPlagiarismSubmit extends Component
 
     protected $rules = [
         'document_title' => 'required|string|max:500',
-        'platform' => 'required|in:turnitin,ithenticate,copyscape',
+        'platform' => 'required|in:turnitin,ithenticate,copylakes',
         'document_file' => 'required|file|mimes:pdf|max:51200',
         'report_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
         'similarity_score' => 'required|numeric|min:0|max:100',
