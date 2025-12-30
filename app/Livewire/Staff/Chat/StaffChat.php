@@ -135,10 +135,11 @@ class StaffChat extends Component
             ], ['role' => 'staff']);
             
             // Mark support notifications as read
-            StaffNotification::where('user_id', auth()->id())
+            StaffNotification::where('notifiable_id', auth()->id())
+                ->where('notifiable_type', User::class)
                 ->where('type', 'support_message')
-                ->where('data', 'like', '%"room_id":' . $roomId . '%')
                 ->whereNull('read_at')
+                ->whereJsonContains('data->room_id', $roomId)
                 ->update(['read_at' => now()]);
         }
         

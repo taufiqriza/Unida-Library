@@ -184,20 +184,23 @@ class SupportChat extends Component
     protected function notifyStaff()
     {
         $member = $this->member();
+        $topicLabel = $this->topics[$this->room->topic]['label'] ?? 'Support';
         
         // Get all staff
         $staffUsers = User::whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])->get();
             
         foreach ($staffUsers as $staff) {
             // Database notification
-            $topicLabel = $this->topics[$this->room->topic]['label'] ?? 'Support';
             StaffNotification::create([
-                'user_id' => $staff->id,
+                'notifiable_type' => User::class,
+                'notifiable_id' => $staff->id,
                 'type' => 'support_message',
                 'title' => 'Pesan Support Baru',
-                'message' => "{$member->name} ({$topicLabel})",
-                'data' => json_encode(['room_id' => $this->room->id, 'member_id' => $member->id]),
-                'url' => '/staff/chat?support=' . $this->room->id,
+                'body' => "{$member->name} ({$topicLabel})",
+                'data' => ['room_id' => $this->room->id, 'member_id' => $member->id],
+                'action_url' => '/staff/chat?support=' . $this->room->id,
+                'icon' => 'headset',
+                'color' => 'orange',
             ]);
             
             // Push notification
