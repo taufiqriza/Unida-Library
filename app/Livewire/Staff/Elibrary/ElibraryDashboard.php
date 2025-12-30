@@ -30,7 +30,7 @@ class ElibraryDashboard extends Component
 
     protected $queryString = ['activeTab' => ['except' => 'ebook'], 'search' => ['except' => ''], 'statusFilter' => ['except' => '']];
     
-    protected $listeners = ['approveSubmission', 'rejectSubmission', 'requestRevision', 'publishSubmission'];
+    protected $listeners = ['approveSubmission', 'rejectSubmission', 'requestRevision', 'publishSubmission', 'approvePlagiarism', 'rejectPlagiarism'];
 
     public function updatingSearch() { $this->resetPage(); }
     public function updatingActiveTab() { $this->resetPage(); $this->search = ''; $this->statusFilter = ''; }
@@ -213,6 +213,49 @@ class ElibraryDashboard extends Component
             $this->publishSubmission();
         }
     }
+
+    public function approvePlagiarism()
+    {
+        if (!$this->canReviewThesis() || !$this->selectedItem || $this->selectedItem->check_type !== 'external') return;
+        
+        $this->selectedItem->update([
+            'status' => 'completed',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+            'review_notes' => $this->reviewNotes,
+            'completed_at' => now(),
+        ]);
+        
+        // Generate certificate using service
+        $generator = new \App\Services\Plagiarism\CertificateGenerator($this->selectedItem);
+        $generator->generate();
+        
+        // Send notification
+        try {
+            $this->selectedItem->member?->notify(new \App\Notifications\PlagiarismCertificateNotification($this->selectedItem));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send plagiarism certificate notification: ' . $e->getMessage());
+        }
+        
+        $this->dispatch('notify', type: 'success', message: 'Plagiasi eksternal disetujui, sertifikat diterbitkan');
+        $this->closeModal();
+    }
+
+    public function rejectPlagiarism()
+    {
+        if (!$this->canReviewThesis() || !$this->selectedItem || $this->selectedItem->check_type !== 'external') return;
+        
+        $this->selectedItem->update([
+            'status' => 'failed',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+            'review_notes' => $this->reviewNotes,
+            'error_message' => 'Ditolak: ' . ($this->reviewNotes ?: 'Tidak memenuhi syarat'),
+        ]);
+        
+        $this->dispatch('notify', type: 'success', message: 'Plagiasi eksternal ditolak');
+        $this->closeModal();
+    }
     
     protected function createClearanceLetter($submission)
     {
@@ -315,6 +358,8 @@ class ElibraryDashboard extends Component
 
         // Plagiarism stats
         $plagiarismStats = [
+            'all' => (clone $plagiarismQuery)->count(),
+            'external_pending' => (clone $plagiarismQuery)->where('check_type', 'external')->where('status', 'pending')->count(),
             'pending' => (clone $plagiarismQuery)->where('status', 'pending')->count(),
             'processing' => (clone $plagiarismQuery)->where('status', 'processing')->count(),
             'completed' => (clone $plagiarismQuery)->where('status', 'completed')->count(),
@@ -345,7 +390,8 @@ class ElibraryDashboard extends Component
         } elseif ($this->activeTab === 'plagiarism') {
             $query = PlagiarismCheck::with(['member', 'thesisSubmission'])
                 ->when($this->search, fn($q) => $q->where('document_title', 'like', "%{$this->search}%"))
-                ->when($this->statusFilter, fn($q) => $q->where('status', $this->statusFilter));
+                ->when($this->statusFilter === 'external_pending', fn($q) => $q->where('check_type', 'external')->where('status', 'pending'))
+                ->when($this->statusFilter && $this->statusFilter !== 'external_pending', fn($q) => $q->where('status', $this->statusFilter));
             
             // Branch filter for non-main branch
             if (!$isMain) {

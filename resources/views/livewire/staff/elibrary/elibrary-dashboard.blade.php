@@ -103,7 +103,12 @@
         <div class="flex items-center gap-2 lg:border-l lg:border-gray-200 lg:pl-3">
             <span class="text-xs text-gray-400 font-medium hidden lg:inline">Filter:</span>
             <div class="flex flex-wrap gap-1">
-                <button wire:click="setStatusFilter('')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</button>
+                <button wire:click="setStatusFilter('')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All ({{ $plagiarismStats['all'] }})</button>
+                @if($plagiarismStats['external_pending'] > 0)
+                <button wire:click="setStatusFilter('external_pending')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'external_pending' ? 'bg-violet-500 text-white' : 'bg-violet-50 text-violet-700 hover:bg-violet-100' }}">
+                    <i class="fas fa-upload mr-1"></i>Eksternal ({{ $plagiarismStats['external_pending'] }})
+                </button>
+                @endif
                 <button wire:click="setStatusFilter('pending')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'pending' ? 'bg-gray-500 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">Pending ({{ $plagiarismStats['pending'] }})</button>
                 <button wire:click="setStatusFilter('processing')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'processing' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">Processing ({{ $plagiarismStats['processing'] }})</button>
                 <button wire:click="setStatusFilter('completed')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'completed' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">Selesai ({{ $plagiarismStats['completed'] }})</button>

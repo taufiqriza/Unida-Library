@@ -1,4 +1,61 @@
 <div class="space-y-5">
+    {{-- External Pending Review Banner --}}
+    @if($selectedItem->check_type === 'external' && $selectedItem->status === 'pending')
+    <div class="p-4 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200/60 rounded-2xl">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
+                <i class="fas fa-upload text-violet-600"></i>
+            </div>
+            <div>
+                <p class="font-bold text-violet-800">Pengajuan Eksternal</p>
+                <p class="text-sm text-violet-600">Menunggu verifikasi staff</p>
+            </div>
+        </div>
+        
+        {{-- External Platform & Score --}}
+        <div class="grid grid-cols-2 gap-3 mb-3">
+            <div class="bg-white/60 rounded-xl p-3">
+                <p class="text-xs text-gray-500">Platform</p>
+                <p class="font-semibold text-gray-900">{{ $selectedItem->external_platform ?? '-' }}</p>
+            </div>
+            <div class="bg-white/60 rounded-xl p-3">
+                <p class="text-xs text-gray-500">Skor Similarity</p>
+                <p class="font-semibold text-gray-900">{{ $selectedItem->similarity_score }}%</p>
+            </div>
+        </div>
+        
+        {{-- Files --}}
+        <div class="flex flex-wrap gap-2 mb-4">
+            @if($selectedItem->document_path)
+            <a href="{{ Storage::url($selectedItem->document_path) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 border">
+                <i class="fas fa-file-pdf text-red-500"></i> Dokumen
+            </a>
+            @endif
+            @if($selectedItem->external_report_file)
+            <a href="{{ Storage::url($selectedItem->external_report_file) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 bg-white rounded-lg text-sm text-gray-700 hover:bg-gray-50 border">
+                <i class="fas fa-file-alt text-blue-500"></i> Laporan Plagiasi
+            </a>
+            @endif
+        </div>
+        
+        {{-- Review Notes --}}
+        <div class="mb-4">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Catatan Review (opsional)</label>
+            <textarea wire:model="reviewNotes" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500" placeholder="Tambahkan catatan..."></textarea>
+        </div>
+        
+        {{-- Action Buttons --}}
+        <div class="flex gap-2">
+            <button onclick="confirmAction('approvePlagiarism', 'Setujui pengajuan eksternal ini?', 'Sertifikat akan diterbitkan dan dikirim ke member.')" class="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-check"></i> Setujui
+            </button>
+            <button onclick="confirmAction('rejectPlagiarism', 'Tolak pengajuan ini?', 'Member akan diberitahu bahwa pengajuan ditolak.')" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition flex items-center justify-center gap-2">
+                <i class="fas fa-times"></i> Tolak
+            </button>
+        </div>
+    </div>
+    @endif
+
     {{-- Similarity Score Banner --}}
     @if($selectedItem->status === 'completed' && $selectedItem->similarity_score !== null)
     <div class="p-5 rounded-2xl text-center relative overflow-hidden

@@ -68,6 +68,7 @@ class ExternalPlagiarismSubmit extends Component
 
     public function render()
     {
-        return view('livewire.opac.plagiarism.external-plagiarism-submit');
+        return view('livewire.opac.plagiarism.external-plagiarism-submit')
+            ->layout('components.opac.layout', ['title' => 'Submit Hasil Cek Plagiasi Eksternal']);
     }
 }

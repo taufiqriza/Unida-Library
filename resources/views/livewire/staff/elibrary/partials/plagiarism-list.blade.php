@@ -71,6 +71,13 @@
                         <i class="fas fa-server mr-1"></i>{{ $item->provider_label }}
                     </span>
 
+                    {{-- External Badge --}}
+                    @if($item->check_type === 'external')
+                    <span class="px-2 py-0.5 rounded-full font-medium bg-violet-100 text-violet-700">
+                        <i class="fas fa-upload mr-1"></i>Eksternal
+                    </span>
+                    @endif
+
                     {{-- File Info --}}
                     <span class="text-gray-400">
                         <i class="fas fa-file mr-1"></i>{{ $item->file_size_formatted }}
