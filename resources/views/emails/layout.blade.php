@@ -9,7 +9,7 @@
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #eff6ff;">
         <tr>
             <td align="center" style="padding: 32px 20px;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 540px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px;">
                     
                     {{-- Header with gradient --}}
                     <tr>
@@ -17,10 +17,13 @@
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border-radius: 12px 12px 0 0;">
                                 <tr>
                                     <td style="padding: 24px 28px;">
-                                        <table role="presentation" cellspacing="0" cellpadding="0">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                                             <tr>
                                                 <td>
                                                     <img src="{{ asset('storage/logo.png') }}" alt="UNIDA Library" style="height: 36px; width: auto;" onerror="this.style.display='none'">
+                                                </td>
+                                                <td align="right">
+                                                    <p style="margin: 0; font-size: 14px; font-weight: 600; color: #ffffff; letter-spacing: 0.5px;">UNIDA LIBRARY</p>
                                                 </td>
                                             </tr>
                                         </table>
@@ -35,7 +38,7 @@
                         <td>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                                 <tr>
-                                    <td style="padding: 28px;">
+                                    <td style="padding: 32px;">
                                         @yield('content')
                                     </td>
                                 </tr>
