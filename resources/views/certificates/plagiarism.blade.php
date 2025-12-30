@@ -52,6 +52,9 @@
             height: 50px;
             vertical-align: middle;
             margin: 0 10px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
         }
         
         .institution {
