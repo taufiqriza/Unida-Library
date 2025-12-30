@@ -157,6 +157,17 @@ class PlagiarismCheck extends Model
      */
     public function getStatusInfoAttribute(): array
     {
+        // External submissions have different status labels
+        if ($this->check_type === 'external' && $this->status === self::STATUS_PENDING) {
+            return [
+                'status' => 'pending_review',
+                'label' => 'Menunggu Review',
+                'message' => 'Pengajuan sedang direview oleh pustakawan.',
+                'color' => 'violet',
+                'icon' => 'user-clock',
+            ];
+        }
+
         if ($this->isStuck()) {
             return [
                 'status' => 'stuck',

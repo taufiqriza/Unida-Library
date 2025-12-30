@@ -65,12 +65,15 @@
                         {{-- Status Icon --}}
                         <div @class([
                             'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
-                            'bg-gray-100 text-gray-400' => $check->isPending(),
+                            'bg-violet-100 text-violet-600' => $check->check_type === 'external' && $check->isPending(),
+                            'bg-gray-100 text-gray-400' => $check->check_type !== 'external' && $check->isPending(),
                             'bg-amber-100 text-amber-600' => $check->isProcessing(),
                             'bg-emerald-100 text-emerald-600' => $check->isCompleted(),
                             'bg-red-100 text-red-600' => $check->isFailed(),
                         ])>
-                            @if($check->isPending())
+                            @if($check->check_type === 'external' && $check->isPending())
+                                <i class="fas fa-user-clock text-lg"></i>
+                            @elseif($check->isPending())
                                 <i class="fas fa-clock text-lg"></i>
                             @elseif($check->isProcessing())
                                 <i class="fas fa-spinner fa-spin text-lg"></i>
@@ -90,11 +93,15 @@
                                 </div>
                                 <span @class([
                                     'px-2 py-1 text-xs font-medium rounded-lg flex-shrink-0',
-                                    'bg-gray-100 text-gray-600' => $check->isPending(),
+                                    'bg-violet-100 text-violet-700' => $check->check_type === 'external' && $check->isPending(),
+                                    'bg-gray-100 text-gray-600' => $check->check_type !== 'external' && $check->isPending(),
                                     'bg-amber-100 text-amber-700' => $check->isProcessing(),
                                     'bg-emerald-100 text-emerald-700' => $check->isCompleted(),
                                     'bg-red-100 text-red-700' => $check->isFailed(),
                                 ])>
+                                    @if($check->check_type === 'external')
+                                    <i class="fas fa-upload mr-1"></i>
+                                    @endif
                                     {{ $check->status_label }}
                                 </span>
                             </div>
