@@ -17,7 +17,7 @@
                     <p class="text-xs text-gray-500 px-3 py-2 font-medium">Hubungi Kami</p>
                     
                     {{-- WhatsApp Option --}}
-                    <a href="https://wa.me/6285156789012" target="_blank"
+                    <a href="https://wa.me/6285183053934" target="_blank"
                        class="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-lg transition">
                         <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                             <i class="fab fa-whatsapp text-white text-lg"></i>
