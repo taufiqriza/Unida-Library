@@ -190,7 +190,11 @@ class ElibraryDashboard extends Component
         ]);
         
         // Auto-create clearance letter on publish
-        $this->createClearanceLetter($this->selectedItem);
+        try {
+            $this->createClearanceLetter($this->selectedItem);
+        } catch (\Exception $e) {
+            \Log::error('Failed to create clearance letter: ' . $e->getMessage());
+        }
         
         // Auto send notification
         $this->sendNotificationEmail($this->selectedItem);
@@ -204,8 +208,9 @@ class ElibraryDashboard extends Component
         $member = $submission->member;
         if (!$member) return null;
         
-        // Check if already has clearance
-        if ($submission->clearanceLetter) return $submission->clearanceLetter;
+        // Check if already has clearance (fresh query)
+        $existing = \App\Models\ClearanceLetter::where('thesis_submission_id', $submission->id)->first();
+        if ($existing) return $existing;
         
         $letter = \App\Models\ClearanceLetter::create([
             'member_id' => $member->id,
