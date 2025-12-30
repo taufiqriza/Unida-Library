@@ -256,6 +256,40 @@ class ElibraryDashboard extends Component
         $this->dispatch('notify', type: 'success', message: 'Plagiasi eksternal ditolak');
         $this->closeModal();
     }
+
+    public function deletePlagiarism()
+    {
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
+        
+        // Delete file if exists
+        if ($this->selectedItem->file_path && \Storage::disk('public')->exists($this->selectedItem->file_path)) {
+            \Storage::disk('public')->delete($this->selectedItem->file_path);
+        }
+        if ($this->selectedItem->certificate_path && \Storage::disk('public')->exists($this->selectedItem->certificate_path)) {
+            \Storage::disk('public')->delete($this->selectedItem->certificate_path);
+        }
+        
+        $this->selectedItem->delete();
+        $this->dispatch('notify', type: 'success', message: 'Data plagiasi berhasil dihapus');
+        $this->closeModal();
+    }
+
+    public function deleteSubmission()
+    {
+        if (!$this->canReviewThesis() || !$this->selectedItem) return;
+        
+        // Delete files if exists
+        if ($this->selectedItem->file_path && \Storage::disk('public')->exists($this->selectedItem->file_path)) {
+            \Storage::disk('public')->delete($this->selectedItem->file_path);
+        }
+        
+        // Delete related clearance letter
+        \App\Models\ClearanceLetter::where('thesis_submission_id', $this->selectedItem->id)->delete();
+        
+        $this->selectedItem->delete();
+        $this->dispatch('notify', type: 'success', message: 'Data unggah mandiri berhasil dihapus');
+        $this->closeModal();
+    }
     
     protected function createClearanceLetter($submission)
     {

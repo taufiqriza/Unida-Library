@@ -258,4 +258,12 @@
         @endif
     </div>
     @endif
+
+    {{-- Delete Button --}}
+    <div class="pt-4 border-t">
+        <button wire:click="deleteSubmission" wire:confirm="Hapus submission ini? Data tidak dapat dikembalikan." 
+                class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fas fa-trash"></i> Hapus Submission
+        </button>
+    </div>
 </div>
