@@ -124,7 +124,7 @@
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer" 
-                                     @click="$dispatch('show-image', '{{ Storage::url($msg['attachment']) }}')">
+                                     onclick="window.dispatchEvent(new CustomEvent('show-image', {detail: '{{ Storage::url($msg['attachment']) }}'}))">
                             @endif
                             @if($msg['message'])
                             <div class="bg-blue-500 text-white px-4 py-2.5 rounded-2xl rounded-br-sm text-sm">
@@ -146,7 +146,7 @@
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
                                      class="rounded-xl mb-1 max-h-48 cursor-pointer"
-                                     @click="$dispatch('show-image', '{{ Storage::url($msg['attachment']) }}')">
+                                     onclick="window.dispatchEvent(new CustomEvent('show-image', {detail: '{{ Storage::url($msg['attachment']) }}'}))">
                             @endif
                             @if(!empty($msg['voice_path']))
                                 <audio controls class="h-10 mb-1 w-full">
