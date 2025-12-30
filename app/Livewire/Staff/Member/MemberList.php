@@ -151,9 +151,12 @@ class MemberList extends Component
         $members = Member::query()
             ->with(['memberType', 'faculty', 'department', 'branch'])
             ->withCount(['loans' => fn($q) => $q->where('is_returned', false)])
-            // Branch filter
-            ->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId))
-            ->when(!$isSuperAdmin && !$effectiveBranchId, fn($q) => $q->where('branch_id', $userBranchId))
+            // Branch filter - skip if searching and user is super_admin
+            ->when($this->search && $isSuperAdmin, fn($q) => $q) // No branch filter when searching as super_admin
+            ->when(!$this->search || !$isSuperAdmin, function($q) use ($effectiveBranchId, $isSuperAdmin, $userBranchId) {
+                $q->when($effectiveBranchId, fn($q2) => $q2->where('branch_id', $effectiveBranchId))
+                  ->when(!$isSuperAdmin && !$effectiveBranchId, fn($q2) => $q2->where('branch_id', $userBranchId));
+            })
             // Search
             ->when($this->search, function (Builder $query) {
                 $query->where(function($q) {
