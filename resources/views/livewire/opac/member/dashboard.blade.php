@@ -209,6 +209,39 @@
                     </div>
                     @endif
 
+                    {{-- Sertifikat Bebas Plagiasi (jika ada) --}}
+                    @if(isset($plagiarismCertificates) && $plagiarismCertificates->count() > 0)
+                    <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl shadow-sm border border-violet-200/50 overflow-hidden">
+                        <div class="p-4 border-b border-violet-200/50">
+                            <h2 class="font-bold text-violet-800 text-sm flex items-center gap-2">
+                                <div class="w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-award text-white text-xs"></i>
+                                </div>
+                                Sertifikat Bebas Plagiasi
+                            </h2>
+                        </div>
+                        <div class="p-3 space-y-2">
+                            @foreach($plagiarismCertificates as $cert)
+                            <div class="p-3 bg-white rounded-xl border border-violet-100">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ $cert->certificate_number }}</p>
+                                        <p class="text-xs text-gray-500">{{ $cert->certificate_generated_at?->format('d M Y') }} • {{ $cert->similarity_score }}% similarity</p>
+                                    </div>
+                                    <a href="{{ route('opac.member.plagiarism.certificate', $cert) }}" target="_blank" class="px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition flex items-center gap-1">
+                                        <i class="fas fa-download"></i> Unduh
+                                    </a>
+                                </div>
+                                <div class="bg-violet-50 rounded-lg p-2">
+                                    <p class="text-xs text-violet-700 font-medium line-clamp-1">{{ $cert->document_title }}</p>
+                                    <p class="text-[10px] text-violet-600">{{ ucfirst($cert->external_platform ?? $cert->provider) }}</p>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
                     {{-- CTA Buttons Grid --}}
                     <div class="grid grid-cols-2 gap-2 lg:gap-3">
                         {{-- Cek Plagiasi CTA (Left) --}}

@@ -113,7 +113,15 @@ class CertificateGenerator
      */
     protected function getStorageLogoBase64(): ?string
     {
-        // Try fixed path first: storage/app/public/logo.png
+        // Try logo-portal.png first (same as staff portal)
+        $portalLogoPath = storage_path('app/public/logo-portal.png');
+        if (file_exists($portalLogoPath)) {
+            $content = file_get_contents($portalLogoPath);
+            $mimeType = mime_content_type($portalLogoPath);
+            return 'data:' . $mimeType . ';base64,' . base64_encode($content);
+        }
+
+        // Fallback to logo.png
         $fixedPath = storage_path('app/public/logo.png');
         if (file_exists($fixedPath)) {
             $content = file_get_contents($fixedPath);

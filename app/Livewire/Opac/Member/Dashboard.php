@@ -3,6 +3,7 @@
 namespace App\Livewire\Opac\Member;
 
 use App\Models\ClearanceLetter;
+use App\Models\PlagiarismCheck;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
@@ -18,6 +19,7 @@ class Dashboard extends Component
     public $fines;
     public $submissions;
     public $clearanceLetters;
+    public $plagiarismCertificates;
     public $photo;
 
     public function mount()
@@ -34,6 +36,10 @@ class Dashboard extends Component
         $this->submissions = $this->member->thesisSubmissions()->with('department')->latest()->get();
         $this->clearanceLetters = ClearanceLetter::where('member_id', $this->member->id)
             ->with('thesisSubmission')
+            ->latest()
+            ->get();
+        $this->plagiarismCertificates = PlagiarismCheck::where('member_id', $this->member->id)
+            ->whereNotNull('certificate_number')
             ->latest()
             ->get();
     }
