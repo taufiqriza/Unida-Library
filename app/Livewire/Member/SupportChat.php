@@ -6,7 +6,7 @@ use App\Models\ChatMessage;
 use App\Models\ChatRoom;
 use App\Models\StaffNotification;
 use App\Models\User;
-use App\Notifications\SupportReplyNotification;
+use App\Services\ChatbotService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -21,6 +21,7 @@ class SupportChat extends Component
     public $newMessage = '';
     public $image;
     public $lastReadAt = null;
+    public $isTyping = false;
     
     public $topics = [
         'unggah' => ['icon' => 'fa-upload', 'label' => 'Unggah Mandiri'],
@@ -29,6 +30,13 @@ class SupportChat extends Component
         'pinjam' => ['icon' => 'fa-book', 'label' => 'Peminjaman'],
         'lainnya' => ['icon' => 'fa-question-circle', 'label' => 'Lainnya'],
     ];
+
+    protected ChatbotService $chatbot;
+
+    public function boot(ChatbotService $chatbot)
+    {
+        $this->chatbot = $chatbot;
+    }
 
     protected function member()
     {
@@ -66,7 +74,7 @@ class SupportChat extends Component
             ChatMessage::create([
                 'chat_room_id' => $this->room->id,
                 'sender_id' => null,
-                'message' => 'Topik diubah ke: ' . ($this->topics[$topic]['label'] ?? $topic),
+                'message' => 'Keperluan diubah ke: ' . ($this->topics[$topic]['label'] ?? $topic),
                 'type' => 'system',
             ]);
         } else {
@@ -103,26 +111,17 @@ class SupportChat extends Component
             'member_last_read' => now(),
         ]);
 
-        ChatMessage::create([
-            'chat_room_id' => $this->room->id,
-            'sender_id' => null,
-            'message' => $this->getWelcomeMessage($topic),
-            'type' => 'system',
-        ]);
-        
-        $this->notifyStaff();
+        // Bot welcome message
+        $this->chatbot->createBotMessage($this->room, $this->getBotWelcome($topic));
     }
 
-    public function getWelcomeMessage($topic)
+    protected function getBotWelcome($topic): string
     {
-        $topicLabel = $this->topics[$topic]['label'] ?? 'Lainnya';
         $member = $this->member();
+        $name = explode(' ', $member->name)[0];
+        $topicLabel = $this->topics[$topic]['label'] ?? 'Lainnya';
         
-        return "Selamat datang di Layanan Perpustakaan UNIDA Gontor!\n\n" .
-               "Halo {$member->name}, terima kasih telah menghubungi kami.\n" .
-               "Topik: {$topicLabel}\n\n" .
-               "Staff kami akan segera membalas pesan Anda.\n" .
-               "Jam layanan: Senin-Jumat, 08:00-16:00 WIB";
+        return "👋 **Halo, {$name}!**\n\nSaya asisten virtual perpustakaan UNIDA Gontor.\nKeperluan: **{$topicLabel}**\n\nSilakan ketik pertanyaan Anda, atau pilih topik:\n• **unggah** - Cara upload karya ilmiah\n• **plagiasi** - Cek plagiasi\n• **bebas pustaka** - Surat bebas pustaka\n• **pinjam** - Info peminjaman\n• **jam** - Jam operasional\n\nKetik **\"staff\"** untuk bicara dengan pustakawan.";
     }
 
     public function loadMessages()
@@ -148,6 +147,9 @@ class SupportChat extends Component
     {
         if (!$this->room || (!trim($this->newMessage) && !$this->image)) return;
 
+        $messageText = trim($this->newMessage);
+        
+        // Save member message
         $data = [
             'chat_room_id' => $this->room->id,
             'sender_id' => null,
@@ -159,12 +161,33 @@ class SupportChat extends Component
             $data['attachment'] = $path;
             $data['attachment_name'] = $this->image->getClientOriginalName();
             $data['attachment_type'] = 'image';
-            $data['message'] = trim($this->newMessage) ?: null;
+            $data['message'] = $messageText ?: null;
         } else {
-            $data['message'] = trim($this->newMessage);
+            $data['message'] = $messageText;
         }
 
         ChatMessage::create($data);
+        
+        $this->newMessage = '';
+        $this->image = null;
+        
+        // Process with chatbot (only for text messages)
+        if ($messageText && !$this->image) {
+            $botResponse = $this->chatbot->processMessage($this->room, $messageText);
+            
+            if ($botResponse) {
+                // Create bot response
+                $this->chatbot->createBotMessage($this->room, $botResponse['message']);
+                
+                // If not handled by bot, notify staff
+                if (!$botResponse['handled']) {
+                    $this->notifyStaff();
+                }
+            }
+        } else {
+            // Image/attachment - always notify staff
+            $this->notifyStaff();
+        }
         
         if ($this->room->status === 'resolved') {
             $this->room->update(['status' => 'open']);
@@ -172,10 +195,6 @@ class SupportChat extends Component
         
         $this->room->touch();
         $this->markAsRead();
-        $this->notifyStaff();
-
-        $this->newMessage = '';
-        $this->image = null;
         $this->loadMessages();
         
         $this->dispatch('message-sent');
@@ -186,11 +205,19 @@ class SupportChat extends Component
         $member = $this->member();
         $topicLabel = $this->topics[$this->room->topic]['label'] ?? 'Support';
         
-        // Get all staff
-        $staffUsers = User::whereIn('role', ['super_admin', 'admin', 'librarian', 'staff', 'pustakawan'])->get();
+        // Only notify admin/librarian (not staff)
+        $staffUsers = User::whereIn('role', ['super_admin', 'admin', 'librarian'])->get();
             
         foreach ($staffUsers as $staff) {
-            // Database notification
+            // Check if already notified recently (within 5 minutes)
+            $recentNotif = StaffNotification::where('notifiable_id', $staff->id)
+                ->where('type', 'support_message')
+                ->whereJsonContains('data->room_id', $this->room->id)
+                ->where('created_at', '>', now()->subMinutes(5))
+                ->exists();
+                
+            if ($recentNotif) continue;
+            
             StaffNotification::create([
                 'notifiable_type' => User::class,
                 'notifiable_id' => $staff->id,
@@ -202,17 +229,6 @@ class SupportChat extends Component
                 'icon' => 'headset',
                 'color' => 'orange',
             ]);
-            
-            // Push notification
-            try {
-                $staff->notify(new \App\Notifications\SupportMessagePushNotification(
-                    $member->name,
-                    $this->room->topic,
-                    $this->room->id
-                ));
-            } catch (\Exception $e) {
-                // Ignore push errors
-            }
         }
     }
 
@@ -227,7 +243,9 @@ class SupportChat extends Component
         if (!$this->room || !auth('member')->check()) return 0;
         
         return ChatMessage::where('chat_room_id', $this->room->id)
-            ->whereNotNull('sender_id')
+            ->where(function($q) {
+                $q->whereNotNull('sender_id')->orWhere('type', 'bot');
+            })
             ->where('type', '!=', 'system')
             ->where('created_at', '>', $this->room->member_last_read ?? '1970-01-01')
             ->count();

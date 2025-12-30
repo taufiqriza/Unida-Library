@@ -111,11 +111,27 @@
         <div id="supportMessages" class="flex-1 p-4 overflow-y-auto space-y-3" wire:poll.5s="loadMessages">
             @forelse($messages as $msg)
                 @if($msg['type'] === 'system')
-                    {{-- System Message (Compact) --}}
+                    {{-- System Message --}}
                     <div class="flex justify-center">
                         <span class="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
                             {{ $msg['message'] }}
                         </span>
+                    </div>
+                @elseif($msg['type'] === 'bot')
+                    {{-- Bot Message --}}
+                    <div class="flex justify-start gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-robot text-white text-xs"></i>
+                        </div>
+                        <div class="max-w-[80%]">
+                            <p class="text-[10px] text-violet-600 mb-1 font-medium">Asisten Virtual</p>
+                            <div class="bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 text-gray-800 px-4 py-3 rounded-2xl rounded-tl-sm text-sm prose prose-sm max-w-none">
+                                {!! nl2br(preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', e($msg['message']))) !!}
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-1">
+                                {{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}
+                            </p>
+                        </div>
                     </div>
                 @elseif(is_null($msg['sender_id']))
                     {{-- Member Message --}}
@@ -138,10 +154,13 @@
                     </div>
                 @else
                     {{-- Staff Message --}}
-                    <div class="flex justify-start">
+                    <div class="flex justify-start gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-user-tie text-white text-xs"></i>
+                        </div>
                         <div class="max-w-[75%]">
                             <p class="text-[10px] text-blue-600 mb-1 font-medium">
-                                {{ $msg['sender']['name'] ?? 'Staff' }}
+                                {{ $msg['sender']['name'] ?? 'Pustakawan' }}
                             </p>
                             @if(!empty($msg['attachment']))
                                 <img src="{{ Storage::url($msg['attachment']) }}" 
@@ -154,7 +173,7 @@
                                 </audio>
                             @endif
                             @if($msg['message'])
-                            <div class="bg-gray-100 text-gray-800 px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm">
+                            <div class="bg-gray-100 text-gray-800 px-4 py-2.5 rounded-2xl rounded-tl-sm text-sm">
                                 {{ $msg['message'] }}
                             </div>
                             @endif
@@ -176,17 +195,25 @@
         <div class="border-t bg-gray-50">
             {{-- Quick Questions --}}
             <div class="px-3 pt-2 flex gap-2 overflow-x-auto scrollbar-hide">
-                <button type="button" wire:click="$set('newMessage', 'Bagaimana cara unggah mandiri?')" 
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
-                    Cara unggah mandiri?
+                <button type="button" wire:click="$set('newMessage', 'unggah')" 
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
+                    📤 Unggah
                 </button>
-                <button type="button" wire:click="$set('newMessage', 'Bagaimana cara cek plagiasi?')"
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
-                    Cara cek plagiasi?
+                <button type="button" wire:click="$set('newMessage', 'plagiasi')"
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
+                    🔍 Plagiasi
                 </button>
-                <button type="button" wire:click="$set('newMessage', 'Syarat bebas pustaka apa saja?')"
-                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-blue-50 hover:border-blue-200 whitespace-nowrap">
-                    Syarat bebas pustaka?
+                <button type="button" wire:click="$set('newMessage', 'bebas pustaka')"
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
+                    📜 Bebas Pustaka
+                </button>
+                <button type="button" wire:click="$set('newMessage', 'pinjam')"
+                        class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">
+                    📚 Pinjam
+                </button>
+                <button type="button" wire:click="$set('newMessage', 'staff')"
+                        class="px-3 py-1 bg-white border border-orange-200 rounded-full text-xs text-orange-600 hover:bg-orange-50 whitespace-nowrap">
+                    👨‍💼 Pustakawan
                 </button>
             </div>
             
