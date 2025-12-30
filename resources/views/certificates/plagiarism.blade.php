@@ -52,23 +52,19 @@
             height: 50px;
             vertical-align: middle;
             margin: 0 10px;
-            background: white;
-            padding: 5px;
-            border-radius: 8px;
         }
         
         .institution {
             font-size: 18px;
             font-weight: bold;
-            color: white;
+            color: #1e40af;
             margin: 8px 0 3px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             letter-spacing: 1px;
         }
         
         .sub-institution {
             font-size: 11px;
-            color: #e0f2fe;
+            color: #3b82f6;
             font-weight: 500;
         }
         
