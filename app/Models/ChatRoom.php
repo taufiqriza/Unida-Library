@@ -8,11 +8,12 @@ class ChatRoom extends Model
 {
     protected $fillable = [
         'type', 'name', 'description', 'icon', 'color', 'branch_id', 'is_archived',
-        'member_id', 'topic', 'status', 'last_staff_id', 'member_last_read'
+        'member_id', 'topic', 'status', 'connected_to_staff', 'last_staff_id', 'member_last_read'
     ];
 
     protected $casts = [
         'is_archived' => 'boolean',
+        'connected_to_staff' => 'boolean',
         'member_last_read' => 'datetime',
     ];
 

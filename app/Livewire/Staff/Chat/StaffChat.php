@@ -657,10 +657,10 @@ class StaffChat extends Component
         $groups = $rooms->filter(fn($r) => $r->isGroup())->sortByDesc('latestMessage.created_at');
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
         
-        // Support rooms - only show rooms where member requested staff connection
+        // Support rooms - show all, but prioritize connected ones
         $support = ChatRoom::where('type', 'support')
-            ->where('connected_to_staff', true)
-            ->with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,created_at'])
+            ->with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,type,created_at'])
+            ->orderByDesc('connected_to_staff')
             ->orderByDesc('updated_at')
             ->get();
         
@@ -670,18 +670,22 @@ class StaffChat extends Component
                     ->where('user_id', $userId)
                     ->first();
                 
-                if ($staffMember && $staffMember->last_read_at) {
-                    // Count member messages (sender_id = null, type = text) after last read
-                    $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
-                        ->whereNull('sender_id')
-                        ->where('type', 'text')
-                        ->where('created_at', '>', $staffMember->last_read_at)
-                        ->count();
+                // Only count unread if connected to staff
+                if ($room->connected_to_staff) {
+                    if ($staffMember && $staffMember->last_read_at) {
+                        $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
+                            ->whereNull('sender_id')
+                            ->where('type', 'text')
+                            ->where('created_at', '>', $staffMember->last_read_at)
+                            ->count();
+                    } else {
+                        $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
+                            ->whereNull('sender_id')
+                            ->where('type', 'text')
+                            ->count();
+                    }
                 } else {
-                    $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
-                        ->whereNull('sender_id')
-                        ->where('type', 'text')
-                        ->count();
+                    $room->unread_count = 0;
                 }
                 return $room;
             });
