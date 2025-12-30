@@ -13,8 +13,8 @@ class QueueStatusAlert extends Component
 
     public function __construct()
     {
-        // Only check for admin roles
-        if (!auth()->check() || !in_array(auth()->user()->role, ['super_admin', 'admin'])) {
+        // Only show for super_admin
+        if (!auth()->check() || auth()->user()->role !== 'super_admin') {
             return;
         }
 
