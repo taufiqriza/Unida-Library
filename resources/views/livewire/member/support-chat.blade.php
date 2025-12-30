@@ -207,7 +207,9 @@
                 <button type="button" wire:click="$set('newMessage', 'pinjam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">📚 Pinjam</button>
                 <button type="button" wire:click="$set('newMessage', 'jam')" class="px-3 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 hover:bg-violet-50 hover:border-violet-200 whitespace-nowrap">🕐 Jam</button>
             </div>
-            {{-- Image Preview --}}            <div class="px-3 pt-2">
+            {{-- Image Preview --}}
+            @if($image)
+            <div class="px-3 pt-2">
                 <div class="relative inline-block">
                     <img src="{{ $image->temporaryUrl() }}" class="h-16 rounded-lg">
                     <button wire:click="$set('image', null)" 
