@@ -10,8 +10,8 @@ class CatalogController extends BaseController
 {
     public function index(Request $request)
     {
-        $query = Book::with(['authors', 'publisher', 'items' => fn($q) => $q->where('is_available', true)])
-            ->withCount(['items', 'items as available_items_count' => fn($q) => $q->where('is_available', true)]);
+        $query = Book::with(['authors', 'publisher'])
+            ->withCount('items');
 
         // Search
         if ($q = $request->q) {
@@ -39,9 +39,6 @@ class CatalogController extends BaseController
         if ($request->branch_id) {
             $query->whereHas('items', fn($q) => $q->where('branch_id', $request->branch_id));
         }
-        if ($request->boolean('available')) {
-            $query->whereHas('items', fn($q) => $q->where('is_available', true));
-        }
 
         // Sort
         $query->when($request->sort, function ($q, $sort) {
@@ -64,8 +61,7 @@ class CatalogController extends BaseController
         $book = Book::with([
             'authors', 'publisher', 'place', 'subjects',
             'items' => fn($q) => $q->with(['location', 'itemStatus', 'branch']),
-        ])->withCount(['items', 'items as available_items_count' => fn($q) => $q->where('is_available', true)])
-            ->find($id);
+        ])->withCount('items')->find($id);
 
         if (!$book) {
             return $this->error('Buku tidak ditemukan', 404);
@@ -101,7 +97,7 @@ class CatalogController extends BaseController
     public function popular(Request $request)
     {
         $books = Book::with(['authors', 'publisher'])
-            ->withCount(['items', 'items as available_items_count' => fn($q) => $q->where('is_available', true)])
+            ->withCount('items')
             ->withCount('loans')
             ->orderByDesc('loans_count')
             ->limit($request->limit ?? 10)
@@ -113,7 +109,7 @@ class CatalogController extends BaseController
     public function newArrivals(Request $request)
     {
         $books = Book::with(['authors', 'publisher'])
-            ->withCount(['items', 'items as available_items_count' => fn($q) => $q->where('is_available', true)])
+            ->withCount('items')
             ->orderByDesc('created_at')
             ->limit($request->limit ?? 10)
             ->get();
@@ -133,7 +129,6 @@ class CatalogController extends BaseController
             'cover_url' => $book->cover ? Storage::disk('public')->url($book->cover) : null,
             'call_number' => $book->call_number,
             'total_items' => $book->items_count ?? 0,
-            'available_items' => $book->available_items_count ?? 0,
         ];
     }
 
@@ -160,11 +155,10 @@ class CatalogController extends BaseController
                 'barcode' => $item->barcode,
                 'call_number' => $item->call_number,
                 'location' => $item->location ? ['id' => $item->location->id, 'name' => $item->location->name] : null,
-                'status' => $item->is_available ? 'available' : 'borrowed',
+                'status' => $item->isAvailable() ? 'available' : 'borrowed',
                 'branch' => $item->branch ? ['id' => $item->branch->id, 'name' => $item->branch->name] : null,
             ]),
-            'total_items' => $book->items_count,
-            'available_items' => $book->available_items_count,
+            'total_items' => $book->items_count ?? $book->items->count(),
         ];
     }
 }
