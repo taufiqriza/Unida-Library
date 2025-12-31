@@ -1,9 +1,4 @@
 @if($data->count() > 0)
-{{-- DEBUG --}}
-@foreach($data as $item)
-<div class="p-2 bg-yellow-100 text-xs">DEBUG: ID={{ $item->id }} member_id={{ $item->member_id }} loaded={{ $item->relationLoaded('member') ? 'Y' : 'N' }} name={{ $item->member?->name ?? 'NULL' }}</div>
-@endforeach
-{{-- END DEBUG --}}
 <div class="divide-y divide-gray-50">
     @foreach($data as $item)
     <div class="p-4 hover:bg-gray-50/50 transition">

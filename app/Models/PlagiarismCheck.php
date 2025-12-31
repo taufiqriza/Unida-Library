@@ -63,7 +63,7 @@ class PlagiarismCheck extends Model
 
     public function member(): BelongsTo
     {
-        return $this->belongsTo(Member::class);
+        return $this->belongsTo(Member::class)->withoutGlobalScope('branch');
     }
 
     public function thesisSubmission(): BelongsTo
