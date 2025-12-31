@@ -32,13 +32,11 @@
                 <h3 class="font-semibold text-gray-900 line-clamp-1">{{ $item->document_title }}</h3>
                 
                 {{-- Member Info --}}
-                @if($item->member)
                 <div class="flex items-center gap-2 mt-1">
-                    <span class="text-sm font-medium text-gray-700">{{ $item->member->name }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ $item->member?->name ?? '-' }}</span>
                     <span class="text-gray-300">•</span>
-                    <span class="text-sm text-gray-500 font-mono">{{ $item->member->member_id }}</span>
+                    <span class="text-sm text-gray-500 font-mono">{{ $item->member?->member_id ?? '-' }}</span>
                 </div>
-                @endif
 
                 {{-- Status & Info --}}
                 <div class="flex flex-wrap items-center gap-2 mt-2 text-xs">
