@@ -58,4 +58,24 @@ class NotificationController extends BaseController
 
         return $this->success(null, 'Semua notifikasi ditandai sudah dibaca');
     }
+
+    public function test(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'body' => 'required|string|max:500',
+        ]);
+
+        $firebase = app(\App\Services\FirebaseService::class);
+        
+        $result = $firebase->sendToMember(
+            $request->user(),
+            $request->title,
+            $request->body,
+            ['action' => 'test'],
+            'test'
+        );
+
+        return $this->success(['sent' => $result], $result ? 'Notifikasi terkirim' : 'Gagal mengirim notifikasi');
+    }
 }

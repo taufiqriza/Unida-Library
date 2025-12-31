@@ -28,6 +28,11 @@ doc/MIGRATION/*.sql
 doc/MIGRATION/cover_*/
 storage/database/
 
+# Firebase credentials (NEVER commit!)
+storage/app/firebase/*.json
+firebase-service-account.json
+**/firebase-adminsdk*.json
+
 # Shamela Content Database (22GB)
 storage/database/shamela_content.db
 docs/google-analytics.json

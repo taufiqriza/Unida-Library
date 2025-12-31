@@ -64,3 +64,6 @@ Schedule::command('kubuku:sync')
 
 // Cleanup old voice notes (older than 5 months) daily at 4:00 AM
 Schedule::command('voice:cleanup')->dailyAt('04:00');
+
+// Send loan due reminders daily at 8:00 AM
+Schedule::command('loans:send-reminders')->dailyAt('08:00');

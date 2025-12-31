@@ -95,6 +95,11 @@ class ProcessPlagiarismCheck implements ShouldQueue
                 $member->notify(new PlagiarismCheckCompleted($this->check->fresh()));
                 Log::info("Email notification sent for check #{$this->check->id}");
             }
+            
+            // Send push notification
+            if ($member && $this->check->status === PlagiarismCheck::STATUS_COMPLETED) {
+                app(\App\Services\MemberNotificationService::class)->sendPlagiarismComplete($this->check);
+            }
         } catch (\Exception $e) {
             Log::error("Failed to send notification for check #{$this->check->id}: " . $e->getMessage());
         }
