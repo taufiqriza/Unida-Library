@@ -69,6 +69,16 @@ class Member extends Authenticatable
         return $this->hasMany(PlagiarismCheck::class);
     }
 
+    public function devices(): HasMany
+    {
+        return $this->hasMany(MemberDevice::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(MemberNotification::class);
+    }
+
     public function hasOutstandingLoans(): bool
     {
         return $this->loans()->where('is_returned', false)->exists();
