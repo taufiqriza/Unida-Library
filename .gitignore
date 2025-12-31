@@ -31,3 +31,4 @@ storage/database/
 # Shamela Content Database (22GB)
 storage/database/shamela_content.db
 docs/google-analytics.json
+/storage
