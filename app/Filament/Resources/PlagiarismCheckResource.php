@@ -75,12 +75,13 @@ class PlagiarismCheckResource extends Resource
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with('member'))
             ->columns([
-                Tables\Columns\TextColumn::make('member.name')
+                Tables\Columns\TextColumn::make('member_name')
                     ->label('Nama')
-                    ->searchable(query: fn (Builder $query, string $search) => $query->whereHas('member', fn ($q) => $q->where('name', 'like', "%{$search}%")))
-                    ->sortable(query: fn (Builder $query, string $direction) => $query->join('members', 'plagiarism_checks.member_id', '=', 'members.id')->orderBy('members.name', $direction)),
-                Tables\Columns\TextColumn::make('member.member_id')
+                    ->getStateUsing(fn ($record) => $record->member?->name)
+                    ->searchable(query: fn (Builder $query, string $search) => $query->whereHas('member', fn ($q) => $q->where('name', 'like', "%{$search}%"))),
+                Tables\Columns\TextColumn::make('member_nim')
                     ->label('NIM/ID')
+                    ->getStateUsing(fn ($record) => $record->member?->member_id)
                     ->searchable(query: fn (Builder $query, string $search) => $query->whereHas('member', fn ($q) => $q->where('member_id', 'like', "%{$search}%"))),
                 Tables\Columns\TextColumn::make('document_title')
                     ->label('Judul')
