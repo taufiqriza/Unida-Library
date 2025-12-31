@@ -3,15 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\ThesisSubmission;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ThesisStatusNotification extends Notification implements ShouldQueue
+class ThesisStatusNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(public ThesisSubmission $submission, public string $action) {}
 
     public function via($notifiable): array

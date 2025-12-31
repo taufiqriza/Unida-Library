@@ -3,15 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\ClearanceLetter;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ClearanceLetterNotification extends Notification implements ShouldQueue
+class ClearanceLetterNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(public ClearanceLetter $letter) {}
 
     public function via($notifiable): array

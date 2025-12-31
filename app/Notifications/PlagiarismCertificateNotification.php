@@ -3,15 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\PlagiarismCheck;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PlagiarismCertificateNotification extends Notification implements ShouldQueue
+class PlagiarismCertificateNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(public PlagiarismCheck $check) {}
 
     public function via($notifiable): array
