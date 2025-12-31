@@ -20,7 +20,7 @@ class GeneralController extends BaseController
         return $this->success([
             'stats' => [
                 'books' => Book::count(),
-                'ebooks' => Ebook::where('is_public', true)->count(),
+                'ebooks' => Ebook::where('is_active', true)->where('opac_hide', false)->count(),
                 'etheses' => Ethesis::where('is_public', true)->count(),
                 'branches' => Branch::where('is_active', true)->count(),
             ],
