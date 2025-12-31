@@ -34,7 +34,7 @@ class GeneralController extends BaseController
                     'authors' => $b->authors->pluck('name'),
                     'cover_url' => $b->cover ? Storage::disk('public')->url($b->cover) : null,
                 ]),
-            'news' => News::where('is_published', true)
+            'news' => News::where('status', 'published')
                 ->orderByDesc('published_at')
                 ->limit(3)
                 ->get()
@@ -42,8 +42,8 @@ class GeneralController extends BaseController
                     'id' => $n->id,
                     'title' => $n->title,
                     'slug' => $n->slug,
-                    'excerpt' => \Str::limit(strip_tags($n->content), 100),
-                    'image_url' => $n->image ? Storage::disk('public')->url($n->image) : null,
+                    'excerpt' => $n->excerpt ?: \Str::limit(strip_tags($n->content), 100),
+                    'image_url' => $n->featured_image ? Storage::disk('public')->url($n->featured_image) : null,
                     'published_at' => $n->published_at?->toIso8601String(),
                 ]),
         ]);
@@ -94,7 +94,7 @@ class GeneralController extends BaseController
 
     public function news(Request $request)
     {
-        $news = News::where('is_published', true)
+        $news = News::where('status', 'published')
             ->orderByDesc('published_at')
             ->paginate($request->per_page ?? 10);
 
@@ -102,8 +102,8 @@ class GeneralController extends BaseController
             'id' => $n->id,
             'title' => $n->title,
             'slug' => $n->slug,
-            'excerpt' => \Str::limit(strip_tags($n->content), 150),
-            'image_url' => $n->image ? Storage::disk('public')->url($n->image) : null,
+            'excerpt' => $n->excerpt ?: \Str::limit(strip_tags($n->content), 150),
+            'image_url' => $n->featured_image ? Storage::disk('public')->url($n->featured_image) : null,
             'category' => $n->category?->name,
             'published_at' => $n->published_at?->toIso8601String(),
         ]));
@@ -111,7 +111,7 @@ class GeneralController extends BaseController
 
     public function newsShow($slug)
     {
-        $news = News::where('slug', $slug)->where('is_published', true)->first();
+        $news = News::where('slug', $slug)->where('status', 'published')->first();
 
         if (!$news) {
             return $this->error('Berita tidak ditemukan', 404);
@@ -122,7 +122,7 @@ class GeneralController extends BaseController
             'title' => $news->title,
             'slug' => $news->slug,
             'content' => $news->content,
-            'image_url' => $news->image ? Storage::disk('public')->url($news->image) : null,
+            'image_url' => $news->featured_image ? Storage::disk('public')->url($news->featured_image) : null,
             'category' => $news->category?->name,
             'author' => $news->author?->name,
             'published_at' => $news->published_at?->toIso8601String(),
