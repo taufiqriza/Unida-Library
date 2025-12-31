@@ -5,8 +5,11 @@
     <title>Sertifikat Cek Plagiasi - {{ $check->certificate_number }}</title>
     <style>
         @page {
-            margin: 25px;
+            margin: 15mm 15mm 20mm 15mm;
             size: A4 portrait;
+        }
+        * {
+            box-sizing: border-box;
         }
         body {
             font-family: 'DejaVu Sans', sans-serif;
@@ -14,17 +17,17 @@
             padding: 0;
             color: #1e3a8a;
             background: #ffffff;
-            font-size: 11px;
-            line-height: 1.4;
+            font-size: 10px;
+            line-height: 1.3;
         }
         
         .certificate {
             width: 100%;
-            max-width: 545px;
+            max-width: 540px;
             margin: 0 auto;
-            padding: 20px;
-            border: 4px solid #2563eb;
-            border-radius: 20px;
+            padding: 15px;
+            border: 3px solid #2563eb;
+            border-radius: 15px;
             position: relative;
             background: #ffffff;
         }
@@ -38,57 +41,57 @@
         /* Header with Blue Background */
         .header {
             text-align: center;
-            padding: 20px 30px;
+            padding: 15px 25px;
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
             color: white;
         }
         
         .logo-row {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: block;
         }
         
         .logo {
-            height: 50px;
+            height: 45px;
             vertical-align: middle;
-            margin: 0 10px;
+            margin: 0 8px;
         }
         
         .institution {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #1e40af;
-            margin: 8px 0 3px;
+            margin: 6px 0 2px;
             letter-spacing: 1px;
         }
         
         .sub-institution {
-            font-size: 11px;
+            font-size: 10px;
             color: #3b82f6;
             font-weight: 500;
         }
         
         /* Content Body */
         .content-body {
-            padding: 20px 30px 25px;
+            padding: 15px 25px 20px;
         }
         
         /* Title */
         .title {
             text-align: center;
-            margin: 0 0 15px;
+            margin: 0 0 12px;
         }
         
         .title h1 {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: bold;
             color: #1e40af;
-            margin: 0 0 8px;
-            letter-spacing: 4px;
+            margin: 0 0 5px;
+            letter-spacing: 3px;
         }
         
         .title-sub {
-            font-size: 12px;
+            font-size: 11px;
             color: #3b82f6;
             font-weight: 500;
         }
@@ -159,7 +162,7 @@
         /* Score Section */
         .score-section {
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         
         .score-container {
@@ -168,38 +171,38 @@
         
         .score-box {
             display: inline-block;
-            padding: 15px 35px;
+            padding: 12px 30px;
             border: 3px solid {{ $isPassed ? '#16a34a' : '#d97706' }};
-            border-radius: 15px;
+            border-radius: 12px;
             background: {{ $isPassed ? '#f0fdf4' : '#fffbeb' }};
         }
         
         .score-value {
-            font-size: 38px;
+            font-size: 32px;
             font-weight: bold;
             color: {{ $isPassed ? '#15803d' : '#b45309' }};
             line-height: 1;
         }
         
         .score-label {
-            font-size: 9px;
+            font-size: 8px;
             color: #64748b;
             text-transform: uppercase;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         
         .status-badge {
-            margin-top: 12px;
+            margin-top: 10px;
         }
         
         .status-text {
             display: inline-block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: {{ $isPassed ? '#15803d' : '#b45309' }};
-            padding: 6px 20px;
+            padding: 5px 15px;
             background: {{ $isPassed ? '#dcfce7' : '#fef3c7' }};
-            border-radius: 20px;
+            border-radius: 15px;
         }
         
         /* iThenticate Info Box */
@@ -230,7 +233,7 @@
         
         /* Footer */
         .footer {
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .footer-row {
@@ -256,67 +259,67 @@
         }
         
         .qr-code {
-            width: 65px;
-            height: 65px;
+            width: 55px;
+            height: 55px;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 3px;
+            border-radius: 6px;
+            padding: 2px;
             background: white;
         }
         
         .qr-label {
             font-size: 7px;
             color: #94a3b8;
-            margin-top: 4px;
+            margin-top: 3px;
         }
         
         .signature-section {
-            margin-top: 5px;
+            margin-top: 3px;
         }
         
         .signature-date {
-            font-size: 10px;
+            font-size: 9px;
             color: #64748b;
-            margin-bottom: 8px;
-        }
-        
-        .signature-qr {
-            width: 55px;
-            height: 55px;
-            border-radius: 8px;
             margin-bottom: 5px;
         }
         
+        .signature-qr {
+            width: 45px;
+            height: 45px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+        
         .signature-name {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             color: #1e3a8a;
             border-top: 1px solid #1e3a8a;
-            padding-top: 5px;
+            padding-top: 4px;
             display: inline-block;
         }
         
         .signature-title {
-            font-size: 8px;
+            font-size: 7px;
             color: #3b82f6;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         
         .provider-section {
-            margin-top: 10px;
+            margin-top: 8px;
         }
         
         .provider-logo {
-            height: 25px;
-            margin-bottom: 5px;
+            height: 22px;
+            margin-bottom: 4px;
         }
         
         .provider-box {
             display: inline-block;
-            padding: 6px 12px;
+            padding: 5px 10px;
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            border-radius: 8px;
-            font-size: 8px;
+            border-radius: 6px;
+            font-size: 7px;
             color: white;
             font-weight: bold;
         }
@@ -324,17 +327,17 @@
         .provider-label {
             font-size: 7px;
             color: #94a3b8;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         /* Verify Footer */
         .verify-footer {
             clear: both;
             text-align: center;
-            margin: 0 30px;
-            padding-top: 12px;
+            margin: 0 25px;
+            padding-top: 10px;
             border-top: 1px dashed #bfdbfe;
-            font-size: 8px;
+            font-size: 7px;
             color: #94a3b8;
         }
         
@@ -348,7 +351,7 @@
             text-align: center;
             font-size: 7px;
             color: #94a3b8;
-            margin: 8px 30px 15px;
+            margin: 6px 25px 12px;
             font-style: italic;
         }
         
