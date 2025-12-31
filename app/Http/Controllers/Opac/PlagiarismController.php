@@ -201,6 +201,23 @@ class PlagiarismController extends Controller
     }
 
     /**
+     * Public certificate download (for admin/staff sharing)
+     */
+    public function publicDownload(PlagiarismCheck $check)
+    {
+        if (!$check->isCompleted() || !$check->hasCertificate()) {
+            abort(404, 'Sertifikat tidak tersedia');
+        }
+
+        $generator = new CertificateGenerator($check);
+        
+        return response($generator->getPdfContent(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $generator->getDownloadFilename() . '"',
+        ]);
+    }
+
+    /**
      * Public verification page
      */
     public function verify(string $certificate)

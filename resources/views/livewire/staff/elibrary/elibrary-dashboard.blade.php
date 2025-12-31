@@ -160,17 +160,16 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg
                                     @if($selectedType === 'submission') bg-gradient-to-br from-amber-400 via-orange-500 to-red-500
-                                    @else bg-gradient-to-br from-rose-400 via-pink-500 to-purple-500 @endif">
-                                    <i class="fas @if($selectedType === 'submission') fa-file-lines @else fa-shield-check @endif text-white text-lg"></i>
+                                    @else bg-gradient-to-br from-violet-400 via-purple-500 to-fuchsia-500 @endif">
+                                    <i class="fas @if($selectedType === 'submission') fa-file-lines @else fa-shield-halved @endif text-white text-lg"></i>
                                 </div>
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-900">
-                                        @if($selectedType === 'submission') Detail Submission @else Detail Cek Plagiasi @endif
+                                        {{ $selectedItem->member->name ?? 'Detail' }}
                                     </h3>
                                     <p class="text-sm text-gray-500">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-md text-xs font-mono">
-                                            <i class="fas fa-hashtag text-gray-400 text-[10px]"></i>{{ $selectedItem->id }}
-                                        </span>
+                                        @if($selectedType === 'submission') Submission @else Cek Plagiasi @endif
+                                        • {{ $selectedItem->member->member_id ?? '' }}
                                     </p>
                                 </div>
                             </div>

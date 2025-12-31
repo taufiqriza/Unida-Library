@@ -61,12 +61,12 @@
         </div>
 
         {{-- Action Buttons --}}
-        <div class="flex gap-2">
-            <button wire:click="approvePlagiarism" wire:confirm="Setujui pengajuan ini? Sertifikat akan diterbitkan." 
+        <div class="flex gap-2" x-data>
+            <button @click="confirmAction({title:'Setujui Pengajuan?',text:'Sertifikat akan diterbitkan untuk mahasiswa.',icon:'question',confirmText:'Ya, Setujui',confirmColor:'#10b981'},()=>$wire.approvePlagiarism())" 
                     class="flex-1 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2">
                 <i class="fas fa-check"></i> Setujui & Terbitkan Sertifikat
             </button>
-            <button wire:click="rejectPlagiarism" wire:confirm="Tolak pengajuan ini?" 
+            <button @click="confirmAction({title:'Tolak Pengajuan?',text:'Mahasiswa perlu mengajukan ulang.',icon:'warning',confirmText:'Ya, Tolak',confirmColor:'#ef4444'},()=>$wire.rejectPlagiarism())" 
                     class="px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition">
                 <i class="fas fa-times"></i>
             </button>
@@ -211,7 +211,7 @@
                     <p class="text-xs text-violet-600 font-mono">{{ $selectedItem->certificate_number }}</p>
                 </div>
             </div>
-            <a href="{{ route('opac.member.plagiarism.certificate', $selectedItem) }}" target="_blank" class="px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold rounded-lg transition">
+            <a href="{{ route('plagiarism.certificate.download', $selectedItem) }}" target="_blank" class="px-3 py-2 bg-violet-500 hover:bg-violet-600 text-white text-sm font-semibold rounded-lg transition">
                 <i class="fas fa-download"></i>
             </a>
         </div>
@@ -239,8 +239,8 @@
     </div>
 
     {{-- Delete Button --}}
-    <div class="pt-4 border-t">
-        <button wire:click="deletePlagiarism" wire:confirm="Hapus data plagiasi ini? Data tidak dapat dikembalikan." 
+    <div class="pt-4 border-t" x-data>
+        <button @click="confirmAction({title:'Hapus Data Plagiasi?',text:'Data tidak dapat dikembalikan.',icon:'warning',confirmText:'Ya, Hapus',confirmColor:'#ef4444'},()=>$wire.deletePlagiarism())" 
                 class="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium rounded-xl transition flex items-center justify-center gap-2">
             <i class="fas fa-trash"></i> Hapus Data Plagiasi
         </button>

@@ -115,6 +115,9 @@ Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileComple
 // Public Plagiarism Certificate Verification
 Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismController::class, 'verify'])->name('plagiarism.verify');
 
+// Public Certificate Download (for admin/staff to share via WhatsApp)
+Route::get('/certificate/{check}/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'publicDownload'])->name('plagiarism.certificate.download');
+
 // Alias for member.dashboard (Livewire)
 Route::get('/member/dashboard', \App\Livewire\Opac\Member\Dashboard::class)->middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->name('member.dashboard');
 

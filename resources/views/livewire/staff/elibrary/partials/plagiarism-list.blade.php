@@ -103,7 +103,7 @@
                     <i class="fas fa-eye"></i>
                 </button>
                 @if($item->hasCertificate())
-                <a href="{{ route('opac.member.plagiarism.certificate', $item) }}" target="_blank" class="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Sertifikat">
+                <a href="{{ route('plagiarism.certificate.download', $item) }}" target="_blank" class="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Download Sertifikat">
                     <i class="fas fa-certificate"></i>
                 </a>
                 @endif

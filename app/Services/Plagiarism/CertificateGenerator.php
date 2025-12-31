@@ -155,11 +155,12 @@ class CertificateGenerator
      */
     public function getPdfContent(): string
     {
-        if (!$this->check->certificate_path) {
+        if (!$this->check->certificate_path || !Storage::disk('local')->exists($this->check->certificate_path)) {
             $this->generate();
+            $this->check->refresh();
         }
 
-        return Storage::disk('local')->get($this->check->certificate_path);
+        return Storage::disk('local')->get($this->check->certificate_path) ?? '';
     }
 
     /**

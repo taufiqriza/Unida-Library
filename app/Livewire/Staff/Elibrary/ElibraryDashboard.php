@@ -423,7 +423,8 @@ class ElibraryDashboard extends Component
             $data = $query->latest()->paginate(10);
         } elseif ($this->activeTab === 'plagiarism') {
             $query = PlagiarismCheck::with(['member', 'thesisSubmission'])
-                ->when($this->search, fn($q) => $q->where('document_title', 'like', "%{$this->search}%"))
+                ->when($this->search, fn($q) => $q->where('document_title', 'like', "%{$this->search}%")
+                    ->orWhereHas('member', fn($m) => $m->where('name', 'like', "%{$this->search}%")->orWhere('member_id', 'like', "%{$this->search}%")))
                 ->when($this->statusFilter === 'external_pending', fn($q) => $q->where('check_type', 'external')->where('status', 'pending'))
                 ->when($this->statusFilter && $this->statusFilter !== 'external_pending', fn($q) => $q->where('status', $this->statusFilter));
             
