@@ -56,8 +56,13 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                         @endif
                     </td>
                     <td class="px-4 py-3">
-                        <p class="text-xs text-gray-700 truncate">{{ $book->user?->name ?? '-' }}</p>
+                        @if($book->user)
+                        <p class="text-xs text-gray-700 truncate">{{ $book->user->name }}</p>
                         <p class="text-[10px] text-gray-400">{{ $book->created_at?->format('d M Y') }}</p>
+                        @else
+                        <p class="text-xs text-gray-500 truncate">{{ $book->branch?->name ?? '-' }}</p>
+                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->format('d M Y') }}</p>
+                        @endif
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-center gap-1">
