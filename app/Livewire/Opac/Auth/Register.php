@@ -70,7 +70,9 @@ class Register extends Component
         // 2. Extract NIM from campus email (e.g., 432022413017@student.unida.gontor.ac.id)
         $nim = $this->extractNimFromEmail($this->email);
         if ($nim) {
-            $member = Member::where('member_id', $nim)->whereNull('email')->first();
+            $member = Member::where('member_id', $nim)
+                ->orWhere('nim_nidn', $nim)
+                ->first();
             if ($member) {
                 $this->detectedMember = $member;
                 $this->showConfirmation = true;
@@ -78,17 +80,33 @@ class Register extends Component
             }
         }
 
-        // 3. Check by exact name match (for SIAKAD members without email)
+        // 3. Check by exact name match (for SIAKAD members)
         if (strlen($this->name) >= 5) {
-            $member = Member::whereRaw('UPPER(name) = ?', [strtoupper($this->name)])
-                ->whereNull('email')
-                ->where('member_id', 'not like', 'M%') // Exclude manual registrations
+            $normalizedName = $this->normalizeName($this->name);
+            $member = Member::whereRaw('UPPER(REPLACE(REPLACE(name, \".\", \"\"), \"  \", \" \")) = ?', [$normalizedName])
+                ->where('registration_type', 'internal')
+                ->first();
+            if ($member) {
+                $this->detectedMember = $member;
+                $this->showConfirmation = true;
+                return;
+            }
+            
+            // 4. Fuzzy match - cari nama yang sangat mirip
+            $member = Member::where('registration_type', 'internal')
+                ->whereRaw('SOUNDEX(name) = SOUNDEX(?)', [$this->name])
+                ->whereRaw('LENGTH(name) BETWEEN ? AND ?', [strlen($this->name) - 3, strlen($this->name) + 3])
                 ->first();
             if ($member) {
                 $this->detectedMember = $member;
                 $this->showConfirmation = true;
             }
         }
+    }
+    
+    protected function normalizeName(string $name): string
+    {
+        return strtoupper(preg_replace('/\s+/', ' ', str_replace('.', '', trim($name))));
     }
 
     protected function extractNimFromEmail(string $email): ?string
@@ -182,8 +200,21 @@ class Register extends Component
         if ($this->showConfirmation) {
             return; // Show confirmation dialog
         }
-
+        
+        // Final check: prevent duplicate by similar name for internal registration
         $registrationType = $otpService->detectRegistrationType($this->email);
+        if ($registrationType === 'internal') {
+            $normalizedName = $this->normalizeName($this->name);
+            $existingByName = Member::whereRaw('UPPER(REPLACE(REPLACE(name, ".", ""), "  ", " ")) = ?', [$normalizedName])
+                ->where('registration_type', 'internal')
+                ->first();
+            if ($existingByName) {
+                $this->detectedMember = $existingByName;
+                $this->showConfirmation = true;
+                return;
+            }
+        }
+
         $isTrusted = $registrationType === 'internal';
 
         // Auto-detect institution for external (.ac.id)
