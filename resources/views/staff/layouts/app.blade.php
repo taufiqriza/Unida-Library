@@ -46,6 +46,22 @@
         html.dark { color-scheme: dark; }
         body { opacity: 0; transition: opacity 0.15s, background-color 0.3s, color 0.3s; }
         body.ready { opacity: 1; }
+        
+        /* Critical: Sidebar curves - prevent FOUC */
+        @media (min-width: 1024px) {
+            .staff-sidebar::before, .staff-sidebar::after {
+                content: '';
+                position: absolute;
+                right: -32px;
+                width: 32px;
+                height: 32px;
+                pointer-events: none;
+            }
+            .staff-sidebar::before { top: 0; background: radial-gradient(circle at 100% 100%, transparent 32px, #1d4ed8 32px); }
+            .staff-sidebar::after { bottom: 0; background: radial-gradient(circle at 100% 0%, transparent 32px, #312e81 32px); }
+            html.dark .staff-sidebar::before { background: radial-gradient(circle at 100% 100%, transparent 32px, #0f172a 32px) !important; }
+            html.dark .staff-sidebar::after { background: radial-gradient(circle at 100% 0%, transparent 32px, #0f172a 32px) !important; }
+        }
     </style>
     
     {{-- Instant dark mode detection (before anything renders) + persist on navigation --}}
