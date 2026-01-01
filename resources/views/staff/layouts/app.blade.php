@@ -62,6 +62,18 @@
             html.dark .staff-sidebar::before { background: radial-gradient(circle at 100% 100%, transparent 32px, #0f172a 32px) !important; }
             html.dark .staff-sidebar::after { background: radial-gradient(circle at 100% 0%, transparent 32px, #0f172a 32px) !important; }
         }
+        
+        /* Custom Scrollbar - Overlay style (tidak mengambil ruang) */
+        html { overflow-y: scroll; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); border: 2px solid transparent; background-clip: padding-box; }
+        html.dark ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border: 2px solid transparent; background-clip: padding-box; }
+        html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); border: 2px solid transparent; background-clip: padding-box; }
+        @supports (overflow: overlay) { html { overflow-y: overlay; } }
+        * { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.3) transparent; }
+        html.dark * { scrollbar-color: rgba(100, 116, 139, 0.3) transparent; }
     </style>
     
     {{-- Instant dark mode detection (before anything renders) + persist on navigation --}}

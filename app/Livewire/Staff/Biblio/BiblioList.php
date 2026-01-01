@@ -235,12 +235,14 @@ class BiblioList extends Component
         $data = ['books' => collect(), 'items' => collect(), 'masterData' => collect()];
         
         // Stats
-        $stats = cache()->remember("biblio_stats_{$branchFilter}", 300, function () use ($branchFilter) {
+        $stats = cache()->remember("biblio_stats_{$branchFilter}_v2", 300, function () use ($branchFilter) {
             $bq = Book::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
             $iq = Item::query()->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter));
             return [
                 'total_books' => (clone $bq)->count(),
                 'total_items' => (clone $iq)->count(),
+                'total_authors' => Author::count(),
+                'active_loans' => \App\Models\Loan::whereNull('return_date')->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))->count(),
                 'recent_additions' => (clone $bq)->where('created_at', '>=', now()->subDays(7))->count(),
                 'books_without_items' => (clone $bq)->whereDoesntHave('items')->count(),
             ];

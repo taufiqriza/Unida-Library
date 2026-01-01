@@ -8,44 +8,30 @@ use App\Models\Branch;
 use App\Models\ActivityLog;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Database\Eloquent\Builder;
 
 class MemberList extends Component
 {
     use WithPagination;
 
     public $search = '';
-    public $filterType = '';
+    public $activeTab = 'all';
     public $filterStatus = '';
     public $filterExpired = '';
-    public $filterLinked = '';
-    public $filterBranchId = ''; // For super admin branch filter
+    public $filterBranchId = '';
     public $showDetailModal = false;
     public $selectedMember = null;
     
     protected $queryString = [
         'search' => ['except' => ''],
-        'filterType' => ['except' => ''],
+        'activeTab' => ['except' => 'all'],
         'filterStatus' => ['except' => ''],
         'filterExpired' => ['except' => ''],
-        'filterLinked' => ['except' => ''],
         'filterBranchId' => ['except' => ''],
     ];
 
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterBranchId()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingFilterLinked()
-    {
-        $this->resetPage();
-    }
+    public function updatingSearch() { $this->resetPage(); }
+    public function updatingActiveTab() { $this->resetPage(); }
+    public function setTab($tab) { $this->activeTab = $tab; $this->resetPage(); }
 
     public function showDetail($memberId)
     {
@@ -53,44 +39,22 @@ class MemberList extends Component
         $this->showDetailModal = true;
     }
 
-    public function closeDetail()
-    {
-        $this->showDetailModal = false;
-        $this->selectedMember = null;
-    }
+    public function closeDetail() { $this->showDetailModal = false; $this->selectedMember = null; }
 
     public function extendMembership($memberId)
     {
         $member = Member::with('memberType')->find($memberId);
         $user = auth()->user();
         
-        if (!$member) {
-            $this->dispatch('notify', type: 'error', message: 'Anggota tidak ditemukan');
-            return;
-        }
-
-        // Only allow extending own branch members (unless super admin)
-        if ($user->role !== 'super_admin' && $member->branch_id !== $user->branch_id) {
-            $this->dispatch('notify', type: 'error', message: 'Tidak dapat memperpanjang anggota cabang lain');
+        if (!$member || ($user->role !== 'super_admin' && $member->branch_id !== $user->branch_id)) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak dapat memperpanjang');
             return;
         }
 
         $period = $member->memberType->membership_period ?? 365;
-        $member->update([
-            'register_date' => now(),
-            'expire_date' => now()->addDays($period),
-        ]);
-
-        // Log activity
-        ActivityLog::log(
-            'update',
-            'member',
-            "Perpanjang keanggotaan: {$member->name}",
-            $member,
-            ['new_expire_date' => now()->addDays($period)->format('Y-m-d')]
-        );
-
-        $this->dispatch('notify', type: 'success', message: "Keanggotaan {$member->name} berhasil diperpanjang");
+        $member->update(['register_date' => now(), 'expire_date' => now()->addDays($period)]);
+        ActivityLog::log('update', 'member', "Perpanjang keanggotaan: {$member->name}", $member);
+        $this->dispatch('notify', type: 'success', message: "Keanggotaan {$member->name} diperpanjang");
     }
 
     public function toggleActive($memberId)
@@ -98,25 +62,26 @@ class MemberList extends Component
         $member = Member::find($memberId);
         $user = auth()->user();
         
-        if (!$member) return;
-        
-        // Super admin can toggle any, admin only own branch
-        if ($user->role !== 'super_admin' && $member->branch_id !== $user->branch_id) {
-            $this->dispatch('notify', type: 'error', message: 'Tidak dapat mengubah status anggota cabang lain');
+        if (!$member || ($user->role !== 'super_admin' && $member->branch_id !== $user->branch_id)) {
+            $this->dispatch('notify', type: 'error', message: 'Tidak dapat mengubah status');
             return;
         }
         
         $member->update(['is_active' => !$member->is_active]);
-        
-        // Log activity
-        ActivityLog::log(
-            'update',
-            'member',
-            ($member->is_active ? 'Aktifkan' : 'Nonaktifkan') . " anggota: {$member->name}",
-            $member
-        );
-        
+        ActivityLog::log('update', 'member', ($member->is_active ? 'Aktifkan' : 'Nonaktifkan') . " anggota: {$member->name}", $member);
         $this->dispatch('notify', type: 'success', message: 'Status anggota berhasil diubah');
+    }
+
+    protected function getTypeIdByTab($tab)
+    {
+        return match($tab) {
+            'mahasiswa' => MemberType::where('name', 'Mahasiswa')->value('id'),
+            'dosen' => MemberType::where('name', 'Dosen')->value('id'),
+            'karyawan' => MemberType::whereIn('name', ['Karyawan', 'Tendik'])->pluck('id')->toArray(),
+            'santri' => MemberType::where('name', 'Santri')->value('id'),
+            'umum' => MemberType::where('name', 'Umum')->value('id'),
+            default => null
+        };
     }
 
     public function render()
@@ -125,65 +90,64 @@ class MemberList extends Component
         $isSuperAdmin = $user->role === 'super_admin';
         $userBranchId = $user->branch_id;
         
-        // Determine which branch to filter
-        $effectiveBranchId = null;
-        if ($isSuperAdmin) {
-            $effectiveBranchId = $this->filterBranchId ?: null; // null = all branches
-        } else {
-            $effectiveBranchId = $userBranchId;
-        }
+        $effectiveBranchId = $isSuperAdmin ? ($this->filterBranchId ?: null) : $userBranchId;
 
-        // Stats scoped to effective branch
-        $statsQuery = Member::query();
-        if ($effectiveBranchId) {
-            $statsQuery->where('branch_id', $effectiveBranchId);
-        } elseif (!$isSuperAdmin) {
-            $statsQuery->where('branch_id', $userBranchId);
-        }
-        
+        // Get member types for tabs
+        $memberTypes = MemberType::withCount(['members' => function($q) use ($effectiveBranchId) {
+            $q->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId));
+        }])->orderBy('name')->get();
+
+        // Check if user can see Santri tab (OPPM Gontor branch or super admin)
+        $canSeeSantri = $isSuperAdmin || ($user->branch && str_contains(strtolower($user->branch->name), 'oppm'));
+
+        // Stats
+        $statsQuery = Member::query()->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId));
         $stats = [
             'total' => (clone $statsQuery)->count(),
             'active' => (clone $statsQuery)->where('is_active', true)->where('expire_date', '>=', now())->count(),
             'expired' => (clone $statsQuery)->where('expire_date', '<', now())->count(),
             'new_this_month' => (clone $statsQuery)->whereMonth('created_at', now()->month)->count(),
+            'mahasiswa' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Mahasiswa'))->count(),
+            'dosen' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Dosen'))->count(),
+            'karyawan' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->whereIn('name', ['Karyawan', 'Tendik']))->count(),
+            'santri' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Santri'))->count(),
+            'umum' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Umum'))->count(),
         ];
 
+        // Members query
+        $typeId = $this->getTypeIdByTab($this->activeTab);
+        
         $members = Member::query()
             ->with(['memberType', 'faculty', 'department', 'branch'])
             ->withCount(['loans' => fn($q) => $q->where('is_returned', false)])
-            // Branch filter - skip if searching and user is super_admin or admin pusat
-            ->when($this->search && ($isSuperAdmin || $user->branch?->is_main), fn($q) => $q) // No branch filter when searching
-            ->when(!$this->search || (!$isSuperAdmin && !$user->branch?->is_main), function($q) use ($effectiveBranchId, $isSuperAdmin, $userBranchId) {
-                $q->when($effectiveBranchId, fn($q2) => $q2->where('branch_id', $effectiveBranchId))
-                  ->when(!$isSuperAdmin && !$effectiveBranchId, fn($q2) => $q2->where('branch_id', $userBranchId));
+            ->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId))
+            ->when($typeId, function($q) use ($typeId) {
+                if (is_array($typeId)) {
+                    $q->whereIn('member_type_id', $typeId);
+                } else {
+                    $q->where('member_type_id', $typeId);
+                }
             })
-            // Search
-            ->when($this->search, function (Builder $query) {
-                $query->where(function($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('member_id', 'like', '%' . $this->search . '%')
-                      ->orWhere('nim_nidn', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%');
-                });
-            })
-            // Other filters
-            ->when($this->filterType, fn($q) => $q->where('member_type_id', $this->filterType))
+            ->when($this->search, fn($q) => $q->where(fn($q) => 
+                $q->where('name', 'like', "%{$this->search}%")
+                  ->orWhere('member_id', 'like', "%{$this->search}%")
+                  ->orWhere('nim_nidn', 'like', "%{$this->search}%")
+                  ->orWhere('email', 'like', "%{$this->search}%")
+            ))
             ->when($this->filterStatus === 'active', fn($q) => $q->where('is_active', true))
             ->when($this->filterStatus === 'inactive', fn($q) => $q->where('is_active', false))
             ->when($this->filterExpired === 'expired', fn($q) => $q->where('expire_date', '<', now()))
             ->when($this->filterExpired === 'valid', fn($q) => $q->where('expire_date', '>=', now()))
-            ->when($this->filterLinked === 'linked', fn($q) => $q->whereNotNull('email')->where('email', '!=', '')->where('profile_completed', 1))
-            ->when($this->filterLinked === 'unlinked', fn($q) => $q->where(fn($q2) => $q2->whereNull('email')->orWhere('email', '=', '')->orWhere('profile_completed', 0)))
             ->latest()
             ->paginate(15);
 
         return view('livewire.staff.member.member-list', [
             'members' => $members,
             'stats' => $stats,
-            'memberTypes' => MemberType::orderBy('name')->get(),
+            'memberTypes' => $memberTypes,
             'branches' => $isSuperAdmin ? Branch::orderBy('name')->get() : collect(),
             'isSuperAdmin' => $isSuperAdmin,
+            'canSeeSantri' => $canSeeSantri,
         ])->extends('staff.layouts.app')->section('content');
     }
 }

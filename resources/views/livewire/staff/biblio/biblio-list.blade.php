@@ -33,7 +33,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
         <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-book text-lg"></i></div>
@@ -46,9 +46,21 @@
                 <div><p class="text-2xl font-bold">{{ number_format($stats['total_items']) }}</p><p class="text-xs text-emerald-100">Eksemplar</p></div>
             </div>
         </div>
+        <div class="bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl p-4 text-white">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-user-edit text-lg"></i></div>
+                <div><p class="text-2xl font-bold">{{ number_format($stats['total_authors']) }}</p><p class="text-xs text-purple-100">Penulis</p></div>
+            </div>
+        </div>
+        <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-4 text-white">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-hand-holding text-lg"></i></div>
+                <div><p class="text-2xl font-bold">{{ number_format($stats['active_loans']) }}</p><p class="text-xs text-amber-100">Dipinjam</p></div>
+            </div>
+        </div>
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-star text-white text-lg"></i></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-star text-white text-lg"></i></div>
                 <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['recent_additions']) }}</p><p class="text-xs text-gray-500">Baru (7 hari)</p></div>
             </div>
         </div>
