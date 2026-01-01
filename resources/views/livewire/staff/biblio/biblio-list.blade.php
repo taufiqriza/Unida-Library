@@ -168,6 +168,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-1">
+                            <button wire:click="quickView({{ $book->id }})" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Lihat"><i class="fas fa-eye"></i></button>
                             <a href="{{ route('staff.biblio.edit', $book->id) }}" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit"><i class="fas fa-edit"></i></a>
                             <button wire:click="confirmDelete({{ $book->id }})" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus"><i class="fas fa-trash"></i></button>
                         </div>
@@ -186,6 +187,7 @@
                             <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fas fa-book text-4xl"></i></div>
                             @endif
                             <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                                <button wire:click="quickView({{ $book->id }})" class="p-2 bg-white rounded-lg text-emerald-600 hover:bg-emerald-50"><i class="fas fa-eye"></i></button>
                                 <a href="{{ route('staff.biblio.edit', $book->id) }}" class="p-2 bg-white rounded-lg text-blue-600 hover:bg-blue-50"><i class="fas fa-edit"></i></a>
                                 <button wire:click="confirmDelete({{ $book->id }})" class="p-2 bg-white rounded-lg text-red-600 hover:bg-red-50"><i class="fas fa-trash"></i></button>
                             </div>
@@ -285,29 +287,229 @@
         </div>
     @endif
 
-    {{-- Delete Confirmation Modal --}}
-    @if($deleteConfirmId)
-    <div class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" wire:click="cancelDelete"></div>
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
-                <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-trash text-red-500 text-xl"></i></div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus Bibliografi?</h3>
-                <p class="text-gray-500 text-sm mb-6">Data buku dan semua eksemplar akan dihapus permanen.</p>
-                <div class="flex gap-3">
-                    <button wire:click="cancelDelete" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Batal</button>
-                    <button wire:click="delete" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition">Hapus</button>
+    {{-- Quick View Modal --}}
+    <template x-teleport="body">
+        <div x-data="{ show: @entangle('quickViewId').live }" x-show="show" x-cloak style="position: fixed; inset: 0; z-index: 99999;" @keydown.escape.window="$wire.closeQuickView()">
+            <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6);" @click="$wire.closeQuickView()"></div>
+            <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none;">
+                <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden" style="pointer-events: auto;">
+                    @if($this->quickViewBook)
+                    @php $book = $this->quickViewBook; @endphp
+                    {{-- Header --}}
+                    <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-white">
+                        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <i class="fas fa-book text-blue-500"></i> Detail Bibliografi
+                        </h3>
+                        <button @click="$wire.closeQuickView()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    {{-- Content --}}
+                    <div class="p-5 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                        <div class="flex gap-5">
+                            {{-- Cover --}}
+                            <div class="w-32 flex-shrink-0">
+                                <div class="aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden">
+                                    @if($book->image)
+                                    <img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
+                                    @else
+                                    <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fas fa-book text-3xl"></i></div>
+                                    @endif
+                                </div>
+                                <div class="mt-2 text-center">
+                                    <span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg">
+                                        <i class="fas fa-copy mr-1"></i> {{ $book->items->count() }} eks
+                                    </span>
+                                </div>
+                            </div>
+                            {{-- Info --}}
+                            <div class="flex-1 space-y-3">
+                                <div>
+                                    <h4 class="text-lg font-bold text-gray-900 leading-tight">{{ $book->title }}</h4>
+                                    @if($book->authors->count())
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        <i class="fas fa-user text-gray-400 mr-1"></i>
+                                        {{ $book->authors->pluck('name')->implode(', ') }}
+                                    </p>
+                                    @endif
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">ISBN</span>
+                                        <span class="font-medium text-gray-900">{{ $book->isbn ?: '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">Tahun</span>
+                                        <span class="font-medium text-gray-900">{{ $book->publish_year ?: '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">Penerbit</span>
+                                        <span class="font-medium text-gray-900">{{ $book->publisher?->name ?: '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">Tempat</span>
+                                        <span class="font-medium text-gray-900">{{ $book->place?->name ?: '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">Klasifikasi</span>
+                                        <span class="font-mono font-medium text-purple-600">{{ $book->classification ?: '-' }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-400 w-20">No. Panggil</span>
+                                        <span class="font-mono font-medium text-blue-600">{{ $book->call_number ?: '-' }}</span>
+                                    </div>
+                                </div>
+                                @if($book->subjects->count())
+                                <div class="flex flex-wrap gap-1.5 pt-2">
+                                    @foreach($book->subjects as $subject)
+                                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-lg">{{ $subject->name }}</span>
+                                    @endforeach
+                                </div>
+                                @endif
+                                @if($book->abstract)
+                                <div class="pt-2 border-t border-gray-100">
+                                    <p class="text-xs text-gray-500 mb-1">Abstrak</p>
+                                    <p class="text-sm text-gray-700 line-clamp-3">{{ $book->abstract }}</p>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    {{-- Footer --}}
+                    <div class="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+                        <a href="{{ route('staff.biblio.show', $book->id) }}" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            <i class="fas fa-external-link-alt mr-1"></i> Lihat Detail Lengkap
+                        </a>
+                        <div class="flex gap-2">
+                            <a href="{{ route('staff.biblio.edit', $book->id) }}" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                    @else
+                    <div class="p-8 text-center">
+                        <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
-    </div>
-    @endif
+    </template>
 
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('notify', (data) => {
-                alert((data[0].type === 'success' ? '✓ ' : '') + data[0].message);
-            });
-        });
-    </script>
+    {{-- Delete Confirmation Modal --}}
+    <template x-teleport="body">
+        <div x-data="{ show: @entangle('deleteConfirmId').live }" x-show="show" x-cloak style="position: fixed; inset: 0; z-index: 99999;">
+            <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6);" @click="$wire.cancelDelete()"></div>
+            <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none;">
+                <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center" style="pointer-events: auto;">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus Bibliografi?</h3>
+                    <p class="text-gray-500 text-sm mb-6">Data buku dan semua eksemplar akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.</p>
+                    <div class="flex gap-3">
+                        <button wire:click="cancelDelete" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">
+                            <i class="fas fa-times mr-1"></i> Batal
+                        </button>
+                        <button wire:click="delete" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition">
+                            <i class="fas fa-trash mr-1"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    {{-- Print Barcode Modal --}}
+    <template x-teleport="body">
+        <div x-data="{ show: @entangle('showPrintModal').live }" x-show="show" x-cloak style="position: fixed; inset: 0; z-index: 99999;" @keydown.escape.window="$wire.closePrintModal()">
+            <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6);" @click="$wire.closePrintModal()"></div>
+            <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none;">
+                <div x-show="show" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" style="pointer-events: auto;">
+                    {{-- Header --}}
+                    <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-white">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-print text-emerald-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">Cetak Barcode</h3>
+                                <p class="text-sm text-gray-500">{{ count($selectedItems) }} label akan dicetak</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Content --}}
+                    <div class="p-5 space-y-4">
+                        {{-- Print Info --}}
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                            <h4 class="text-sm font-semibold text-blue-800 flex items-center gap-2 mb-2">
+                                <i class="fas fa-info-circle"></i> Informasi Cetak
+                            </h4>
+                            <ul class="text-xs text-blue-700 space-y-1">
+                                <li><i class="fas fa-check mr-1.5 text-blue-500"></i> Ukuran label: <strong>9 × 3 cm</strong> (2 kolom per baris)</li>
+                                <li><i class="fas fa-check mr-1.5 text-blue-500"></i> Kertas: <strong>A4</strong> (210 × 297 mm)</li>
+                                <li><i class="fas fa-check mr-1.5 text-blue-500"></i> Margin: <strong>0.5 cm</strong> setiap sisi</li>
+                                <li><i class="fas fa-check mr-1.5 text-blue-500"></i> Hasil: <strong>~18 label</strong> per halaman A4</li>
+                            </ul>
+                        </div>
+
+                        {{-- Tips --}}
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                            <h4 class="text-sm font-semibold text-amber-800 flex items-center gap-2 mb-2">
+                                <i class="fas fa-lightbulb"></i> Tips Cetak
+                            </h4>
+                            <ul class="text-xs text-amber-700 space-y-1">
+                                <li>• Gunakan kertas stiker untuk hasil terbaik</li>
+                                <li>• Atur printer ke "Actual Size" / "100%"</li>
+                                <li>• Nonaktifkan "Fit to Page" atau "Scale"</li>
+                                <li>• Gunakan garis potong sebagai panduan</li>
+                            </ul>
+                        </div>
+
+                        {{-- Preview Items --}}
+                        <div>
+                            <p class="text-xs text-gray-500 mb-2">Item yang akan dicetak:</p>
+                            <div class="max-h-32 overflow-y-auto bg-gray-50 rounded-xl p-3 space-y-1.5">
+                                @foreach($this->selectedItemsData->take(5) as $item)
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span class="font-mono bg-white px-2 py-0.5 rounded border">{{ $item->barcode }}</span>
+                                    <span class="text-gray-600 truncate">{{ Str::limit($item->book?->title, 40) }}</span>
+                                </div>
+                                @endforeach
+                                @if(count($selectedItems) > 5)
+                                <p class="text-xs text-gray-400 italic">... dan {{ count($selectedItems) - 5 }} lainnya</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Footer --}}
+                    <div class="p-5 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3">
+                        <button wire:click="closePrintModal" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">
+                            <i class="fas fa-times mr-1"></i> Batal
+                        </button>
+                        <button wire:click="confirmPrint" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition">
+                            <i class="fas fa-print mr-1"></i> Cetak Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+@script
+<script>
+$wire.on('notify', ({ type, message }) => {
+    Swal.fire({
+        icon: type === 'success' ? 'success' : (type === 'error' ? 'error' : 'info'),
+        title: type === 'success' ? 'Berhasil!' : (type === 'error' ? 'Gagal!' : 'Info'),
+        text: message,
+        timer: 2500,
+        showConfirmButton: false,
+        timerProgressBar: true
+    });
+});
+</script>
+@endscript
 </div>

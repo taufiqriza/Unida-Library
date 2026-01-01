@@ -17,6 +17,8 @@ class BiblioList extends Component
     public $viewMode = 'list';
     public $activeTab = 'biblio'; // 'biblio' or 'items'
     public $deleteConfirmId = null;
+    public $quickViewId = null;
+    public $showPrintModal = false;
     public $selectedItems = [];
     public $selectAll = false;
     public $filterBranch = '';
@@ -66,6 +68,15 @@ class BiblioList extends Component
 
     public function confirmDelete($id) { $this->deleteConfirmId = $id; }
     public function cancelDelete() { $this->deleteConfirmId = null; }
+    
+    public function quickView($id) { $this->quickViewId = $id; }
+    public function closeQuickView() { $this->quickViewId = null; }
+    
+    public function getQuickViewBookProperty()
+    {
+        if (!$this->quickViewId) return null;
+        return Book::with(['authors', 'subjects', 'publisher', 'place', 'mediaType', 'items'])->find($this->quickViewId);
+    }
 
     public function delete()
     {
@@ -88,9 +99,24 @@ class BiblioList extends Component
             $this->dispatch('notify', type: 'error', message: 'Pilih minimal 1 eksemplar');
             return;
         }
-        
-        // Redirect to print page with selected items
+        $this->showPrintModal = true;
+    }
+
+    public function closePrintModal()
+    {
+        $this->showPrintModal = false;
+    }
+
+    public function confirmPrint()
+    {
+        $this->showPrintModal = false;
         return redirect()->route('print.barcodes', ['items' => implode(',', $this->selectedItems)]);
+    }
+
+    public function getSelectedItemsDataProperty()
+    {
+        if (empty($this->selectedItems)) return collect();
+        return \App\Models\Item::with('book')->whereIn('id', $this->selectedItems)->get();
     }
 
     protected function getBranchFilter()
@@ -116,7 +142,7 @@ class BiblioList extends Component
                 'book:id,title,isbn',
                 'collectionType:id,name',
                 'location:id,name',
-                'itemStatus:id,name,color'
+                'itemStatus:id,name'
             ])
             ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
             ->when($this->search, function ($query) {

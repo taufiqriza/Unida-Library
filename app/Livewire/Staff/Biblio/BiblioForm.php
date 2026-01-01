@@ -8,397 +8,441 @@ use App\Models\Subject;
 use App\Models\Publisher;
 use App\Models\Place;
 use App\Models\Branch;
+use App\Models\Location;
+use App\Models\ItemStatus;
 use App\Models\MediaType;
 use App\Models\ContentType;
 use App\Models\Frequency;
 use App\Services\CallNumberService;
-use Filament\Forms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
-use Filament\Notifications\Notification;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\View\View;
 
-class BiblioForm extends Component implements HasForms, HasActions
+class BiblioForm extends Component
 {
-    use InteractsWithForms;
-    use InteractsWithActions;
+    use WithFileUploads;
 
+    public int $step = 1;
+    public int $totalSteps = 4;
+    
     public ?Book $book = null;
-    public ?array $data = [];
+    public bool $isEdit = false;
+
+    // Step 1: Info Utama
+    public ?int $branch_id = null;
+    public ?int $location_id = null;
+    public string $title = '';
+    public ?string $edition = null;
+    public ?string $spec_detail_info = null;
+    public ?int $media_type_id = null;
+    public ?int $content_type_id = null;
+    public int $item_qty = 1;
+
+    // Step 2: Penulis & Subjek
+    public array $selectedAuthors = [];
+    public array $selectedSubjects = [];
+    public string $authorSearch = '';
+    public string $subjectSearch = '';
+    public array $authorResults = [];
+    public array $subjectResults = [];
+
+    // Step 3: Penerbitan & Klasifikasi
+    public ?int $publisher_id = null;
+    public ?int $place_id = null;
+    public ?string $publish_year = null;
+    public ?string $collation = null;
+    public ?string $isbn = null;
+    public string $language = 'id';
+    public ?string $classification = null;
+    public ?string $call_number = null;
+    public ?string $series_title = null;
+    public ?int $frequency_id = null;
+
+    // Step 4: Detail & File
+    public ?string $abstract = null;
+    public ?string $notes = null;
+    public $cover_image = null;
+    public bool $is_opac_visible = true;
+    public bool $promoted = false;
+
+    // Master data (preloaded)
+    public $branches = [];
+    public $locations = [];
+    public $mediaTypes = [];
+    public $contentTypes = [];
+    public $frequencies = [];
+    public $places = [];
+    public $languages = [];
+
+    protected function rules(): array
+    {
+        return [
+            'title' => 'required|min:3|max:500',
+            'branch_id' => 'required|exists:branches,id',
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'title.required' => 'Judul wajib diisi',
+            'title.min' => 'Judul minimal 3 karakter',
+            'branch_id.required' => 'Lokasi/cabang wajib dipilih',
+        ];
+    }
 
     public function mount($id = null): void
     {
+        $this->loadMasterData();
+        
+        $user = auth()->user();
+        $this->branch_id = $user->branch_id ?? Branch::first()?->id;
+        $this->loadLocations();
+
         if ($id) {
-            $this->book = Book::withoutGlobalScopes()->with(['authors', 'subjects'])->findOrFail($id);
-            $this->form->fill([
-                ...$this->book->toArray(),
-                'authors' => $this->book->authors->pluck('id')->toArray(),
-                'subjects' => $this->book->subjects->pluck('id')->toArray(),
-            ]);
-        } else {
-            $this->form->fill([
-                'branch_id' => auth()->user()->branch_id ?? 1,
-                'is_opac_visible' => true,
-                'language' => 'id',
-                'item_qty' => 1,
-            ]);
+            $this->book = Book::withoutGlobalScopes()->with(['authors', 'subjects', 'items'])->findOrFail($id);
+            $this->isEdit = true;
+            $this->loadBookData();
         }
     }
 
-    public function form(Form $form): Form
+    protected function loadMasterData(): void
     {
-        return $form
-            ->schema([
-                Forms\Components\Tabs::make('Bibliography')
-                    ->tabs([
-                        // Tab 1: Informasi Utama
-                        Forms\Components\Tabs\Tab::make('Informasi Utama')
-                            ->icon('heroicon-o-information-circle')
-                            ->schema([
-                                Forms\Components\Select::make('branch_id')
-                                    ->label('Lokasi')
-                                    ->options(function () {
-                                        $user = auth()->user();
-                                        // Only super_admin can see all branches
-                                        if ($user->role === 'super_admin') {
-                                            return Branch::orderBy('name')->pluck('name', 'id');
-                                        }
-                                        // Others only see their own branch
-                                        return Branch::where('id', $user->branch_id)->pluck('name', 'id');
-                                    })
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->disabled(fn () => auth()->user()->role !== 'super_admin')
-                                    ->dehydrated()
-                                    ->default(fn () => auth()->user()->branch_id ?? 1),
-                                Forms\Components\Select::make('media_type_id')
-                                    ->label('GMD')
-                                    ->options(MediaType::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->helperText('General Material Designation')
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')->required(),
-                                        Forms\Components\TextInput::make('code')->maxLength(10),
-                                    ])
-                                    ->createOptionUsing(fn (array $data) => MediaType::create($data)->id),
-                                Forms\Components\Select::make('content_type_id')
-                                    ->label('Content Type')
-                                    ->options(ContentType::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->native(false)
-                                    ->helperText('RDA Content Type'),
-                                Forms\Components\TextInput::make('item_qty')
-                                    ->label('Jml Eksemplar')
-                                    ->numeric()
-                                    ->default(1)
-                                    ->minValue(0)
-                                    ->maxValue(100)
-                                    ->visible(fn () => !$this->book),
-                                Forms\Components\TextInput::make('title')
-                                    ->label('Judul')
-                                    ->required()
-                                    ->maxLength(500)
-                                    ->live(onBlur: true)
-                                    ->columnSpanFull(),
-                                Forms\Components\TextInput::make('edition')
-                                    ->label('Edisi'),
-                                Forms\Components\TextInput::make('spec_detail_info')
-                                    ->label('Info Detail Khusus')
-                                    ->helperText('Untuk terbitan berseri: Vol, No'),
-                            ])->columns(4),
-
-                        // Tab 2: Penulis & Subjek
-                        Forms\Components\Tabs\Tab::make('Penulis & Subjek')
-                            ->icon('heroicon-o-users')
-                            ->schema([
-                                Forms\Components\Select::make('authors')
-                                    ->label('Penulis')
-                                    ->multiple()
-                                    ->options(Author::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->live()
-                                    ->helperText('Tambahkan penulis utama dan tambahan')
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')->label('Nama Penulis')->required(),
-                                        Forms\Components\Radio::make('type')
-                                            ->label('Tipe Kepengarangan')
-                                            ->options([
-                                                'personal' => 'Personal Name (p)',
-                                                'organizational' => 'Organizational Body (o)',
-                                                'conference' => 'Conference (c)',
-                                            ])
-                                            ->default('personal')
-                                            ->inline(),
-                                    ])
-                                    ->createOptionUsing(fn (array $data) => Author::create($data)->id),
-                                Forms\Components\Select::make('subjects')
-                                    ->label('Subjek/Topik')
-                                    ->multiple()
-                                    ->options(Subject::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->helperText('Subjek atau topik buku')
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')->label('Subjek')->required(),
-                                        Forms\Components\Radio::make('type')
-                                            ->label('Tipe Subjek')
-                                            ->options([
-                                                'topic' => 'Topik (t)',
-                                                'geographic' => 'Geografis (g)',
-                                                'name' => 'Nama (n)',
-                                                'temporal' => 'Temporal (tm)',
-                                                'genre' => 'Genre (gr)',
-                                            ])
-                                            ->default('topic')
-                                            ->columns(2),
-                                    ])
-                                    ->createOptionUsing(fn (array $data) => Subject::create($data)->id),
-                            ])->columns(2),
-
-                        // Tab 3: Penerbitan
-                        Forms\Components\Tabs\Tab::make('Penerbitan')
-                            ->icon('heroicon-o-building-office')
-                            ->schema([
-                                Forms\Components\Select::make('publisher_id')
-                                    ->label('Penerbit')
-                                    ->options(Publisher::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->preload()
-                                    ->native(false)
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')->label('Nama Penerbit')->required(),
-                                    ])
-                                    ->createOptionUsing(fn (array $data) => Publisher::create($data)->id),
-                                Forms\Components\Select::make('place_id')
-                                    ->label('Tempat Terbit')
-                                    ->options(Place::pluck('name', 'id'))
-                                    ->searchable()
-                                    ->native(false)
-                                    ->createOptionForm([
-                                        Forms\Components\TextInput::make('name')->label('Nama Kota')->required(),
-                                    ])
-                                    ->createOptionUsing(fn (array $data) => Place::create($data)->id),
-                                Forms\Components\TextInput::make('publish_year')
-                                    ->label('Tahun Terbit')
-                                    ->maxLength(4)
-                                    ->numeric(),
-                                Forms\Components\TextInput::make('collation')
-                                    ->label('Kolasi')
-                                    ->helperText('Contoh: xii, 350 hlm. : ilus. ; 21 cm')
-                                    ->maxLength(100),
-                                Forms\Components\TextInput::make('isbn')
-                                    ->label('ISBN/ISSN')
-                                    ->maxLength(20),
-                                Forms\Components\Select::make('language')
-                                    ->label('Bahasa')
-                                    ->options([
-                                        'id' => 'Indonesia',
-                                        'en' => 'English',
-                                        'ar' => 'Arabic',
-                                        'zh' => 'Chinese',
-                                        'ja' => 'Japanese',
-                                    ])
-                                    ->default('id')
-                                    ->native(false)
-                                    ->searchable(),
-                            ])->columns(3),
-
-                        // Tab 4: Klasifikasi
-                        Forms\Components\Tabs\Tab::make('Klasifikasi')
-                            ->icon('heroicon-o-tag')
-                            ->schema([
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('classification')
-                                            ->label('No. Klasifikasi')
-                                            ->maxLength(40)
-                                            ->hint('Nomor DDC/UDC')
-                                            ->hintIcon('heroicon-o-information-circle')
-                                            ->live(onBlur: true)
-                                            ->suffixAction(
-                                                Forms\Components\Actions\Action::make('searchDdc')
-                                                    ->label('Cari DDC')
-                                                    ->icon('heroicon-o-book-open')
-                                                    ->color('primary')
-                                                    ->modalHeading('DDC Lookup - Dewey Decimal Classification')
-                                                    ->modalDescription('Cari dan pilih nomor klasifikasi yang sesuai')
-                                                    ->modalWidth('3xl')
-                                                    ->modalSubmitAction(false)
-                                                    ->modalCancelActionLabel('Tutup')
-                                                    ->modalContent(fn () => view('filament.components.ddc-lookup-modal'))
-                                            ),
-                                        Forms\Components\TextInput::make('call_number')
-                                            ->label('No. Panggil')
-                                            ->hint('Format: S Klasifikasi Penulis Judul')
-                                            ->hintIcon('heroicon-o-information-circle')
-                                            ->maxLength(50)
-                                            ->placeholder('Klik Generate →')
-                                            ->suffixAction(
-                                                Forms\Components\Actions\Action::make('generateCallNumber')
-                                                    ->label('Generate')
-                                                    ->icon('heroicon-o-sparkles')
-                                                    ->color('success')
-                                                    ->action(function (Forms\Get $get, Forms\Set $set) {
-                                                        $classification = $get('classification');
-                                                        $title = $get('title');
-                                                        $authors = $get('authors');
-                                                        
-                                                        $sor = '';
-                                                        if (!empty($authors) && is_array($authors)) {
-                                                            $author = Author::find($authors[0]);
-                                                            $sor = $author?->name ?? '';
-                                                        }
-                                                        
-                                                        $authorCode = CallNumberService::getAuthorCode($sor);
-                                                        $titleCode = CallNumberService::getTitleCode($title);
-                                                        
-                                                        $parts = array_filter(['S', $classification, $authorCode, $titleCode]);
-                                                        $callNumber = implode(' ', $parts);
-                                                        $set('call_number', $callNumber);
-                                                        
-                                                        Notification::make()
-                                                            ->title('Nomor panggil berhasil di-generate')
-                                                            ->success()
-                                                            ->send();
-                                                    })
-                                            ),
-                                    ]),
-                                Forms\Components\TextInput::make('series_title')
-                                    ->label('Judul Seri')
-                                    ->maxLength(200),
-                                Forms\Components\Select::make('frequency_id')
-                                    ->label('Frekuensi')
-                                    ->options(Frequency::pluck('name', 'id'))
-                                    ->native(false)
-                                    ->hint('Untuk terbitan berseri'),
-                            ])->columns(2),
-
-                        // Tab 5: Abstrak & Catatan
-                        Forms\Components\Tabs\Tab::make('Abstrak & Catatan')
-                            ->icon('heroicon-o-document-text')
-                            ->schema([
-                                Forms\Components\Textarea::make('abstract')
-                                    ->label('Abstrak/Ringkasan')
-                                    ->rows(5)
-                                    ->columnSpanFull(),
-                                Forms\Components\Textarea::make('notes')
-                                    ->label('Catatan')
-                                    ->rows(3)
-                                    ->columnSpanFull(),
-                            ]),
-
-                        // Tab 6: Gambar & File
-                        Forms\Components\Tabs\Tab::make('Gambar & File')
-                            ->icon('heroicon-o-photo')
-                            ->schema([
-                                Forms\Components\FileUpload::make('image')
-                                    ->label('Gambar Sampul')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('covers')
-                                    ->visibility('public')
-                                    ->maxSize(2048)
-                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->helperText('Upload gambar sampul buku (max 2MB, JPG/PNG/WebP)'),
-                            ]),
-
-                        // Tab 7: Pengaturan OPAC
-                        Forms\Components\Tabs\Tab::make('Pengaturan')
-                            ->icon('heroicon-o-cog-6-tooth')
-                            ->schema([
-                                Forms\Components\Toggle::make('is_opac_visible')
-                                    ->label('Tampilkan di OPAC')
-                                    ->default(true)
-                                    ->helperText('Tampilkan bibliografi ini di OPAC publik'),
-                                Forms\Components\Toggle::make('opac_hide')
-                                    ->label('Sembunyikan dari OPAC')
-                                    ->helperText('Sembunyikan sementara dari OPAC'),
-                                Forms\Components\Toggle::make('promoted')
-                                    ->label('Promosikan')
-                                    ->helperText('Tampilkan di halaman utama OPAC'),
-                                Forms\Components\TextInput::make('labels')
-                                    ->label('Label')
-                                    ->helperText('Label tambahan, pisahkan dengan koma'),
-                            ])->columns(4),
-                    ])
-                    ->columnSpanFull()
-                    ->persistTabInQueryString(),
-            ])
-            ->statePath('data');
+        $user = auth()->user();
+        
+        // Branches - super_admin sees all
+        if ($user->role === 'super_admin') {
+            $this->branches = Branch::orderBy('name')->pluck('name', 'id')->toArray();
+        } else {
+            $this->branches = Branch::where('id', $user->branch_id)->pluck('name', 'id')->toArray();
+        }
+        
+        $this->mediaTypes = MediaType::orderBy('name')->pluck('name', 'id')->toArray();
+        $this->contentTypes = ContentType::orderBy('name')->pluck('name', 'id')->toArray();
+        $this->frequencies = Frequency::orderBy('name')->pluck('name', 'id')->toArray();
+        $this->places = Place::orderBy('name')->pluck('name', 'id')->toArray();
+        
+        $this->languages = [
+            'id' => 'Indonesia',
+            'en' => 'English', 
+            'ar' => 'Arabic',
+            'zh' => 'Chinese',
+            'ja' => 'Japanese',
+        ];
     }
 
-    public function create(): void
+    protected function loadBookData(): void
     {
-        $this->save();
+        $b = $this->book;
+        $this->branch_id = $b->branch_id;
+        $this->title = $b->title;
+        $this->edition = $b->edition;
+        $this->spec_detail_info = $b->spec_detail_info;
+        $this->media_type_id = $b->media_type_id;
+        $this->content_type_id = $b->content_type_id;
+        $this->publisher_id = $b->publisher_id;
+        $this->place_id = $b->place_id;
+        $this->publish_year = $b->publish_year;
+        $this->collation = $b->collation;
+        $this->isbn = $b->isbn;
+        $this->language = $b->language ?? 'id';
+        $this->classification = $b->classification;
+        $this->call_number = $b->call_number;
+        $this->series_title = $b->series_title;
+        $this->frequency_id = $b->frequency_id;
+        $this->abstract = $b->abstract;
+        $this->notes = $b->notes;
+        $this->is_opac_visible = $b->is_opac_visible ?? true;
+        $this->promoted = $b->promoted ?? false;
+        
+        // Load relations
+        $this->selectedAuthors = $b->authors->map(fn($a) => [
+            'id' => $a->id, 
+            'name' => $a->name
+        ])->toArray();
+        
+        $this->selectedSubjects = $b->subjects->map(fn($s) => [
+            'id' => $s->id,
+            'name' => $s->name
+        ])->toArray();
     }
 
+    // Update locations when branch changes
+    public function updatedBranchId($value): void
+    {
+        $this->loadLocations();
+        $this->location_id = null;
+    }
+
+    protected function loadLocations(): void
+    {
+        $this->locations = $this->branch_id 
+            ? Location::where('branch_id', $this->branch_id)->orderBy('name')->pluck('name', 'id')->toArray()
+            : [];
+    }
+
+    // Step Navigation
+    public function nextStep(): void
+    {
+        if ($this->validateCurrentStep()) {
+            if ($this->step < $this->totalSteps) {
+                $this->step++;
+            }
+        }
+    }
+
+    public function previousStep(): void
+    {
+        if ($this->step > 1) {
+            $this->step--;
+        }
+    }
+
+    public function goToStep(int $step): void
+    {
+        if ($step >= 1 && $step < $this->step) {
+            $this->step = $step;
+        }
+    }
+
+    protected function validateCurrentStep(): bool
+    {
+        $rules = match($this->step) {
+            1 => [
+                'title' => 'required|min:3|max:500',
+                'branch_id' => 'required',
+            ],
+            2 => [], // Authors/subjects optional
+            3 => [], // Publishing info optional
+            4 => [
+                'cover_image' => 'nullable|image|max:2048',
+            ],
+            default => [],
+        };
+
+        if (!empty($rules)) {
+            $this->validate($rules, $this->messages());
+        }
+        return true;
+    }
+
+    // Auto-trigger search when typing
+    public function updatedAuthorSearch(): void
+    {
+        $this->searchAuthors();
+    }
+
+    public function updatedSubjectSearch(): void
+    {
+        $this->searchSubjects();
+    }
+
+    // Author Search
+    public function searchAuthors(): void
+    {
+        if (strlen($this->authorSearch) < 2) {
+            $this->authorResults = [];
+            return;
+        }
+        
+        $this->authorResults = Author::where('name', 'like', "%{$this->authorSearch}%")
+            ->limit(10)
+            ->get(['id', 'name'])
+            ->toArray();
+    }
+
+    public function addAuthor(int $id, string $name): void
+    {
+        if (!collect($this->selectedAuthors)->contains('id', $id)) {
+            $this->selectedAuthors[] = ['id' => $id, 'name' => $name];
+        }
+        $this->authorSearch = '';
+        $this->authorResults = [];
+    }
+
+    public function removeAuthor(int $id): void
+    {
+        $this->selectedAuthors = array_values(
+            array_filter($this->selectedAuthors, fn($a) => $a['id'] !== $id)
+        );
+    }
+
+    public function createAuthor(): void
+    {
+        if (strlen($this->authorSearch) < 2) return;
+        
+        $author = Author::create(['name' => $this->authorSearch, 'type' => 'personal']);
+        $this->addAuthor($author->id, $author->name);
+    }
+
+    // Subject Search
+    public function searchSubjects(): void
+    {
+        if (strlen($this->subjectSearch) < 2) {
+            $this->subjectResults = [];
+            return;
+        }
+        
+        $this->subjectResults = Subject::where('name', 'like', "%{$this->subjectSearch}%")
+            ->limit(10)
+            ->get(['id', 'name'])
+            ->toArray();
+    }
+
+    public function addSubject(int $id, string $name): void
+    {
+        if (!collect($this->selectedSubjects)->contains('id', $id)) {
+            $this->selectedSubjects[] = ['id' => $id, 'name' => $name];
+        }
+        $this->subjectSearch = '';
+        $this->subjectResults = [];
+    }
+
+    public function removeSubject(int $id): void
+    {
+        $this->selectedSubjects = array_values(
+            array_filter($this->selectedSubjects, fn($s) => $s['id'] !== $id)
+        );
+    }
+
+    public function createSubject(): void
+    {
+        if (strlen($this->subjectSearch) < 2) return;
+        
+        $subject = Subject::create(['name' => $this->subjectSearch, 'type' => 'topic']);
+        $this->addSubject($subject->id, $subject->name);
+    }
+
+    // Publisher Search (via API)
+    public function getPublisherName(): ?string
+    {
+        if (!$this->publisher_id) return null;
+        return Publisher::find($this->publisher_id)?->name;
+    }
+
+    // Generate Call Number
+    public function generateCallNumber(): void
+    {
+        $authorCode = '';
+        if (!empty($this->selectedAuthors)) {
+            $authorCode = CallNumberService::getAuthorCode($this->selectedAuthors[0]['name']);
+        }
+        
+        $titleCode = CallNumberService::getTitleCode($this->title);
+        
+        $parts = array_filter(['S', $this->classification, $authorCode, $titleCode]);
+        $this->call_number = implode(' ', $parts);
+        
+        $this->dispatch('notify', type: 'success', message: 'Nomor panggil berhasil di-generate');
+    }
+
+    // Apply DDC from modal
+    public function applyDdc(string $code): void
+    {
+        $this->classification = $code;
+    }
+
+    // Save
     public function save(): void
     {
-        $data = $this->form->getState();
-        $data['user_id'] = auth()->id();
-        
-        $itemQty = $data['item_qty'] ?? 1;
-        unset($data['item_qty']);
-        
-        // Extract relations
-        $authors = $data['authors'] ?? [];
-        $subjects = $data['subjects'] ?? [];
-        unset($data['authors'], $data['subjects']);
+        $this->validate([
+            'title' => 'required|min:3',
+            'branch_id' => 'required',
+        ]);
 
-        if ($this->book) {
+        $data = [
+            'branch_id' => $this->branch_id,
+            'user_id' => auth()->id(),
+            'title' => $this->title,
+            'edition' => $this->edition,
+            'spec_detail_info' => $this->spec_detail_info,
+            'media_type_id' => $this->media_type_id,
+            'content_type_id' => $this->content_type_id,
+            'publisher_id' => $this->publisher_id,
+            'place_id' => $this->place_id,
+            'publish_year' => $this->publish_year,
+            'collation' => $this->collation,
+            'isbn' => $this->isbn,
+            'language' => $this->language,
+            'classification' => $this->classification,
+            'call_number' => $this->call_number,
+            'series_title' => $this->series_title,
+            'frequency_id' => $this->frequency_id,
+            'abstract' => $this->abstract,
+            'notes' => $this->notes,
+            'is_opac_visible' => $this->is_opac_visible,
+            'promoted' => $this->promoted,
+        ];
+
+        // Handle cover upload
+        if ($this->cover_image) {
+            $data['image'] = $this->cover_image->store('covers', 'public');
+        }
+
+        $authorIds = collect($this->selectedAuthors)->pluck('id')->toArray();
+        $subjectIds = collect($this->selectedSubjects)->pluck('id')->toArray();
+
+        if ($this->isEdit) {
             $this->book->update($data);
-            $this->book->authors()->sync($authors);
-            $this->book->subjects()->sync($subjects);
+            $this->book->authors()->sync($authorIds);
+            $this->book->subjects()->sync($subjectIds);
             $message = 'Bibliografi berhasil diperbarui.';
         } else {
             $book = Book::create($data);
-            $book->authors()->sync($authors);
-            $book->subjects()->sync($subjects);
+            $book->authors()->sync($authorIds);
+            $book->subjects()->sync($subjectIds);
             
-            // Get default location for branch
-            $defaultLocation = \App\Models\Location::where('branch_id', $data['branch_id'])->first();
-            
-            // Get default item status (Tersedia)
-            $defaultStatus = \App\Models\ItemStatus::where('name', 'like', '%Tersedia%')->first()
-                ?? \App\Models\ItemStatus::first();
-            
-            // Generate items
-            for ($i = 0; $i < $itemQty; $i++) {
-                $book->items()->create([
-                    'branch_id' => $data['branch_id'],
-                    'call_number' => $data['call_number'] ?? null,
-                    'location_id' => $defaultLocation?->id,
-                    'item_status_id' => $defaultStatus?->id,
-                    'source' => 'purchase',
-                    'barcode' => 'B' . now()->format('ymd') . rand(1000, 9999),
-                    'inventory_code' => 'ITM' . Str::random(5),
-                ]);
-            }
-            
-            $message = "Bibliografi berhasil ditambahkan dengan {$itemQty} eksemplar.";
+            // Create items
+            $this->createItems($book);
+            $message = "Bibliografi berhasil ditambahkan dengan {$this->item_qty} eksemplar.";
         }
 
-        Notification::make()
-            ->title($message)
-            ->success()
-            ->send();
-
-        $this->redirect(route('staff.biblio.index'));
+        $this->dispatch('showSuccess', title: 'Berhasil!', message: $message);
+        
+        $this->redirect(route('staff.biblio.index'), navigate: true);
     }
 
-    public function render(): View
+    protected function createItems(Book $book): void
+    {
+        // Use selected location or get default for branch
+        $locationId = $this->location_id 
+            ?? Location::where('branch_id', $this->branch_id)->first()?->id;
+            
+        $defaultStatus = ItemStatus::where('name', 'like', '%Tersedia%')->first() 
+            ?? ItemStatus::first();
+
+        // Get last inventory number for this branch today
+        $today = now()->format('ymd');
+        $lastItem = \App\Models\Item::where('inventory_code', 'like', "INV-{$this->branch_id}-{$today}-%")
+            ->orderByDesc('inventory_code')
+            ->first();
+        $lastNum = $lastItem ? (int) substr($lastItem->inventory_code, -4) : 0;
+
+        for ($i = 0; $i < $this->item_qty; $i++) {
+            $lastNum++;
+            $book->items()->create([
+                'branch_id' => $this->branch_id,
+                'call_number' => $this->call_number,
+                'location_id' => $locationId,
+                'item_status_id' => $defaultStatus?->id,
+                'source' => 'purchase',
+                'barcode' => 'B' . $today . str_pad($lastNum, 4, '0', STR_PAD_LEFT),
+                'inventory_code' => "INV-{$this->branch_id}-{$today}-" . str_pad($lastNum, 4, '0', STR_PAD_LEFT),
+            ]);
+        }
+    }
+
+    public function getCompletionPercentageProperty(): int
+    {
+        $completed = 0;
+        if ($this->title && $this->branch_id) $completed++;
+        if (!empty($this->selectedAuthors)) $completed++;
+        if ($this->classification || $this->call_number) $completed++;
+        if ($this->is_opac_visible !== null) $completed++;
+        return (int)(($completed / 4) * 100);
+    }
+
+    public function render()
     {
         return view('livewire.staff.biblio.biblio-form')
             ->extends('staff.layouts.app')
