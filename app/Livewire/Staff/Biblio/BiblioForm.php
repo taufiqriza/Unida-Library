@@ -365,14 +365,23 @@ class BiblioForm extends Component implements HasForms, HasActions
             $book->authors()->sync($authors);
             $book->subjects()->sync($subjects);
             
+            // Get default location for branch
+            $defaultLocation = \App\Models\Location::where('branch_id', $data['branch_id'])->first();
+            
+            // Get default item status (Tersedia)
+            $defaultStatus = \App\Models\ItemStatus::where('name', 'like', '%Tersedia%')->first()
+                ?? \App\Models\ItemStatus::first();
+            
             // Generate items
             for ($i = 0; $i < $itemQty; $i++) {
                 $book->items()->create([
                     'branch_id' => $data['branch_id'],
+                    'call_number' => $data['call_number'] ?? null,
+                    'location_id' => $defaultLocation?->id,
+                    'item_status_id' => $defaultStatus?->id,
                     'source' => 'purchase',
-                    'status' => 'available',
                     'barcode' => 'B' . now()->format('ymd') . rand(1000, 9999),
-                    'item_code' => 'ITM' . Str::random(5),
+                    'inventory_code' => 'ITM' . Str::random(5),
                 ]);
             }
             
