@@ -12,7 +12,7 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                     <th class="px-4 py-3 text-left font-medium w-20">Cover</th>
                     <th class="px-4 py-3 text-left font-medium">Judul & Info</th>
                     <th class="px-4 py-3 text-center font-medium w-16">Tahun</th>
-                    <th class="px-4 py-3 text-left font-medium w-28">Media</th>
+                    <th class="px-4 py-3 text-left font-medium w-36">Media</th>
                     <th class="px-4 py-3 text-left font-medium w-40">Input By</th>
                     <th class="px-4 py-3 text-center font-medium w-24">Aksi</th>
                 </tr>

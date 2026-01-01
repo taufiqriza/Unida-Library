@@ -6,10 +6,15 @@ use App\Models\Item;
 use App\Models\Loan;
 use App\Models\Member;
 use App\Models\Fine;
+use Illuminate\Support\Str;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class CirculationTransaction extends Component
 {
+    use WithPagination;
+    
+    public string $tab = 'transaction';
     public ?string $memberBarcode = '';
     public ?string $itemBarcode = '';
     public ?Member $activeMember = null;
@@ -19,11 +24,42 @@ class CirculationTransaction extends Component
     public $todayLoans = 0;
     public $todayReturns = 0;
     public $overdueCount = 0;
+    public $activeLoansCount = 0;
+    
+    // History filters
+    public string $searchHistory = '';
+    public int $filterDays = 7;
+    
+    // Branch filter
+    public $selectedBranchId = '';
+
+    protected $queryString = ['tab'];
 
     public function mount(): void
     {
+        $this->selectedBranchId = auth()->user()->branch_id ?? '';
         $this->loadFromSession();
-        $this->loadTodayStats();
+        $this->loadStats();
+    }
+    
+    public function updatedSelectedBranchId(): void
+    {
+        $this->loadStats();
+    }
+    
+    public function getBranchIdProperty()
+    {
+        return $this->selectedBranchId ?: null;
+    }
+    
+    public function getIsSuperAdminProperty(): bool
+    {
+        return auth()->user()->role === 'super_admin' || auth()->user()->branch_id === null;
+    }
+    
+    public function getBranchesProperty()
+    {
+        return \App\Models\Branch::orderBy('name')->get();
     }
 
     protected function loadFromSession(): void
@@ -34,22 +70,20 @@ class CirculationTransaction extends Component
         }
     }
 
-    protected function loadTodayStats(): void
+    protected function loadStats(): void
     {
-        $branchId = auth()->user()->branch_id;
+        $branchId = $this->branchId;
+        $startOfMonth = now()->startOfMonth();
         
-        $this->todayLoans = Loan::where('branch_id', $branchId)
-            ->whereDate('loan_date', today())
-            ->count();
-            
-        $this->todayReturns = Loan::where('branch_id', $branchId)
-            ->whereDate('return_date', today())
-            ->count();
-            
-        $this->overdueCount = Loan::where('branch_id', $branchId)
-            ->where('is_returned', false)
-            ->where('due_date', '<', now())
-            ->count();
+        $query = Loan::query();
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+        
+        $this->todayLoans = (clone $query)->where('loan_date', '>=', $startOfMonth)->count();
+        $this->todayReturns = (clone $query)->whereNotNull('return_date')->where('return_date', '>=', $startOfMonth)->count();
+        $this->overdueCount = (clone $query)->where('is_returned', false)->where('due_date', '<', now())->count();
+        $this->activeLoansCount = (clone $query)->where('is_returned', false)->count();
     }
 
     protected function loadActiveLoans(): void
@@ -63,27 +97,77 @@ class CirculationTransaction extends Component
         }
     }
 
+    // Search suggestions
+    public $memberSuggestions = [];
+    public $itemSuggestions = [];
+
+    public function updatedMemberBarcode($value): void
+    {
+        $value = trim($value);
+        if (strlen($value) >= 2) {
+            $branchId = auth()->user()->branch_id;
+            $this->memberSuggestions = Member::with('memberType')
+                ->where('is_active', true)
+                ->where(function($q) use ($branchId) {
+                    if ($branchId) $q->where('branch_id', $branchId);
+                })
+                ->where(function($q) use ($value) {
+                    $q->where('name', 'like', "%{$value}%")
+                      ->orWhere('member_id', 'like', "%{$value}%")
+                      ->orWhere('email', 'like', "%{$value}%");
+                })
+                ->limit(5)
+                ->get();
+        } else {
+            $this->memberSuggestions = [];
+        }
+    }
+
+    public function selectMember($memberId): void
+    {
+        $member = Member::with('memberType')->find($memberId);
+        if ($member) {
+            $this->activeMember = $member;
+            session(['staff_circulation_member_id' => $member->id]);
+            $this->loadActiveLoans();
+            $this->memberBarcode = '';
+            $this->memberSuggestions = [];
+            
+            if ($member->isExpired()) {
+                $this->alert('warning', 'Keanggotaan kadaluarsa', $member->name);
+            } else {
+                $this->alert('success', 'Transaksi dimulai', $member->name);
+            }
+        }
+    }
+
     public function startTransaction(): void
     {
         $this->memberBarcode = trim($this->memberBarcode);
         
         if (empty($this->memberBarcode)) {
-            session()->flash('error', 'Masukkan nomor anggota');
+            $this->alert('error', 'Masukkan nama atau nomor anggota');
             return;
         }
 
+        $branchId = auth()->user()->branch_id;
         $member = Member::with('memberType')
-            ->where('member_id', $this->memberBarcode)
-            ->orWhere('id', $this->memberBarcode)
+            ->where(function($q) use ($branchId) {
+                if ($branchId) $q->where('branch_id', $branchId);
+            })
+            ->where(function($q) {
+                $q->where('member_id', $this->memberBarcode)
+                  ->orWhere('id', $this->memberBarcode);
+            })
             ->first();
 
         if (!$member) {
-            session()->flash('error', 'Anggota tidak ditemukan');
+            $this->alert('error', 'Anggota tidak ditemukan', $this->memberBarcode);
             return;
         }
 
         if (!$member->is_active) {
-            session()->flash('error', 'Keanggotaan tidak aktif');
+            $this->alert('error', 'Keanggotaan tidak aktif', $member->name);
             return;
         }
 
@@ -91,69 +175,103 @@ class CirculationTransaction extends Component
         session(['staff_circulation_member_id' => $member->id]);
         $this->loadActiveLoans();
         $this->memberBarcode = '';
+        $this->memberSuggestions = [];
 
         if ($member->isExpired()) {
-            session()->flash('warning', 'Perhatian: Keanggotaan sudah kadaluarsa');
+            $this->alert('warning', 'Keanggotaan kadaluarsa', $member->name);
         } else {
-            session()->flash('success', "Transaksi dimulai: {$member->name}");
+            $this->alert('success', 'Transaksi dimulai', $member->name);
         }
+    }
+
+    public function updatedItemBarcode($value): void
+    {
+        $value = trim($value);
+        if (strlen($value) >= 2) {
+            $branchId = auth()->user()->branch_id;
+            $query = Item::withoutGlobalScopes()
+                ->with('book')
+                ->whereDoesntHave('loans', fn($q) => $q->where('is_returned', false))
+                ->where(function($q) use ($value) {
+                    $q->where('barcode', 'like', "%{$value}%")
+                      ->orWhereHas('book', fn($b) => $b->where('title', 'like', "%{$value}%"));
+                });
+            
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+            
+            $this->itemSuggestions = $query->limit(8)->get();
+        } else {
+            $this->itemSuggestions = [];
+        }
+    }
+
+    public function selectItem($itemId): void
+    {
+        $this->itemBarcode = Item::find($itemId)?->barcode ?? '';
+        $this->itemSuggestions = [];
+        $this->loanItem();
+    }
+
+    protected function alert($type, $title, $message = ''): void
+    {
+        $this->dispatch('circulation-alert', type: $type, title: $title, message: $message);
     }
 
     public function loanItem(): void
     {
         if (!$this->activeMember) {
-            session()->flash('error', 'Pilih anggota terlebih dahulu');
+            $this->alert('error', 'Pilih anggota terlebih dahulu');
             return;
         }
 
         if ($this->activeMember->isExpired()) {
-            session()->flash('error', 'Keanggotaan sudah kadaluarsa. Peminjaman tidak diizinkan.');
+            $this->alert('error', 'Keanggotaan sudah kadaluarsa', 'Peminjaman tidak diizinkan');
             return;
         }
 
         $this->itemBarcode = trim($this->itemBarcode);
+        $this->itemSuggestions = [];
         
         if (empty($this->itemBarcode)) {
-            session()->flash('error', 'Masukkan barcode item');
+            $this->alert('error', 'Masukkan barcode atau judul buku');
             return;
         }
 
         $item = Item::withoutGlobalScopes()->with('book')->where('barcode', $this->itemBarcode)->first();
 
         if (!$item) {
-            session()->flash('error', 'Item tidak ditemukan');
+            $this->alert('error', 'Item tidak ditemukan', "Barcode: {$this->itemBarcode}");
             return;
         }
 
-        // Branch validation
         $currentBranchId = auth()->user()->branch_id;
         if ($currentBranchId && $item->branch_id !== $currentBranchId) {
-            session()->flash('error', 'Item milik cabang lain. Tidak dapat dipinjam.');
+            $this->alert('error', 'Item milik cabang lain', 'Tidak dapat dipinjam');
             return;
         }
 
         if (!$item->isAvailable()) {
-            session()->flash('error', 'Item tidak tersedia untuk dipinjam');
+            $this->alert('error', 'Item tidak tersedia', 'Sedang dipinjam atau tidak aktif');
             return;
         }
 
-        // Check loan limit
         $loanLimit = $this->activeMember->memberType->loan_limit ?? 3;
         $currentLoans = count($this->activeLoans);
 
         if ($currentLoans >= $loanLimit) {
-            session()->flash('error', "Batas pinjam tercapai ({$loanLimit} buku)");
+            $this->alert('warning', 'Batas pinjam tercapai', "Maksimal {$loanLimit} buku");
             return;
         }
 
-        // Check if already borrowed
         $alreadyBorrowed = Loan::where('member_id', $this->activeMember->id)
             ->where('item_id', $item->id)
             ->where('is_returned', false)
             ->exists();
 
         if ($alreadyBorrowed) {
-            session()->flash('warning', 'Item sudah dipinjam oleh anggota ini');
+            $this->alert('warning', 'Sudah dipinjam', 'Item ini sudah dipinjam anggota');
             return;
         }
 
@@ -168,10 +286,10 @@ class CirculationTransaction extends Component
         ]);
 
         $this->loadActiveLoans();
-        $this->loadTodayStats();
+        $this->loadStats();
         $this->itemBarcode = '';
 
-        session()->flash('success', "Berhasil meminjam: {$item->book->title}");
+        $this->alert('success', 'Berhasil dipinjam!', Str::limit($item->book->title, 40));
     }
 
     public function returnItem(int $loanId): void
@@ -179,7 +297,7 @@ class CirculationTransaction extends Component
         $loan = Loan::with('item.book')->find($loanId);
 
         if (!$loan) {
-            session()->flash('error', 'Data peminjaman tidak ditemukan');
+            $this->alert('error', 'Data tidak ditemukan');
             return;
         }
 
@@ -188,9 +306,8 @@ class CirculationTransaction extends Component
             'is_returned' => true,
         ]);
 
-        $bookTitle = $loan->item->book->title ?? 'Buku';
+        $bookTitle = Str::limit($loan->item->book->title ?? 'Buku', 35);
 
-        // Calculate fine if overdue
         if ($loan->due_date < now()) {
             $daysOverdue = now()->diffInDays($loan->due_date);
             $finePerDay = $this->activeMember->memberType->fine_per_day ?? 500;
@@ -203,30 +320,29 @@ class CirculationTransaction extends Component
                     'amount' => $fineAmount,
                     'description' => "Keterlambatan {$daysOverdue} hari",
                 ]);
-
-                session()->flash('warning', "Dikembalikan dengan denda Rp " . number_format($fineAmount, 0, ',', '.'));
+                $this->alert('warning', 'Dikembalikan dengan denda', "Rp " . number_format($fineAmount, 0, ',', '.') . " ({$daysOverdue} hari)");
             }
         } else {
-            session()->flash('success', "Berhasil dikembalikan: {$bookTitle}");
+            $this->alert('success', 'Berhasil dikembalikan!', $bookTitle);
         }
 
         $this->loadActiveLoans();
-        $this->loadTodayStats();
+        $this->loadStats();
     }
 
     public function extendLoan(int $loanId): void
     {
-        $loan = Loan::find($loanId);
+        $loan = Loan::with('item.book')->find($loanId);
 
         if (!$loan) return;
 
         if ($loan->extend_count >= 2) {
-            session()->flash('error', 'Batas perpanjangan tercapai (max 2x)');
+            $this->alert('error', 'Batas perpanjangan tercapai', 'Maksimal 2x perpanjangan');
             return;
         }
 
         if ($loan->due_date < now()) {
-            session()->flash('error', 'Tidak bisa perpanjang, sudah terlambat');
+            $this->alert('error', 'Tidak bisa perpanjang', 'Buku sudah terlambat');
             return;
         }
 
@@ -238,24 +354,104 @@ class CirculationTransaction extends Component
         ]);
 
         $this->loadActiveLoans();
-        session()->flash('success', 'Perpanjangan berhasil (+' . $loanPeriod . ' hari)');
+        $this->alert('success', 'Perpanjangan berhasil!', "+{$loanPeriod} hari • " . Str::limit($loan->item->book->title ?? '', 25));
     }
 
+    public bool $showReceipt = false;
+    public $receiptData = null;
+
     public function endTransaction(): void
+    {
+        if ($this->activeMember && count($this->activeLoans) > 0) {
+            $this->receiptData = [
+                'member' => $this->activeMember,
+                'loans' => $this->activeLoans,
+                'date' => now(),
+                'staff' => auth()->user()->name,
+                'branch' => auth()->user()->branch->name ?? 'Perpustakaan',
+            ];
+            $this->showReceipt = true;
+        } else {
+            $this->closeTransaction();
+        }
+    }
+
+    public function closeTransaction(): void
     {
         session()->forget('staff_circulation_member_id');
         $this->activeMember = null;
         $this->activeLoans = [];
         $this->memberBarcode = '';
         $this->itemBarcode = '';
+        $this->showReceipt = false;
+        $this->receiptData = null;
+        $this->alert('info', 'Transaksi selesai', 'Siap untuk transaksi berikutnya');
+    }
 
-        session()->flash('success', 'Transaksi selesai');
+    public function quickReturn(int $loanId): void
+    {
+        $loan = Loan::with(['item.book', 'member.memberType'])->find($loanId);
+        if (!$loan) return;
+
+        $loan->update(['return_date' => now(), 'is_returned' => true]);
+        $bookTitle = Str::limit($loan->item->book->title ?? 'Buku', 30);
+
+        if ($loan->due_date < now()) {
+            $daysOverdue = now()->diffInDays($loan->due_date);
+            $finePerDay = $loan->member->memberType->fine_per_day ?? 500;
+            $fineAmount = $daysOverdue * $finePerDay;
+            if ($fineAmount > 0) {
+                Fine::create([
+                    'loan_id' => $loan->id,
+                    'member_id' => $loan->member_id,
+                    'amount' => $fineAmount,
+                    'description' => "Keterlambatan {$daysOverdue} hari",
+                ]);
+                $this->alert('warning', 'Dikembalikan dengan denda', "Rp " . number_format($fineAmount, 0, ',', '.'));
+            }
+        } else {
+            $this->alert('success', 'Berhasil dikembalikan!', $bookTitle);
+        }
+
+        $this->loadStats();
     }
 
     public function render()
     {
-        return view('livewire.staff.circulation.transaction')
-            ->extends('staff.layouts.app')
-            ->section('content');
+        $branchId = $this->branchId;
+        
+        $historyLoans = null;
+        $overdueLoans = null;
+        
+        if ($this->tab === 'history') {
+            $query = Loan::with(['member', 'item.book'])
+                ->where('loan_date', '>=', now()->subDays($this->filterDays))
+                ->when($this->searchHistory, fn($q) => $q->whereHas('member', fn($m) => $m->where('name', 'like', "%{$this->searchHistory}%")->orWhere('member_id', 'like', "%{$this->searchHistory}%")))
+                ->orderByDesc('loan_date');
+            
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+            
+            $historyLoans = $query->paginate(15);
+        }
+        
+        if ($this->tab === 'overdue') {
+            $query = Loan::with(['member', 'item.book'])
+                ->where('is_returned', false)
+                ->where('due_date', '<', now())
+                ->orderBy('due_date');
+            
+            if ($branchId) {
+                $query->where('branch_id', $branchId);
+            }
+            
+            $overdueLoans = $query->get();
+        }
+
+        return view('livewire.staff.circulation.transaction', [
+            'historyLoans' => $historyLoans,
+            'overdueLoans' => $overdueLoans,
+        ])->extends('staff.layouts.app')->section('content');
     }
 }

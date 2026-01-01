@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    {{-- CRITICAL: Sync state BEFORE anything renders --}}
+    <script>
+        (function() {
+            var c = localStorage.getItem('staffSidebarCollapsed') === 'true';
+            var d = localStorage.getItem('staffPortalDarkMode') === 'true';
+            if (c) document.documentElement.classList.add('sidebar-collapsed');
+            if (d) document.documentElement.classList.add('dark');
+        })();
+    </script>
     <x-google-analytics />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -56,11 +65,12 @@
                 width: 32px;
                 height: 32px;
                 pointer-events: none;
+                transition: background 0.3s;
             }
             .staff-sidebar::before { top: 0; background: radial-gradient(circle at 100% 100%, transparent 32px, #1d4ed8 32px); }
             .staff-sidebar::after { bottom: 0; background: radial-gradient(circle at 100% 0%, transparent 32px, #312e81 32px); }
-            html.dark .staff-sidebar::before { background: radial-gradient(circle at 100% 100%, transparent 32px, #0f172a 32px) !important; }
-            html.dark .staff-sidebar::after { background: radial-gradient(circle at 100% 0%, transparent 32px, #0f172a 32px) !important; }
+            html.dark .staff-sidebar::before { background: radial-gradient(circle at 100% 100%, transparent 32px, #1e293b 32px) !important; }
+            html.dark .staff-sidebar::after { background: radial-gradient(circle at 100% 0%, transparent 32px, #020617 32px) !important; }
         }
         
         /* Custom Scrollbar - Overlay style (tidak mengambil ruang) */
@@ -75,28 +85,6 @@
         * { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.3) transparent; }
         html.dark * { scrollbar-color: rgba(100, 116, 139, 0.3) transparent; }
     </style>
-    
-    {{-- Instant dark mode detection (before anything renders) + persist on navigation --}}
-    <script>
-        (function() {
-            function syncDarkMode() {
-                const stored = localStorage.getItem('staffPortalDarkMode');
-                // Default to light mode if no preference stored
-                const isDark = stored === 'true';
-                if (isDark) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            }
-            
-            // Sync immediately on page load
-            syncDarkMode();
-            
-            // Sync after Livewire SPA navigation
-            document.addEventListener('livewire:navigated', syncDarkMode);
-        })();
-    </script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -190,14 +178,25 @@
     <style>
         [x-cloak] { display: none !important; }
         
-        .staff-sidebar { width: 14rem; }
+        /* Sidebar & content positioning - CSS only for instant state */
+        .staff-sidebar { width: 14rem; transition: width 0.3s; }
         html.sidebar-collapsed .staff-sidebar { width: 5rem; }
-        .main-content-wrapper { margin-left: 14rem; }
+        
+        .main-content-wrapper { margin-left: 14rem; transition: margin-left 0.3s; }
         html.sidebar-collapsed .main-content-wrapper { margin-left: 5rem; }
+        
+        .desktop-header { left: 14rem; width: calc(100vw - 14rem); transition: left 0.3s, width 0.3s; }
+        html.sidebar-collapsed .desktop-header { left: 5rem; width: calc(100vw - 5rem); }
+        
+        /* Disable transitions during navigation */
+        html.navigating .staff-sidebar,
+        html.navigating .main-content-wrapper,
+        html.navigating .desktop-header { transition: none !important; }
         
         @media (max-width: 1023px) {
             .staff-sidebar { display: none !important; }
             .main-content-wrapper { margin-left: 0 !important; }
+            .desktop-header { left: 0 !important; width: 100% !important; }
         }
         
         /* Ensure modals with high z-index appear above everything */
@@ -209,22 +208,33 @@
 
     <script>
         (function() {
-            function syncSidebarState() {
-                const collapsed = localStorage.getItem('staffSidebarCollapsed') === 'true';
-                if (collapsed) {
-                    document.documentElement.classList.add('sidebar-collapsed');
-                } else {
-                    document.documentElement.classList.remove('sidebar-collapsed');
+            function syncState() {
+                var c = localStorage.getItem('staffSidebarCollapsed') === 'true';
+                var d = localStorage.getItem('staffPortalDarkMode') === 'true';
+                document.documentElement.classList.toggle('sidebar-collapsed', c);
+                document.documentElement.classList.toggle('dark', d);
+                // Sync Alpine state
+                if (window.Alpine && document.body._x_dataStack) {
+                    var data = document.body._x_dataStack[0];
+                    if (data) {
+                        data.sidebarCollapsed = c;
+                        data.darkMode = d;
+                    }
                 }
-                // Pre-set sidebar state for Alpine
-                window.__sidebarCollapsed = collapsed;
             }
             
-            // Sync immediately on page load
-            syncSidebarState();
+            document.addEventListener('livewire:navigate', function() {
+                document.documentElement.classList.add('navigating');
+                syncState();
+            });
             
-            // Sync after Livewire SPA navigation  
-            document.addEventListener('livewire:navigated', syncSidebarState);
+            document.addEventListener('livewire:navigated', function() {
+                syncState();
+                // Delay removal to ensure DOM is fully rendered
+                setTimeout(function() {
+                    document.documentElement.classList.remove('navigating');
+                }, 50);
+            });
         })();
     </script>
     @livewireStyles
@@ -266,8 +276,8 @@
 
     <div class="lg:flex lg:min-h-screen w-full lg:pt-0">
         {{-- Desktop Sidebar - FIXED --}}
-        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900 text-white/80 shadow-xl transition-all duration-300 z-40"
-               :class="sidebarCollapsed ? 'lg:w-20' : 'lg:w-56'">
+        <aside class="staff-sidebar hidden lg:flex lg:flex-col lg:fixed lg:top-0 lg:left-0 lg:h-screen text-white/80 shadow-xl z-40"
+               :class="darkMode ? 'bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950' : 'bg-gradient-to-b from-blue-700 via-blue-800 to-indigo-900'">
             
             {{-- Logo --}}
             <div class="p-4 border-b border-white/10 min-h-[72px] flex items-center transition-all duration-300">
@@ -293,24 +303,65 @@
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                 @foreach($navItems as $item)
                     @php $active = request()->routeIs($item['patterns']); @endphp
-                    <a href="{{ route($item['route']) }}" wire:navigate title="{{ $item['label'] }}"
-                       class="group relative flex items-center rounded-xl transition-all duration-200 {{ $active ? 'bg-white/15 text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}"
-                       :class="sidebarCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5'">
-                        @if($active)
-                            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
-                        @endif
-                        <div class="relative w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all
-                            {{ $active ? 'bg-white/20 text-white shadow-lg' : 'text-blue-200 group-hover:text-white' }}"
-                            :class="!{{ $active ? 'true' : 'false' }} && !darkMode ? 'bg-white/10' : ''">
-                            <i class="fas {{ $item['icon'] }} text-sm"></i>
-                            {{-- Badge indicator when collapsed --}}
+                    <a href="{{ route($item['route']) }}" wire:navigate
+                       x-data="{ showTooltip: false }"
+                       @mouseenter="if(sidebarCollapsed) showTooltip = true"
+                       @mouseleave="showTooltip = false"
+                       class="group relative flex items-center transition-all duration-200"
+                       :class="[
+                           sidebarCollapsed ? 'justify-center py-1' : 'gap-3 px-3 py-2.5 rounded-xl',
+                           !sidebarCollapsed && {{ $active ? 'true' : 'false' }} 
+                               ? (darkMode ? 'bg-indigo-500/20 text-white' : 'bg-white/15 text-white')
+                               : (!sidebarCollapsed ? (darkMode ? 'text-slate-300 hover:bg-white/5 hover:text-white' : 'text-blue-100 hover:bg-white/10 hover:text-white') : '')
+                       ]">
+                        {{-- Active indicator for expanded --}}
+                        <div x-show="!sidebarCollapsed" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full transition-all {{ $active ? 'opacity-100' : 'opacity-0' }}" :class="darkMode ? 'bg-indigo-400' : 'bg-white'"></div>
+                        
+                        {{-- Icon wrapper --}}
+                        <div class="relative flex items-center justify-center flex-shrink-0 transition-all duration-200"
+                             :class="{
+                                 'w-11 h-11 rounded-xl': sidebarCollapsed,
+                                 'w-9 h-9 rounded-lg': !sidebarCollapsed,
+                                 'bg-indigo-500 ring-2 ring-indigo-300 shadow-lg shadow-indigo-500/40 text-white': sidebarCollapsed && {{ $active ? 'true' : 'false' }} && darkMode,
+                                 'bg-white/30 ring-2 ring-white shadow-lg shadow-white/20 text-white': sidebarCollapsed && {{ $active ? 'true' : 'false' }} && !darkMode,
+                                 'bg-indigo-500/40 shadow-lg text-white': !sidebarCollapsed && {{ $active ? 'true' : 'false' }} && darkMode,
+                                 'bg-white/20 shadow-lg text-white': !sidebarCollapsed && {{ $active ? 'true' : 'false' }} && !darkMode,
+                                 'bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white': !{{ $active ? 'true' : 'false' }} && darkMode,
+                                 'bg-white/10 hover:bg-white/20 text-blue-200 hover:text-white': !{{ $active ? 'true' : 'false' }} && !darkMode
+                             }">
+                            <i class="fas {{ $item['icon'] }} text-sm relative z-10"></i>
                             @if(!empty($item['badges']))
-                            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border border-blue-800 animate-pulse"
-                                  :class="sidebarCollapsed ? 'block' : 'hidden'"></span>
+                            <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border animate-pulse" :class="darkMode ? 'border-slate-800' : 'border-blue-800'" x-show="sidebarCollapsed"></span>
+                            @endif
+                            @if($active)
+                            <div x-show="sidebarCollapsed" class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full shadow-lg" :class="darkMode ? 'bg-indigo-300 shadow-indigo-300/60' : 'bg-white shadow-white/50'"></div>
                             @endif
                         </div>
+                        
+                        {{-- Label for expanded --}}
                         <span class="text-sm font-medium transition-all duration-300"
-                              :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">{{ $item['label'] }}</span>
+                              :class="[sidebarCollapsed ? 'hidden' : 'block', {{ $active ? 'true' : 'false' }} ? 'text-white' : (darkMode ? 'text-slate-300 group-hover:text-white' : 'text-blue-100 group-hover:text-white')]">{{ $item['label'] }}</span>
+                        
+                        {{-- Tooltip teleported to body --}}
+                        <template x-teleport="body">
+                            <div x-show="showTooltip" 
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 translate-x-1"
+                                 x-transition:enter-end="opacity-100 translate-x-0"
+                                 x-transition:leave="transition ease-in duration-100"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="fixed z-[99999] ml-2 px-4 py-2.5 bg-gray-900/95 backdrop-blur-sm text-white text-sm font-semibold rounded-xl shadow-2xl border border-white/10"
+                                 :style="'left: ' + ($el.closest('a')?.getBoundingClientRect().right || 80) + 'px; top: ' + (($el.closest('a')?.getBoundingClientRect().top || 0) + ($el.closest('a')?.getBoundingClientRect().height || 0) / 2 - 18) + 'px;'"
+                                 x-init="$watch('showTooltip', v => { if(v) $nextTick(() => { const a = $el.closest('a') || document.querySelector('a[href=\'{{ route($item['route']) }}\']'); if(a) { const r = a.getBoundingClientRect(); $el.style.left = (r.right + 8) + 'px'; $el.style.top = (r.top + r.height/2 - 18) + 'px'; } }) })">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas {{ $item['icon'] }} text-blue-400"></i>
+                                    <span>{{ $item['label'] }}</span>
+                                </div>
+                                <div class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1.5 w-3 h-3 bg-gray-900/95 rotate-45 border-l border-b border-white/10"></div>
+                            </div>
+                        </template>
+                        
                         {{-- Badges when expanded --}}
                         @if(!empty($item['badges']))
                         <div class="flex items-center gap-1 ml-auto transition-all duration-300"
@@ -408,11 +459,8 @@
         </aside>
 
         {{-- Desktop Header - FIXED --}}
-        <header class="desktop-header hidden lg:flex items-center justify-between px-8 shadow-sm fixed top-0 z-30 h-[72px] transition-colors duration-300"
-                :class="[
-                    sidebarCollapsed ? 'left-20 w-[calc(100vw-80px)]' : 'left-56 w-[calc(100vw-224px)]',
-                    darkMode ? 'bg-slate-800 border-b border-slate-700' : 'bg-white border-b border-slate-200'
-                ]">
+        <header class="desktop-header hidden lg:flex items-center justify-between px-8 shadow-sm fixed top-0 z-30 h-[72px]"
+                :class="darkMode ? 'bg-slate-800 border-b border-slate-700' : 'bg-white border-b border-slate-200'">
             <div class="flex items-center gap-4">
                 <button @click="toggleSidebar()" 
                         class="w-9 h-9 rounded-lg border flex items-center justify-center transition-all"
@@ -537,8 +585,7 @@
         </header>
 
         {{-- Main Content Wrapper - background controlled by CSS dark mode --}}
-        <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden bg-slate-50"
-             :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-56'">
+        <div class="flex-1 flex flex-col min-h-screen lg:pt-0 lg:pb-0 main-content-wrapper overflow-x-hidden bg-slate-50">
             <main class="flex-1 w-full max-w-full px-4 pt-20 pb-24 sm:px-6 lg:px-8 lg:pt-4 lg:pb-8 overflow-x-hidden">
                 {{-- Queue Status Alert for Admins --}}
                 <x-queue-status-alert />
@@ -744,11 +791,10 @@
     <script>
         function staffPortal() {
             return {
-                // Sidebar state
-                sidebarCollapsed: window.__sidebarCollapsed ?? localStorage.getItem('staffSidebarCollapsed') === 'true',
-                
-                // Dark mode state - read from HTML class (set by inline script)
+                // Read from HTML class (already set by inline script in <head>)
+                sidebarCollapsed: document.documentElement.classList.contains('sidebar-collapsed'),
                 darkMode: document.documentElement.classList.contains('dark'),
+                menuOpen: false,
                 
                 toggleSidebar() {
                     this.sidebarCollapsed = !this.sidebarCollapsed;

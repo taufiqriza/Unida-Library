@@ -122,50 +122,53 @@
     </div>
 
     {{-- Desktop Quick Stats - This Month (hidden on mobile) --}}
-    <div class="hidden lg:grid lg:grid-cols-4 gap-4">
-        <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white">
-            <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-arrow-right-from-bracket"></i>
+    <div class="hidden lg:grid lg:grid-cols-4 gap-3">
+        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+                    <i class="fas fa-arrow-right-from-bracket text-sm"></i>
                 </div>
-                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Bulan Ini</span>
+                <div>
+                    <p class="text-gray-500 text-xs">Peminjaman</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['loans_month'] ?? 0 }}</p>
+                </div>
             </div>
-            <p class="text-blue-100 text-xs mb-1">Peminjaman</p>
-            <p class="text-3xl font-bold">{{ $stats['loans_month'] ?? 0 }}</p>
         </div>
 
-        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
-            <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-arrow-right-to-bracket"></i>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
+                    <i class="fas fa-arrow-right-to-bracket text-sm"></i>
                 </div>
-                <span class="px-2 py-1 bg-white/20 rounded-full text-[10px] font-medium">Bulan Ini</span>
+                <div>
+                    <p class="text-gray-500 text-xs">Pengembalian</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['returns_month'] ?? 0 }}</p>
+                </div>
             </div>
-            <p class="text-emerald-100 text-xs mb-1">Pengembalian</p>
-            <p class="text-3xl font-bold">{{ $stats['returns_month'] ?? 0 }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-500/30">
-                    <i class="fas fa-clock"></i>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-500/25">
+                    <i class="fas fa-clock text-sm"></i>
                 </div>
-                @if(($stats['overdue'] ?? 0) > 0)
-                <span class="px-2 py-1 bg-red-100 text-red-600 rounded-full text-[10px] font-semibold animate-pulse">Perlu Tindakan</span>
-                @endif
+                <div>
+                    <p class="text-gray-500 text-xs">Terlambat</p>
+                    <p class="text-2xl font-bold {{ ($stats['overdue'] ?? 0) > 0 ? 'text-red-600' : 'text-gray-900' }}">{{ $stats['overdue'] ?? 0 }}</p>
+                </div>
             </div>
-            <p class="text-gray-500 text-xs mb-1">Terlambat</p>
-            <p class="text-3xl font-bold text-gray-900">{{ $stats['overdue'] ?? 0 }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-            <div class="flex items-center justify-between mb-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
-                    <i class="fas fa-coins"></i>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
+                    <i class="fas fa-coins text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-xs">Denda</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ number_format(($stats['unpaid_fines'] ?? 0)/1000, 0) }}<span class="text-sm text-gray-400">K</span></p>
                 </div>
             </div>
-            <p class="text-gray-500 text-xs mb-1">Denda Belum Bayar</p>
-            <p class="text-3xl font-bold text-amber-600">Rp {{ number_format(($stats['unpaid_fines'] ?? 0)/1000, 0) }}K</p>
         </div>
     </div>
 
