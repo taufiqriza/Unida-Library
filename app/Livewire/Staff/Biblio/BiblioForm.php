@@ -71,7 +71,6 @@ class BiblioForm extends Component
     public $mediaTypes = [];
     public $contentTypes = [];
     public $frequencies = [];
-    public $places = [];
     public $languages = [];
 
     protected function rules(): array
@@ -120,7 +119,6 @@ class BiblioForm extends Component
         $this->mediaTypes = MediaType::orderBy('name')->pluck('name', 'id')->toArray();
         $this->contentTypes = ContentType::orderBy('name')->pluck('name', 'id')->toArray();
         $this->frequencies = Frequency::orderBy('name')->pluck('name', 'id')->toArray();
-        $this->places = Place::orderBy('name')->pluck('name', 'id')->toArray();
         
         $this->languages = [
             'id' => 'Indonesia',

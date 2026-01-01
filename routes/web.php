@@ -137,17 +137,14 @@ Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.s
 Route::get('/api/ddc/main-classes', [DdcController::class, 'mainClasses'])->name('api.ddc.main-classes');
 
 // Publisher API (for biblio form)
-Route::get('/api/publishers/search', function (\Illuminate\Http\Request $request) {
-    return \App\Models\Publisher::where('name', 'like', '%' . $request->q . '%')
-        ->limit(15)->get(['id', 'name']);
-});
-Route::get('/api/publishers/{id}', function ($id) {
-    return \App\Models\Publisher::find($id, ['id', 'name']) ?? ['id' => null, 'name' => ''];
-});
-Route::post('/api/publishers', function (\Illuminate\Http\Request $request) {
-    $pub = \App\Models\Publisher::create(['name' => $request->name]);
-    return ['id' => $pub->id, 'name' => $pub->name];
-})->middleware('auth');
+Route::get('/api/publishers/search', fn(\Illuminate\Http\Request $r) => \App\Models\Publisher::where('name', 'like', '%'.$r->q.'%')->limit(15)->get(['id', 'name']));
+Route::get('/api/publishers/{id}', fn($id) => \App\Models\Publisher::find($id, ['id', 'name']) ?? ['id' => null, 'name' => '']);
+Route::post('/api/publishers', fn(\Illuminate\Http\Request $r) => \App\Models\Publisher::create(['name' => $r->name]))->middleware('auth');
+
+// Place API (for biblio form)
+Route::get('/api/places/search', fn(\Illuminate\Http\Request $r) => \App\Models\Place::where('name', 'like', '%'.$r->q.'%')->limit(15)->get(['id', 'name']));
+Route::get('/api/places/{id}', fn($id) => \App\Models\Place::find($id, ['id', 'name']) ?? ['id' => null, 'name' => '']);
+Route::post('/api/places', fn(\Illuminate\Http\Request $r) => \App\Models\Place::create(['name' => $r->name]))->middleware('auth');
 
 // Print routes
 Route::middleware('auth')->group(function () {

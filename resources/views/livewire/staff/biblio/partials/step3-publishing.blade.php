@@ -63,15 +63,31 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
+        <div x-data="placeSearch()" x-init="init()" @click.away="open = false">
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Tempat Terbit</label>
-            <select wire:model="place_id" class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                <option value="">-- Pilih --</option>
-                @foreach($places as $id => $name)
-                    <option value="{{ $id }}">{{ $name }}</option>
-                @endforeach
-            </select>
+            <div class="relative">
+                <input type="text" x-model="search" @input.debounce.300ms="doSearch()" @focus="open = true" class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Cari kota...">
+                <div x-show="open && (results.length || search.length > 1)" class="absolute z-50 w-full mt-1 bg-white border rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    <template x-for="r in results" :key="r.id">
+                        <div @click="select(r)" class="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm" x-text="r.name"></div>
+                    </template>
+                    <div x-show="search.length > 1 && !results.find(r => r.name.toLowerCase() === search.toLowerCase())" @click="addNew()" class="px-4 py-2 hover:bg-emerald-50 cursor-pointer text-sm text-emerald-600 border-t">
+                        <i class="fas fa-plus mr-1"></i> Tambah "<span x-text="search"></span>"
+                    </div>
+                </div>
+            </div>
         </div>
+        <script>
+        function placeSearch() {
+            return {
+                search: '', results: [], open: false, selected: @entangle('place_id').live,
+                init() { if (this.selected) fetch('/api/places/' + this.selected).then(r => r.json()).then(d => this.search = d.name || ''); },
+                doSearch() { if (this.search.length > 1) fetch('/api/places/search?q=' + encodeURIComponent(this.search)).then(r => r.json()).then(d => { this.results = d; this.open = true; }); },
+                select(r) { this.selected = r.id; this.search = r.name; this.open = false; },
+                addNew() { fetch('/api/places', { method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content}, body: JSON.stringify({name: this.search}) }).then(r => r.json()).then(d => this.select(d)); }
+            }
+        }
+        </script>
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1.5">Tahun Terbit</label>
             <input type="text" wire:model="publish_year" maxlength="4" class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="2024">
