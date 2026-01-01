@@ -82,7 +82,7 @@
                 <span class="px-2 py-0.5 {{ $activeTab === 'dosen' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['dosen']) }}</span>
             </button>
             <button wire:click="setTab('karyawan')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'karyawan' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-user-tie"></i><span>Karyawan</span>
+                <i class="fas fa-user-tie"></i><span>Tendik</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'karyawan' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['karyawan']) }}</span>
             </button>
             @if($canSeeSantri)
@@ -131,7 +131,7 @@
                         <th class="px-4 py-3 text-left font-medium w-28">Tipe</th>
                         <th class="px-4 py-3 text-left font-medium">NIM/NIDN</th>
                         <th class="px-4 py-3 text-left font-medium">Kontak</th>
-                        <th class="px-4 py-3 text-center font-medium w-28">Kadaluarsa</th>
+                        <th class="px-4 py-3 text-center font-medium w-32">Kadaluarsa</th>
                         <th class="px-4 py-3 text-center font-medium w-20">Pinjam</th>
                         <th class="px-4 py-3 text-center font-medium w-20">Status</th>
                         <th class="px-4 py-3 text-center font-medium w-28">Aksi</th>
