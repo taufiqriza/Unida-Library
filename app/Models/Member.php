@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Traits\BelongsToBranch;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class Member extends Authenticatable
 {
-    use BelongsToBranch, HasApiTokens, Notifiable;
+    use BelongsToBranch, HasApiTokens, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'pddikti_id', 'nim_nidn',

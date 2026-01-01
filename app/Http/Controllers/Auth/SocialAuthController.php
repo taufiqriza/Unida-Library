@@ -84,16 +84,30 @@ class SocialAuthController extends Controller
 
         // Auto-link if found by email but not yet linked
         if ($userByEmail && !$staffAccount) {
+            // Check if this provider_id is linked to different user - update it
+            SocialAccount::where('provider', 'google')
+                ->where('provider_id', $googleUser->getId())
+                ->whereNotNull('user_id')
+                ->where('user_id', '!=', $userByEmail->id)
+                ->delete();
+                
             $staffAccount = SocialAccount::updateOrCreate(
-                ['provider' => 'google', 'provider_id' => $googleUser->getId(), 'user_id' => $userByEmail->id],
-                ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
+                ['provider' => 'google', 'user_id' => $userByEmail->id],
+                ['provider_id' => $googleUser->getId(), 'provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
             );
         }
 
         if ($memberByEmail && !$memberAccount) {
+            // Check if this provider_id is linked to different member - update it
+            SocialAccount::where('provider', 'google')
+                ->where('provider_id', $googleUser->getId())
+                ->whereNotNull('member_id')
+                ->where('member_id', '!=', $memberByEmail->id)
+                ->delete();
+                
             $memberAccount = SocialAccount::updateOrCreate(
-                ['provider' => 'google', 'provider_id' => $googleUser->getId(), 'member_id' => $memberByEmail->id],
-                ['provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
+                ['provider' => 'google', 'member_id' => $memberByEmail->id],
+                ['provider_id' => $googleUser->getId(), 'provider_email' => $googleUser->getEmail(), 'provider_avatar' => $googleUser->getAvatar()]
             );
         }
 
