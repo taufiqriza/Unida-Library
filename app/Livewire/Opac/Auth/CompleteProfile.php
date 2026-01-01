@@ -43,6 +43,9 @@ class CompleteProfile extends Component
     public string $phone = '';
     public string $gender = '';
     public $photo;
+    
+    // NIM check
+    public $nimExistingMember = null;
 
     public $branches;
     public $faculties;
@@ -445,6 +448,51 @@ class CompleteProfile extends Component
         }
         
         $this->step = 2;
+    }
+
+    /**
+     * Check if NIM exists in SIAKAD data (called on NIM input change)
+     */
+    public function updatedNim($value)
+    {
+        $this->nimExistingMember = null;
+        
+        if (strlen($value) >= 10) {
+            $existing = Member::with(['department', 'branch'])
+                ->where('member_id', $value)
+                ->where('id', '!=', $this->member->id)
+                ->where(function($q) {
+                    $q->whereNull('email')->orWhere('email', '');
+                })
+                ->where('profile_completed', false)
+                ->first();
+            
+            if ($existing) {
+                $this->nimExistingMember = $existing;
+            }
+        }
+    }
+
+    /**
+     * Link to existing SIAKAD member from NIM check
+     */
+    public function linkToExistingMember()
+    {
+        if (!$this->nimExistingMember) {
+            return;
+        }
+        
+        $this->selectedPddiktiId = $this->nimExistingMember->id;
+        $this->selectedPddikti = $this->nimExistingMember;
+        $this->branch_id = $this->nimExistingMember->branch_id;
+        $this->department_id = $this->nimExistingMember->department_id;
+        $this->faculty_id = $this->nimExistingMember->faculty_id;
+        $this->gender = $this->nimExistingMember->gender ?? $this->gender;
+        
+        $mahasiswaType = MemberType::where('name', 'like', '%Mahasiswa%')->first();
+        $this->member_type_id = $mahasiswaType?->id ?? $this->nimExistingMember->member_type_id;
+        
+        $this->nimExistingMember = null;
     }
 
     /**

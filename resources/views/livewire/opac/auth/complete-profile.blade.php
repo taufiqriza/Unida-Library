@@ -286,8 +286,21 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                                <input type="text" wire:model="nim" required placeholder="Nomor Induk Pegawai"
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <input type="text" wire:model.live.debounce.500ms="nim" required placeholder="Nomor Induk Pegawai"
+                                    class="w-full px-4 py-2.5 border {{ $nimExistingMember ? 'border-green-400 bg-green-50' : 'border-gray-200' }} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                
+                                @if($nimExistingMember)
+                                <div class="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                                    <p class="text-xs text-green-700 font-medium mb-1">
+                                        <i class="fas fa-check-circle mr-1"></i> Data ditemukan!
+                                    </p>
+                                    <p class="text-sm text-green-800 font-semibold">{{ $nimExistingMember->name }}</p>
+                                    <button type="button" wire:click="linkToExistingMember" 
+                                        class="mt-2 w-full py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition">
+                                        <i class="fas fa-link mr-1"></i> Hubungkan
+                                    </button>
+                                </div>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
@@ -342,8 +355,25 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">NIM/NIDN</label>
-                                <input type="text" wire:model="nim" required placeholder="Nomor Induk"
-                                    class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                <input type="text" wire:model.live.debounce.500ms="nim" required placeholder="Nomor Induk"
+                                    class="w-full px-4 py-2.5 border {{ $nimExistingMember ? 'border-green-400 bg-green-50' : 'border-gray-200' }} rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                
+                                @if($nimExistingMember)
+                                <div class="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                                    <p class="text-xs text-green-700 font-medium mb-1">
+                                        <i class="fas fa-check-circle mr-1"></i> Data SIAKAD ditemukan!
+                                    </p>
+                                    <p class="text-sm text-green-800 font-semibold">{{ $nimExistingMember->name }}</p>
+                                    <p class="text-xs text-green-600">
+                                        {{ $nimExistingMember->member_id }}
+                                        @if($nimExistingMember->department) · {{ $nimExistingMember->department->name }}@endif
+                                    </p>
+                                    <button type="button" wire:click="linkToExistingMember" 
+                                        class="mt-2 w-full py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition">
+                                        <i class="fas fa-link mr-1"></i> Hubungkan dengan Data Ini
+                                    </button>
+                                </div>
+                                @endif
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Kampus</label>
