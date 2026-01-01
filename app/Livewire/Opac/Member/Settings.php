@@ -52,7 +52,8 @@ class Settings extends Component
         ];
         
         if ($this->canEditNim) {
-            $rules['nim'] = 'required|string|max:30|unique:members,member_id,' . $this->member->id;
+            // Allow NIM that exists in SIAKAD (will be merged)
+            $rules['nim'] = 'required|string|max:30';
         }
         
         return $rules;
@@ -78,6 +79,49 @@ class Settings extends Component
         ];
         
         if ($this->canEditNim && $this->nim) {
+            // Check if NIM exists in another member record
+            $existingMember = \App\Models\Member::where('member_id', $this->nim)
+                ->where('id', '!=', $this->member->id)
+                ->first();
+            
+            if ($existingMember) {
+                // If has SIAKAD data (pddikti_id), merge
+                if ($existingMember->pddikti_id) {
+                    // Merge: transfer current member's data to SIAKAD member
+                    $existingMember->update([
+                        'email' => $this->member->email,
+                        'phone' => $this->phone,
+                        'gender' => $this->gender,
+                        'photo' => $this->photo 
+                            ? $this->photo->store('members', 'public') 
+                            : ($this->member->photo ?? $existingMember->photo),
+                        'profile_completed' => true,
+                    ]);
+                    
+                    // Transfer social accounts
+                    \App\Models\SocialAccount::where('member_id', $this->member->id)
+                        ->update(['member_id' => $existingMember->id]);
+                    
+                    // Delete old member record
+                    $oldMemberId = $this->member->id;
+                    
+                    // Re-login with merged account
+                    Auth::guard('member')->login($existingMember);
+                    
+                    // Delete after re-login
+                    \App\Models\Member::find($oldMemberId)?->delete();
+                    
+                    $this->dispatch('notify', type: 'success', message: 'NIM berhasil diperbarui dan data SIAKAD telah ditautkan.');
+                    
+                    return redirect()->route('member.settings');
+                } else {
+                    // NIM used by non-SIAKAD member, reject
+                    $this->addError('nim', 'NIM sudah digunakan oleh anggota lain.');
+                    return;
+                }
+            }
+            
+            // NIM not used, just update
             $data['member_id'] = $this->nim;
             $data['nim_nidn'] = $this->nim;
         }
