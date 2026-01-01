@@ -110,7 +110,7 @@
                             </div>
                             <p class="text-xs text-gray-500 mt-1.5">
                                 <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
-                                <strong>Tips:</strong> Gunakan NIM untuk hasil lebih akurat (contoh: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-primary-600 font-mono">432022413017</code>)
+                                <strong>Tips:</strong> Gunakan NIM untuk hasil lebih akurat
                             </p>
                         </div>
 
@@ -134,25 +134,19 @@
                             <div class="max-h-64 overflow-y-auto">
                                 @foreach($searchResults as $result)
                                 @php
-                                    $matchType = $result->_matchType ?? 'partial';
-                                    $matchColors = [
-                                        'nim_exact' => 'bg-green-100 text-green-700 border-green-200',
-                                        'exact' => 'bg-green-100 text-green-700 border-green-200',
-                                        'starts' => 'bg-blue-100 text-blue-700 border-blue-200',
-                                        'all_words' => 'bg-cyan-100 text-cyan-700 border-cyan-200',
-                                        'contains' => 'bg-amber-100 text-amber-700 border-amber-200',
-                                        'partial' => 'bg-gray-100 text-gray-600 border-gray-200',
-                                    ];
-                                    $matchLabels = [
-                                        'nim_exact' => 'NIM Cocok',
-                                        'exact' => 'Nama Cocok',
-                                        'starts' => 'Awalan Cocok',
-                                        'all_words' => 'Kata Cocok',
-                                        'contains' => 'Mengandung',
-                                        'partial' => 'Mirip',
-                                    ];
-                                    $colorClass = $matchColors[$matchType] ?? $matchColors['partial'];
-                                    $label = $matchLabels[$matchType] ?? 'Mirip';
+                                    $score = $result->_matchScore ?? 0;
+                                    // Color based on percentage
+                                    if ($score >= 90) {
+                                        $colorClass = 'bg-green-100 text-green-700 border-green-300';
+                                    } elseif ($score >= 70) {
+                                        $colorClass = 'bg-blue-100 text-blue-700 border-blue-300';
+                                    } elseif ($score >= 50) {
+                                        $colorClass = 'bg-cyan-100 text-cyan-700 border-cyan-300';
+                                    } elseif ($score >= 30) {
+                                        $colorClass = 'bg-amber-100 text-amber-700 border-amber-300';
+                                    } else {
+                                        $colorClass = 'bg-gray-100 text-gray-600 border-gray-300';
+                                    }
                                 @endphp
                                 <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedPddiktiId == $result->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
                                     <input type="radio" 
@@ -164,7 +158,7 @@
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-medium text-gray-900 truncate">{{ $result->name }}</p>
-                                            <span class="text-[10px] px-1.5 py-0.5 rounded border {{ $colorClass }}">{{ $label }}</span>
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
                                         </div>
                                         <p class="text-xs text-gray-500">
                                             {{ $result->member_id ?? '-' }}

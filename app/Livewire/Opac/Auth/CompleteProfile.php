@@ -333,8 +333,8 @@ class CompleteProfile extends Component
                 ->limit(5)
                 ->get();
             
-            // Mark as exact NIM match
-            $results->each(fn($r) => $r->_matchType = 'nim_exact');
+            // Mark as exact NIM match (100%)
+            $results->each(fn($r) => $r->_matchScore = 100);
             $this->searchResults = $results;
         } else {
             // Name search - more accurate matching with scoring
@@ -370,46 +370,42 @@ class CompleteProfile extends Component
                 $nameUpper = strtoupper($r->name);
                 $score = 0;
                 
-                // Exact match = 100
+                // Exact match = 100%
                 if ($nameUpper === $searchUpper) {
                     $score = 100;
-                    $r->_matchType = 'exact';
                 }
-                // Starts with = 80
+                // Starts with = 90%
                 elseif (str_starts_with($nameUpper, $searchUpper)) {
-                    $score = 80;
-                    $r->_matchType = 'starts';
+                    $score = 90;
                 }
-                // All words match = 60-70
+                // All words match
                 elseif (count($words) > 1) {
                     $matchCount = 0;
                     foreach ($words as $word) {
                         if (str_contains($nameUpper, $word)) $matchCount++;
                     }
-                    if ($matchCount === count($words)) {
-                        $score = 60 + ($matchCount * 2);
-                        $r->_matchType = 'all_words';
-                    } else {
-                        $score = 30 + ($matchCount * 5);
-                        $r->_matchType = 'partial';
-                    }
+                    $score = (int) round(($matchCount / count($words)) * 85);
                 }
-                // Contains = 40
+                // Contains = 70%
                 elseif (str_contains($nameUpper, $searchUpper)) {
-                    $score = 40;
-                    $r->_matchType = 'contains';
+                    $score = 70;
                 }
+                // Single word partial
                 else {
-                    $score = 20;
-                    $r->_matchType = 'partial';
+                    $searchLen = strlen($searchUpper);
+                    $nameLen = strlen($nameUpper);
+                    similar_text($searchUpper, $nameUpper, $percent);
+                    $score = (int) round($percent * 0.5);
                 }
                 
                 $r->_matchScore = $score;
                 return $r;
             });
             
-            // Sort by score and limit
-            $this->searchResults = $scored->sortByDesc('_matchScore')->take(15)->values();
+            // Sort by score, filter minimum 20%
+            $this->searchResults = $scored->filter(fn($r) => $r->_matchScore >= 20)
+                ->sortByDesc('_matchScore')
+                ->values();
         }
 
         $this->isSearching = false;
