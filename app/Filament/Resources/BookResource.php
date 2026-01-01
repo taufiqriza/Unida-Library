@@ -261,12 +261,16 @@ class BookResource extends Resource
                             Forms\Components\FileUpload::make('image')
                                 ->label('Gambar Sampul')
                                 ->image()
+                                ->disk('public')
                                 ->directory('covers')
+                                ->visibility('public')
                                 ->imageResizeMode('cover')
                                 ->imageCropAspectRatio('2:3')
                                 ->imageResizeTargetWidth('300')
                                 ->imageResizeTargetHeight('450')
-                                ->helperText('Upload gambar sampul buku'),
+                                ->maxSize(2048)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Upload gambar sampul buku (max 2MB, JPG/PNG/WebP)'),
                         ]),
 
                     // Tab 7: Pengaturan OPAC
