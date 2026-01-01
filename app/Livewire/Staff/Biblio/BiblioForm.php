@@ -107,6 +107,7 @@ class BiblioForm extends Component implements HasForms, HasActions
                                     ->label('Judul')
                                     ->required()
                                     ->maxLength(500)
+                                    ->live(onBlur: true)
                                     ->columnSpanFull(),
                                 Forms\Components\TextInput::make('edition')
                                     ->label('Edisi'),
@@ -126,6 +127,7 @@ class BiblioForm extends Component implements HasForms, HasActions
                                     ->searchable()
                                     ->preload()
                                     ->native(false)
+                                    ->live()
                                     ->helperText('Tambahkan penulis utama dan tambahan')
                                     ->createOptionForm([
                                         Forms\Components\TextInput::make('name')->label('Nama Penulis')->required(),
