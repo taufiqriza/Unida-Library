@@ -31,11 +31,11 @@
     }
     
     html.dark .staff-sidebar::before {
-        background: radial-gradient(circle at 100% 100%, transparent 32px, #1e3a8a 32px);
+        background: radial-gradient(circle at 100% 100%, transparent 32px, #1e3a8a 32px) !important;
     }
     
     html.dark .staff-sidebar::after {
-        background: radial-gradient(circle at 100% 0%, transparent 32px, #1e1b4b 32px);
+        background: radial-gradient(circle at 100% 0%, transparent 32px, #1e1b4b 32px) !important;
     }
     
     html.sidebar-collapsed .staff-sidebar::before,
@@ -54,11 +54,11 @@
     }
     
     html.dark.sidebar-collapsed .staff-sidebar::before {
-        background: radial-gradient(circle at 100% 100%, transparent 24px, #1e3a8a 24px);
+        background: radial-gradient(circle at 100% 100%, transparent 24px, #1e3a8a 24px) !important;
     }
     
     html.dark.sidebar-collapsed .staff-sidebar::after {
-        background: radial-gradient(circle at 100% 0%, transparent 24px, #1e1b4b 24px);
+        background: radial-gradient(circle at 100% 0%, transparent 24px, #1e1b4b 24px) !important;
     }
 }
 
