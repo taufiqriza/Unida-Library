@@ -64,19 +64,19 @@ class BiblioForm extends Component implements HasForms, HasActions
                                     ->label('Lokasi')
                                     ->options(function () {
                                         $user = auth()->user();
-                                        // Admin can see all branches
-                                        if ($user->role === 'admin') {
-                                            return Branch::pluck('name', 'id');
+                                        // Super admin and admin can see all branches
+                                        if (in_array($user->role, ['super_admin', 'admin'])) {
+                                            return Branch::orderBy('name')->pluck('name', 'id');
                                         }
-                                        // Pustakawan only sees their own branch
+                                        // Others only see their own branch
                                         return Branch::where('id', $user->branch_id)->pluck('name', 'id');
                                     })
                                     ->required()
                                     ->searchable()
                                     ->preload()
                                     ->native(false)
-                                    ->disabled(fn () => auth()->user()->role !== 'admin') // Pustakawan cannot change
-                                    ->dehydrated() // Make sure value is still submitted even if disabled
+                                    ->disabled(fn () => !in_array(auth()->user()->role, ['super_admin', 'admin']))
+                                    ->dehydrated()
                                     ->default(fn () => auth()->user()->branch_id ?? 1),
                                 Forms\Components\Select::make('media_type_id')
                                     ->label('GMD')
