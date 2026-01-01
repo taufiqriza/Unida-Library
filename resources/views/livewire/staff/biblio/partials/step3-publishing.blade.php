@@ -139,6 +139,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Panggil</label>
+                <p class="text-xs text-amber-600 mb-1"><i class="fas fa-info-circle"></i> Pastikan judul, klasifikasi & penulis sudah diisi</p>
                 <div class="flex gap-2">
                     <input type="text" wire:model="call_number" class="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="S 297.12 TIR M">
                     <button type="button" wire:click="generateCallNumber" class="px-4 py-2.5 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-xl hover:bg-emerald-200 transition flex items-center gap-1.5">
