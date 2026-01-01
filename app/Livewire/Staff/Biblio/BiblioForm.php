@@ -64,8 +64,8 @@ class BiblioForm extends Component implements HasForms, HasActions
                                     ->label('Lokasi')
                                     ->options(function () {
                                         $user = auth()->user();
-                                        // Super admin and admin can see all branches
-                                        if (in_array($user->role, ['super_admin', 'admin'])) {
+                                        // Only super_admin can see all branches
+                                        if ($user->role === 'super_admin') {
                                             return Branch::orderBy('name')->pluck('name', 'id');
                                         }
                                         // Others only see their own branch
@@ -75,7 +75,7 @@ class BiblioForm extends Component implements HasForms, HasActions
                                     ->searchable()
                                     ->preload()
                                     ->native(false)
-                                    ->disabled(fn () => !in_array(auth()->user()->role, ['super_admin', 'admin']))
+                                    ->disabled(fn () => auth()->user()->role !== 'super_admin')
                                     ->dehydrated()
                                     ->default(fn () => auth()->user()->branch_id ?? 1),
                                 Forms\Components\Select::make('media_type_id')
