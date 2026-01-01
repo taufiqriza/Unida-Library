@@ -184,7 +184,6 @@
                         <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                             <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
                             <p class="text-xs text-amber-600 mt-2">Coba cari menggunakan <strong>NIM</strong> untuk hasil lebih akurat.</p>
-                            <p class="text-xs text-gray-500 mt-1">Contoh: 432022118144</p>
                         </div>
                         @endif
 
