@@ -321,7 +321,7 @@ class CompleteProfile extends Component
         
         if ($isNim) {
             // Exact NIM search - should return 1 result
-            $this->searchResults = Member::with(['department', 'branch'])
+            $results = Member::with(['department', 'branch'])
                 ->where(function($q) use ($search) {
                     $q->where('member_id', $search)
                       ->orWhere('nim_nidn', $search);
@@ -332,23 +332,27 @@ class CompleteProfile extends Component
                 ->where('profile_completed', false)
                 ->limit(5)
                 ->get();
+            
+            // Mark as exact NIM match
+            $results->each(fn($r) => $r->_matchType = 'nim_exact');
+            $this->searchResults = $results;
         } else {
-            // Name search - more accurate matching
+            // Name search - more accurate matching with scoring
             $searchUpper = strtoupper($search);
             $words = array_filter(explode(' ', $searchUpper), fn($w) => strlen($w) >= 2);
             
-            $this->searchResults = Member::with(['department', 'branch'])
+            $results = Member::with(['department', 'branch'])
                 ->where(function($q) {
                     $q->whereNull('email')->orWhere('email', '');
                 })
                 ->where('profile_completed', false)
                 ->where(function($q) use ($searchUpper, $words) {
-                    // Exact match first
+                    // Exact match
                     $q->whereRaw('UPPER(name) = ?', [$searchUpper]);
-                    
+                    // Starts with
+                    $q->orWhereRaw('UPPER(name) LIKE ?', [$searchUpper . '%']);
                     // Contains full search
                     $q->orWhereRaw('UPPER(name) LIKE ?', ['%' . $searchUpper . '%']);
-                    
                     // All words must match
                     if (count($words) > 1) {
                         $q->orWhere(function($sub) use ($words) {
@@ -358,13 +362,54 @@ class CompleteProfile extends Component
                         });
                     }
                 })
-                ->orderByRaw("CASE 
-                    WHEN UPPER(name) = ? THEN 1 
-                    WHEN UPPER(name) LIKE ? THEN 2 
-                    ELSE 3 
-                END", [$searchUpper, $searchUpper . '%'])
-                ->limit(20)
+                ->limit(50)
                 ->get();
+            
+            // Score and label results
+            $scored = $results->map(function($r) use ($searchUpper, $words) {
+                $nameUpper = strtoupper($r->name);
+                $score = 0;
+                
+                // Exact match = 100
+                if ($nameUpper === $searchUpper) {
+                    $score = 100;
+                    $r->_matchType = 'exact';
+                }
+                // Starts with = 80
+                elseif (str_starts_with($nameUpper, $searchUpper)) {
+                    $score = 80;
+                    $r->_matchType = 'starts';
+                }
+                // All words match = 60-70
+                elseif (count($words) > 1) {
+                    $matchCount = 0;
+                    foreach ($words as $word) {
+                        if (str_contains($nameUpper, $word)) $matchCount++;
+                    }
+                    if ($matchCount === count($words)) {
+                        $score = 60 + ($matchCount * 2);
+                        $r->_matchType = 'all_words';
+                    } else {
+                        $score = 30 + ($matchCount * 5);
+                        $r->_matchType = 'partial';
+                    }
+                }
+                // Contains = 40
+                elseif (str_contains($nameUpper, $searchUpper)) {
+                    $score = 40;
+                    $r->_matchType = 'contains';
+                }
+                else {
+                    $score = 20;
+                    $r->_matchType = 'partial';
+                }
+                
+                $r->_matchScore = $score;
+                return $r;
+            });
+            
+            // Sort by score and limit
+            $this->searchResults = $scored->sortByDesc('_matchScore')->take(15)->values();
         }
 
         $this->isSearching = false;
