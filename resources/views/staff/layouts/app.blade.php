@@ -221,6 +221,10 @@
 <body x-data="staffPortal()" class="antialiased font-['Inter']">
 <script>document.body.classList.add('ready');</script>
 
+    {{-- Right side corner curves --}}
+    <div class="hidden lg:block fixed top-0 right-0 w-8 h-8 z-50 pointer-events-none right-curve-top"></div>
+    <div class="hidden lg:block fixed bottom-0 right-0 w-8 h-8 z-50 pointer-events-none right-curve-bottom"></div>
+
     {{-- Mobile Header --}}
     <header class="mobile-header lg:hidden fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-50 bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 shadow-xl">
         <div class="flex items-center gap-3">

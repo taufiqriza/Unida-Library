@@ -60,6 +60,54 @@
     html.dark.sidebar-collapsed .staff-sidebar::after {
         background: radial-gradient(circle at 100% 0%, transparent 24px, #0f172a 24px) !important;
     }
+    
+    /* Right side curves for main content */
+    .main-content-wrapper::before,
+    .main-content-wrapper::after {
+        content: '';
+        position: fixed;
+        right: 0;
+        width: 32px;
+        height: 32px;
+        pointer-events: none;
+        z-index: 40;
+        background: radial-gradient(circle at 0% 100%, transparent 32px, #f1f5f9 32px);
+    }
+    
+    .main-content-wrapper::before {
+        top: 0;
+        background: radial-gradient(circle at 0% 100%, transparent 32px, #f1f5f9 32px);
+    }
+    
+    .main-content-wrapper::after {
+        bottom: 0;
+        background: radial-gradient(circle at 0% 0%, transparent 32px, #f1f5f9 32px);
+    }
+    
+    html.dark .main-content-wrapper::before {
+        background: radial-gradient(circle at 0% 100%, transparent 32px, #0f172a 32px) !important;
+    }
+    
+    html.dark .main-content-wrapper::after {
+        background: radial-gradient(circle at 0% 0%, transparent 32px, #0f172a 32px) !important;
+    }
+    
+    /* Right corner elements */
+    .right-curve-top {
+        background: radial-gradient(circle at 0% 100%, transparent 32px, #1d4ed8 32px);
+    }
+    
+    .right-curve-bottom {
+        background: radial-gradient(circle at 0% 0%, transparent 32px, #312e81 32px);
+    }
+    
+    html.dark .right-curve-top {
+        background: radial-gradient(circle at 0% 100%, transparent 32px, #0f172a 32px) !important;
+    }
+    
+    html.dark .right-curve-bottom {
+        background: radial-gradient(circle at 0% 0%, transparent 32px, #0f172a 32px) !important;
+    }
 }
 
 /* ============================================ */
