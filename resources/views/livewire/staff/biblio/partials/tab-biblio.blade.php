@@ -25,7 +25,7 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                     <th class="px-4 py-3 text-left font-medium">Judul & Info</th>
                     <th class="px-4 py-3 text-center font-medium w-16">Tahun</th>
                     <th class="px-4 py-3 text-left font-medium w-36">Media</th>
-                    <th class="px-4 py-3 text-left font-medium w-40">Input By</th>
+                    <th class="px-4 py-3 text-left font-medium w-40">Modified</th>
                     <th class="px-4 py-3 text-center font-medium w-24">Aksi</th>
                 </tr>
             </thead>
@@ -73,11 +73,8 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                     <td class="px-4 py-3">
                         @if($book->user)
                         <p class="text-xs text-gray-700 truncate">{{ $book->user->name }}</p>
-                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}</p>
-                        @else
-                        <p class="text-xs text-gray-500 truncate">{{ $book->branch?->name ?? '-' }}</p>
-                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}</p>
                         @endif
+                        <p class="text-[10px] text-gray-400">{{ $book->updated_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}</p>
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-center gap-1">
