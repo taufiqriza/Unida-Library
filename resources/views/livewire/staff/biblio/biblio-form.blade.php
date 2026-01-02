@@ -54,10 +54,15 @@
         
         {{-- Step 1: Info Utama --}}
         @if($step === 1)
-        <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white">
+        <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-white flex items-center justify-between">
             <h2 class="text-base font-bold text-gray-900 flex items-center gap-2">
                 <i class="fas fa-info-circle text-primary-500"></i> Informasi Utama
             </h2>
+            @if(!$isEdit)
+            <button type="button" wire:click="openCopyModal" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-medium rounded-lg transition flex items-center gap-1">
+                <i class="fas fa-search-plus"></i> Cari Data Existing
+            </button>
+            @endif
         </div>
         <div class="p-5 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -263,6 +268,76 @@
 
     {{-- DDC Modal via teleport --}}
     @include('livewire.staff.biblio.partials.ddc-modal')
+
+    {{-- Copy Catalog Modal --}}
+    <template x-teleport="body">
+        <div x-data="{ show: @entangle('showCopyModal') }" x-show="show" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50" x-transition>
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden" @click.outside="show = false">
+                <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-white">
+                    <div>
+                        <h3 class="font-bold text-gray-900 flex items-center gap-2"><i class="fas fa-database text-emerald-500"></i> Salin dari Katalog Existing</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Cari dan salin data bibliografi yang sudah ada di cabang lain</p>
+                    </div>
+                    <button @click="show = false" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-4">
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" wire:model="copySearch" wire:keydown.enter="searchCatalog" placeholder="Masukkan ISBN, judul buku, atau nama penulis..." class="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500">
+                        <button wire:click="searchCatalog" wire:loading.attr="disabled" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-xl transition flex items-center gap-2">
+                            <span wire:loading.remove wire:target="searchCatalog"><i class="fas fa-search"></i> Cari</span>
+                            <span wire:loading wire:target="searchCatalog"><i class="fas fa-spinner fa-spin"></i></span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2 max-h-[60vh] overflow-y-auto">
+                        @forelse($copyResults as $result)
+                        <div class="p-3 bg-gray-50 rounded-xl hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition">
+                            <div class="flex gap-3">
+                                <div class="w-14 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
+                                    @if($result['image'])
+                                    <img src="{{ asset('storage/' . (str_starts_with($result['image'], 'covers/') ? $result['image'] : 'covers/' . $result['image'])) }}" class="w-full h-full object-cover">
+                                    @else
+                                    <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><i class="fas fa-book-open text-white/80"></i></div>
+                                    @endif
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-gray-900 text-sm line-clamp-2">{{ $result['title'] }}</p>
+                                    <p class="text-xs text-gray-600 mt-0.5"><i class="fas fa-user text-gray-400 mr-1"></i>{{ collect($result['authors'])->pluck('name')->implode(', ') ?: 'Penulis tidak diketahui' }}</p>
+                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs">
+                                        @if($result['isbn'])<span class="text-gray-500"><i class="fas fa-barcode text-gray-400 mr-1"></i>{{ $result['isbn'] }}</span>@endif
+                                        @if($result['classification'])<span class="text-blue-600 font-medium"><i class="fas fa-tag mr-1"></i>{{ $result['classification'] }}</span>@endif
+                                        @if($result['publish_year'])<span class="text-gray-500"><i class="fas fa-calendar mr-1"></i>{{ $result['publish_year'] }}</span>@endif
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full"><i class="fas fa-building mr-1"></i>{{ $result['branch']['name'] ?? '-' }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full"><i class="fas fa-layer-group mr-1"></i>{{ $result['items_count'] }} eksemplar</span>
+                                    </div>
+                                </div>
+                                <button wire:click="copyCatalog({{ $result['id'] }})" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition self-center shadow-sm">
+                                    <i class="fas fa-clone mr-1"></i> Salin
+                                </button>
+                            </div>
+                        </div>
+                        @empty
+                        @if($copySearch)
+                        <div class="text-center py-10 text-gray-400">
+                            <i class="fas fa-search text-4xl mb-3"></i>
+                            <p class="text-sm font-medium">Tidak ditemukan</p>
+                            <p class="text-xs mt-1">Coba kata kunci lain atau input data baru secara manual</p>
+                        </div>
+                        @else
+                        <div class="text-center py-10 text-gray-400">
+                            <i class="fas fa-lightbulb text-4xl mb-3 text-amber-400"></i>
+                            <p class="text-sm font-medium text-gray-600">Tips Pencarian</p>
+                            <p class="text-xs mt-1 text-gray-500">Gunakan ISBN untuk hasil paling akurat, atau cari berdasarkan judul/penulis</p>
+                        </div>
+                        @endif
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>
 
 @script

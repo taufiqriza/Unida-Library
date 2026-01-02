@@ -69,6 +69,11 @@ class BiblioForm extends Component
     public string $coverUrl = '';
     public array $coverResults = [];
 
+    // Copy Catalog
+    public bool $showCopyModal = false;
+    public string $copySearch = '';
+    public array $copyResults = [];
+
     // Master data (preloaded)
     public $branches = [];
     public $locations = [];
@@ -414,6 +419,76 @@ class BiblioForm extends Component
         $this->dispatch('showSuccess', title: 'Berhasil!', message: $message);
         
         $this->redirect(route('staff.biblio.index'), navigate: true);
+    }
+
+    // Copy Catalog Methods
+    public function openCopyModal(): void
+    {
+        $this->showCopyModal = true;
+        $this->copySearch = '';
+        $this->copyResults = [];
+    }
+
+    public function searchCatalog(): void
+    {
+        $this->copyResults = [];
+        if (strlen($this->copySearch) < 3) return;
+
+        $search = $this->copySearch;
+        $this->copyResults = Book::query()
+            ->select(['id', 'branch_id', 'title', 'isbn', 'image', 'call_number', 'classification', 'publish_year'])
+            ->with(['branch:id,name', 'authors:id,name'])
+            ->withCount('items')
+            ->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('isbn', 'like', "%{$search}%")
+                  ->orWhereHas('authors', fn($q) => $q->where('name', 'like', "%{$search}%"));
+            })
+            ->orderByDesc('items_count')
+            ->limit(10)
+            ->get()
+            ->toArray();
+    }
+
+    public function copyCatalog(int $bookId): void
+    {
+        $source = Book::with(['authors', 'subjects', 'publisher', 'place'])->find($bookId);
+        if (!$source) return;
+
+        // Copy basic fields
+        $this->title = $source->title;
+        $this->isbn = $source->isbn;
+        $this->edition = $source->edition;
+        $this->spec_detail_info = $source->spec_detail_info;
+        $this->media_type_id = $source->media_type_id;
+        $this->content_type_id = $source->content_type_id;
+        $this->publisher_id = $source->publisher_id;
+        $this->place_id = $source->place_id;
+        $this->publish_year = $source->publish_year;
+        $this->collation = $source->collation;
+        $this->language = $source->language ?? 'id';
+        $this->classification = $source->classification;
+        $this->call_number = $source->call_number;
+        $this->series_title = $source->series_title;
+        $this->abstract = $source->abstract;
+        $this->notes = $source->notes;
+
+        // Copy authors
+        $this->selectedAuthors = $source->authors->map(fn($a) => ['id' => $a->id, 'name' => $a->name])->toArray();
+
+        // Copy subjects
+        $this->selectedSubjects = $source->subjects->map(fn($s) => ['id' => $s->id, 'name' => $s->name])->toArray();
+
+        // Reference same cover image
+        if ($source->image) {
+            session(['pending_cover' => $source->image]);
+        }
+
+        $this->showCopyModal = false;
+        $this->copySearch = '';
+        $this->copyResults = [];
+
+        $this->dispatch('notify', type: 'success', message: 'Data katalog berhasil disalin dari ' . $source->branch?->name);
     }
 
     // Cover Finder Methods
