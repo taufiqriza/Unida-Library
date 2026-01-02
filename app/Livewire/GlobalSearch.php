@@ -481,25 +481,44 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->orderByDesc('published_at')->limit(500)->get()->map(fn($article) => [
-            'type' => 'journal',
-            'id' => $article->id,
-            'title' => $article->title,
-            'author' => $article->authors_string ?: '-',
-            'cover' => $article->cover_url,
-            'year' => $article->publish_year,
-            'publisher' => $article->journal_name,
-            'badge' => $article->source_type === 'repo' ? 'Repo' : ($article->source?->name ?? 'Jurnal'),
-            'badgeColor' => $article->source_type === 'repo' ? 'indigo' : 'purple',
-            'icon' => 'fa-file-lines',
-            'url' => route('opac.journals.show', $article->id),
-            'description' => $article->abstract ? \Str::limit(strip_tags($article->abstract), 150) : null,
-            'meta' => [
-                'journal' => $article->journal_name,
-                'doi' => $article->doi,
-                'source' => $article->source_type,
-            ],
-        ]);
+        return $query->orderByDesc('published_at')->limit(500)->get()->map(function($article) {
+            $typeLabels = [
+                'article' => 'Artikel',
+                'conference' => 'Prosiding',
+                'book' => 'Buku',
+                'book_section' => 'Bab Buku',
+                'patent' => 'Paten',
+            ];
+            $typeColors = [
+                'article' => 'purple',
+                'conference' => 'blue',
+                'book' => 'emerald',
+                'book_section' => 'teal',
+                'patent' => 'amber',
+            ];
+            $type = $article->type ?? 'article';
+            
+            return [
+                'type' => 'journal',
+                'id' => $article->id,
+                'title' => $article->title,
+                'author' => $article->authors_string ?: '-',
+                'cover' => $article->cover_url,
+                'year' => $article->publish_year,
+                'publisher' => $article->journal_name,
+                'badge' => $typeLabels[$type] ?? 'Jurnal',
+                'badgeColor' => $typeColors[$type] ?? 'purple',
+                'icon' => 'fa-file-lines',
+                'url' => route('opac.journals.show', $article->id),
+                'description' => $article->abstract ? \Str::limit(strip_tags($article->abstract), 150) : null,
+                'meta' => [
+                    'journal' => $article->journal_name,
+                    'doi' => $article->doi,
+                    'source' => $article->source_type,
+                    'pub_type' => $type,
+                ],
+            ];
+        });
     }
 
     protected function searchExternal(): Collection
