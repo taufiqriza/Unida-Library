@@ -72,7 +72,6 @@ class BiblioForm extends Component
     // Copy Catalog
     public bool $showCopyModal = false;
     public string $copySearch = '';
-    public array $copyResults = [];
 
     // Master data (preloaded)
     public $branches = [];
@@ -441,22 +440,35 @@ class BiblioForm extends Component
     }
 
     // Copy Catalog Methods
+    public array $internalResults = [];
+    public array $googleResults = [];
+    public array $openLibraryResults = [];
+    public bool $isSearching = false;
+
     public function openCopyModal(): void
     {
         $this->showCopyModal = true;
         $this->copySearch = '';
-        $this->copyResults = [];
+        $this->internalResults = [];
+        $this->googleResults = [];
+        $this->openLibraryResults = [];
     }
 
     public function searchCatalog(): void
     {
-        $this->copyResults = [];
         if (strlen($this->copySearch) < 3) return;
 
+        $this->isSearching = true;
+        $this->internalResults = [];
+        $this->googleResults = [];
+        $this->openLibraryResults = [];
+
         $search = $this->copySearch;
-        $this->copyResults = Book::query()
+
+        // 1. Internal catalog
+        $this->internalResults = Book::query()
             ->select(['id', 'branch_id', 'title', 'isbn', 'image', 'call_number', 'classification', 'publish_year'])
-            ->with(['branch:id,name', 'authors:id,name'])
+            ->with(['branch:id,name', 'authors:id,name', 'publisher:id,name'])
             ->withCount('items')
             ->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
@@ -464,9 +476,158 @@ class BiblioForm extends Component
                   ->orWhereHas('authors', fn($q) => $q->where('name', 'like', "%{$search}%"));
             })
             ->orderByDesc('items_count')
-            ->limit(10)
+            ->limit(5)
             ->get()
             ->toArray();
+
+        // 2. Google Books API
+        try {
+            $query = urlencode($search);
+            $googleData = @file_get_contents(
+                "https://www.googleapis.com/books/v1/volumes?q={$query}&maxResults=5&langRestrict=id",
+                false,
+                stream_context_create(['http' => ['timeout' => 5]])
+            );
+            if ($googleData) {
+                $data = json_decode($googleData, true);
+                foreach ($data['items'] ?? [] as $item) {
+                    $info = $item['volumeInfo'] ?? [];
+                    $this->googleResults[] = [
+                        'id' => $item['id'],
+                        'title' => $info['title'] ?? '',
+                        'subtitle' => $info['subtitle'] ?? '',
+                        'authors' => $info['authors'] ?? [],
+                        'publisher' => $info['publisher'] ?? '',
+                        'publishedDate' => $info['publishedDate'] ?? '',
+                        'description' => $info['description'] ?? '',
+                        'isbn' => $this->extractIsbn($info['industryIdentifiers'] ?? []),
+                        'pageCount' => $info['pageCount'] ?? null,
+                        'categories' => $info['categories'] ?? [],
+                        'language' => $info['language'] ?? '',
+                        'cover' => str_replace('http://', 'https://', $info['imageLinks']['thumbnail'] ?? ''),
+                    ];
+                }
+            }
+        } catch (\Exception $e) {}
+
+        // 3. Open Library API
+        try {
+            $query = urlencode($search);
+            $olData = @file_get_contents(
+                "https://openlibrary.org/search.json?q={$query}&limit=5",
+                false,
+                stream_context_create(['http' => ['timeout' => 5]])
+            );
+            if ($olData) {
+                $data = json_decode($olData, true);
+                foreach ($data['docs'] ?? [] as $doc) {
+                    $this->openLibraryResults[] = [
+                        'key' => $doc['key'] ?? '',
+                        'title' => $doc['title'] ?? '',
+                        'authors' => $doc['author_name'] ?? [],
+                        'publisher' => $doc['publisher'][0] ?? '',
+                        'publishYear' => $doc['first_publish_year'] ?? '',
+                        'isbn' => $doc['isbn'][0] ?? '',
+                        'subjects' => array_slice($doc['subject'] ?? [], 0, 3),
+                        'ddc' => $doc['ddc'][0] ?? '',
+                        'cover' => !empty($doc['cover_i']) ? "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-M.jpg" : '',
+                    ];
+                }
+            }
+        } catch (\Exception $e) {}
+
+        $this->isSearching = false;
+    }
+
+    protected function extractIsbn(array $identifiers): string
+    {
+        foreach ($identifiers as $id) {
+            if (($id['type'] ?? '') === 'ISBN_13') return $id['identifier'];
+        }
+        foreach ($identifiers as $id) {
+            if (($id['type'] ?? '') === 'ISBN_10') return $id['identifier'];
+        }
+        return '';
+    }
+
+    public function useGoogleBook(int $index): void
+    {
+        $book = $this->googleResults[$index] ?? null;
+        if (!$book) return;
+
+        $this->title = $book['title'] . ($book['subtitle'] ? ': ' . $book['subtitle'] : '');
+        $this->isbn = $book['isbn'];
+        $this->publish_year = substr($book['publishedDate'], 0, 4);
+        $this->abstract = $book['description'];
+        $this->collation = $book['pageCount'] ? $book['pageCount'] . ' hlm.' : null;
+        $this->language = $book['language'] === 'id' ? 'id' : 'en';
+
+        // Create/find authors
+        $this->selectedAuthors = [];
+        foreach ($book['authors'] as $authorName) {
+            $author = Author::firstOrCreate(['name' => $authorName]);
+            $this->selectedAuthors[] = ['id' => $author->id, 'name' => $author->name];
+        }
+
+        // Create/find publisher
+        if ($book['publisher']) {
+            $publisher = Publisher::firstOrCreate(['name' => $book['publisher']]);
+            $this->publisher_id = $publisher->id;
+        }
+
+        // Download cover
+        if ($book['cover']) {
+            $this->downloadAndSetCover($book['cover']);
+        }
+
+        $this->showCopyModal = false;
+        $this->dispatch('notify', type: 'success', message: 'Data dari Google Books berhasil digunakan');
+    }
+
+    public function useOpenLibrary(int $index): void
+    {
+        $book = $this->openLibraryResults[$index] ?? null;
+        if (!$book) return;
+
+        $this->title = $book['title'];
+        $this->isbn = $book['isbn'];
+        $this->publish_year = $book['publishYear'];
+        $this->classification = $book['ddc'];
+
+        // Create/find authors
+        $this->selectedAuthors = [];
+        foreach ($book['authors'] as $authorName) {
+            $author = Author::firstOrCreate(['name' => $authorName]);
+            $this->selectedAuthors[] = ['id' => $author->id, 'name' => $author->name];
+        }
+
+        // Create/find publisher
+        if ($book['publisher']) {
+            $publisher = Publisher::firstOrCreate(['name' => $book['publisher']]);
+            $this->publisher_id = $publisher->id;
+        }
+
+        // Download cover
+        if ($book['cover']) {
+            $this->downloadAndSetCover($book['cover']);
+        }
+
+        $this->showCopyModal = false;
+        $this->dispatch('notify', type: 'success', message: 'Data dari Open Library berhasil digunakan');
+    }
+
+    protected function downloadAndSetCover(string $url): void
+    {
+        try {
+            $ctx = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'Mozilla/5.0']]);
+            $imageData = @file_get_contents($url, false, $ctx);
+            if ($imageData && strlen($imageData) > 1000) {
+                $ext = 'jpg';
+                $filename = 'covers/cover_' . Str::slug(substr($this->title, 0, 50)) . '-' . now()->format('YmdHis') . '.' . $ext;
+                \Storage::disk('public')->put($filename, $imageData);
+                session(['pending_cover' => $filename]);
+            }
+        } catch (\Exception $e) {}
     }
 
     public function copyCatalog(int $bookId): void

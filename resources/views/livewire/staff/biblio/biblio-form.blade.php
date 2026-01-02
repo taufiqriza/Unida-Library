@@ -59,8 +59,14 @@
                 <i class="fas fa-info-circle text-primary-500"></i> Informasi Utama
             </h2>
             @if(!$isEdit)
-            <button type="button" wire:click="openCopyModal" class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-medium rounded-lg transition flex items-center gap-1">
-                <i class="fas fa-search-plus"></i> Cari Data Existing
+            <button type="button" wire:click="openCopyModal" class="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white text-xs font-medium rounded-lg transition flex items-center gap-2 shadow-sm">
+                <i class="fas fa-globe"></i>
+                <span>Cari Online</span>
+                <div class="flex -space-x-1">
+                    <span class="w-4 h-4 bg-white rounded-full flex items-center justify-center"><i class="fas fa-database text-[8px] text-emerald-500"></i></span>
+                    <span class="w-4 h-4 bg-white rounded-full flex items-center justify-center"><i class="fab fa-google text-[8px] text-blue-500"></i></span>
+                    <span class="w-4 h-4 bg-white rounded-full flex items-center justify-center"><i class="fas fa-book-open text-[8px] text-orange-500"></i></span>
+                </div>
             </button>
             @endif
         </div>
@@ -273,69 +279,193 @@
 
     {{-- Copy Catalog Modal --}}
     <template x-teleport="body">
-        <div x-data="{ show: @entangle('showCopyModal') }" x-show="show" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50" x-transition>
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden" @click.outside="show = false">
-                <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-white">
-                    <div>
-                        <h3 class="font-bold text-gray-900 flex items-center gap-2"><i class="fas fa-database text-emerald-500"></i> Salin dari Katalog Existing</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">Cari dan salin data bibliografi yang sudah ada di cabang lain</p>
+        <div x-data="{ show: @entangle('showCopyModal') }" x-show="show" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" x-transition>
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden" @click.outside="show = false">
+                {{-- Header --}}
+                <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-600 to-indigo-600">
+                    <div class="flex items-center justify-between">
+                        <div class="text-white">
+                            <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-search-plus"></i> Cari Data Bibliografi</h3>
+                            <p class="text-blue-100 text-sm mt-0.5">Temukan data buku untuk mempercepat proses input katalog</p>
+                        </div>
+                        <button @click="show = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white transition"><i class="fas fa-times"></i></button>
                     </div>
-                    <button @click="show = false" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="p-4">
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" wire:model="copySearch" wire:keydown.enter="searchCatalog" placeholder="Masukkan ISBN, judul buku, atau nama penulis..." class="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500">
-                        <button wire:click="searchCatalog" wire:loading.attr="disabled" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-xl transition flex items-center gap-2">
-                            <span wire:loading.remove wire:target="searchCatalog"><i class="fas fa-search"></i> Cari</span>
+                    {{-- Search Input --}}
+                    <div class="mt-4 flex gap-2">
+                        <div class="flex-1 relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" wire:model="copySearch" wire:keydown.enter="searchCatalog" placeholder="Ketik ISBN, judul buku, atau nama penulis..." class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl focus:ring-2 focus:ring-white/50 border-0">
+                        </div>
+                        <button wire:click="searchCatalog" wire:loading.attr="disabled" class="px-6 py-3 bg-white text-blue-600 text-sm font-semibold rounded-xl hover:bg-blue-50 transition flex items-center gap-2">
+                            <span wire:loading.remove wire:target="searchCatalog">Cari</span>
                             <span wire:loading wire:target="searchCatalog"><i class="fas fa-spinner fa-spin"></i></span>
                         </button>
                     </div>
-                    
-                    <div class="space-y-2 max-h-[60vh] overflow-y-auto">
-                        @forelse($copyResults as $result)
-                        <div class="p-3 bg-gray-50 rounded-xl hover:bg-emerald-50 border border-transparent hover:border-emerald-200 transition">
-                            <div class="flex gap-3">
-                                <div class="w-14 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
-                                    @if($result['image'])
-                                    <img src="{{ asset('storage/' . (str_starts_with($result['image'], 'covers/') ? $result['image'] : 'covers/' . $result['image'])) }}" class="w-full h-full object-cover">
-                                    @else
-                                    <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><i class="fas fa-book-open text-white/80"></i></div>
-                                    @endif
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-900 text-sm line-clamp-2">{{ $result['title'] }}</p>
-                                    <p class="text-xs text-gray-600 mt-0.5"><i class="fas fa-user text-gray-400 mr-1"></i>{{ collect($result['authors'])->pluck('name')->implode(', ') ?: 'Penulis tidak diketahui' }}</p>
-                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs">
-                                        @if($result['isbn'])<span class="text-gray-500"><i class="fas fa-barcode text-gray-400 mr-1"></i>{{ $result['isbn'] }}</span>@endif
-                                        @if($result['classification'])<span class="text-blue-600 font-medium"><i class="fas fa-tag mr-1"></i>{{ $result['classification'] }}</span>@endif
-                                        @if($result['publish_year'])<span class="text-gray-500"><i class="fas fa-calendar mr-1"></i>{{ $result['publish_year'] }}</span>@endif
-                                    </div>
-                                    <div class="flex items-center gap-2 mt-1.5">
-                                        <span class="inline-flex items-center px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full"><i class="fas fa-building mr-1"></i>{{ $result['branch']['name'] ?? '-' }}</span>
-                                        <span class="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-full"><i class="fas fa-layer-group mr-1"></i>{{ $result['items_count'] }} eksemplar</span>
-                                    </div>
-                                </div>
-                                <button wire:click="copyCatalog({{ $result['id'] }})" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition self-center shadow-sm">
-                                    <i class="fas fa-clone mr-1"></i> Salin
-                                </button>
+                    {{-- Source Info --}}
+                    <div class="mt-3 flex items-center gap-4 text-xs text-blue-100">
+                        <span class="flex items-center gap-1.5"><i class="fas fa-database"></i> Katalog UNIDA</span>
+                        <span class="flex items-center gap-1.5"><i class="fab fa-google"></i> Google Books</span>
+                        <span class="flex items-center gap-1.5"><i class="fas fa-globe"></i> Open Library</span>
+                    </div>
+                </div>
+
+                {{-- Results --}}
+                <div class="p-5 overflow-y-auto" style="max-height: calc(90vh - 180px);">
+                    @if(empty($internalResults) && empty($googleResults) && empty($openLibraryResults) && !$copySearch)
+                    <div class="text-center py-12">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-lightbulb text-3xl text-amber-500"></i>
+                        </div>
+                        <h4 class="text-gray-800 font-semibold mb-2">Cari Data untuk Input Cepat</h4>
+                        <p class="text-gray-500 text-sm max-w-md mx-auto">Gunakan <span class="font-medium text-blue-600">ISBN</span> untuk hasil paling akurat, atau cari berdasarkan <span class="font-medium text-blue-600">judul</span> dan <span class="font-medium text-blue-600">penulis</span></p>
+                        <div class="flex justify-center gap-6 mt-6">
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center"><i class="fas fa-database text-emerald-600"></i></span>
+                                <span class="text-[10px] text-gray-500">Katalog UNIDA</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fab fa-google text-blue-600"></i></span>
+                                <span class="text-[10px] text-gray-500">Google Books</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-globe text-orange-600"></i></span>
+                                <span class="text-[10px] text-gray-500">Open Library</span>
                             </div>
                         </div>
-                        @empty
-                        @if($copySearch)
-                        <div class="text-center py-10 text-gray-400">
-                            <i class="fas fa-search text-4xl mb-3"></i>
-                            <p class="text-sm font-medium">Tidak ditemukan</p>
-                            <p class="text-xs mt-1">Coba kata kunci lain atau input data baru secara manual</p>
-                        </div>
-                        @else
-                        <div class="text-center py-10 text-gray-400">
-                            <i class="fas fa-lightbulb text-4xl mb-3 text-amber-400"></i>
-                            <p class="text-sm font-medium text-gray-600">Tips Pencarian</p>
-                            <p class="text-xs mt-1 text-gray-500">Gunakan ISBN untuk hasil paling akurat, atau cari berdasarkan judul/penulis</p>
+                    </div>
+                    @else
+                    <div class="space-y-6">
+                        {{-- Internal Results --}}
+                        @if(!empty($internalResults))
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-database text-white text-xs"></i></span>
+                                <h4 class="font-semibold text-gray-800">Katalog Internal UNIDA Gontor</h4>
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">{{ count($internalResults) }} hasil</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-2 -mt-1">Data dari seluruh cabang perpustakaan Universitas Darussalam Gontor</p>
+                            <div class="space-y-2">
+                                @foreach($internalResults as $result)
+                                <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 hover:border-emerald-300 transition group">
+                                    <div class="flex gap-3">
+                                        <div class="w-12 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
+                                            @if($result['image'])
+                                            <img src="{{ asset('storage/' . (str_starts_with($result['image'], 'covers/') ? $result['image'] : 'covers/' . $result['image'])) }}" class="w-full h-full object-cover">
+                                            @else
+                                            <div class="w-full h-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"><i class="fas fa-book text-white/80"></i></div>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ $result['title'] }}</p>
+                                            <p class="text-xs text-gray-600">{{ collect($result['authors'])->pluck('name')->implode(', ') ?: '-' }}</p>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                                                @if($result['isbn'])<span class="text-gray-500"><i class="fas fa-barcode mr-1"></i>{{ $result['isbn'] }}</span>@endif
+                                                @if($result['classification'])<span class="text-emerald-600 font-medium">DDC: {{ $result['classification'] }}</span>@endif
+                                                <span class="px-1.5 py-0.5 bg-emerald-200 text-emerald-800 rounded text-[10px]">{{ $result['branch']['name'] ?? '-' }}</span>
+                                                <span class="text-gray-400">{{ $result['items_count'] }} eks</span>
+                                            </div>
+                                        </div>
+                                        <button wire:click="copyCatalog({{ $result['id'] }})" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition self-center opacity-80 group-hover:opacity-100">
+                                            <i class="fas fa-clone mr-1"></i> Salin
+                                        </button>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
                         @endif
-                        @endforelse
+
+                        {{-- Google Books Results --}}
+                        @if(!empty($googleResults))
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center"><i class="fab fa-google text-white text-xs"></i></span>
+                                <h4 class="font-semibold text-gray-800">Google Books</h4>
+                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">{{ count($googleResults) }} hasil</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-2 -mt-1">Database buku terlengkap dari Google dengan cover & deskripsi</p>
+                            <div class="space-y-2">
+                                @foreach($googleResults as $index => $result)
+                                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 hover:border-blue-300 transition group">
+                                    <div class="flex gap-3">
+                                        <div class="w-12 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
+                                            @if($result['cover'])
+                                            <img src="{{ $result['cover'] }}" class="w-full h-full object-cover">
+                                            @else
+                                            <div class="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center"><i class="fas fa-book text-white/80"></i></div>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ $result['title'] }}</p>
+                                            <p class="text-xs text-gray-600">{{ implode(', ', $result['authors']) ?: '-' }}</p>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                                                @if($result['isbn'])<span class="text-gray-500"><i class="fas fa-barcode mr-1"></i>{{ $result['isbn'] }}</span>@endif
+                                                @if($result['publisher'])<span class="text-gray-500"><i class="fas fa-building mr-1"></i>{{ Str::limit($result['publisher'], 20) }}</span>@endif
+                                                @if($result['publishedDate'])<span class="text-blue-600 font-medium">{{ substr($result['publishedDate'], 0, 4) }}</span>@endif
+                                                @if($result['pageCount'])<span class="text-gray-400">{{ $result['pageCount'] }} hlm</span>@endif
+                                            </div>
+                                        </div>
+                                        <button wire:click="useGoogleBook({{ $index }})" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition self-center opacity-80 group-hover:opacity-100">
+                                            <i class="fas fa-download mr-1"></i> Gunakan
+                                        </button>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- Open Library Results --}}
+                        @if(!empty($openLibraryResults))
+                        <div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-globe text-white text-xs"></i></span>
+                                <h4 class="font-semibold text-gray-800">Open Library</h4>
+                                <span class="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">{{ count($openLibraryResults) }} hasil</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-2 -mt-1">Database open source dengan klasifikasi DDC</p>
+                            <div class="space-y-2">
+                                @foreach($openLibraryResults as $index => $result)
+                                <div class="p-3 bg-orange-50 rounded-xl border border-orange-100 hover:border-orange-300 transition group">
+                                    <div class="flex gap-3">
+                                        <div class="w-12 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
+                                            @if($result['cover'])
+                                            <img src="{{ $result['cover'] }}" class="w-full h-full object-cover">
+                                            @else
+                                            <div class="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center"><i class="fas fa-book text-white/80"></i></div>
+                                            @endif
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ $result['title'] }}</p>
+                                            <p class="text-xs text-gray-600">{{ implode(', ', $result['authors']) ?: '-' }}</p>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                                                @if($result['isbn'])<span class="text-gray-500"><i class="fas fa-barcode mr-1"></i>{{ $result['isbn'] }}</span>@endif
+                                                @if($result['ddc'])<span class="text-orange-600 font-medium">DDC: {{ $result['ddc'] }}</span>@endif
+                                                @if($result['publishYear'])<span class="text-gray-500">{{ $result['publishYear'] }}</span>@endif
+                                            </div>
+                                        </div>
+                                        <button wire:click="useOpenLibrary({{ $index }})" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition self-center opacity-80 group-hover:opacity-100">
+                                            <i class="fas fa-download mr-1"></i> Gunakan
+                                        </button>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- No Results --}}
+                        @if(empty($internalResults) && empty($googleResults) && empty($openLibraryResults) && $copySearch)
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-search text-2xl text-gray-400"></i>
+                            </div>
+                            <h4 class="text-gray-600 font-medium mb-1">Tidak ditemukan hasil</h4>
+                            <p class="text-gray-400 text-sm">Coba kata kunci lain atau input data secara manual</p>
+                        </div>
+                        @endif
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
