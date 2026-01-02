@@ -4,18 +4,18 @@
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div class="flex flex-col lg:flex-row">
                     <!-- Left - Info (Hidden on Mobile) -->
-                    <div class="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-primary-600 to-primary-800 p-8 flex-col justify-between text-white">
-                        <div>
-                            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                                <i class="fas fa-book-reader text-2xl"></i>
+                    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 p-8 flex-col justify-center text-white">
+                        <div class="flex items-center gap-3 mb-6">
+                            <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-12 h-12 object-contain">
+                            <div>
+                                <h2 class="text-xl font-bold">{{ __('opac.auth.login.digital_library') }}</h2>
+                                <p class="text-primary-200 text-sm">{{ __('opac.auth.login.digital_library_desc') }}</p>
                             </div>
-                            <h2 class="text-xl font-bold mb-1">{{ __('opac.auth.login.digital_library') }}</h2>
-                            <p class="text-primary-200 text-sm mb-6">{{ __('opac.auth.login.digital_library_desc') }}</p>
                         </div>
                         
-                        <div class="space-y-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-book"></i>
                                 </div>
                                 <div>
@@ -23,8 +23,8 @@
                                     <p class="text-primary-200 text-xs">{{ __('opac.auth.login.online_loan_desc') }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-file-pdf"></i>
                                 </div>
                                 <div>
@@ -32,38 +32,47 @@
                                     <p class="text-primary-200 text-xs">{{ __('opac.auth.login.ebook_ethesis_desc') }}</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-upload"></i>
                                 </div>
                                 <div>
                                     <p class="font-medium text-sm">Unggah Mandiri</p>
-                                    <p class="text-primary-200 text-xs">Submit skripsi/tesis/disertasi online</p>
+                                    <p class="text-primary-200 text-xs">Submit tugas akhir online</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-search-plus"></i>
                                 </div>
                                 <div>
                                     <p class="font-medium text-sm">Cek Plagiasi</p>
-                                    <p class="text-primary-200 text-xs">Integrasi Turnitin untuk similarity check</p>
+                                    <p class="text-primary-200 text-xs">Integrasi Turnitin</p>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                     <i class="fas fa-certificate"></i>
                                 </div>
                                 <div>
                                     <p class="font-medium text-sm">Bebas Pustaka</p>
-                                    <p class="text-primary-200 text-xs">Pengajuan surat bebas pustaka digital</p>
+                                    <p class="text-primary-200 text-xs">Pengajuan surat digital</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm">{{ __('opac.auth.login.complete_history') }}</p>
+                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.complete_history_desc') }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Right - Form -->
-                    <div class="lg:w-7/12">
+                    <div class="lg:w-1/2">
                         <!-- Header - Mobile Only -->
                         <div class="lg:hidden bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-4 flex items-center gap-4">
                             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -218,10 +227,12 @@
                             </form>
 
                             <div class="mt-5 pt-5 border-t border-gray-100 text-center">
-                                <p class="text-sm text-gray-500">
-                                    {{ __('opac.auth.login.no_account') }} 
-                                    <a href="{{ route('opac.register') }}" class="text-primary-600 font-semibold hover:text-primary-700">{{ __('opac.auth.login.register_manual') }}</a>
-                                </p>
+                                <p class="text-sm text-gray-600 mb-2">Belum punya akun?</p>
+                                <a href="{{ route('opac.register') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm">
+                                    <i class="fas fa-user-plus"></i>
+                                    Daftar dengan Data SIAKAD/SDM
+                                </a>
+                                <p class="text-xs text-gray-400 mt-2">Mahasiswa, Dosen, Tendik & Umum</p>
                             </div>
                             @endif {{-- End portal choice else --}}
                         </div>
