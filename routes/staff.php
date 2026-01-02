@@ -61,6 +61,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{member}/edit', \App\Livewire\Staff\Member\MemberForm::class)->name('edit');
         });
 
+        // Employees (SDM - Dosen & Tendik)
+        Route::get('/employee', \App\Livewire\Staff\Employee\EmployeeList::class)->name('employee.index');
+
         // Tasks (Kanban Board) & Schedule
         Route::prefix('task')->name('task.')->group(function () {
             Route::get('/', \App\Livewire\Staff\Task\TaskKanban::class)->name('index');
