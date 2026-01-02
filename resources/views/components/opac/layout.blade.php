@@ -1147,9 +1147,6 @@
     {{-- Support Chat Widget --}}
     @livewire('member.support-chat')
     
-    {{-- Floating Widgets: WhatsApp & Scroll to Top --}}
-    @include('partials.floating-widgets')
-    
     @livewireScripts
 </body>
 </html>

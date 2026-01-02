@@ -740,6 +740,7 @@ return [
         'connected' => 'Connected with Google',
         'profile_incomplete' => 'Your profile is incomplete',
         'complete_now' => 'Complete Now',
+        'full_access' => 'Login for full access',
         
         // Login
         'login' => [

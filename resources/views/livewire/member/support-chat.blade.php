@@ -4,7 +4,7 @@
     @endphp
     
     {{-- Floating Button --}}
-    <div class="fixed bottom-6 right-6 z-50" x-data="{ showOptions: false }">
+    <div class="fixed bottom-24 lg:bottom-6 right-6 z-50" x-data="{ showOptions: false }">
         @if(!$isOpen)
             <div class="relative">
                 {{-- Options Popup --}}

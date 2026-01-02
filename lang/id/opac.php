@@ -796,6 +796,7 @@ return [
         'connected' => 'Terhubung dengan Google',
         'profile_incomplete' => 'Profil Anda belum lengkap',
         'complete_now' => 'Lengkapi Sekarang',
+        'full_access' => 'Masuk untuk akses penuh',
         
         // Login
         'login' => [
