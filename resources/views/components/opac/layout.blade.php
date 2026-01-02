@@ -952,12 +952,10 @@
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-primary-300">
+            <div class="border-t border-white/20 mt-8 pt-6 text-center text-sm text-primary-300 group">
                 <p>&copy; {{ date('Y') }} {{ __('opac.site_name') }}. {{ __('opac.footer.all_rights') }}.</p>
-                <p class="mt-2 text-xs text-primary-400/60 hover:text-primary-300 transition cursor-default" title="Developer Contact">
-                    <span class="opacity-0 hover:opacity-100 transition-opacity duration-500">
-                        Crafted with ❤️ by <a href="mailto:zyntech.id@gmail.com" class="hover:underline">ZynTech</a> • 082117049501
-                    </span>
+                <p class="mt-2 text-xs text-primary-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Crafted with ❤️ by <a href="mailto:zyntech.id@gmail.com" class="hover:text-white">ZynTech</a> • <a href="https://wa.me/6282117049501" target="_blank" class="hover:text-white">082117049501</a>
                 </p>
             </div>
         </div>

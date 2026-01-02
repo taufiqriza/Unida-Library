@@ -10,8 +10,8 @@
                                 <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-9 h-9 object-contain">
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold">Perpustakaan Digital</h2>
-                                <p class="text-primary-200 text-sm">UNIDA Gontor</p>
+                                <h2 class="text-lg font-bold">{{ __('opac.auth.login.digital_library') }}</h2>
+                                <p class="text-primary-200 text-sm">{{ __('opac.auth.login.digital_library_desc') }}</p>
                             </div>
                         </div>
                         
@@ -21,8 +21,8 @@
                                     <i class="fas fa-book"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold">Peminjaman Online</p>
-                                    <p class="text-primary-200 text-sm">Reservasi & perpanjang buku</p>
+                                    <p class="font-semibold">{{ __('opac.auth.login.online_loan') }}</p>
+                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.online_loan_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -30,8 +30,8 @@
                                     <i class="fas fa-file-pdf"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold">E-Book & E-Thesis</p>
-                                    <p class="text-primary-200 text-sm">Akses koleksi digital</p>
+                                    <p class="font-semibold">{{ __('opac.auth.login.ebook_ethesis') }}</p>
+                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.ebook_ethesis_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -39,8 +39,8 @@
                                     <i class="fas fa-upload"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold">Unggah Mandiri</p>
-                                    <p class="text-primary-200 text-sm">Submit tugas akhir online</p>
+                                    <p class="font-semibold">{{ __('opac.auth.login.upload_thesis') }}</p>
+                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.upload_thesis_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -48,8 +48,8 @@
                                     <i class="fas fa-search-plus"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold">Cek Plagiasi</p>
-                                    <p class="text-primary-200 text-sm">Integrasi Turnitin</p>
+                                    <p class="font-semibold">{{ __('opac.auth.login.plagiarism_check') }}</p>
+                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.plagiarism_check_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -57,8 +57,8 @@
                                     <i class="fas fa-certificate"></i>
                                 </div>
                                 <div>
-                                    <p class="font-semibold">Bebas Pustaka</p>
-                                    <p class="text-primary-200 text-sm">Pengajuan surat digital</p>
+                                    <p class="font-semibold">{{ __('opac.auth.login.library_clearance') }}</p>
+                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.library_clearance_desc') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -165,28 +165,28 @@
                             </a>
                             <p class="text-xs text-gray-500 text-center mt-2 mb-5">
                                 <i class="fas fa-link text-primary-500 mr-1"></i>
-                                Civitas UNIDA otomatis terhubung data SIAKAD/SDM
+                                {{ __('opac.auth.login.auto_link_hint') }}
                             </p>
 
                             <div class="relative mb-5">
                                 <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
-                                <div class="relative flex justify-center text-xs"><span class="px-3 bg-white text-gray-400">atau login manual</span></div>
+                                <div class="relative flex justify-center text-xs"><span class="px-3 bg-white text-gray-400">{{ __('opac.auth.login.or_manual') }}</span></div>
                             </div>
                             @endif
 
                             <form wire:submit="login" class="space-y-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email / NIM / ID Anggota</label>
-                                    <input type="text" wire:model="identifier" required placeholder="Masukkan email atau NIM"
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('opac.auth.login.member_id_email') }}</label>
+                                    <input type="text" wire:model="identifier" required placeholder="{{ __('opac.auth.login.member_id_placeholder') }}"
                                         class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
                                 </div>
                                 <div>
                                     <div class="flex items-center justify-between mb-1.5">
-                                        <label class="block text-sm font-medium text-gray-700">Password</label>
-                                        <a href="{{ route('opac.forgot-password') }}" class="text-xs text-primary-600 hover:text-primary-700">Lupa Password?</a>
+                                        <label class="block text-sm font-medium text-gray-700">{{ __('opac.auth.login.password') }}</label>
+                                        <a href="{{ route('opac.forgot-password') }}" class="text-xs text-primary-600 hover:text-primary-700">{{ __('opac.auth.login.forgot_password') }}</a>
                                     </div>
                                     <div class="relative" x-data="{ show: false }">
-                                        <input :type="show ? 'text' : 'password'" wire:model="password" required placeholder="Masukkan password"
+                                        <input :type="show ? 'text' : 'password'" wire:model="password" required placeholder="{{ __('opac.auth.login.password_placeholder') }}"
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition pr-12">
                                         <button type="button" @click="show = !show" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                                             <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
@@ -196,14 +196,14 @@
                                 <button type="submit" wire:loading.attr="disabled" class="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-50">
                                     <span wire:loading wire:target="login"><i class="fas fa-spinner fa-spin"></i></span>
                                     <span wire:loading.remove wire:target="login"><i class="fas fa-sign-in-alt"></i></span>
-                                    Masuk
+                                    {{ __('opac.auth.login.login_btn') }}
                                 </button>
                             </form>
 
                             <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-                                <p class="text-sm text-gray-500 mb-2">Belum punya akun?</p>
+                                <p class="text-sm text-gray-500 mb-2">{{ __('opac.auth.login.no_account') }}</p>
                                 <a href="{{ route('opac.register') }}" class="text-primary-600 hover:text-primary-700 font-semibold text-sm">
-                                    Daftar dengan Data SIAKAD/SDM <i class="fas fa-arrow-right ml-1"></i>
+                                    {{ __('opac.auth.login.register_siakad') }} <i class="fas fa-arrow-right ml-1"></i>
                                 </a>
                             </div>
                             @endif {{-- End portal choice else --}}
