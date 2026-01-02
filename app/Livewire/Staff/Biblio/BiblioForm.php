@@ -228,18 +228,37 @@ class BiblioForm extends Component
             1 => [
                 'title' => 'required|min:3|max:500',
                 'branch_id' => 'required',
+                'location_id' => 'required',
             ],
-            2 => [], // Authors/subjects optional
-            3 => [], // Publishing info optional
+            2 => [
+                'selectedAuthors' => 'required|array|min:1',
+            ],
+            3 => [
+                'classification' => 'required|min:1',
+                'call_number' => 'required|min:3',
+            ],
             4 => [
                 'cover_image' => 'nullable|image|max:2048',
             ],
             default => [],
         };
 
+        $messages = [
+            'title.required' => 'Judul wajib diisi',
+            'title.min' => 'Judul minimal 3 karakter',
+            'branch_id.required' => 'Cabang wajib dipilih',
+            'location_id.required' => 'Lokasi wajib dipilih',
+            'selectedAuthors.required' => 'Minimal 1 penulis wajib dipilih',
+            'selectedAuthors.min' => 'Minimal 1 penulis wajib dipilih',
+            'classification.required' => 'Klasifikasi DDC wajib diisi',
+            'call_number.required' => 'Nomor panggil wajib diisi',
+            'call_number.min' => 'Nomor panggil minimal 3 karakter',
+        ];
+
         if (!empty($rules)) {
-            $this->validate($rules, $this->messages());
+            $this->validate($rules, $messages);
         }
+
         return true;
     }
 
