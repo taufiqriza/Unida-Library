@@ -82,6 +82,10 @@ class BiblioForm extends Component
         return [
             'title' => 'required|min:3|max:500',
             'branch_id' => 'required|exists:branches,id',
+            'location_id' => 'required|exists:locations,id',
+            'selectedAuthors' => 'required|array|min:1',
+            'classification' => 'required|min:1',
+            'call_number' => 'required|min:3',
         ];
     }
 
@@ -90,7 +94,13 @@ class BiblioForm extends Component
         return [
             'title.required' => 'Judul wajib diisi',
             'title.min' => 'Judul minimal 3 karakter',
-            'branch_id.required' => 'Lokasi/cabang wajib dipilih',
+            'branch_id.required' => 'Cabang wajib dipilih',
+            'location_id.required' => 'Lokasi wajib dipilih',
+            'selectedAuthors.required' => 'Minimal 1 penulis wajib dipilih',
+            'selectedAuthors.min' => 'Minimal 1 penulis wajib dipilih',
+            'classification.required' => 'Klasifikasi DDC wajib diisi',
+            'call_number.required' => 'Nomor panggil wajib diisi',
+            'call_number.min' => 'Nomor panggil minimal 3 karakter',
         ];
     }
 
