@@ -37,7 +37,7 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                         <div class="relative w-14 h-20">
                             <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden shadow-sm">
                                 @if($book->image)
-                                <img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
+                                <img src="{{ $book->cover_url }}" class="w-full h-full object-cover" alt="">
                                 @else
                                 <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                     <i class="fas fa-book-open text-white/80 text-lg"></i>
@@ -98,7 +98,7 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
             <div class="absolute -top-1.5 -right-1.5 z-10 px-2 py-0.5 bg-gradient-to-r {{ $config['gradient'] }} rounded-full text-white text-xs font-bold shadow border-2 border-white">{{ $book->items_count }}</div>
             <div class="relative aspect-[3/4] bg-gray-200 rounded-t-xl overflow-hidden">
                 @if($book->image)
-                <img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
+                <img src="{{ $book->cover_url }}" class="w-full h-full object-cover" alt="">
                 @else
                 <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                     <i class="fas fa-book-open text-white/80 text-3xl"></i>
