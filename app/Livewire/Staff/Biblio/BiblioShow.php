@@ -4,6 +4,9 @@ namespace App\Livewire\Staff\Biblio;
 
 use App\Models\Book;
 use App\Models\Item;
+use App\Models\Location;
+use App\Models\ItemStatus;
+use App\Models\CollectionType;
 use Livewire\Component;
 
 class BiblioShow extends Component
@@ -35,19 +38,28 @@ class BiblioShow extends Component
             'addQty' => 'required|integer|min:1|max:50',
         ]);
 
-        $lastItem = Item::orderBy('id', 'desc')->first();
-        $lastNumber = $lastItem ? intval(substr($lastItem->barcode, -6)) : 0;
+        $branchId = $this->book->branch_id;
+        $locationId = Location::where('branch_id', $branchId)->value('id');
+        $statusId = ItemStatus::where('name', 'Tersedia')->value('id') ?? ItemStatus::value('id');
+        
+        $today = now()->format('ymd');
+        $lastItem = Item::where('inventory_code', 'like', "INV-{$branchId}-{$today}-%")
+            ->orderByDesc('inventory_code')
+            ->first();
+        $lastNum = $lastItem ? (int) substr($lastItem->inventory_code, -4) : 0;
 
         for ($i = 0; $i < $this->addQty; $i++) {
-            $lastNumber++;
+            $lastNum++;
             Item::create([
                 'book_id' => $this->book->id,
-                'branch_id' => $this->book->branch_id,
-                'barcode' => 'B' . str_pad($lastNumber, 6, '0', STR_PAD_LEFT),
+                'branch_id' => $branchId,
+                'barcode' => 'B' . $today . str_pad($lastNum, 4, '0', STR_PAD_LEFT),
+                'inventory_code' => "INV-{$branchId}-{$today}-" . str_pad($lastNum, 4, '0', STR_PAD_LEFT),
                 'call_number' => $this->book->call_number,
-                'collection_type_id' => 1,
-                'location_id' => 1,
-                'item_status_id' => 1,
+                'collection_type_id' => CollectionType::value('id'),
+                'location_id' => $locationId,
+                'item_status_id' => $statusId,
+                'source' => 'manual',
                 'user_id' => auth()->id(),
             ]);
         }
