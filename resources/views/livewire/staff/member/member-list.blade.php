@@ -68,32 +68,36 @@
 
     {{-- Tabs --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-1.5">
-        <div class="flex gap-1">
-            <button wire:click="setTab('all')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'all' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+        <div class="flex gap-1 overflow-x-auto">
+            <button wire:click="setTab('all')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'all' ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-users"></i><span>Semua</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'all' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['total']) }}</span>
             </button>
-            <button wire:click="setTab('mahasiswa')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'mahasiswa' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('mahasiswa')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'mahasiswa' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-graduate"></i><span>Mahasiswa</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'mahasiswa' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['mahasiswa']) }}</span>
             </button>
-            <button wire:click="setTab('dosen')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'dosen' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('dosen')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'dosen' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-chalkboard-teacher"></i><span>Dosen</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'dosen' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['dosen']) }}</span>
             </button>
-            <button wire:click="setTab('karyawan')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'karyawan' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('karyawan')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'karyawan' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-tie"></i><span>Tendik</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'karyawan' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['karyawan']) }}</span>
             </button>
             @if($canSeeSantri)
-            <button wire:click="setTab('santri')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'santri' ? 'bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('santri')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'santri' ? 'bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-mosque"></i><span>Santri</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'santri' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['santri']) }}</span>
             </button>
             @endif
-            <button wire:click="setTab('umum')" class="flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'umum' ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('umum')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'umum' ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user"></i><span>Umum</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'umum' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['umum']) }}</span>
+            </button>
+            <button wire:click="setTab('sdm')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'sdm' ? 'bg-gradient-to-r from-slate-600 to-slate-800 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-id-card"></i><span>Data SDM</span>
+                <span class="px-2 py-0.5 {{ $activeTab === 'sdm' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['sdm_dosen'] + $stats['sdm_tendik']) }}</span>
             </button>
         </div>
     </div>
@@ -103,9 +107,20 @@
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="Cari nama, ID, NIM, email..." class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg text-sm">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="{{ $activeTab === 'sdm' ? 'Cari nama, NIY, NIDN, email...' : 'Cari nama, ID, NIM, email...' }}" class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg text-sm">
             </div>
             <div class="flex items-center gap-2">
+                @if($activeTab === 'sdm')
+                <select wire:model.live="sdmType" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
+                    <option value="">Semua Tipe</option>
+                    <option value="dosen">Dosen</option>
+                    <option value="tendik">Tendik</option>
+                </select>
+                <select wire:model.live="sdmFaculty" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
+                    <option value="">Semua Fakultas</option>
+                    @foreach($sdmFaculties as $fac)<option value="{{ $fac }}">{{ $fac }}</option>@endforeach
+                </select>
+                @else
                 <select wire:model.live="filterStatus" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
                     <option value="">Status</option>
                     <option value="active">Aktif</option>
@@ -116,10 +131,87 @@
                     <option value="valid">Berlaku</option>
                     <option value="expired">Kadaluarsa</option>
                 </select>
+                @endif
             </div>
         </div>
     </div>
 
+    @if($activeTab === 'sdm')
+    {{-- SDM Table --}}
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-3 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-id-card"></i>
+                <span class="font-semibold">Data SDM UNIDA</span>
+                <span class="px-2 py-0.5 bg-white/20 rounded-full text-xs">{{ $employees->total() }} data</span>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+                <span class="flex items-center gap-1"><i class="fas fa-chalkboard-teacher"></i> {{ $stats['sdm_dosen'] }} Dosen</span>
+                <span class="flex items-center gap-1"><i class="fas fa-user-tie"></i> {{ $stats['sdm_tendik'] }} Tendik</span>
+            </div>
+        </div>
+        @if($employees->count() > 0)
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-medium text-gray-600">NIY</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-600">Nama</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-600">Tipe</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-600">Unit</th>
+                        <th class="px-4 py-3 text-left font-medium text-gray-600">Email</th>
+                        <th class="px-4 py-3 text-center font-medium text-gray-600">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($employees as $emp)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <span class="font-mono text-gray-900">{{ $emp->niy ?? '-' }}</span>
+                            @if($emp->nidn)<p class="text-xs text-gray-500">NIDN: {{ $emp->nidn }}</p>@endif
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="font-medium text-gray-900">{{ $emp->full_name ?? $emp->name }}</p>
+                            @if($emp->position)<p class="text-xs text-gray-500">{{ $emp->position }}</p>@endif
+                        </td>
+                        <td class="px-4 py-3">
+                            @if($emp->type === 'dosen')
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"><i class="fas fa-chalkboard-teacher"></i> Dosen</span>
+                            @else
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"><i class="fas fa-user-tie"></i> Tendik</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-gray-900">{{ $emp->faculty ?? $emp->satker ?? '-' }}</p>
+                            @if($emp->prodi)<p class="text-xs text-gray-500">{{ $emp->prodi }}</p>@endif
+                        </td>
+                        <td class="px-4 py-3">
+                            @if($emp->email)<a href="mailto:{{ $emp->email }}" class="text-blue-600 hover:underline text-sm">{{ $emp->email }}</a>@else<span class="text-gray-400">-</span>@endif
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            @if($emp->is_active)
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full"><i class="fas fa-check-circle"></i> Aktif</span>
+                            @else
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"><i class="fas fa-times-circle"></i> Non-Aktif</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-gray-100 bg-gray-50">{{ $employees->links() }}</div>
+        @else
+        <div class="flex flex-col items-center justify-center py-16 text-center px-4">
+            <div class="w-20 h-20 bg-gradient-to-br from-slate-500 to-slate-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                <i class="fas fa-id-card text-3xl text-white"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-1">Tidak Ada Data</h3>
+            <p class="text-gray-500 text-sm">{{ $search ? 'Tidak ditemukan SDM sesuai pencarian.' : 'Data SDM belum tersedia.' }}</p>
+        </div>
+        @endif
+    </div>
+    @else
     {{-- Members Table --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         @if($members->count() > 0)
@@ -219,6 +311,7 @@
         </div>
         @endif
     </div>
+    @endif
 
     {{-- Member Detail Modal --}}
     @if($showDetailModal && $selectedMember)

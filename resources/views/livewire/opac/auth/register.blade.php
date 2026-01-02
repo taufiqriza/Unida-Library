@@ -121,7 +121,7 @@
                     </div>
 
                     <div class="text-center pt-4 border-t mt-6">
-                        <p class="text-sm text-gray-500">Sudah punya akun? <a href="{{ route('opac.login') }}" class="text-primary-600 font-semibold hover:underline">Masuk di sini</a></p>
+                        <p class="text-sm text-gray-500">Sudah punya akun? <a href="{{ route('login') }}" class="text-primary-600 font-semibold hover:underline">Masuk di sini</a></p>
                     </div>
                 </div>
                 @endif

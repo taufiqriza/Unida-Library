@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Staff\Member;
 
+use App\Models\Employee;
 use App\Models\Member;
 use App\Models\MemberType;
 use App\Models\Branch;
@@ -21,12 +22,18 @@ class MemberList extends Component
     public $showDetailModal = false;
     public $selectedMember = null;
     
+    // SDM filters
+    public $sdmType = '';
+    public $sdmFaculty = '';
+    
     protected $queryString = [
         'search' => ['except' => ''],
         'activeTab' => ['except' => 'all'],
         'filterStatus' => ['except' => ''],
         'filterExpired' => ['except' => ''],
         'filterBranchId' => ['except' => ''],
+        'sdmType' => ['except' => ''],
+        'sdmFaculty' => ['except' => ''],
     ];
 
     public function updatingSearch() { $this->resetPage(); }
@@ -112,7 +119,39 @@ class MemberList extends Component
             'karyawan' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->whereIn('name', ['Karyawan', 'Tendik']))->count(),
             'santri' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Santri'))->count(),
             'umum' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Umum'))->count(),
+            'sdm_dosen' => Employee::dosen()->active()->count(),
+            'sdm_tendik' => Employee::tendik()->count(),
         ];
+
+        // SDM Tab - show employees instead of members
+        if ($this->activeTab === 'sdm') {
+            $employees = Employee::query()
+                ->when($this->search, fn($q) => $q->where(fn($q) => 
+                    $q->where('name', 'like', "%{$this->search}%")
+                      ->orWhere('niy', 'like', "%{$this->search}%")
+                      ->orWhere('nidn', 'like', "%{$this->search}%")
+                      ->orWhere('email', 'like', "%{$this->search}%")
+                ))
+                ->when($this->sdmType, fn($q) => $q->where('type', $this->sdmType))
+                ->when($this->sdmFaculty, fn($q) => $q->where('faculty', $this->sdmFaculty))
+                ->when($this->filterStatus === 'active', fn($q) => $q->where('is_active', true))
+                ->when($this->filterStatus === 'inactive', fn($q) => $q->where('is_active', false))
+                ->orderBy('name')
+                ->paginate(15);
+
+            $sdmFaculties = Employee::whereNotNull('faculty')->distinct()->pluck('faculty')->sort();
+
+            return view('livewire.staff.member.member-list', [
+                'members' => collect(),
+                'employees' => $employees,
+                'stats' => $stats,
+                'memberTypes' => $memberTypes,
+                'branches' => $isSuperAdmin ? Branch::orderBy('name')->get() : collect(),
+                'isSuperAdmin' => $isSuperAdmin,
+                'canSeeSantri' => $canSeeSantri,
+                'sdmFaculties' => $sdmFaculties,
+            ])->extends('staff.layouts.app')->section('content');
+        }
 
         // Members query
         $typeId = $this->getTypeIdByTab($this->activeTab);
@@ -143,11 +182,13 @@ class MemberList extends Component
 
         return view('livewire.staff.member.member-list', [
             'members' => $members,
+            'employees' => collect(),
             'stats' => $stats,
             'memberTypes' => $memberTypes,
             'branches' => $isSuperAdmin ? Branch::orderBy('name')->get() : collect(),
             'isSuperAdmin' => $isSuperAdmin,
             'canSeeSantri' => $canSeeSantri,
+            'sdmFaculties' => collect(),
         ])->extends('staff.layouts.app')->section('content');
     }
 }
