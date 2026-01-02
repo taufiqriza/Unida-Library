@@ -73,10 +73,10 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                     <td class="px-4 py-3">
                         @if($book->user)
                         <p class="text-xs text-gray-700 truncate">{{ $book->user->name }}</p>
-                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->format('d M Y, H:i') }}</p>
+                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}</p>
                         @else
                         <p class="text-xs text-gray-500 truncate">{{ $book->branch?->name ?? '-' }}</p>
-                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->format('d M Y, H:i') }}</p>
+                        <p class="text-[10px] text-gray-400">{{ $book->created_at?->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}</p>
                         @endif
                     </td>
                     <td class="px-4 py-3">
