@@ -361,7 +361,7 @@ class BiblioList extends Component
                         $q->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('isbn', 'like', "%{$s}%")->orWhere('call_number', 'like', "%{$s}%"));
                         if (strlen($s) >= 3) $q->orWhereHas('authors', fn($q) => $q->where('name', 'like', "%{$s}%"));
                     })
-                    ->latest('updated_at')->paginate(12);
+                    ->latest('created_at')->paginate(12);
         }
 
         $branches = $isSuperAdmin ? cache()->remember('all_branches', 3600, fn() => Branch::select(['id', 'name'])->orderBy('name')->get()) : collect();
