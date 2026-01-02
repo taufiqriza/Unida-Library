@@ -54,14 +54,14 @@
         </div>
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-clock text-white text-lg"></i></div>
-                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['expired']) }}</p><p class="text-xs text-gray-500">Kadaluarsa</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-tie text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['tendik']) }}</p><p class="text-xs text-gray-500">Tendik</p></div>
             </div>
         </div>
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-plus text-white text-lg"></i></div>
-                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['new_this_month']) }}</p><p class="text-xs text-gray-500">Baru</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-clock text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['expired']) }}</p><p class="text-xs text-gray-500">Kadaluarsa</p></div>
             </div>
         </div>
     </div>
@@ -81,9 +81,9 @@
                 <i class="fas fa-chalkboard-teacher"></i><span>Dosen</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'dosen' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['dosen']) }}</span>
             </button>
-            <button wire:click="setTab('karyawan')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'karyawan' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+            <button wire:click="setTab('tendik')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'tendik' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-tie"></i><span>Tendik</span>
-                <span class="px-2 py-0.5 {{ $activeTab === 'karyawan' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['karyawan']) }}</span>
+                <span class="px-2 py-0.5 {{ $activeTab === 'tendik' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['tendik']) }}</span>
             </button>
             @if($canSeeSantri)
             <button wire:click="setTab('santri')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'santri' ? 'bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
@@ -95,10 +95,6 @@
                 <i class="fas fa-user"></i><span>Umum</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'umum' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['umum']) }}</span>
             </button>
-            <button wire:click="setTab('sdm')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'sdm' ? 'bg-gradient-to-r from-slate-600 to-slate-800 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-id-card"></i><span>Data SDM</span>
-                <span class="px-2 py-0.5 {{ $activeTab === 'sdm' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['sdm_dosen'] + $stats['sdm_tendik']) }}</span>
-            </button>
         </div>
     </div>
 
@@ -107,25 +103,21 @@
         <div class="flex flex-col sm:flex-row gap-3">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input wire:model.live.debounce.300ms="search" type="text" placeholder="{{ $activeTab === 'sdm' ? 'Cari nama, NIY, NIDN, email...' : 'Cari nama, ID, NIM, email...' }}" class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg text-sm">
+                <input wire:model.live.debounce.300ms="search" type="text" placeholder="{{ ($showEmployees ?? false) ? 'Cari nama, NIY, NIDN, email...' : 'Cari nama, ID, NIM, email...' }}" class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border-transparent focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 rounded-lg text-sm">
             </div>
             <div class="flex items-center gap-2">
-                @if($activeTab === 'sdm')
-                <select wire:model.live="sdmType" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
-                    <option value="">Semua Tipe</option>
-                    <option value="dosen">Dosen</option>
-                    <option value="tendik">Tendik</option>
-                </select>
+                @if($showEmployees ?? false)
                 <select wire:model.live="sdmFaculty" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
                     <option value="">Semua Fakultas</option>
                     @foreach($sdmFaculties as $fac)<option value="{{ $fac }}">{{ $fac }}</option>@endforeach
                 </select>
-                @else
+                @endif
                 <select wire:model.live="filterStatus" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
                     <option value="">Status</option>
                     <option value="active">Aktif</option>
                     <option value="inactive">Nonaktif</option>
                 </select>
+                @if(!($showEmployees ?? false))
                 <select wire:model.live="filterExpired" class="px-3 py-2.5 bg-gray-50 border-transparent rounded-lg text-sm">
                     <option value="">Masa Berlaku</option>
                     <option value="valid">Berlaku</option>
@@ -136,31 +128,19 @@
         </div>
     </div>
 
-    @if($activeTab === 'sdm')
-    {{-- SDM Table --}}
+    @if($showEmployees ?? false)
+    {{-- Employees Table (Dosen/Tendik) --}}
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="bg-gradient-to-r from-slate-600 to-slate-800 px-4 py-3 text-white flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-id-card"></i>
-                <span class="font-semibold">Data SDM UNIDA</span>
-                <span class="px-2 py-0.5 bg-white/20 rounded-full text-xs">{{ $employees->total() }} data</span>
-            </div>
-            <div class="flex items-center gap-3 text-sm">
-                <span class="flex items-center gap-1"><i class="fas fa-chalkboard-teacher"></i> {{ $stats['sdm_dosen'] }} Dosen</span>
-                <span class="flex items-center gap-1"><i class="fas fa-user-tie"></i> {{ $stats['sdm_tendik'] }} Tendik</span>
-            </div>
-        </div>
         @if($employees->count() > 0)
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50">
+                <thead class="bg-gradient-to-r {{ $activeTab === 'dosen' ? 'from-amber-500 to-orange-600' : 'from-emerald-500 to-teal-600' }} text-white">
                     <tr>
-                        <th class="px-4 py-3 text-left font-medium text-gray-600">NIY</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-600">Nama</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-600">Tipe</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-600">Unit</th>
-                        <th class="px-4 py-3 text-left font-medium text-gray-600">Email</th>
-                        <th class="px-4 py-3 text-center font-medium text-gray-600">Status</th>
+                        <th class="px-4 py-3 text-left font-medium">NIY</th>
+                        <th class="px-4 py-3 text-left font-medium">Nama</th>
+                        <th class="px-4 py-3 text-left font-medium">Unit</th>
+                        <th class="px-4 py-3 text-left font-medium">Email</th>
+                        <th class="px-4 py-3 text-center font-medium w-24">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -173,13 +153,6 @@
                         <td class="px-4 py-3">
                             <p class="font-medium text-gray-900">{{ $emp->full_name ?? $emp->name }}</p>
                             @if($emp->position)<p class="text-xs text-gray-500">{{ $emp->position }}</p>@endif
-                        </td>
-                        <td class="px-4 py-3">
-                            @if($emp->type === 'dosen')
-                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"><i class="fas fa-chalkboard-teacher"></i> Dosen</span>
-                            @else
-                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full"><i class="fas fa-user-tie"></i> Tendik</span>
-                            @endif
                         </td>
                         <td class="px-4 py-3">
                             <p class="text-gray-900">{{ $emp->faculty ?? $emp->satker ?? '-' }}</p>
@@ -203,11 +176,11 @@
         <div class="p-4 border-t border-gray-100 bg-gray-50">{{ $employees->links() }}</div>
         @else
         <div class="flex flex-col items-center justify-center py-16 text-center px-4">
-            <div class="w-20 h-20 bg-gradient-to-br from-slate-500 to-slate-700 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-                <i class="fas fa-id-card text-3xl text-white"></i>
+            <div class="w-20 h-20 bg-gradient-to-br {{ $activeTab === 'dosen' ? 'from-amber-500 to-orange-600' : 'from-emerald-500 to-teal-600' }} rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+                <i class="fas {{ $activeTab === 'dosen' ? 'fa-chalkboard-teacher' : 'fa-user-tie' }} text-3xl text-white"></i>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-1">Tidak Ada Data</h3>
-            <p class="text-gray-500 text-sm">{{ $search ? 'Tidak ditemukan SDM sesuai pencarian.' : 'Data SDM belum tersedia.' }}</p>
+            <p class="text-gray-500 text-sm">{{ $search ? 'Tidak ditemukan data sesuai pencarian.' : 'Data belum tersedia.' }}</p>
         </div>
         @endif
     </div>

@@ -83,8 +83,6 @@ class MemberList extends Component
     {
         return match($tab) {
             'mahasiswa' => MemberType::where('name', 'Mahasiswa')->value('id'),
-            'dosen' => MemberType::where('name', 'Dosen')->value('id'),
-            'karyawan' => MemberType::whereIn('name', ['Karyawan', 'Tendik'])->pluck('id')->toArray(),
             'santri' => MemberType::where('name', 'Santri')->value('id'),
             'umum' => MemberType::where('name', 'Umum')->value('id'),
             default => null
@@ -115,31 +113,33 @@ class MemberList extends Component
             'expired' => (clone $statsQuery)->where('expire_date', '<', now())->count(),
             'new_this_month' => (clone $statsQuery)->whereMonth('created_at', now()->month)->count(),
             'mahasiswa' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Mahasiswa'))->count(),
-            'dosen' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Dosen'))->count(),
-            'karyawan' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->whereIn('name', ['Karyawan', 'Tendik']))->count(),
             'santri' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Santri'))->count(),
             'umum' => (clone $statsQuery)->whereHas('memberType', fn($q) => $q->where('name', 'Umum'))->count(),
-            'sdm_dosen' => Employee::dosen()->active()->count(),
-            'sdm_tendik' => Employee::tendik()->count(),
+            'dosen' => Employee::dosen()->active()->count(),
+            'tendik' => Employee::tendik()->count(),
         ];
 
-        // SDM Tab - show employees instead of members
-        if ($this->activeTab === 'sdm') {
+        // Dosen/Tendik tabs - show from employees table
+        if (in_array($this->activeTab, ['dosen', 'tendik'])) {
             $employees = Employee::query()
+                ->where('type', $this->activeTab)
                 ->when($this->search, fn($q) => $q->where(fn($q) => 
                     $q->where('name', 'like', "%{$this->search}%")
                       ->orWhere('niy', 'like', "%{$this->search}%")
                       ->orWhere('nidn', 'like', "%{$this->search}%")
                       ->orWhere('email', 'like', "%{$this->search}%")
                 ))
-                ->when($this->sdmType, fn($q) => $q->where('type', $this->sdmType))
                 ->when($this->sdmFaculty, fn($q) => $q->where('faculty', $this->sdmFaculty))
                 ->when($this->filterStatus === 'active', fn($q) => $q->where('is_active', true))
                 ->when($this->filterStatus === 'inactive', fn($q) => $q->where('is_active', false))
                 ->orderBy('name')
                 ->paginate(15);
 
-            $sdmFaculties = Employee::whereNotNull('faculty')->distinct()->pluck('faculty')->sort();
+            $sdmFaculties = Employee::where('type', $this->activeTab)
+                ->whereNotNull('faculty')
+                ->distinct()
+                ->pluck('faculty')
+                ->sort();
 
             return view('livewire.staff.member.member-list', [
                 'members' => collect(),
@@ -150,6 +150,7 @@ class MemberList extends Component
                 'isSuperAdmin' => $isSuperAdmin,
                 'canSeeSantri' => $canSeeSantri,
                 'sdmFaculties' => $sdmFaculties,
+                'showEmployees' => true,
             ])->extends('staff.layouts.app')->section('content');
         }
 
@@ -189,6 +190,7 @@ class MemberList extends Component
             'isSuperAdmin' => $isSuperAdmin,
             'canSeeSantri' => $canSeeSantri,
             'sdmFaculties' => collect(),
+            'showEmployees' => false,
         ])->extends('staff.layouts.app')->section('content');
     }
 }
