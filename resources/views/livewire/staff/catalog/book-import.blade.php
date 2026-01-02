@@ -99,14 +99,64 @@
                 <button wire:click="downloadTemplate" class="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition flex items-center justify-center gap-2">
                     <i class="fas fa-download"></i> Download Template Excel
                 </button>
+            </div>
+        </div>
+    </div>
 
-                <div class="mt-5 pt-5 border-t border-gray-100">
-                    <p class="font-medium text-gray-900 text-sm mb-2"><i class="fas fa-image text-gray-400 mr-1"></i> Panduan Cover:</p>
-                    <ol class="list-decimal list-inside space-y-1 text-xs text-gray-600">
-                        <li>Foto cover, simpan dengan nama unik <code class="bg-gray-100 px-1.5 py-0.5 rounded">buku001.jpg</code></li>
-                        <li>Tulis nama file di kolom "Cover File"</li>
-                        <li>Compress semua foto menjadi <code class="bg-gray-100 px-1.5 py-0.5 rounded">covers.zip</code></li>
-                    </ol>
+    {{-- Guide Card - Full Width --}}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-5">
+            {{-- Steps Flow --}}
+            <div class="flex items-center justify-center mb-6">
+                <div class="flex items-center">
+                    @foreach([
+                        ['icon' => 'fa-download', 'text' => 'Download Template', 'color' => 'emerald'],
+                        ['icon' => 'fa-edit', 'text' => 'Isi Data Excel', 'color' => 'blue'],
+                        ['icon' => 'fa-image', 'text' => 'Siapkan Cover', 'color' => 'purple'],
+                        ['icon' => 'fa-upload', 'text' => 'Upload File', 'color' => 'amber'],
+                        ['icon' => 'fa-eye', 'text' => 'Preview Data', 'color' => 'cyan'],
+                        ['icon' => 'fa-check-circle', 'text' => 'Import', 'color' => 'green'],
+                    ] as $i => $step)
+                    <div class="flex items-center">
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-xl bg-{{ $step['color'] }}-100 border border-{{ $step['color'] }}-200 flex items-center justify-center">
+                                <i class="fas {{ $step['icon'] }} text-{{ $step['color'] }}-600"></i>
+                            </div>
+                            <span class="text-[10px] text-gray-600 mt-2 font-medium text-center w-20">{{ $step['text'] }}</span>
+                        </div>
+                        @if($i < 5)
+                        <div class="w-8 h-px bg-gray-200 mx-1 mb-6"></div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Tips Grid --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <h4 class="font-semibold text-blue-900 text-sm mb-2"><i class="fas fa-file-excel mr-2"></i>Data Excel</h4>
+                    <ul class="text-xs text-blue-700 space-y-1">
+                        <li>• Isi data mulai baris ke-9</li>
+                        <li>• Kolom wajib: Judul, Penulis, DDC, Jml Eks</li>
+                        <li>• Pisahkan penulis dengan titik koma (;)</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+                    <h4 class="font-semibold text-purple-900 text-sm mb-2"><i class="fas fa-image mr-2"></i>File Cover</h4>
+                    <ul class="text-xs text-purple-700 space-y-1">
+                        <li>• Format: JPG, PNG, atau WebP</li>
+                        <li>• Nama file = kolom "Cover File"</li>
+                        <li>• Compress semua ke dalam ZIP</li>
+                    </ul>
+                </div>
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                    <h4 class="font-semibold text-amber-900 text-sm mb-2"><i class="fas fa-lightbulb mr-2"></i>Tips</h4>
+                    <ul class="text-xs text-amber-700 space-y-1">
+                        <li>• Cek preview sebelum import</li>
+                        <li>• Data warning bisa dilewati</li>
+                        <li>• Barcode & No. Inv otomatis</li>
+                    </ul>
                 </div>
             </div>
         </div>

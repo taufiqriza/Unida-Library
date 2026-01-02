@@ -383,11 +383,6 @@
 
             {{-- User Info --}}
             <div class="border-t border-white/10 p-4" x-data="{ showLogoutModal: false }">
-                <div class="bg-white/10 rounded-xl p-3 mb-3 transition-all duration-300"
-                     :class="sidebarCollapsed ? 'opacity-0 absolute pointer-events-none' : 'opacity-100 relative'">
-                    <p class="text-xs text-blue-200">{{ ucfirst($user->role) }}</p>
-                    <p class="text-sm font-semibold text-white truncate">{{ $user->name }}</p>
-                </div>
                 <button @click="showLogoutModal = true" 
                         type="button"
                         class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-500 text-white transition-all">
@@ -395,6 +390,14 @@
                     <span class="text-sm font-medium transition-all duration-300"
                           :class="sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'">Logout</span>
                 </button>
+
+                {{-- System Info --}}
+                <div class="mt-3 text-center transition-all duration-300" :class="sidebarCollapsed ? 'opacity-0' : 'opacity-100'">
+                    <a href="https://wa.me/6282117049501" target="_blank" class="group">
+                        <p class="text-[10px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">SYSTEM ILMU v2</p>
+                        <p class="text-[9px] text-blue-400/50 group-hover:text-blue-300/70 transition">Integrated Library Management UNIDA</p>
+                    </a>
+                </div>
 
                 {{-- Logout Confirmation Modal - Teleported to body --}}
                 <template x-teleport="body">
