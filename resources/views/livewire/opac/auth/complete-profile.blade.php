@@ -1,33 +1,33 @@
 <div>
     <div class="min-h-[70vh] flex items-center justify-center py-8 px-4">
-        <div class="w-full max-w-lg">
+        <div class="w-full max-w-xl lg:max-w-2xl">
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
                 {{-- Header --}}
-                <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-4 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div class="bg-gradient-to-r from-primary-600 to-primary-800 px-6 py-5 flex items-center gap-4">
+                    <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                         <i class="fas {{ $step === 1 ? 'fa-search' : 'fa-user-edit' }} text-2xl text-white"></i>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-white">
+                        <h1 class="text-xl font-bold text-white">
                             {{ $step === 1 ? 'Cari Data Anda' : __('opac.auth.complete_profile.title') }}
                         </h1>
-                        <p class="text-primary-200 text-sm">
-                            {{ $step === 1 ? 'Temukan data Anda di sistem SIAKAD' : __('opac.auth.complete_profile.subtitle') }}
+                        <p class="text-primary-200">
+                            {{ $step === 1 ? 'Temukan data Anda di sistem SIAKAD / SDM' : __('opac.auth.complete_profile.subtitle') }}
                         </p>
                     </div>
                 </div>
 
-                <div class="p-6">
+                <div class="p-6 lg:p-8">
                     {{-- Step Indicator --}}
                     <div class="flex items-center justify-center gap-4 mb-6">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full {{ $step >= 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">1</div>
-                            <span class="text-sm font-medium {{ $step >= 1 ? 'text-primary-600' : 'text-gray-400' }}">Cari Data</span>
+                            <div class="w-9 h-9 rounded-full {{ $step >= 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold">1</div>
+                            <span class="font-medium {{ $step >= 1 ? 'text-primary-600' : 'text-gray-400' }}">Cari Data</span>
                         </div>
-                        <div class="w-8 h-0.5 {{ $step >= 2 ? 'bg-primary-600' : 'bg-gray-200' }}"></div>
+                        <div class="w-12 h-0.5 {{ $step >= 2 ? 'bg-primary-600' : 'bg-gray-200' }}"></div>
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full {{ $step >= 2 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold text-sm">2</div>
-                            <span class="text-sm font-medium {{ $step >= 2 ? 'text-primary-600' : 'text-gray-400' }}">Lengkapi Profil</span>
+                            <div class="w-9 h-9 rounded-full {{ $step >= 2 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-500' }} flex items-center justify-center font-bold">2</div>
+                            <span class="font-medium {{ $step >= 2 ? 'text-primary-600' : 'text-gray-400' }}">Lengkapi Profil</span>
                         </div>
                     </div>
 
