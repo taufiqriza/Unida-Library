@@ -41,6 +41,12 @@
                             <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
                         @endforeach
                     </select>
+                    <select name="type" class="px-4 py-3 rounded-xl border-0 text-gray-900 bg-white">
+                        <option value="">Semua Jenis</option>
+                        @foreach($types as $key => $label)
+                            <option value="{{ $key }}" {{ request('type') == $key ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
                     <button type="submit" class="px-6 py-3 bg-white text-purple-600 font-semibold rounded-xl hover:bg-purple-50 transition">
                         <i class="fas fa-search mr-2"></i>Cari
                     </button>
@@ -53,7 +59,29 @@
         <div class="flex gap-8">
             
             <!-- Sidebar: Journal List -->
-            <div class="hidden lg:block w-72 flex-shrink-0">
+            <div class="hidden lg:block w-72 flex-shrink-0 space-y-4">
+                <!-- Type Filter -->
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
+                    <div class="p-4 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-900">Jenis Publikasi</h3>
+                    </div>
+                    <div class="p-2">
+                        <a href="{{ route('opac.journals.index', array_filter(['q' => request('q'), 'journal' => request('journal'), 'year' => request('year')])) }}" 
+                           class="flex items-center justify-between px-3 py-2 rounded-lg {{ !request('type') ? 'bg-purple-50 text-purple-700' : 'hover:bg-gray-50' }}">
+                            <span class="font-medium">Semua Jenis</span>
+                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{{ $typeCounts->sum() }}</span>
+                        </a>
+                        @foreach($types as $key => $label)
+                        <a href="{{ route('opac.journals.index', array_filter(['q' => request('q'), 'journal' => request('journal'), 'year' => request('year'), 'type' => $key])) }}" 
+                           class="flex items-center justify-between px-3 py-2 rounded-lg {{ request('type') == $key ? 'bg-purple-50 text-purple-700' : 'hover:bg-gray-50' }}">
+                            <span class="text-sm">{{ $label }}</span>
+                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">{{ $typeCounts[$key] ?? 0 }}</span>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Journal List -->
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm sticky top-24">
                     <div class="p-4 border-b border-gray-100">
                         <h3 class="font-bold text-gray-900">Daftar Jurnal</h3>
@@ -78,13 +106,19 @@
             <!-- Main Content -->
             <div class="flex-1 min-w-0">
                 
-                @if(request('q') || request('journal') || request('year'))
+                @if(request('q') || request('journal') || request('year') || request('type'))
                 <div class="mb-4 flex items-center gap-2 flex-wrap">
                     <span class="text-sm text-gray-500">Filter aktif:</span>
                     @if(request('q'))
                         <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
                             "{{ request('q') }}"
-                            <a href="{{ route('opac.journals.index', array_filter(['journal' => request('journal'), 'year' => request('year')])) }}" class="ml-1 hover:text-purple-900">&times;</a>
+                            <a href="{{ route('opac.journals.index', array_filter(['journal' => request('journal'), 'year' => request('year'), 'type' => request('type')])) }}" class="ml-1 hover:text-purple-900">&times;</a>
+                        </span>
+                    @endif
+                    @if(request('type'))
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                            {{ $types[request('type')] ?? request('type') }}
+                            <a href="{{ route('opac.journals.index', array_filter(['q' => request('q'), 'journal' => request('journal'), 'year' => request('year')])) }}" class="ml-1 hover:text-green-900">&times;</a>
                         </span>
                     @endif
                     @if(request('journal'))

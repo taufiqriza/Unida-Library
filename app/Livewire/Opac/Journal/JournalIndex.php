@@ -14,11 +14,13 @@ class JournalIndex extends Component
     public string $q = '';
     public string $journal = '';
     public string $year = '';
+    public string $type = '';
 
     protected $queryString = [
         'q' => ['except' => ''],
         'journal' => ['except' => ''],
         'year' => ['except' => ''],
+        'type' => ['except' => ''],
     ];
 
     public function updatingQ()
@@ -32,6 +34,11 @@ class JournalIndex extends Component
     }
 
     public function updatingYear()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingType()
     {
         $this->resetPage();
     }
@@ -61,6 +68,10 @@ class JournalIndex extends Component
             $query->where('publish_year', $this->year);
         }
 
+        if ($this->type) {
+            $query->where('type', $this->type);
+        }
+
         $articles = $query->orderByDesc('published_at')->paginate(20);
 
         $years = JournalArticle::selectRaw('DISTINCT publish_year')
@@ -68,10 +79,24 @@ class JournalIndex extends Component
             ->orderByDesc('publish_year')
             ->pluck('publish_year');
 
+        $types = [
+            'article' => 'Artikel Jurnal',
+            'conference' => 'Prosiding',
+            'book' => 'Buku',
+            'book_section' => 'Bab Buku',
+            'patent' => 'Paten/HKI',
+        ];
+
+        $typeCounts = JournalArticle::selectRaw('type, count(*) as total')
+            ->groupBy('type')
+            ->pluck('total', 'type');
+
         return view('livewire.opac.journal.journal-index', [
             'sources' => $sources,
             'articles' => $articles,
             'years' => $years,
+            'types' => $types,
+            'typeCounts' => $typeCounts,
         ])->layout('components.opac.layout', ['title' => 'Jurnal']);
     }
 }
