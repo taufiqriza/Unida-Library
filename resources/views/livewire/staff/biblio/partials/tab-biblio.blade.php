@@ -35,11 +35,13 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                     <td class="px-3 py-3 text-center"><input type="checkbox" wire:click="toggleBookSelection({{ $book->id }})" {{ in_array((string)$book->id, $selectedItems) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600"></td>
                     <td class="px-4 py-3">
                         <div class="relative w-14 h-20">
-                            <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden">
+                            <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden shadow-sm">
                                 @if($book->image)
                                 <img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
                                 @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fas fa-book"></i></div>
+                                <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                    <i class="fas fa-book-open text-white/80 text-lg"></i>
+                                </div>
                                 @endif
                             </div>
                             <div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gradient-to-r {{ $config['gradient'] }} rounded-full flex items-center justify-center text-white text-[10px] font-bold border-2 border-white shadow">{{ $book->items_count }}</div>
@@ -98,7 +100,9 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                 @if($book->image)
                 <img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
                 @else
-                <div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fas fa-book text-4xl"></i></div>
+                <div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-book-open text-white/80 text-3xl"></i>
+                </div>
                 @endif
                 <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                     <button wire:click="quickView({{ $book->id }})" class="p-2 bg-white rounded-lg text-emerald-600 hover:bg-emerald-50"><i class="fas fa-eye"></i></button>

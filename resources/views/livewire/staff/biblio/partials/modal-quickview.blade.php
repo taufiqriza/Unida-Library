@@ -13,9 +13,9 @@
                 <div class="p-5 overflow-y-auto" style="max-height: calc(90vh - 140px);">
                     <div class="flex gap-5">
                         <div class="w-32 flex-shrink-0">
-                            <div class="aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden">
+                            <div class="aspect-[2/3] bg-gray-100 rounded-xl overflow-hidden shadow-sm">
                                 @if($book->image)<img src="{{ asset('storage/' . $book->image) }}" class="w-full h-full object-cover" alt="">
-                                @else<div class="w-full h-full flex items-center justify-center text-gray-300"><i class="fas fa-book text-3xl"></i></div>@endif
+                                @else<div class="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><i class="fas fa-book-open text-white/80 text-2xl"></i></div>@endif
                             </div>
                             <div class="mt-2 text-center"><span class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-lg"><i class="fas fa-copy mr-1"></i> {{ $book->items->count() }} eks</span></div>
                         </div>

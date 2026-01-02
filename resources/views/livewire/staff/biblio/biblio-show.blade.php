@@ -18,11 +18,11 @@
         <div class="lg:col-span-2 space-y-5">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <div class="flex gap-5">
-                    <div class="w-32 h-44 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div class="w-32 h-44 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm {{ $book->image ? 'bg-gray-100' : 'bg-gradient-to-br from-blue-500 to-indigo-600' }}">
                         @if($book->image)
                             <img src="{{ asset('storage/'.$book->image) }}" class="w-full h-full object-cover">
                         @else
-                            <i class="fas fa-book text-slate-300 text-4xl"></i>
+                            <i class="fas fa-book-open text-white/80 text-3xl"></i>
                         @endif
                     </div>
                     <div class="flex-1 min-w-0">
