@@ -50,7 +50,11 @@ class MemberList extends Component
         $this->showDetailModal = true;
     }
 
-    public function closeDetail() { $this->showDetailModal = false; $this->selectedMember = null; }
+    public function closeDetail() { 
+        $this->showDetailModal = false; 
+        $this->selectedMember = null; 
+        $this->dispatch('close-modal');
+    }
 
     public function showEmployeeDetail($employeeId)
     {
@@ -58,7 +62,11 @@ class MemberList extends Component
         $this->showEmployeeModal = true;
     }
 
-    public function closeEmployeeDetail() { $this->showEmployeeModal = false; $this->selectedEmployee = null; }
+    public function closeEmployeeDetail() { 
+        $this->showEmployeeModal = false; 
+        $this->selectedEmployee = null; 
+        $this->dispatch('close-modal');
+    }
 
     public function extendMembership($memberId)
     {

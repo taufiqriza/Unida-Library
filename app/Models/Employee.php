@@ -11,7 +11,7 @@ class Employee extends Model
         'gender', 'birth_place_date', 'type', 'status', 'yayasan', 'category',
         'position', 'join_year', 'faculty', 'prodi', 'satker', 'campus',
         'education_level', 's1_univ', 's1_year', 's2_univ', 's2_year',
-        's3_univ', 's3_year', 'expertise', 'email', 'serdos', 'domicile',
+        's3_univ', 's3_year', 'expertise', 'email', 'photo', 'serdos', 'domicile',
         'additional_duties', 'is_active'
     ];
 

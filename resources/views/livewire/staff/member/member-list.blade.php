@@ -289,7 +289,11 @@
     {{-- Member Detail Modal - Teleported --}}
     @if($showDetailModal && $selectedMember)
     <template x-teleport="body">
-        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" x-data x-init="document.body.style.overflow='hidden'" x-on:click.self="$wire.closeDetail()">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
+            x-data 
+            x-init="document.body.classList.add('overflow-hidden')" 
+            x-on:click.self="$wire.closeDetail()"
+            @close-modal.window="document.body.classList.remove('overflow-hidden')">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
                 <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 text-white flex items-center justify-between">
                     <h3 class="text-lg font-bold">Detail Anggota</h3>
@@ -330,7 +334,11 @@
     {{-- Employee Detail Modal - Teleported --}}
     @if($showEmployeeModal && $selectedEmployee)
     <template x-teleport="body">
-        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" x-data x-init="document.body.style.overflow='hidden'" x-on:click.self="$wire.closeEmployeeDetail()">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
+            x-data 
+            x-init="document.body.classList.add('overflow-hidden')" 
+            x-on:click.self="$wire.closeEmployeeDetail()"
+            @close-modal.window="document.body.classList.remove('overflow-hidden')">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
                 <div class="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white flex items-center justify-between">
                     <h3 class="text-lg font-bold">Detail {{ $selectedEmployee->type === 'dosen' ? 'Dosen' : 'Tendik' }}</h3>
@@ -338,8 +346,12 @@
                 </div>
                 <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg overflow-hidden">
+                            @if($selectedEmployee->photo)
+                            <img src="{{ asset('storage/' . $selectedEmployee->photo) }}" class="w-full h-full object-cover">
+                            @else
                             {{ strtoupper(substr($selectedEmployee->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div>
                             <h4 class="text-lg font-bold text-gray-900">{{ $selectedEmployee->full_name ?? $selectedEmployee->name }}</h4>
@@ -354,7 +366,7 @@
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Fakultas</p><p class="font-medium text-gray-900">{{ $selectedEmployee->faculty ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Prodi</p><p class="font-medium text-gray-900">{{ $selectedEmployee->prodi ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jabatan</p><p class="font-medium text-gray-900">{{ $selectedEmployee->position ?? '-' }}</p></div>
-                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Pendidikan</p><p class="font-medium text-gray-900">{{ $selectedEmployee->education ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Pendidikan</p><p class="font-medium text-gray-900">{{ $selectedEmployee->education_level ?? '-' }}</p></div>
                         @if($selectedEmployee->satker)
                         <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Satuan Kerja</p><p class="font-medium text-gray-900">{{ $selectedEmployee->satker }}</p></div>
                         @endif
