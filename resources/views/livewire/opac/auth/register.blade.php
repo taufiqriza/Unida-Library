@@ -18,7 +18,7 @@
                 <div class="flex items-center gap-2 mt-5">
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold {{ $step >= 1 ? 'bg-white text-primary-600' : 'bg-white/30' }}">1</div>
-                        <span class="text-sm {{ $step >= 1 ? 'text-white' : 'text-white/60' }}">Pilih Status</span>
+                        <span class="text-sm {{ $step >= 1 ? 'text-white' : 'text-white/60' }}">Status</span>
                     </div>
                     <div class="flex-1 h-0.5 {{ $step >= 2 ? 'bg-white' : 'bg-white/30' }}"></div>
                     <div class="flex items-center gap-2">
@@ -28,7 +28,7 @@
                     <div class="flex-1 h-0.5 {{ $step >= 3 ? 'bg-white' : 'bg-white/30' }}"></div>
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold {{ $step >= 3 ? 'bg-white text-primary-600' : 'bg-white/30' }}">3</div>
-                        <span class="text-sm {{ $step >= 3 ? 'text-white' : 'text-white/60' }}">Buat Akun</span>
+                        <span class="text-sm {{ $step >= 3 ? 'text-white' : 'text-white/60' }}">Akun</span>
                     </div>
                 </div>
             </div>
@@ -49,7 +49,6 @@
                             <div>
                                 <p class="font-semibold text-green-800">Data SIAKAD Ditemukan!</p>
                                 <p class="text-green-700 text-sm">{{ $detectedMember->name }} ({{ $detectedMember->member_id }})</p>
-                                <p class="text-green-600 text-xs mt-1">Klik "Mahasiswa UNIDA" untuk melanjutkan</p>
                             </div>
                         </div>
                     </div>
@@ -62,7 +61,7 @@
                             <div>
                                 <p class="font-semibold text-blue-800">Data SDM Ditemukan!</p>
                                 <p class="text-blue-700 text-sm">{{ $detectedEmployee->full_name ?? $detectedEmployee->name }}</p>
-                                <p class="text-blue-600 text-xs mt-1">{{ ucfirst($detectedEmployee->type) }} - {{ $detectedEmployee->faculty ?? $detectedEmployee->satker }}</p>
+                                <p class="text-blue-600 text-xs">{{ ucfirst($detectedEmployee->type) }} - {{ $detectedEmployee->faculty ?? $detectedEmployee->satker }}</p>
                             </div>
                         </div>
                     </div>
@@ -70,53 +69,36 @@
 
                     {{-- User Type Cards --}}
                     <div class="grid grid-cols-2 gap-3">
-                        {{-- Mahasiswa --}}
-                        <button wire:click="selectUserType('mahasiswa')" 
-                                class="group p-4 rounded-xl border-2 transition-all text-left hover:border-primary-500 hover:bg-primary-50 {{ $detectedType === 'mahasiswa' ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }}">
+                        <button wire:click="selectUserType('mahasiswa')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-primary-500 hover:bg-primary-50 {{ $detectedType === 'mahasiswa' ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }}">
                             <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-primary-200 transition">
                                 <i class="fas fa-graduation-cap text-xl text-primary-600"></i>
                             </div>
                             <h3 class="font-semibold text-gray-900">Mahasiswa UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Mahasiswa aktif Universitas Darussalam Gontor</p>
-                            @if($detectedType === 'mahasiswa')
-                            <span class="inline-flex items-center gap-1 text-xs text-primary-600 mt-2"><i class="fas fa-check-circle"></i> Terdeteksi</span>
-                            @endif
+                            <p class="text-xs text-gray-500 mt-1">Mahasiswa aktif UNIDA Gontor</p>
                         </button>
 
-                        {{-- Dosen --}}
-                        <button wire:click="selectUserType('dosen')" 
-                                class="group p-4 rounded-xl border-2 transition-all text-left hover:border-blue-500 hover:bg-blue-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'dosen' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
+                        <button wire:click="selectUserType('dosen')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-blue-500 hover:bg-blue-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'dosen' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
                             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-200 transition">
                                 <i class="fas fa-chalkboard-teacher text-xl text-blue-600"></i>
                             </div>
                             <h3 class="font-semibold text-gray-900">Dosen UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Dosen tetap atau tidak tetap UNIDA</p>
-                            @if($detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'dosen')
-                            <span class="inline-flex items-center gap-1 text-xs text-blue-600 mt-2"><i class="fas fa-check-circle"></i> Terdeteksi</span>
-                            @endif
+                            <p class="text-xs text-gray-500 mt-1">Dosen tetap/tidak tetap</p>
                         </button>
 
-                        {{-- Tendik --}}
-                        <button wire:click="selectUserType('tendik')" 
-                                class="group p-4 rounded-xl border-2 transition-all text-left hover:border-emerald-500 hover:bg-emerald-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'tendik' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200' }}">
+                        <button wire:click="selectUserType('tendik')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-emerald-500 hover:bg-emerald-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'tendik' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200' }}">
                             <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition">
                                 <i class="fas fa-user-tie text-xl text-emerald-600"></i>
                             </div>
                             <h3 class="font-semibold text-gray-900">Tendik UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Tenaga kependidikan UNIDA</p>
-                            @if($detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'tendik')
-                            <span class="inline-flex items-center gap-1 text-xs text-emerald-600 mt-2"><i class="fas fa-check-circle"></i> Terdeteksi</span>
-                            @endif
+                            <p class="text-xs text-gray-500 mt-1">Tenaga kependidikan</p>
                         </button>
 
-                        {{-- Umum --}}
-                        <button wire:click="selectUserType('umum')" 
-                                class="group p-4 rounded-xl border-2 border-gray-200 transition-all text-left hover:border-gray-400 hover:bg-gray-50">
+                        <button wire:click="selectUserType('umum')" class="group p-4 rounded-xl border-2 border-gray-200 transition-all text-left hover:border-gray-400 hover:bg-gray-50">
                             <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-gray-200 transition">
                                 <i class="fas fa-users text-xl text-gray-600"></i>
                             </div>
                             <h3 class="font-semibold text-gray-900">Pengunjung Umum</h3>
-                            <p class="text-xs text-gray-500 mt-1">Bukan civitas akademika UNIDA</p>
+                            <p class="text-xs text-gray-500 mt-1">Bukan civitas UNIDA</p>
                         </button>
                     </div>
 
@@ -126,106 +108,141 @@
                 </div>
                 @endif
 
-                {{-- Step 2: Verification --}}
+                {{-- Step 2: Search & Verify --}}
                 @if($step === 2)
                 <div>
                     <button wire:click="goToStep(1)" class="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </button>
 
-                    @if($userType === 'mahasiswa')
-                    {{-- Mahasiswa Verification --}}
+                    @php
+                        $colors = match($userType) {
+                            'mahasiswa' => ['bg' => 'bg-primary-100', 'text' => 'text-primary-600', 'border' => 'border-primary-500', 'btn' => 'bg-primary-600 hover:bg-primary-700'],
+                            'dosen' => ['bg' => 'bg-blue-100', 'text' => 'text-blue-600', 'border' => 'border-blue-500', 'btn' => 'bg-blue-600 hover:bg-blue-700'],
+                            'tendik' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-600', 'border' => 'border-emerald-500', 'btn' => 'bg-emerald-600 hover:bg-emerald-700'],
+                            default => ['bg' => 'bg-gray-100', 'text' => 'text-gray-600', 'border' => 'border-gray-500', 'btn' => 'bg-gray-600 hover:bg-gray-700'],
+                        };
+                        $icon = match($userType) {
+                            'mahasiswa' => 'fa-graduation-cap',
+                            'dosen' => 'fa-chalkboard-teacher',
+                            'tendik' => 'fa-user-tie',
+                            default => 'fa-user',
+                        };
+                    @endphp
+
                     <div class="text-center mb-6">
-                        <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <i class="fas fa-graduation-cap text-2xl text-primary-600"></i>
+                        <div class="w-16 h-16 {{ $colors['bg'] }} rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas {{ $icon }} text-2xl {{ $colors['text'] }}"></i>
                         </div>
-                        <h2 class="text-lg font-bold text-gray-900">Verifikasi Mahasiswa</h2>
-                        <p class="text-gray-500 text-sm">Masukkan NIM untuk menghubungkan dengan data SIAKAD</p>
-                    </div>
-
-                    @if($detectedMember && $claimVerified)
-                    {{-- Verified --}}
-                    <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-check text-green-600 text-xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold text-green-800">{{ $detectedMember->name }}</p>
-                                <p class="text-green-700 text-sm">NIM: {{ $detectedMember->member_id }}</p>
-                                <p class="text-green-600 text-xs">{{ $detectedMember->department?->name ?? $detectedMember->faculty?->name ?? 'UNIDA Gontor' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button wire:click="goToStep(3)" class="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition">
-                        Lanjutkan <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
-                    @else
-                    {{-- Input NIM --}}
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Induk Mahasiswa (NIM)</label>
-                            <input type="text" wire:model="claimNim" placeholder="Contoh: 432022413017" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg tracking-wider">
-                            @error('claimNim') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <button wire:click="verifyClaim" class="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition">
-                            <span wire:loading.remove wire:target="verifyClaim">Verifikasi NIM</span>
-                            <span wire:loading wire:target="verifyClaim"><i class="fas fa-spinner fa-spin mr-2"></i> Mencari...</span>
-                        </button>
-                    </div>
-                    @endif
-
-                    @elseif(in_array($userType, ['dosen', 'tendik']))
-                    {{-- Dosen/Tendik Verification --}}
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 {{ $userType === 'dosen' ? 'bg-blue-100' : 'bg-emerald-100' }} rounded-full flex items-center justify-center mx-auto mb-3">
-                            <i class="fas {{ $userType === 'dosen' ? 'fa-chalkboard-teacher text-blue-600' : 'fa-user-tie text-emerald-600' }} text-2xl"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-gray-900">Verifikasi {{ ucfirst($userType) }}</h2>
-                        <p class="text-gray-500 text-sm">Masukkan NIY untuk menghubungkan dengan data SDM</p>
-                    </div>
-
-                    @if($detectedEmployee && $claimVerified)
-                    {{-- Verified --}}
-                    <div class="{{ $userType === 'dosen' ? 'bg-blue-50 border-blue-200' : 'bg-emerald-50 border-emerald-200' }} border rounded-xl p-4 mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 {{ $userType === 'dosen' ? 'bg-blue-100' : 'bg-emerald-100' }} rounded-full flex items-center justify-center">
-                                <i class="fas fa-check {{ $userType === 'dosen' ? 'text-blue-600' : 'text-emerald-600' }} text-xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-semibold {{ $userType === 'dosen' ? 'text-blue-800' : 'text-emerald-800' }}">{{ $detectedEmployee->full_name ?? $detectedEmployee->name }}</p>
-                                <p class="{{ $userType === 'dosen' ? 'text-blue-700' : 'text-emerald-700' }} text-sm">NIY: {{ $detectedEmployee->niy }}</p>
-                                <p class="{{ $userType === 'dosen' ? 'text-blue-600' : 'text-emerald-600' }} text-xs">{{ $detectedEmployee->faculty ?? $detectedEmployee->satker }} {{ $detectedEmployee->prodi ? '- '.$detectedEmployee->prodi : '' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button wire:click="goToStep(3)" class="w-full py-3 {{ $userType === 'dosen' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white rounded-xl font-semibold transition">
-                        Lanjutkan <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
-                    @else
-                    {{-- Input NIY --}}
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Induk Yayasan (NIY)</label>
-                            <input type="text" wire:model="claimNiy" placeholder="Contoh: 200776" 
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-lg tracking-wider">
-                            @error('claimNiy') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <button wire:click="verifyClaim" class="w-full py-3 {{ $userType === 'dosen' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white rounded-xl font-semibold transition">
-                            <span wire:loading.remove wire:target="verifyClaim">Verifikasi NIY</span>
-                            <span wire:loading wire:target="verifyClaim"><i class="fas fa-spinner fa-spin mr-2"></i> Mencari...</span>
-                        </button>
-                        
-                        <p class="text-center text-sm text-gray-500">
-                            Tidak tahu NIY? <a href="https://ekinerja.unida.gontor.ac.id" target="_blank" class="text-primary-600 hover:underline">Cek di E-Kinerja</a>
+                        <h2 class="text-lg font-bold text-gray-900">Cari Data {{ ucfirst($userType) }}</h2>
+                        <p class="text-gray-500 text-sm">
+                            @if($userType === 'mahasiswa')
+                                Cari berdasarkan NIM atau Nama
+                            @else
+                                Cari berdasarkan NIY, NIDN, Nama, atau Email
+                            @endif
                         </p>
                     </div>
-                    @endif
 
-                    @elseif($userType === 'umum')
-                    {{-- Umum - Skip to step 3 --}}
-                    @php $this->goToStep(3); @endphp
+                    @if($claimVerified && ($detectedMember || $detectedEmployee))
+                    {{-- Selected/Verified --}}
+                    <div class="{{ str_replace('bg-', 'bg-', $colors['bg']) }}/50 border {{ $colors['border'] }} rounded-xl p-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 {{ $colors['bg'] }} rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check {{ $colors['text'] }} text-xl"></i>
+                                </div>
+                                <div>
+                                    @if($detectedMember)
+                                    <p class="font-semibold text-gray-900">{{ $detectedMember->name }}</p>
+                                    <p class="text-sm text-gray-600">NIM: {{ $detectedMember->member_id }}</p>
+                                    @if($detectedMember->faculty)
+                                    <p class="text-xs text-gray-500">{{ $detectedMember->faculty?->name }} - {{ $detectedMember->department?->name }}</p>
+                                    @endif
+                                    @elseif($detectedEmployee)
+                                    <p class="font-semibold text-gray-900">{{ $detectedEmployee->full_name ?? $detectedEmployee->name }}</p>
+                                    <p class="text-sm text-gray-600">NIY: {{ $detectedEmployee->niy }} @if($detectedEmployee->nidn)• NIDN: {{ $detectedEmployee->nidn }}@endif</p>
+                                    <p class="text-xs text-gray-500">{{ $detectedEmployee->faculty ?? $detectedEmployee->satker }} {{ $detectedEmployee->prodi ? '- '.$detectedEmployee->prodi : '' }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                            <button wire:click="clearSelection" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button wire:click="goToStep(3)" class="w-full py-3 {{ $colors['btn'] }} text-white rounded-xl font-semibold transition">
+                        Lanjutkan <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    @else
+                    {{-- Search Input with Dropdown --}}
+                    <div x-data="{ 
+                        open: false,
+                        position: { top: 0, left: 0, width: 0 },
+                        updatePosition() {
+                            const input = this.$refs.searchInput;
+                            const rect = input.getBoundingClientRect();
+                            this.position = { 
+                                top: rect.bottom + window.scrollY + 8, 
+                                left: rect.left + window.scrollX, 
+                                width: rect.width 
+                            };
+                        }
+                    }" @click.away="open = false" class="relative">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" wire:model.live.debounce.300ms="searchQuery" 
+                                   x-ref="searchInput"
+                                   @focus="updatePosition(); open = true"
+                                   @input="updatePosition(); open = true"
+                                   placeholder="{{ $userType === 'mahasiswa' ? 'Ketik NIM atau Nama...' : 'Ketik NIY, NIDN, Nama, atau Email...' }}"
+                                   class="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        
+                        {{-- Search Results Dropdown --}}
+                        <template x-teleport="body">
+                            <div x-show="open && ({{ count($searchResults) }} > 0 || {{ strlen($searchQuery) >= 3 ? 'true' : 'false' }})"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="opacity-0 scale-95"
+                                 x-transition:enter-end="opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100"
+                                 x-transition:leave-end="opacity-0 scale-95"
+                                 :style="'position: fixed; top: ' + position.top + 'px; left: ' + position.left + 'px; width: ' + position.width + 'px; z-index: 99999;'"
+                                 class="bg-white border border-gray-200 rounded-xl shadow-2xl max-h-64 overflow-y-auto">
+                                @if(count($searchResults) > 0)
+                                    @foreach($searchResults as $result)
+                                    <button wire:click="selectResult({{ $result['id'] }})" @click="open = false"
+                                            class="w-full px-4 py-3 text-left hover:bg-primary-50 border-b border-gray-100 last:border-0 transition">
+                                        <p class="font-medium text-gray-900">{{ $result['name'] }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            @if($userType === 'mahasiswa')
+                                                NIM: {{ $result['nim'] }}
+                                            @else
+                                                NIY: {{ $result['niy'] ?? '-' }} 
+                                                @if($result['nidn'])• NIDN: {{ $result['nidn'] }}@endif
+                                                @if($result['unit'])• {{ $result['unit'] }}@endif
+                                            @endif
+                                        </p>
+                                    </button>
+                                    @endforeach
+                                @elseif(strlen($searchQuery) >= 3)
+                                    <div class="p-4 text-center">
+                                        <i class="fas fa-search text-gray-300 text-2xl mb-2"></i>
+                                        <p class="text-gray-500 text-sm">Tidak ditemukan data yang cocok</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </template>
+                    </div>
+
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        @if($userType === 'mahasiswa')
+                            Data tidak ditemukan? Pastikan Anda sudah terdaftar di SIAKAD.
+                        @else
+                            Tidak tahu NIY? <a href="https://ekinerja.unida.gontor.ac.id" target="_blank" class="text-primary-600 hover:underline">Cek di E-Kinerja</a>
+                        @endif
+                    </p>
                     @endif
                 </div>
                 @endif
@@ -233,15 +250,9 @@
                 {{-- Step 3: Create Account --}}
                 @if($step === 3)
                 <div>
-                    @if($userType !== 'umum')
-                    <button wire:click="goToStep(2)" class="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4">
+                    <button wire:click="goToStep({{ $userType === 'umum' ? 1 : 2 }})" class="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </button>
-                    @else
-                    <button wire:click="goToStep(1)" class="flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-4">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </button>
-                    @endif
 
                     <div class="text-center mb-6">
                         <h2 class="text-lg font-bold text-gray-900">Buat Akun</h2>
@@ -249,7 +260,7 @@
                     </div>
 
                     {{-- Verified Info Badge --}}
-                    @if($detectedMember || $detectedEmployee)
+                    @if($claimVerified && ($detectedMember || $detectedEmployee))
                     <div class="bg-gray-50 rounded-xl p-3 mb-4 flex items-center gap-3">
                         <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                             <i class="fas fa-user-check text-green-600"></i>
@@ -267,50 +278,51 @@
                     @endif
 
                     <form wire:submit="register" class="space-y-4">
-                        @if(!$detectedMember && !$detectedEmployee)
+                        @if($userType === 'umum')
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                            <input type="text" wire:model="name" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="name" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Nama sesuai KTP">
                             @error('name') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
                         @endif
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" wire:model="email" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" {{ $detectedType ? 'readonly' : '' }}>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                            <input type="email" wire:model="email" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="email@example.com">
                             @error('email') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                            @if($detectedType === 'mahasiswa' || $detectedType === 'dosen_tendik')
-                            <p class="text-xs text-green-600 mt-1"><i class="fas fa-check-circle mr-1"></i> Email kampus terverifikasi</p>
+                            @if($userType !== 'umum' && $claimVerified)
+                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-info-circle mr-1"></i> Gunakan email aktif untuk verifikasi</p>
                             @endif
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">No. HP (Opsional)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">No. HP</label>
                             <input type="tel" wire:model="phone" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                            @error('phone') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         @if($userType === 'umum')
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Institusi / Asal</label>
-                            <input type="text" wire:model="institution" placeholder="Nama universitas/instansi" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                            @error('institution') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Kota Asal</label>
-                            <input type="text" wire:model="institution_city" placeholder="Kota" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Institusi/Asal <span class="text-red-500">*</span></label>
+                                <input type="text" wire:model="institution" placeholder="Nama universitas/instansi" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                @error('institution') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Kota</label>
+                                <input type="text" wire:model="institution_city" placeholder="Kota asal" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
                         </div>
                         @endif
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                                <input type="password" wire:model="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Password <span class="text-red-500">*</span></label>
+                                <input type="password" wire:model="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Min. 8 karakter">
                                 @error('password') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-                                <input type="password" wire:model="password_confirmation" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi <span class="text-red-500">*</span></label>
+                                <input type="password" wire:model="password_confirmation" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ulangi password">
                             </div>
                         </div>
 
@@ -320,9 +332,11 @@
                         </button>
                     </form>
 
-                    <p class="text-center text-sm text-gray-500 mt-4">
-                        Dengan mendaftar, Anda menyetujui <a href="#" class="text-primary-600 hover:underline">Syarat & Ketentuan</a>
+                    @if($userType === 'umum')
+                    <p class="text-center text-xs text-gray-500 mt-4">
+                        Setelah mendaftar, Anda akan menerima kode OTP via email untuk verifikasi.
                     </p>
+                    @endif
                 </div>
                 @endif
             </div>
