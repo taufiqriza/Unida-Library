@@ -28,28 +28,28 @@
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-        <div class="bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl p-4 text-white">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-users text-lg"></i></div>
-                <div><p class="text-2xl font-bold">{{ number_format($stats['total']) }}</p><p class="text-xs text-purple-100">Total</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"><i class="fas fa-users text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total'] + $stats['dosen'] + $stats['tendik']) }}</p><p class="text-xs text-gray-500">Total Semua</p></div>
             </div>
         </div>
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl p-4 text-white">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-user-check text-lg"></i></div>
-                <div><p class="text-2xl font-bold">{{ number_format($stats['active']) }}</p><p class="text-xs text-emerald-100">Aktif</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-user-check text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['active']) }}</p><p class="text-xs text-gray-500">Member Aktif</p></div>
             </div>
         </div>
-        <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-4 text-white">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-user-graduate text-lg"></i></div>
-                <div><p class="text-2xl font-bold">{{ number_format($stats['mahasiswa']) }}</p><p class="text-xs text-blue-100">Mahasiswa</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"><i class="fas fa-user-graduate text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['mahasiswa']) }}</p><p class="text-xs text-gray-500">Mahasiswa</p></div>
             </div>
         </div>
-        <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-4 text-white">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-lg"></i></div>
-                <div><p class="text-2xl font-bold">{{ number_format($stats['dosen']) }}</p><p class="text-xs text-amber-100">Dosen</p></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['dosen']) }}</p><p class="text-xs text-gray-500">Dosen</p></div>
             </div>
         </div>
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">

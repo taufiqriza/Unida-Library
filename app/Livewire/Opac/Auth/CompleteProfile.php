@@ -451,27 +451,55 @@ class CompleteProfile extends Component
         $this->step = 2;
     }
 
+    // Property for existing employee found
+    public $niyExistingEmployee = null;
+
     /**
-     * Check if NIM exists in SIAKAD data (called on NIM input change)
+     * Check if NIM/NIY exists (called on input change)
      */
     public function updatedNim($value)
     {
         $this->nimExistingMember = null;
+        $this->niyExistingEmployee = null;
         
-        if (strlen($value) >= 10) {
-            $existing = Member::with(['department', 'branch'])
-                ->where('member_id', $value)
-                ->where('id', '!=', $this->member->id)
-                ->where(function($q) {
-                    $q->whereNull('email')->orWhere('email', '');
-                })
-                ->where('profile_completed', false)
+        if (strlen($value) >= 4) {
+            // Check Employee table (NIY/NIDN for dosen/tendik)
+            $employee = \App\Models\Employee::where('niy', $value)
+                ->orWhere('nidn', $value)
                 ->first();
             
-            if ($existing) {
-                $this->nimExistingMember = $existing;
+            if ($employee) {
+                $this->niyExistingEmployee = $employee;
+                return;
+            }
+            
+            // Check Member table (NIM for mahasiswa) - only if 10+ digits
+            if (strlen($value) >= 10) {
+                $existing = Member::with(['department', 'branch'])
+                    ->where('member_id', $value)
+                    ->where('id', '!=', $this->member->id)
+                    ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                    ->where('profile_completed', false)
+                    ->first();
+                
+                if ($existing) {
+                    $this->nimExistingMember = $existing;
+                }
             }
         }
+    }
+
+    /**
+     * Link to existing employee from NIY check
+     */
+    public function linkToExistingEmployee()
+    {
+        if (!$this->niyExistingEmployee) return;
+        
+        $this->selectEmployee($this->niyExistingEmployee->id);
+        $this->niyExistingEmployee = null;
+        $this->step = 1; // Go back to confirm
+        $this->showManualEntry = false;
     }
 
     /**
