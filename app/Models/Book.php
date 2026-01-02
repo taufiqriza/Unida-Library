@@ -28,6 +28,26 @@ class Book extends Model
         'input_date' => 'datetime',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($book) {
+            // Delete related items
+            $book->items()->each(function ($item) {
+                // Check if item has active loans (not returned)
+                if ($item->loans()->where('is_returned', false)->exists()) {
+                    throw new \Exception("Tidak dapat menghapus buku karena ada peminjaman aktif.");
+                }
+                // Delete completed loans first
+                $item->loans()->delete();
+                $item->delete();
+            });
+            // Delete attachments
+            $book->attachments()->delete();
+        });
+    }
+
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function publisher(): BelongsTo { return $this->belongsTo(Publisher::class); }
     public function place(): BelongsTo { return $this->belongsTo(Place::class); }

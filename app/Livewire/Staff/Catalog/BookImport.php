@@ -27,12 +27,25 @@ class BookImport extends Component
     
     public bool $showDetailModal = false;
     public ?array $selectedRow = null;
+    public bool $isUploading = false;
+    
+    // Import result
+    public bool $showSuccessModal = false;
+    public int $importedCount = 0;
+    public int $skippedCount = 0;
+    public bool $showErrorModal = false;
+    public string $errorMessage = '';
 
     protected $rules = [
         'excelFile' => 'required|file|mimes:xlsx,xls|max:10240',
         'coversZip' => 'nullable|file|mimes:zip|max:102400',
         'branchId' => 'required|exists:branches,id',
     ];
+
+    public function updatedExcelFile()
+    {
+        $this->validateOnly('excelFile');
+    }
 
     public function mount()
     {
@@ -49,7 +62,7 @@ class BookImport extends Component
         return response()->download($path)->deleteFileAfterSend();
     }
 
-    public function upload()
+    public function processUpload()
     {
         $this->validate();
 
@@ -86,10 +99,12 @@ class BookImport extends Component
         $result = $service->executeImport($this->batch, $this->includeWarnings);
 
         if ($result['success']) {
-            session()->flash('success', "Berhasil import {$result['imported']} buku. {$result['skipped']} dilewati.");
-            return redirect()->route('staff.biblio.index');
+            $this->importedCount = $result['imported'];
+            $this->skippedCount = $result['skipped'];
+            $this->showSuccessModal = true;
         } else {
-            session()->flash('error', 'Import gagal: ' . $result['error']);
+            $this->errorMessage = $result['error'];
+            $this->showErrorModal = true;
         }
     }
 
@@ -137,6 +152,6 @@ class BookImport extends Component
         return view('livewire.staff.catalog.book-import', [
             'filteredPreview' => $this->filteredPreview,
             'branches' => $this->branches,
-        ]);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }

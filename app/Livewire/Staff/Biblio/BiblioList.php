@@ -29,6 +29,7 @@ class BiblioList extends Component
     public $selectedItems = [];
     public $selectAll = false;
     public $filterBranch = '';
+    public $showBulkDeleteModal = false;
     
     // Modal for master data CRUD
     public $showModal = false;
@@ -59,11 +60,65 @@ class BiblioList extends Component
 
     public function updatedSelectAll($value)
     {
-        if ($value && $this->activeTab === 'items') {
-            $this->selectedItems = $this->getItemsQuery()->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        if ($value) {
+            if ($this->activeTab === 'items') {
+                $this->selectedItems = $this->getItemsQuery()->paginate(15)->pluck('id')->map(fn($id) => (string) $id)->toArray();
+            } elseif ($this->activeTab === 'biblio') {
+                $this->selectedItems = $this->getBooksQuery()->paginate(12)->pluck('id')->map(fn($id) => (string) $id)->toArray();
+            }
         } else {
             $this->selectedItems = [];
         }
+    }
+
+    public function clearSelection()
+    {
+        $this->selectedItems = [];
+        $this->selectAll = false;
+    }
+
+    public function toggleBookSelection($id)
+    {
+        $id = (string) $id;
+        if (in_array($id, $this->selectedItems)) {
+            $this->selectedItems = array_diff($this->selectedItems, [$id]);
+        } else {
+            $this->selectedItems[] = $id;
+        }
+        $this->selectAll = false;
+    }
+
+    public function confirmBulkDelete()
+    {
+        if (!empty($this->selectedItems)) {
+            $this->showBulkDeleteModal = true;
+        }
+    }
+
+    public function bulkDeleteBooks()
+    {
+        if (empty($this->selectedItems)) return;
+        
+        $deleted = 0;
+        $failed = 0;
+        
+        foreach ($this->selectedItems as $id) {
+            try {
+                $book = Book::find($id);
+                if ($book) {
+                    $book->delete();
+                    $deleted++;
+                }
+            } catch (\Exception $e) {
+                $failed++;
+            }
+        }
+        
+        $this->selectedItems = [];
+        $this->selectAll = false;
+        $this->showBulkDeleteModal = false;
+        
+        session()->flash('message', "Berhasil menghapus {$deleted} buku." . ($failed > 0 ? " {$failed} gagal dihapus." : ''));
     }
 
     // Quick View
@@ -209,6 +264,17 @@ class BiblioList extends Component
         $user = auth()->user();
         if ($user->role === 'super_admin') return $this->filterBranch ?: null;
         return $user->branch_id;
+    }
+
+    protected function getBooksQuery()
+    {
+        $branchFilter = $this->getBranchFilter();
+        return Book::query()
+            ->when($branchFilter, fn($q) => $q->where('branch_id', $branchFilter))
+            ->when($this->search, function ($q) {
+                $s = $this->search;
+                $q->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('isbn', 'like', "%{$s}%")->orWhere('call_number', 'like', "%{$s}%"));
+            });
     }
 
     protected function getItemsQuery()

@@ -151,8 +151,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
+            padding-bottom: 1mm;
         }
         
         .barcode-image {
@@ -168,7 +169,7 @@
             font-weight: 700;
             letter-spacing: 2px;
             color: #333;
-            margin-top: 1mm;
+            margin-top: 0;
             font-family: 'Consolas', 'Monaco', monospace;
         }
         
@@ -182,15 +183,18 @@
         }
         
         .library-header {
-            font-size: 5.5pt;
+            font-size: 5pt;
             font-weight: 700;
             text-align: center;
-            padding: 1.5mm 1mm;
+            padding: 1.5mm 0.5mm;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            line-height: 1.2;
+            letter-spacing: 0.2px;
+            line-height: 1.1;
+            word-break: break-word;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
         
         .callnumber-body {
@@ -233,7 +237,9 @@
             .print-controls, .cut-guide { display: none !important; } 
             body { 
                 background: #fff; 
-                padding: 0; 
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .paper-preview {
                 box-shadow: none;
@@ -242,6 +248,17 @@
             .label-card { 
                 border: 0.5pt solid #ccc;
                 box-shadow: none;
+            }
+            .library-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .callnumber-line.collection-code {
+                color: #667eea !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
         }
     </style>
@@ -266,10 +283,6 @@
         </div>
     </div>
 
-    @php
-        $libraryName = \App\Models\Setting::get('library_name', 'PERPUSTAKAAN UNIDA');
-    @endphp
-
     <div class="paper-preview">
         <div class="labels-grid">
             @foreach($items as $item)
@@ -290,7 +303,7 @@
                 
                 {{-- Call Number Section (Spine Label) --}}
                 <div class="callnumber-section">
-                    <div class="library-header">{{ Str::limit($libraryName, 18) }}</div>
+                    <div class="library-header">{{ Str::limit($item->branch?->name ?? 'PERPUSTAKAAN', 18) }}</div>
                     <div class="callnumber-body">
                         @foreach($cnParts as $index => $part)
                         <div class="callnumber-line {{ $index === 0 && strlen($part) <= 2 ? 'collection-code' : '' }}">{{ $part }}</div>

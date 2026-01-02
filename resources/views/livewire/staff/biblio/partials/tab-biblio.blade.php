@@ -4,11 +4,23 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
 @endphp
 
 @if($books->count() > 0)
+    {{-- Bulk Actions --}}
+    @if(count($selectedItems) > 0)
+    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <span class="text-sm text-blue-700"><i class="fas fa-check-circle mr-2"></i>{{ count($selectedItems) }} buku dipilih</span>
+        <div class="flex gap-2">
+            <button wire:click="clearSelection" class="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800">Batal</button>
+            <button wire:click="confirmBulkDelete" class="px-3 py-1.5 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600"><i class="fas fa-trash mr-1"></i>Hapus</button>
+        </div>
+    </div>
+    @endif
+
     @if($viewMode === 'list')
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-gradient-to-r {{ $config['gradient'] }} text-white">
                 <tr>
+                    <th class="px-3 py-3 text-center w-10"><input type="checkbox" wire:model.live="selectAll" class="rounded border-white/50 text-blue-600"></th>
                     <th class="px-4 py-3 text-left font-medium w-20">Cover</th>
                     <th class="px-4 py-3 text-left font-medium">Judul & Info</th>
                     <th class="px-4 py-3 text-center font-medium w-16">Tahun</th>
@@ -19,7 +31,8 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
             </thead>
             <tbody class="divide-y divide-gray-50">
                 @foreach($books as $book)
-                <tr class="hover:bg-blue-50/30 transition">
+                <tr class="hover:bg-blue-50/30 transition {{ in_array((string)$book->id, $selectedItems) ? 'bg-blue-50' : '' }}">
+                    <td class="px-3 py-3 text-center"><input type="checkbox" wire:click="toggleBookSelection({{ $book->id }})" {{ in_array((string)$book->id, $selectedItems) ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600"></td>
                     <td class="px-4 py-3">
                         <div class="relative w-14 h-20">
                             <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden">

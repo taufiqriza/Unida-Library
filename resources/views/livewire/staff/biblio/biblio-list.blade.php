@@ -139,6 +139,7 @@
     {{-- Modals --}}
     @include('livewire.staff.biblio.partials.modal-quickview')
     @include('livewire.staff.biblio.partials.modal-delete')
+    @include('livewire.staff.biblio.partials.modal-bulk-delete')
     @include('livewire.staff.biblio.partials.modal-print')
     @include('livewire.staff.biblio.partials.modal-master')
 </div>

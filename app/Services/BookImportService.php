@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Book;
 use App\Models\Author;
 use App\Models\Branch;
-use App\Models\BookItem;
+use App\Models\Item;
 use App\Models\ImportBatch;
 use App\Models\Publisher;
 use App\Models\Subject;
@@ -34,6 +34,13 @@ class BookImportService
 
     protected array $requiredColumns = ['judul', 'penulis', 'jumlah_eksemplar'];
     protected array $coverFiles = [];
+    
+    // Cached values for batch import
+    protected int $barcodeSeq = 1;
+    protected int $invSeq = 1;
+    protected ?int $defaultCollectionTypeId = null;
+    protected ?int $defaultStatusId = null;
+    protected ?int $defaultLocationId = null;
 
     /**
      * Generate premium Excel template
@@ -95,7 +102,7 @@ class BookImportService
         $sheet->setCellValue('E4', date('d/m/Y'));
 
         // Instructions
-        $sheet->mergeCells('A6:L6');
+        $sheet->mergeCells('A6:N6');
         $sheet->setCellValue('A6', '⚠️ PENTING: Jangan mengubah header kolom (baris 8). Mulai isi data dari baris 9. Kolom dengan tanda (*) wajib diisi.');
         $sheet->getStyle('A6')->getFont()->setItalic(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF6600'));
 
@@ -106,13 +113,15 @@ class BookImportService
             'C' => 'Penulis *',
             'D' => 'ISBN',
             'E' => 'Penerbit',
-            'F' => 'Tahun',
-            'G' => 'DDC *',
-            'H' => 'Kategori',
-            'I' => 'Bahasa',
-            'J' => 'Jml Eks *',
-            'K' => 'Lokasi Rak',
-            'L' => 'Cover File',
+            'F' => 'Tempat Terbit',
+            'G' => 'Tahun',
+            'H' => 'DDC *',
+            'I' => 'Subjek',
+            'J' => 'Bahasa',
+            'K' => 'Media',
+            'L' => 'Jml Eks *',
+            'M' => 'Lokasi Rak',
+            'N' => 'Cover File',
         ];
 
         $row = 8;
@@ -127,28 +136,30 @@ class BookImportService
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
         ];
-        $sheet->getStyle('A8:L8')->applyFromArray($headerStyle);
-
-        // Add dropdowns and formatting for data rows
-        $categories = Subject::orderBy('name')->pluck('name')->toArray();
-        $categoryList = implode(',', array_slice($categories, 0, 50)); // Excel limit
+        $sheet->getStyle('A8:N8')->applyFromArray($headerStyle);
 
         for ($i = 9; $i <= 508; $i++) {
             // Row number
             $sheet->setCellValue('A' . $i, $i - 8);
             
             // Bahasa dropdown
-            $validation = $sheet->getCell('I' . $i)->getDataValidation();
+            $validation = $sheet->getCell('J' . $i)->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setFormula1('"Indonesia,Arab,Inggris"');
             $validation->setShowDropDown(true);
 
+            // Media dropdown
+            $mediaValidation = $sheet->getCell('K' . $i)->getDataValidation();
+            $mediaValidation->setType(DataValidation::TYPE_LIST);
+            $mediaValidation->setFormula1('"Buku Cetak,E-Book,CD-ROM,Reference,Skripsi,Tesis,Disertasi"');
+            $mediaValidation->setShowDropDown(true);
+
             // Jumlah eksemplar default
-            $sheet->setCellValue('J' . $i, 1);
+            $sheet->setCellValue('L' . $i, 1);
         }
 
         // Column widths
-        $widths = ['A' => 5, 'B' => 35, 'C' => 25, 'D' => 18, 'E' => 20, 'F' => 8, 'G' => 10, 'H' => 15, 'I' => 12, 'J' => 8, 'K' => 12, 'L' => 20];
+        $widths = ['A' => 5, 'B' => 35, 'C' => 25, 'D' => 18, 'E' => 18, 'F' => 15, 'G' => 8, 'H' => 10, 'I' => 18, 'J' => 12, 'K' => 12, 'L' => 8, 'M' => 12, 'N' => 18];
         foreach ($widths as $col => $width) {
             $sheet->getColumnDimension($col)->setWidth($width);
         }
@@ -375,13 +386,15 @@ class BookImportService
         $authors = trim($row['C'] ?? '');
         $isbn = trim($row['D'] ?? '');
         $publisher = trim($row['E'] ?? '');
-        $year = trim($row['F'] ?? '');
-        $ddc = trim($row['G'] ?? '');
-        $category = trim($row['H'] ?? '');
-        $language = trim($row['I'] ?? '');
-        $quantity = (int) ($row['J'] ?? 1);
-        $location = trim($row['K'] ?? '');
-        $coverFile = trim($row['L'] ?? '');
+        $publishPlace = trim($row['F'] ?? '');
+        $year = trim($row['G'] ?? '');
+        $ddc = trim($row['H'] ?? '');
+        $subject = trim($row['I'] ?? '');
+        $language = trim($row['J'] ?? '');
+        $media = trim($row['K'] ?? '');
+        $quantity = (int) ($row['L'] ?? 1);
+        $location = trim($row['M'] ?? '');
+        $coverFile = trim($row['N'] ?? '');
 
         // Validations
         if (empty($title)) {
@@ -400,20 +413,23 @@ class BookImportService
         if (empty($ddc)) {
             $warnings[] = 'DDC kosong, call number tidak bisa digenerate';
         } else {
-            // Generate call number
-            $authorCode = $this->generateAuthorCode($authors);
-            $titleCode = strtolower(substr(preg_replace('/^(the|a|an)\s+/i', '', $title), 0, 1));
-            $callNumber = "{$ddc} {$authorCode} {$titleCode}";
+            // Generate call number using CallNumberService
+            $callNumber = CallNumberService::generate('S', $ddc, $authors, $title);
             $ddcName = $this->getDdcName($ddc);
         }
 
         // Cover validation
         $coverFound = false;
         $coverPath = null;
+        $coverPreviewUrl = null;
         if (!empty($coverFile)) {
             $coverPath = $this->findCoverFile($batch, $coverFile);
-            if ($coverPath) {
+            if ($coverPath && file_exists($coverPath)) {
                 $coverFound = true;
+                // Copy to public temp for preview
+                $previewName = 'import-preview/' . $batch->id . '/' . basename($coverPath);
+                Storage::disk('public')->put($previewName, file_get_contents($coverPath));
+                $coverPreviewUrl = asset('storage/' . $previewName);
             } else {
                 $warnings[] = "Cover '$coverFile' tidak ditemukan dalam ZIP";
             }
@@ -431,6 +447,18 @@ class BookImportService
         $langMap = ['indonesia' => 'id', 'arab' => 'ar', 'inggris' => 'en'];
         $langCode = $langMap[strtolower($language)] ?? 'id';
 
+        // Media type mapping
+        $mediaMap = [
+            'buku cetak' => 33,
+            'e-book' => 34,
+            'cd-rom' => 28,
+            'reference' => 36,
+            'skripsi' => 37,
+            'tesis' => 38,
+            'disertasi' => 39,
+        ];
+        $mediaTypeId = $mediaMap[strtolower($media)] ?? 33; // Default: Buku Cetak
+
         $status = 'valid';
         if (!empty($errors)) {
             $status = 'error';
@@ -447,27 +475,23 @@ class BookImportService
                 'authors' => $authors,
                 'isbn' => $isbn,
                 'publisher' => $publisher,
+                'publish_place' => $publishPlace,
                 'year' => $year ?: null,
                 'ddc' => $ddc,
                 'ddc_name' => $ddcName,
                 'call_number' => $callNumber,
-                'category' => $category,
+                'subject' => $subject,
                 'language' => $langCode,
+                'media' => $media,
+                'media_type_id' => $mediaTypeId,
                 'quantity' => $quantity,
                 'location' => $location,
                 'cover_file' => $coverFile,
                 'cover_found' => $coverFound,
                 'cover_path' => $coverPath,
+                'cover_preview_url' => $coverPreviewUrl,
             ],
         ];
-    }
-
-    protected function generateAuthorCode(string $authors): string
-    {
-        $firstAuthor = explode(';', $authors)[0];
-        $parts = preg_split('/\s+/', trim($firstAuthor));
-        $lastName = end($parts);
-        return strtoupper(substr($lastName, 0, 3));
     }
 
     protected function getDdcName(string $code): ?string
@@ -567,11 +591,33 @@ class BookImportService
     }
 
     /**
+     * Initialize default values once before batch import
+     */
+    protected function initializeDefaults(ImportBatch $batch): void
+    {
+        $this->defaultCollectionTypeId = CollectionType::value('id');
+        $this->defaultStatusId = \App\Models\ItemStatus::where('name', 'Tersedia')->value('id') 
+            ?? \App\Models\ItemStatus::value('id');
+        $this->defaultLocationId = \App\Models\Location::where('branch_id', $batch->branch_id)->value('id')
+            ?? \App\Models\Location::value('id');
+        
+        // Get last sequence numbers
+        $date = now()->format('ymd');
+        $prefix = "INV-{$batch->branch_id}-{$date}-";
+        $lastInv = Item::where('inventory_code', 'like', $prefix . '%')->max('inventory_code');
+        $this->invSeq = $lastInv ? (int) substr($lastInv, -4) + 1 : 1;
+        $this->barcodeSeq = 1;
+    }
+
+    /**
      * Execute import
      */
     public function executeImport(ImportBatch $batch, bool $includeWarnings = false): array
     {
         $batch->update(['status' => 'processing']);
+        
+        // Initialize cached values once
+        $this->initializeDefaults($batch);
         
         $preview = $batch->preview_data ?? [];
         $imported = 0;
@@ -641,6 +687,14 @@ class BookImportService
             );
         }
 
+        // Find or create place
+        $place = null;
+        if (!empty($data['publish_place'])) {
+            $place = \App\Models\Place::firstOrCreate(
+                ['name' => $data['publish_place']]
+            );
+        }
+
         // Find or create authors
         $authorIds = [];
         if (!empty($data['authors'])) {
@@ -669,11 +723,13 @@ class BookImportService
             'title' => $data['title'],
             'isbn' => $data['isbn'] ?: null,
             'publisher_id' => $publisher?->id,
+            'place_id' => $place?->id,
             'publish_year' => $data['year'],
             'call_number' => $data['call_number'],
-            'ddc_code' => $data['ddc'],
+            'classification' => $data['ddc'],
             'language' => $data['language'],
-            'cover' => $coverPath,
+            'media_type_id' => $data['media_type_id'] ?? 33,
+            'image' => $coverPath,
             'is_opac_visible' => true,
         ]);
 
@@ -682,32 +738,44 @@ class BookImportService
             $book->authors()->attach($authorIds);
         }
 
-        // Attach subject/category
-        if (!empty($data['category'])) {
-            $subject = Subject::where('name', $data['category'])->first();
-            if ($subject) {
-                $book->subjects()->attach($subject->id);
-            }
+        // Attach subject
+        if (!empty($data['subject'])) {
+            $subject = Subject::firstOrCreate(
+                ['name' => $data['subject']],
+                ['slug' => Str::slug($data['subject'])]
+            );
+            $book->subjects()->attach($subject->id);
         }
 
         // Create book items (eksemplar)
-        $collectionType = CollectionType::first();
         for ($i = 1; $i <= $data['quantity']; $i++) {
-            BookItem::create([
+            Item::create([
                 'book_id' => $book->id,
                 'branch_id' => $batch->branch_id,
-                'collection_type_id' => $collectionType?->id,
-                'barcode' => $this->generateBarcode($book, $i),
-                'shelf_location' => $data['location'],
-                'status' => 'available',
+                'collection_type_id' => $this->defaultCollectionTypeId,
+                'barcode' => $this->getNextBarcode(),
+                'inventory_code' => $this->getNextInventoryCode($batch->branch_id),
+                'call_number' => $data['call_number'],
+                'location_id' => $this->defaultLocationId,
+                'item_status_id' => $this->defaultStatusId,
+                'received_date' => now(),
+                'source' => 'Import Excel',
+                'user_id' => $batch->user_id,
             ]);
         }
 
         return $book;
     }
 
-    protected function generateBarcode(Book $book, int $copy): string
+    protected function getNextBarcode(): string
     {
-        return sprintf('%s-%04d-%02d', date('Ymd'), $book->id, $copy);
+        // Format: B + yymmdd (6) + seq (4) = 11 chars total
+        return 'B' . now()->format('ymd') . str_pad($this->barcodeSeq++, 4, '0', STR_PAD_LEFT);
+    }
+
+    protected function getNextInventoryCode(int $branchId): string
+    {
+        $date = now()->format('ymd');
+        return "INV-{$branchId}-{$date}-" . str_pad($this->invSeq++, 4, '0', STR_PAD_LEFT);
     }
 }
