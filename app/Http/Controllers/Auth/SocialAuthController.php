@@ -138,7 +138,75 @@ class SocialAuthController extends Controller
             return $this->redirectAfterLogin($member);
         }
 
-        // No account - create new member
+        // No account - check SIAKAD/Employee first before creating new
+        $email = $googleUser->getEmail();
+        $domain = strtolower(substr(strrchr($email, '@'), 1));
+        
+        // Check if student email - try to find in SIAKAD
+        if (str_contains($domain, 'student.') || str_starts_with($domain, 'stu.') || str_starts_with($domain, 'mhs.')) {
+            $nim = explode('@', $email)[0];
+            if (preg_match('/^\d{9,15}$/', $nim)) {
+                $siakadMember = Member::where('member_id', $nim)->orWhere('nim_nidn', $nim)->first();
+                if ($siakadMember) {
+                    // Link to existing SIAKAD member
+                    $siakadMember->update([
+                        'email' => $email,
+                        'profile_completed' => true,
+                        'email_verified' => 'verified',
+                        'email_verified_at' => now(),
+                    ]);
+                    
+                    SocialAccount::create([
+                        'member_id' => $siakadMember->id,
+                        'provider' => 'google',
+                        'provider_id' => $googleUser->getId(),
+                        'provider_email' => $email,
+                        'provider_avatar' => $googleUser->getAvatar(),
+                    ]);
+                    
+                    Auth::guard('member')->login($siakadMember);
+                    return redirect()->route('opac.member.dashboard')
+                        ->with('success', 'Akun berhasil dihubungkan dengan data SIAKAD!');
+                }
+            }
+        }
+        
+        // Check if staff email - try to find in Employee
+        if (str_contains($domain, 'unida.gontor') && !str_contains($domain, 'student.')) {
+            $employee = \App\Models\Employee::where('email', $email)->first();
+            if ($employee) {
+                // Create member from employee data
+                $member = Member::create([
+                    'member_id' => $employee->niy ?? $this->generateUniqueMemberId(),
+                    'nim_nidn' => $employee->nidn,
+                    'name' => $employee->full_name ?? $employee->name,
+                    'email' => $email,
+                    'member_type_id' => $employee->type === 'dosen' ? 2 : 3,
+                    'gender' => $employee->gender === 'L' ? 'M' : ($employee->gender === 'P' ? 'F' : null),
+                    'is_active' => true,
+                    'profile_completed' => true,
+                    'register_date' => now(),
+                    'expire_date' => now()->addYears(5),
+                    'registration_type' => 'internal',
+                    'email_verified' => 'verified',
+                    'email_verified_at' => now(),
+                ]);
+                
+                SocialAccount::create([
+                    'member_id' => $member->id,
+                    'provider' => 'google',
+                    'provider_id' => $googleUser->getId(),
+                    'provider_email' => $email,
+                    'provider_avatar' => $googleUser->getAvatar(),
+                ]);
+                
+                Auth::guard('member')->login($member);
+                return redirect()->route('opac.member.dashboard')
+                    ->with('success', 'Akun berhasil dibuat dari data SDM!');
+            }
+        }
+
+        // No match found - create new member, redirect to complete profile
         $member = Member::create([
             'member_id' => $this->generateUniqueMemberId(),
             'name' => $googleUser->getName(),

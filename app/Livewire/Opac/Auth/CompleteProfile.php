@@ -516,7 +516,7 @@ class CompleteProfile extends Component
     }
 
     /**
-     * Skip as Dosen - auto-select dosen member type
+     * Skip as Dosen - search from Employee table
      */
     public function skipAsDosen()
     {
@@ -524,16 +524,28 @@ class CompleteProfile extends Component
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
         $this->entryMode = 'dosen';
+        $this->searchResults = collect();
         
         // Auto-select Dosen member type
         $dosenType = MemberType::where('name', 'like', '%Dosen%')->first();
-        $this->member_type_id = $dosenType?->id ?? 1;
+        $this->member_type_id = $dosenType?->id ?? 2;
+        
+        // Try to find employee by email
+        $employee = \App\Models\Employee::where('email', $this->member->email)
+            ->where('type', 'dosen')
+            ->first();
+        
+        if ($employee) {
+            $this->selectedEmployee = $employee;
+            $this->nim = $employee->niy ?? '';
+            $this->searchName = $employee->full_name ?? $employee->name;
+        }
         
         $this->step = 2;
     }
     
     /**
-     * Skip as Tendik - auto-select tendik member type with manual satker
+     * Skip as Tendik - search from Employee table
      */
     public function skipAsTendik()
     {
@@ -541,8 +553,9 @@ class CompleteProfile extends Component
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
         $this->entryMode = 'tendik';
+        $this->searchResults = collect();
         
-        // Auto-select Tendik member type (or create if not exists)
+        // Auto-select Tendik member type
         $tendikType = MemberType::firstOrCreate(
             ['name' => 'Tendik'],
             ['description' => 'Tenaga Kependidikan']
@@ -555,8 +568,23 @@ class CompleteProfile extends Component
             ->first();
         $this->branch_id = $pusatBranch?->id;
         
+        // Try to find employee by email
+        $employee = \App\Models\Employee::where('email', $this->member->email)
+            ->where('type', 'tendik')
+            ->first();
+        
+        if ($employee) {
+            $this->selectedEmployee = $employee;
+            $this->nim = $employee->niy ?? '';
+            $this->satker = $employee->satker ?? '';
+            $this->searchName = $employee->full_name ?? $employee->name;
+        }
+        
         $this->step = 2;
     }
+    
+    // Property for selected employee
+    public $selectedEmployee = null;
 
     public function updatedFacultyId($value)
     {
