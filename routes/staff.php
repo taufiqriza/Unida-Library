@@ -20,6 +20,7 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         Route::prefix('biblio')->name('biblio.')->group(function () {
             Route::get('/', \App\Livewire\Staff\Biblio\BiblioList::class)->name('index');
             Route::get('/create', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('create');
+            Route::get('/import', \App\Livewire\Staff\Catalog\BookImport::class)->name('import');
             Route::get('/{book}', \App\Livewire\Staff\Biblio\BiblioShow::class)->name('show');
             Route::get('/{id}/edit', \App\Livewire\Staff\Biblio\BiblioForm::class)->name('edit');
         });

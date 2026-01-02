@@ -21,6 +21,9 @@
             </select>
             @endif
             @if(in_array($activeTab, ['biblio']))
+            <a href="{{ route('staff.biblio.import') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-xl shadow-lg shadow-emerald-500/25 transition text-sm">
+                <i class="fas fa-file-import"></i><span>Import Excel</span>
+            </a>
             <a href="{{ route('staff.biblio.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg shadow-blue-500/25 transition text-sm">
                 <i class="fas fa-plus"></i><span>Tambah Buku</span>
             </a>
