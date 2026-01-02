@@ -415,10 +415,7 @@ class BiblioForm extends Component
         $isbn = preg_replace('/[^0-9X]/', '', $this->isbn);
         
         try {
-            // Open Library
-            $this->coverResults[] = ['url' => "https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg", 'source' => 'OpenLibrary'];
-            
-            // Google Books
+            // Google Books first (more reliable)
             $googleData = @file_get_contents("https://www.googleapis.com/books/v1/volumes?q=isbn:{$isbn}", false, stream_context_create(['http' => ['timeout' => 5]]));
             if ($googleData) {
                 $data = json_decode($googleData, true);
@@ -426,6 +423,13 @@ class BiblioForm extends Component
                     $thumb = str_replace(['http://', 'zoom=1'], ['https://', 'zoom=2'], $data['items'][0]['volumeInfo']['imageLinks']['thumbnail']);
                     $this->coverResults[] = ['url' => $thumb, 'source' => 'Google'];
                 }
+            }
+            
+            // Open Library - check if real image exists
+            $olUrl = "https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg";
+            $headers = @get_headers($olUrl, true);
+            if ($headers && isset($headers['Content-Length']) && $headers['Content-Length'] > 1000) {
+                $this->coverResults[] = ['url' => $olUrl, 'source' => 'OpenLibrary'];
             }
         } catch (\Exception $e) {}
     }
@@ -469,8 +473,8 @@ class BiblioForm extends Component
             $ctx = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'Mozilla/5.0']]);
             $imageData = @file_get_contents($url, false, $ctx);
             
-            if (!$imageData) {
-                $this->dispatch('notify', type: 'error', message: 'Gagal mengunduh gambar');
+            if (!$imageData || strlen($imageData) < 1000) {
+                $this->dispatch('notify', type: 'error', message: 'Gambar tidak valid atau terlalu kecil');
                 return;
             }
 
