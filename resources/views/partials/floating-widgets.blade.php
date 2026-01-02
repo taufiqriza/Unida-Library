@@ -17,13 +17,13 @@
     <style>
         #wa-widget { 
             position: fixed; 
-            bottom: 90px; 
+            bottom: 100px; 
             right: 20px; 
             z-index: 99998; 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
         }
         @media (min-width: 1024px) {
-            #wa-widget { bottom: 20px; }
+            #wa-widget { bottom: 24px; }
         }
         #wa-btn { 
             width: 56px; 
@@ -214,7 +214,7 @@
             visibility: hidden;
             opacity: 0;
             right: 20px;
-            bottom: 160px;
+            bottom: 170px;
             z-index: 99997;
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             width: 48px;
@@ -230,7 +230,7 @@
             transform: translateY(20px);
         }
         @media (min-width: 1024px) {
-            #scroll-top-btn { bottom: 90px; }
+            #scroll-top-btn { bottom: 94px; }
         }
         #scroll-top-btn i {
             font-size: 22px;
