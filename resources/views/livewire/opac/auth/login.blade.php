@@ -4,69 +4,41 @@
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div class="flex flex-col lg:flex-row">
                     <!-- Left - Info (Hidden on Mobile) -->
-                    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 p-8 flex-col justify-center text-white">
-                        <div class="flex items-center gap-3 mb-6">
-                            <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-12 h-12 object-contain">
+                    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 to-primary-800 p-6 flex-col justify-center text-white">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-11 h-11 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+                                <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="w-8 h-8 object-contain">
+                            </div>
                             <div>
-                                <h2 class="text-xl font-bold">{{ __('opac.auth.login.digital_library') }}</h2>
-                                <p class="text-primary-200 text-sm">{{ __('opac.auth.login.digital_library_desc') }}</p>
+                                <h2 class="text-lg font-bold">{{ __('opac.auth.login.digital_library') }}</h2>
+                                <p class="text-primary-200 text-xs">{{ __('opac.auth.login.digital_library_desc') }}</p>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">{{ __('opac.auth.login.online_loan') }}</p>
-                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.online_loan_desc') }}</p>
-                                </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-book w-4 text-center"></i>
+                                <span class="text-sm">Peminjaman & Reservasi Online</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-file-pdf"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">{{ __('opac.auth.login.ebook_ethesis') }}</p>
-                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.ebook_ethesis_desc') }}</p>
-                                </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-file-pdf w-4 text-center"></i>
+                                <span class="text-sm">Akses E-Book & E-Thesis</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-upload"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Unggah Mandiri</p>
-                                    <p class="text-primary-200 text-xs">Submit tugas akhir online</p>
-                                </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-upload w-4 text-center"></i>
+                                <span class="text-sm">Unggah Mandiri Tugas Akhir</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-search-plus"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Cek Plagiasi</p>
-                                    <p class="text-primary-200 text-xs">Integrasi Turnitin</p>
-                                </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-search-plus w-4 text-center"></i>
+                                <span class="text-sm">Cek Plagiasi (Turnitin)</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-certificate"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Bebas Pustaka</p>
-                                    <p class="text-primary-200 text-xs">Pengajuan surat digital</p>
-                                </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-certificate w-4 text-center"></i>
+                                <span class="text-sm">Pengajuan Bebas Pustaka</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-history"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">{{ __('opac.auth.login.complete_history') }}</p>
-                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.complete_history_desc') }}</p>
-                                </div>
+                            <div class="flex items-center gap-3 bg-white/10 rounded-lg px-3 py-2">
+                                <i class="fas fa-history w-4 text-center"></i>
+                                <span class="text-sm">Riwayat Peminjaman Lengkap</span>
                             </div>
                         </div>
                     </div>
