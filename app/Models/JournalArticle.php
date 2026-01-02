@@ -8,6 +8,7 @@ class JournalArticle extends Model
 {
     protected $fillable = [
         'source_type',
+        'type',
         'external_id',
         'journal_code',
         'journal_name',

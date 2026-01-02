@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class SyncRepoCommand extends Command
 {
-    protected $signature = 'repo:sync {--type= : thesis or article}';
+    protected $signature = 'repo:sync {--type= : thesis, article, conference, book, book_section, patent, or publication (all non-thesis)}';
     protected $description = 'Sync data from repo.unida.gontor.ac.id via OAI-PMH';
 
     public function handle(RepoSyncService $service): int
@@ -19,7 +19,7 @@ class SyncRepoCommand extends Command
 
         $this->table(['Type', 'Count'], [
             ['Thesis', $stats['thesis']],
-            ['Article', $stats['article']],
+            ['Publication', $stats['publication']],
             ['Skipped', $stats['skipped']],
             ['Errors', $stats['errors']],
         ]);

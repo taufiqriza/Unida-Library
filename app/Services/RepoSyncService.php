@@ -13,28 +13,50 @@ class RepoSyncService
     protected int $timeout = 60;
 
     // OAI-PMH set codes
-    const SET_THESIS = '74797065733D746865736973';
-    const SET_ARTICLE = '74797065733D61727469636C65';
+    const SETS = [
+        'thesis' => '74797065733D746865736973',
+        'article' => '74797065733D61727469636C65',
+        'conference' => '74797065733D636F6E666572656E63655F6974656D',
+        'book' => '74797065733D626F6F6B',
+        'book_section' => '74797065733D626F6F6B5F73656374696F6E',
+        'patent' => '74797065733D706174656E74',
+    ];
 
     public function sync(?string $type = null): array
     {
-        $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0, 'errors' => 0];
+        $stats = ['thesis' => 0, 'publication' => 0, 'skipped' => 0, 'errors' => 0];
 
         if (!$type || $type === 'thesis') {
-            $result = $this->syncSet(self::SET_THESIS, 'thesis');
+            $result = $this->syncSet(self::SETS['thesis'], 'thesis');
             $stats['thesis'] = $result['saved'];
             $stats['skipped'] += $result['skipped'];
             $stats['errors'] += $result['errors'];
         }
 
-        if (!$type || $type === 'article') {
-            $result = $this->syncSet(self::SET_ARTICLE, 'article');
-            $stats['article'] = $result['saved'];
-            $stats['skipped'] += $result['skipped'];
-            $stats['errors'] += $result['errors'];
+        $pubTypes = ['article', 'conference', 'book', 'book_section', 'patent'];
+        foreach ($pubTypes as $pubType) {
+            if (!$type || $type === $pubType || $type === 'publication') {
+                $result = $this->syncSet(self::SETS[$pubType], $pubType);
+                $stats['publication'] += $result['saved'];
+                $stats['skipped'] += $result['skipped'];
+                $stats['errors'] += $result['errors'];
+            }
         }
 
         return $stats;
+    }
+
+    public function syncPublications(): array
+    {
+        return $this->sync('publication');
+    }
+
+    public function syncType(string $type): array
+    {
+        if (!isset(self::SETS[$type])) {
+            return ['saved' => 0, 'skipped' => 0, 'errors' => 1];
+        }
+        return $this->syncSet(self::SETS[$type], $type);
     }
 
     public function syncSet(string $setSpec, string $targetType): array
@@ -83,7 +105,7 @@ class RepoSyncService
             try {
                 $saved = $targetType === 'thesis'
                     ? $this->processThesis($record)
-                    : $this->processArticle($record);
+                    : $this->processPublication($record, $targetType);
                 $saved ? $stats['saved']++ : $stats['skipped']++;
             } catch (\Exception $e) {
                 Log::warning('Record error', ['error' => substr($e->getMessage(), 0, 200)]);
@@ -107,7 +129,7 @@ class RepoSyncService
         return (bool) $this->saveThesis($record, $externalId);
     }
 
-    protected function processArticle(string $record): bool
+    protected function processPublication(string $record, string $type): bool
     {
         preg_match('/<identifier>oai:repo\.unida\.gontor\.ac\.id:(\d+)<\/identifier>/', $record, $m);
         $externalId = $m[1] ?? null;
@@ -117,7 +139,7 @@ class RepoSyncService
             return false;
         }
 
-        return (bool) $this->saveArticle($record, $externalId);
+        return (bool) $this->savePublication($record, $externalId, $type);
     }
 
     protected function saveThesis(string $record, string $externalId): ?string
@@ -154,7 +176,7 @@ class RepoSyncService
         return 'thesis';
     }
 
-    protected function saveArticle(string $record, string $externalId): ?string
+    protected function savePublication(string $record, string $externalId, string $type): ?string
     {
         $title = $this->extract($record, 'dc:title');
         if (!$title) return null;
@@ -173,11 +195,20 @@ class RepoSyncService
         $identifiers = $this->extractAll($record, 'dc:identifier');
         $pdfUrl = collect($identifiers)->first(fn($i) => str_ends_with(strtolower($i), '.pdf'));
 
+        $typeLabels = [
+            'article' => 'UNIDA Repository',
+            'conference' => 'Conference Paper',
+            'book' => 'Book',
+            'book_section' => 'Book Chapter',
+            'patent' => 'Patent',
+        ];
+
         JournalArticle::create([
             'source_type' => 'repo',
+            'type' => $type,
             'external_id' => $externalId,
             'journal_code' => 'repo',
-            'journal_name' => 'UNIDA Repository',
+            'journal_name' => $typeLabels[$type] ?? 'UNIDA Repository',
             'title' => $title,
             'abstract' => $abstract,
             'authors' => $authors,
@@ -188,7 +219,7 @@ class RepoSyncService
             'synced_at' => now(),
         ]);
 
-        return 'article';
+        return $type;
     }
 
     protected function extract(string $xml, string $tag): ?string
