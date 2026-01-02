@@ -9,7 +9,7 @@
                 <h1 class="text-xl font-bold text-gray-900">Data Anggota</h1>
                 <p class="text-sm text-gray-500">
                     @if($isSuperAdmin && !$filterBranchId) Semua Kampus @else {{ auth()->user()->branch->name ?? 'Cabang' }} @endif
-                    • {{ number_format($stats['total']) }} anggota
+                    • {{ number_format($stats['total'] + $stats['dosen'] + $stats['tendik']) }} civitas
                 </p>
             </div>
         </div>
@@ -25,6 +25,17 @@
             </a>
         </div>
     </div>
+
+    {{-- Info visibility untuk non-super admin --}}
+    @if(!$isSuperAdmin)
+    <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-3 text-sm">
+        <i class="fas fa-info-circle text-blue-500"></i>
+        <span class="text-blue-700">
+            <strong>Dosen & Tendik</strong> dapat dilihat semua cabang.
+            @if(!$canSeeSantri)<strong>Santri</strong> hanya dapat dilihat oleh OPPM.@endif
+        </span>
+    </div>
+    @endif
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
@@ -130,6 +141,7 @@
             <table class="w-full text-sm">
                 <thead class="bg-gradient-to-r {{ $activeTab === 'dosen' ? 'from-amber-500 to-orange-600' : 'from-emerald-500 to-teal-600' }} text-white">
                     <tr>
+                        <th class="px-4 py-3 text-left font-medium w-16">Foto</th>
                         <th class="px-4 py-3 text-left font-medium">NIY</th>
                         <th class="px-4 py-3 text-left font-medium">Nama</th>
                         <th class="px-4 py-3 text-left font-medium">Unit</th>
@@ -141,6 +153,15 @@
                 <tbody class="divide-y divide-gray-100">
                     @foreach($employees as $emp)
                     <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br {{ $activeTab === 'dosen' ? 'from-amber-400 to-orange-500' : 'from-teal-400 to-emerald-500' }} flex items-center justify-center text-white font-bold shadow">
+                                @if($emp->photo)
+                                <img src="{{ asset('storage/' . $emp->photo) }}" class="w-full h-full object-cover">
+                                @else
+                                {{ strtoupper(substr($emp->name, 0, 1)) }}
+                                @endif
+                            </div>
+                        </td>
                         <td class="px-4 py-3">
                             <span class="font-mono text-gray-900">{{ $emp->niy ?? '-' }}</span>
                             @if($emp->nidn)<p class="text-xs text-gray-500">NIDN: {{ $emp->nidn }}</p>@endif

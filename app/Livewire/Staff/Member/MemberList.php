@@ -115,6 +115,7 @@ class MemberList extends Component
         $isSuperAdmin = $user->role === 'super_admin';
         $userBranchId = $user->branch_id;
         
+        // Branch filter only applies to members, not employees (dosen/tendik visible to all)
         $effectiveBranchId = $isSuperAdmin ? ($this->filterBranchId ?: null) : $userBranchId;
 
         // Get member types for tabs
@@ -122,10 +123,15 @@ class MemberList extends Component
             $q->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId));
         }])->orderBy('name')->get();
 
-        // Check if user can see Santri tab (OPPM Gontor branch or super admin)
+        // Visibility rules:
+        // - Dosen/Tendik: visible to ALL branches (data SDM pusat)
+        // - Santri: only visible to OPPM branch or super admin
+        // - Mahasiswa/Umum: filtered by branch
         $canSeeSantri = $isSuperAdmin || ($user->branch && str_contains(strtolower($user->branch->name), 'oppm'));
+        $canSeeDosen = true; // All branches can see dosen
+        $canSeeTendik = true; // All branches can see tendik
 
-        // Stats
+        // Stats - dosen/tendik always show full count
         $statsQuery = Member::query()->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId));
         $stats = [
             'total' => (clone $statsQuery)->count(),
