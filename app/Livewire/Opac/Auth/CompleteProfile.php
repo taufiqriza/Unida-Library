@@ -516,44 +516,47 @@ class CompleteProfile extends Component
     }
 
     /**
-     * Skip as Dosen - search from Employee table
+     * Skip as Dosen - go to search employee step
      */
     public function skipAsDosen()
     {
-        $this->showManualEntry = true;
+        $this->entryMode = 'dosen';
+        $this->showManualEntry = false;
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
-        $this->entryMode = 'dosen';
+        $this->selectedEmployee = null;
         $this->searchResults = collect();
+        $this->searchName = '';
         
         // Auto-select Dosen member type
         $dosenType = MemberType::where('name', 'like', '%Dosen%')->first();
         $this->member_type_id = $dosenType?->id ?? 2;
         
-        // Try to find employee by email
+        // Try auto-detect by email
         $employee = \App\Models\Employee::where('email', $this->member->email)
             ->where('type', 'dosen')
             ->first();
         
         if ($employee) {
-            $this->selectedEmployee = $employee;
-            $this->nim = $employee->niy ?? '';
-            $this->searchName = $employee->full_name ?? $employee->name;
+            $this->selectEmployee($employee->id);
+            $this->autoDetected = true;
         }
         
-        $this->step = 2;
+        // Stay on step 1 for search
     }
     
     /**
-     * Skip as Tendik - search from Employee table
+     * Skip as Tendik - go to search employee step
      */
     public function skipAsTendik()
     {
-        $this->showManualEntry = true;
+        $this->entryMode = 'tendik';
+        $this->showManualEntry = false;
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
-        $this->entryMode = 'tendik';
+        $this->selectedEmployee = null;
         $this->searchResults = collect();
+        $this->searchName = '';
         
         // Auto-select Tendik member type
         $tendikType = MemberType::firstOrCreate(
@@ -568,19 +571,127 @@ class CompleteProfile extends Component
             ->first();
         $this->branch_id = $pusatBranch?->id;
         
-        // Try to find employee by email
+        // Try auto-detect by email
         $employee = \App\Models\Employee::where('email', $this->member->email)
             ->where('type', 'tendik')
             ->first();
         
         if ($employee) {
-            $this->selectedEmployee = $employee;
-            $this->nim = $employee->niy ?? '';
-            $this->satker = $employee->satker ?? '';
-            $this->searchName = $employee->full_name ?? $employee->name;
+            $this->selectEmployee($employee->id);
+            $this->autoDetected = true;
         }
         
-        $this->step = 2;
+        // Stay on step 1 for search
+    }
+    
+    /**
+     * Search employee (dosen/tendik) by NIY, NIDN, or name
+     */
+    public function searchEmployee()
+    {
+        $this->isSearching = true;
+        $this->searchResults = collect();
+        $this->selectedEmployee = null;
+        
+        $search = trim($this->searchName);
+        if (strlen($search) < 2) {
+            $this->isSearching = false;
+            return;
+        }
+        
+        $type = $this->entryMode; // 'dosen' or 'tendik'
+        $searchUpper = strtoupper($search);
+        
+        // Check if search is NIY/NIDN (numeric)
+        $isNumeric = preg_match('/^\d{4,}$/', $search);
+        
+        $query = \App\Models\Employee::where('type', $type);
+        
+        if ($isNumeric) {
+            // Search by NIY or NIDN
+            $query->where(function($q) use ($search) {
+                $q->where('niy', $search)
+                  ->orWhere('nidn', $search);
+            });
+        } else {
+            // Search by name
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('full_name', 'like', "%{$search}%");
+            });
+        }
+        
+        $results = $query->limit(10)->get();
+        
+        // Add match score
+        $results->each(function($emp) use ($searchUpper, $isNumeric, $search) {
+            if ($isNumeric) {
+                $emp->_matchScore = ($emp->niy === $search || $emp->nidn === $search) ? 100 : 80;
+            } else {
+                $nameUpper = strtoupper($emp->full_name ?? $emp->name);
+                similar_text($searchUpper, $nameUpper, $percent);
+                $emp->_matchScore = (int) round($percent);
+            }
+        });
+        
+        $this->searchResults = $results->sortByDesc('_matchScore')->values();
+        $this->isSearching = false;
+    }
+    
+    /**
+     * Select an employee record
+     */
+    public function selectEmployee($id)
+    {
+        $employee = \App\Models\Employee::find($id);
+        if (!$employee) return;
+        
+        $this->selectedEmployee = $employee;
+        $this->nim = $employee->niy ?? '';
+        $this->searchName = $employee->full_name ?? $employee->name;
+        $this->satker = $employee->satker ?? '';
+        $this->gender = $employee->gender ?? '';
+        
+        // Set faculty if available
+        if ($employee->faculty) {
+            $faculty = Faculty::where('name', 'like', "%{$employee->faculty}%")->first();
+            $this->faculty_id = $faculty?->id;
+            if ($this->faculty_id) {
+                $this->departments = Department::where('faculty_id', $this->faculty_id)->orderBy('name')->get();
+            }
+        }
+        
+        // Set department if available
+        if ($employee->prodi) {
+            $dept = Department::where('name', 'like', "%{$employee->prodi}%")->first();
+            $this->department_id = $dept?->id;
+        }
+    }
+    
+    /**
+     * Quick confirm for employee (dosen/tendik)
+     */
+    public function quickConfirmEmployee()
+    {
+        if (!$this->selectedEmployee) return;
+        
+        $emp = $this->selectedEmployee;
+        
+        // Update current member with employee data
+        $this->member->update([
+            'name' => $emp->full_name ?? $emp->name,
+            'member_id' => $emp->niy,
+            'nim_nidn' => $emp->nidn,
+            'member_type_id' => $this->member_type_id,
+            'branch_id' => $this->branch_id ?? Branch::first()?->id,
+            'faculty_id' => $this->faculty_id,
+            'department_id' => $this->department_id,
+            'gender' => $emp->gender ?? $this->gender,
+            'profile_completed' => true,
+        ]);
+        
+        return redirect()->route('member.dashboard')
+            ->with('success', 'Profil berhasil ditautkan dengan data SDM!');
     }
     
     // Property for selected employee
