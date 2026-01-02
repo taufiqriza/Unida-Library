@@ -53,6 +53,11 @@ class BookImport extends Component
         $this->branchId = $user->branch_id ?? Branch::first()?->id;
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return Auth::user()->role === 'super_admin';
+    }
+
     public function downloadTemplate()
     {
         $branch = Branch::findOrFail($this->branchId);

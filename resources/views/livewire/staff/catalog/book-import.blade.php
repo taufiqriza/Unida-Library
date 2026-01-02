@@ -27,6 +27,7 @@
             </div>
             <div class="p-5">
                 <form wire:submit.prevent="processUpload" class="space-y-4">
+                    @if($this->isSuperAdmin())
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Cabang Perpustakaan</label>
                         <select wire:model="branchId" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
@@ -35,6 +36,7 @@
                             @endforeach
                         </select>
                     </div>
+                    @endif
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">File Excel <span class="text-red-500">*</span></label>
