@@ -9,32 +9,77 @@
         {{-- Cover Upload --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-image text-gray-400 mr-1"></i> Gambar Sampul</label>
-            <label class="block cursor-pointer">
-                <div class="w-full aspect-[2/3] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center overflow-hidden bg-gray-50 hover:bg-gray-100 hover:border-primary-400 transition relative group">
+            
+            {{-- Preview with floating upload --}}
+            <div class="relative w-28 aspect-[2/3] mx-auto mb-3">
+                <div class="w-full h-full border-2 border-dashed border-gray-300 rounded-xl overflow-hidden bg-gray-50">
                     @if($cover_image)
                         <img src="{{ $cover_image->temporaryUrl() }}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="text-white text-sm font-medium"><i class="fas fa-camera mr-1"></i> Ganti</span>
-                        </div>
+                    @elseif(session('pending_cover'))
+                        <img src="{{ asset('storage/' . session('pending_cover')) }}" class="w-full h-full object-cover">
                     @elseif($isEdit && $book?->image)
                         <img src="{{ $book->cover_url }}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="text-white text-sm font-medium"><i class="fas fa-camera mr-1"></i> Ganti</span>
-                        </div>
                     @else
-                        <div class="text-center p-4">
-                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-300 mb-2"></i>
-                            <p class="text-xs text-gray-500">Klik untuk upload</p>
-                            <p class="text-xs text-gray-400">JPG/PNG, max 2MB</p>
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-book-open text-2xl text-gray-300"></i>
                         </div>
                     @endif
-                    <input type="file" wire:model="cover_image" accept="image/*" class="hidden">
                 </div>
-            </label>
-            @error('cover_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            <div wire:loading wire:target="cover_image" class="mt-2 text-xs text-primary-600 flex items-center gap-1">
-                <i class="fas fa-spinner fa-spin"></i> Mengupload...
+                {{-- Floating Upload Button --}}
+                <label class="absolute -bottom-2 -right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-lg transition">
+                    <i class="fas fa-camera text-white text-xs"></i>
+                    <input type="file" wire:model="cover_image" accept="image/*" class="hidden">
+                </label>
+                <div wire:loading wire:target="cover_image" class="absolute inset-0 bg-white/80 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-spinner fa-spin text-blue-500"></i>
+                </div>
             </div>
+
+            {{-- Search Options --}}
+            <div class="space-y-2">
+                {{-- By ISBN --}}
+                @if($isbn)
+                <button type="button" wire:click="searchCoverByIsbn" wire:loading.attr="disabled" class="w-full py-1.5 px-3 bg-blue-50 hover:bg-blue-100 rounded-lg text-xs text-blue-600 transition flex items-center justify-center gap-1">
+                    <span wire:loading.remove wire:target="searchCoverByIsbn"><i class="fas fa-barcode"></i> Cari by ISBN</span>
+                    <span wire:loading wire:target="searchCoverByIsbn"><i class="fas fa-spinner fa-spin"></i> Mencari...</span>
+                </button>
+                @endif
+
+                {{-- By Title --}}
+                @if($title)
+                <button type="button" wire:click="searchCoverByTitle" wire:loading.attr="disabled" class="w-full py-1.5 px-3 bg-purple-50 hover:bg-purple-100 rounded-lg text-xs text-purple-600 transition flex items-center justify-center gap-1">
+                    <span wire:loading.remove wire:target="searchCoverByTitle"><i class="fas fa-heading"></i> Cari by Judul</span>
+                    <span wire:loading wire:target="searchCoverByTitle"><i class="fas fa-spinner fa-spin"></i> Mencari...</span>
+                </button>
+                @endif
+
+                {{-- URL Input --}}
+                <div class="flex gap-1">
+                    <input type="url" wire:model="coverUrl" placeholder="Paste URL gambar..." class="flex-1 px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500">
+                    <button type="button" wire:click="downloadCoverFromUrl" wire:loading.attr="disabled" class="px-2 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs rounded-lg" title="Download">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Cover Results - Horizontal Scroll --}}
+            @if(!empty($coverResults))
+            <div class="mt-3">
+                <p class="text-[10px] text-gray-500 font-medium mb-2">Hasil ({{ count($coverResults) }}) - geser untuk lihat semua:</p>
+                <div class="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 snap-x">
+                    @foreach($coverResults as $result)
+                    <div class="flex-shrink-0 w-16 snap-start relative group cursor-pointer" wire:click="applyCoverFromUrl('{{ $result['url'] }}')">
+                        <img src="{{ $result['url'] }}" class="w-16 h-24 object-cover rounded border-2 border-transparent group-hover:border-blue-500" onerror="this.parentElement.style.display='none'">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition rounded flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            @error('cover_image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
         </div>
 
         {{-- OPAC Settings --}}

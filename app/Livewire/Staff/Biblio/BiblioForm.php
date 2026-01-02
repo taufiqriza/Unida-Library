@@ -65,6 +65,10 @@ class BiblioForm extends Component
     public bool $is_opac_visible = true;
     public bool $promoted = false;
 
+    // Cover Finder
+    public string $coverUrl = '';
+    public array $coverResults = [];
+
     // Master data (preloaded)
     public $branches = [];
     public $locations = [];
@@ -372,9 +376,11 @@ class BiblioForm extends Component
             'promoted' => $this->promoted,
         ];
 
-        // Handle cover upload
+        // Handle cover upload or downloaded cover
         if ($this->cover_image) {
             $data['image'] = $this->cover_image->store('covers', 'public');
+        } elseif (session('pending_cover')) {
+            $data['image'] = session()->pull('pending_cover');
         }
 
         $authorIds = collect($this->selectedAuthors)->pluck('id')->toArray();
@@ -398,6 +404,115 @@ class BiblioForm extends Component
         $this->dispatch('showSuccess', title: 'Berhasil!', message: $message);
         
         $this->redirect(route('staff.biblio.index'), navigate: true);
+    }
+
+    // Cover Finder Methods
+    public function searchCoverByIsbn(): void
+    {
+        $this->coverResults = [];
+        if (empty($this->isbn)) return;
+        
+        $isbn = preg_replace('/[^0-9X]/', '', $this->isbn);
+        
+        try {
+            // Open Library
+            $this->coverResults[] = ['url' => "https://covers.openlibrary.org/b/isbn/{$isbn}-L.jpg", 'source' => 'OpenLibrary'];
+            
+            // Google Books
+            $googleData = @file_get_contents("https://www.googleapis.com/books/v1/volumes?q=isbn:{$isbn}", false, stream_context_create(['http' => ['timeout' => 5]]));
+            if ($googleData) {
+                $data = json_decode($googleData, true);
+                if (!empty($data['items'][0]['volumeInfo']['imageLinks']['thumbnail'])) {
+                    $thumb = str_replace(['http://', 'zoom=1'], ['https://', 'zoom=2'], $data['items'][0]['volumeInfo']['imageLinks']['thumbnail']);
+                    $this->coverResults[] = ['url' => $thumb, 'source' => 'Google'];
+                }
+            }
+        } catch (\Exception $e) {}
+    }
+
+    public function searchCoverByTitle(): void
+    {
+        $this->coverResults = [];
+        if (empty($this->title)) return;
+        
+        $query = urlencode($this->title);
+        
+        try {
+            // Google Books by title - more results
+            $googleData = @file_get_contents("https://www.googleapis.com/books/v1/volumes?q={$query}&maxResults=15", false, stream_context_create(['http' => ['timeout' => 5]]));
+            if ($googleData) {
+                $data = json_decode($googleData, true);
+                foreach ($data['items'] ?? [] as $item) {
+                    if (!empty($item['volumeInfo']['imageLinks']['thumbnail'])) {
+                        $thumb = str_replace(['http://', 'zoom=1'], ['https://', 'zoom=2'], $item['volumeInfo']['imageLinks']['thumbnail']);
+                        $this->coverResults[] = ['url' => $thumb, 'source' => 'Google'];
+                    }
+                }
+            }
+            
+            // Open Library by title
+            $olData = @file_get_contents("https://openlibrary.org/search.json?title=" . $query . "&limit=10", false, stream_context_create(['http' => ['timeout' => 5]]));
+            if ($olData) {
+                $data = json_decode($olData, true);
+                foreach ($data['docs'] ?? [] as $doc) {
+                    if (!empty($doc['cover_i'])) {
+                        $this->coverResults[] = ['url' => "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg", 'source' => 'OpenLibrary'];
+                    }
+                }
+            }
+        } catch (\Exception $e) {}
+    }
+
+    public function applyCoverFromUrl(string $url): void
+    {
+        try {
+            $ctx = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'Mozilla/5.0']]);
+            $imageData = @file_get_contents($url, false, $ctx);
+            
+            if (!$imageData) {
+                $this->dispatch('notify', type: 'error', message: 'Gagal mengunduh gambar');
+                return;
+            }
+
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mime = $finfo->buffer($imageData);
+            $ext = match($mime) {
+                'image/jpeg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+                'image/gif' => 'gif',
+                default => null
+            };
+
+            if (!$ext) {
+                $this->dispatch('notify', type: 'error', message: 'Format gambar tidak didukung');
+                return;
+            }
+
+            $filename = 'covers/cover_' . Str::slug(substr($this->title, 0, 50)) . '-' . now()->format('YmdHis') . '.' . $ext;
+            \Storage::disk('public')->put($filename, $imageData);
+
+            // Update book if editing, or store for new
+            if ($this->isEdit && $this->book) {
+                $this->book->update(['image' => $filename]);
+                $this->book->refresh();
+            } else {
+                $this->cover_image = null; // Clear uploaded file
+                session(['pending_cover' => $filename]);
+            }
+
+            $this->coverUrl = '';
+            $this->coverResults = [];
+            $this->dispatch('notify', type: 'success', message: 'Cover berhasil diterapkan');
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Gagal: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadCoverFromUrl(): void
+    {
+        if (empty($this->coverUrl)) return;
+        $this->applyCoverFromUrl($this->coverUrl);
     }
 
     protected function createItems(Book $book): void
