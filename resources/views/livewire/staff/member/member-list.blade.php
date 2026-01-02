@@ -27,17 +27,11 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"><i class="fas fa-users text-white text-lg"></i></div>
-                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total'] + $stats['dosen'] + $stats['tendik']) }}</p><p class="text-xs text-gray-500">Total Semua</p></div>
-            </div>
-        </div>
-        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-user-check text-white text-lg"></i></div>
-                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['active']) }}</p><p class="text-xs text-gray-500">Member Aktif</p></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total'] + $stats['dosen'] + $stats['tendik']) }}</p><p class="text-xs text-gray-500">Total Civitas</p></div>
             </div>
         </div>
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
@@ -141,6 +135,7 @@
                         <th class="px-4 py-3 text-left font-medium">Unit</th>
                         <th class="px-4 py-3 text-left font-medium">Email</th>
                         <th class="px-4 py-3 text-center font-medium w-24">Status</th>
+                        <th class="px-4 py-3 text-center font-medium w-20">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -167,6 +162,11 @@
                             @else
                             <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"><i class="fas fa-times-circle"></i> Non-Aktif</span>
                             @endif
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button wire:click="showEmployeeDetail({{ $emp->id }})" class="p-2 text-gray-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
                     @endforeach
@@ -286,42 +286,85 @@
     </div>
     @endif
 
-    {{-- Member Detail Modal --}}
+    {{-- Member Detail Modal - Teleported --}}
     @if($showDetailModal && $selectedMember)
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 text-white flex items-center justify-between">
-                <h3 class="text-lg font-bold">Detail Anggota</h3>
-                <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                        @if($selectedMember->photo)<img src="{{ asset('storage/' . $selectedMember->photo) }}" class="w-full h-full object-cover rounded-xl">@else{{ strtoupper(substr($selectedMember->name, 0, 1)) }}@endif
+    <template x-teleport="body">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" x-data x-init="document.body.style.overflow='hidden'" x-on:click.self="$wire.closeDetail()">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
+                <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 text-white flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Detail Anggota</h3>
+                    <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            @if($selectedMember->photo)<img src="{{ asset('storage/' . $selectedMember->photo) }}" class="w-full h-full object-cover rounded-xl">@else{{ strtoupper(substr($selectedMember->name, 0, 1)) }}@endif
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">{{ $selectedMember->name }}</h4>
+                            <p class="text-sm text-gray-500">{{ $selectedMember->member_id }}</p>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 {{ $selectedMember->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $selectedMember->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                        </div>
                     </div>
-                    <div>
-                        <h4 class="text-lg font-bold text-gray-900">{{ $selectedMember->name }}</h4>
-                        <p class="text-sm text-gray-500">{{ $selectedMember->member_id }}</p>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 {{ $selectedMember->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $selectedMember->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tipe</p><p class="font-medium text-gray-900">{{ $selectedMember->memberType?->name ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">NIM/NIDN</p><p class="font-medium text-gray-900">{{ $selectedMember->nim_nidn ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jenis Kelamin</p><p class="font-medium text-gray-900">{{ $selectedMember->gender == 'L' ? 'Laki-laki' : ($selectedMember->gender == 'P' ? 'Perempuan' : '-') }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Email</p><p class="font-medium text-gray-900">{{ $selectedMember->email ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Fakultas</p><p class="font-medium text-gray-900">{{ $selectedMember->faculty?->name ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Prodi</p><p class="font-medium text-gray-900">{{ $selectedMember->department?->name ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tgl Daftar</p><p class="font-medium text-gray-900">{{ $selectedMember->register_date?->format('d M Y') ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Kadaluarsa</p><p class="font-medium {{ $selectedMember->expire_date && $selectedMember->expire_date < now() ? 'text-red-600' : 'text-gray-900' }}">{{ $selectedMember->expire_date?->format('d M Y') ?? '-' }}</p></div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3 text-sm">
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tipe</p><p class="font-medium text-gray-900">{{ $selectedMember->memberType?->name ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">NIM/NIDN</p><p class="font-medium text-gray-900">{{ $selectedMember->nim_nidn ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jenis Kelamin</p><p class="font-medium text-gray-900">{{ $selectedMember->gender == 'L' ? 'Laki-laki' : ($selectedMember->gender == 'P' ? 'Perempuan' : '-') }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Email</p><p class="font-medium text-gray-900">{{ $selectedMember->email ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Fakultas</p><p class="font-medium text-gray-900">{{ $selectedMember->faculty?->name ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Prodi</p><p class="font-medium text-gray-900">{{ $selectedMember->department?->name ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tgl Daftar</p><p class="font-medium text-gray-900">{{ $selectedMember->register_date?->format('d M Y') ?? '-' }}</p></div>
-                    <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Kadaluarsa</p><p class="font-medium {{ $selectedMember->expire_date && $selectedMember->expire_date < now() ? 'text-red-600' : 'text-gray-900' }}">{{ $selectedMember->expire_date?->format('d M Y') ?? '-' }}</p></div>
+                <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                    <button wire:click="closeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
+                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
                 </div>
-            </div>
-            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                <button wire:click="closeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
-                <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
             </div>
         </div>
-    </div>
+    </template>
+    @endif
+
+    {{-- Employee Detail Modal - Teleported --}}
+    @if($showEmployeeModal && $selectedEmployee)
+    <template x-teleport="body">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" x-data x-init="document.body.style.overflow='hidden'" x-on:click.self="$wire.closeEmployeeDetail()">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
+                <div class="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Detail {{ $selectedEmployee->type === 'dosen' ? 'Dosen' : 'Tendik' }}</h3>
+                    <button wire:click="closeEmployeeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            {{ strtoupper(substr($selectedEmployee->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">{{ $selectedEmployee->full_name ?? $selectedEmployee->name }}</h4>
+                            <p class="text-sm text-gray-500">NIY: {{ $selectedEmployee->niy ?? '-' }}</p>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 {{ $selectedEmployee->type === 'dosen' ? 'bg-amber-100 text-amber-700' : 'bg-teal-100 text-teal-700' }}">{{ ucfirst($selectedEmployee->type) }}</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">NIY</p><p class="font-medium text-gray-900">{{ $selectedEmployee->niy ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">NIDN</p><p class="font-medium text-gray-900">{{ $selectedEmployee->nidn ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Email</p><p class="font-medium text-gray-900">{{ $selectedEmployee->email ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Fakultas</p><p class="font-medium text-gray-900">{{ $selectedEmployee->faculty ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Prodi</p><p class="font-medium text-gray-900">{{ $selectedEmployee->prodi ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jabatan</p><p class="font-medium text-gray-900">{{ $selectedEmployee->position ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Pendidikan</p><p class="font-medium text-gray-900">{{ $selectedEmployee->education ?? '-' }}</p></div>
+                        @if($selectedEmployee->satker)
+                        <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Satuan Kerja</p><p class="font-medium text-gray-900">{{ $selectedEmployee->satker }}</p></div>
+                        @endif
+                    </div>
+                </div>
+                <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+                    <button wire:click="closeEmployeeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </template>
     @endif
 </div>

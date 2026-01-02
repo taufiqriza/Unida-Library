@@ -36,6 +36,10 @@ class MemberList extends Component
         'sdmFaculty' => ['except' => ''],
     ];
 
+    // Employee modal
+    public $showEmployeeModal = false;
+    public $selectedEmployee = null;
+
     public function updatingSearch() { $this->resetPage(); }
     public function updatingActiveTab() { $this->resetPage(); }
     public function setTab($tab) { $this->activeTab = $tab; $this->resetPage(); }
@@ -47,6 +51,14 @@ class MemberList extends Component
     }
 
     public function closeDetail() { $this->showDetailModal = false; $this->selectedMember = null; }
+
+    public function showEmployeeDetail($employeeId)
+    {
+        $this->selectedEmployee = Employee::find($employeeId);
+        $this->showEmployeeModal = true;
+    }
+
+    public function closeEmployeeDetail() { $this->showEmployeeModal = false; $this->selectedEmployee = null; }
 
     public function extendMembership($memberId)
     {
