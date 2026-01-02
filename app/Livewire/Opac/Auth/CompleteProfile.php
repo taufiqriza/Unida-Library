@@ -69,28 +69,51 @@ class CompleteProfile extends Component
         $this->faculties = Faculty::orderBy('name')->get();
         $this->memberTypes = MemberType::orderBy('name')->distinct()->get(['id', 'name']);
         
-        // Auto-detect member from email pattern
+        // Auto-detect from email (mahasiswa, dosen, tendik)
         $this->autoDetectFromEmail();
     }
+    
     /**
-     * Auto-detect matching member from logged-in email
-     * Uses multi-factor scoring for ultra-high accuracy
+     * Auto-detect matching data from email
+     * Priority: 1) Employee (dosen/tendik) by email, 2) Student by NIM in email, 3) Name matching
      */
     protected function autoDetectFromEmail()
     {
         $email = $this->member->email;
         if (!$email) return;
         
-        // Extract parts
         $emailParts = explode('@', $email);
         $username = $emailParts[0] ?? '';
         $domain = $emailParts[1] ?? '';
         if (!$username) return;
         
-        $googleName = $this->member->name ?? '';
+        // === PRIORITY 1: Check Employee table by email (Dosen/Tendik) ===
+        if (str_contains($domain, 'unida.gontor') && !str_contains($domain, 'student')) {
+            $employee = \App\Models\Employee::where('email', $email)->first();
+            if ($employee) {
+                $this->autoDetected = true;
+                $this->entryMode = $employee->type; // 'dosen' or 'tendik'
+                $this->selectedEmployee = $employee;
+                $this->nim = $employee->niy ?? '';
+                $this->searchName = $employee->full_name ?? $employee->name;
+                
+                // Set member type
+                if ($employee->type === 'dosen') {
+                    $this->member_type_id = MemberType::where('name', 'like', '%Dosen%')->first()?->id;
+                } else {
+                    $this->member_type_id = MemberType::firstOrCreate(['name' => 'Tendik'], ['description' => 'Tenaga Kependidikan'])->id;
+                }
+                
+                // Set faculty/department if available
+                if ($employee->faculty) {
+                    $faculty = Faculty::where('name', 'like', "%{$employee->faculty}%")->first();
+                    $this->faculty_id = $faculty?->id;
+                }
+                return;
+            }
+        }
         
-        // === PHASE 0: Direct NIM match from email ===
-        // Many UNIDA emails are: nim@student.xxx.unida.gontor.ac.id or nim@stu.unida.gontor.ac.id
+        // === PRIORITY 2: Direct NIM match from student email ===
         if (preg_match('/^(\d{12,15})@(student|stu|mhs)/', $email, $nimMatch)) {
             $nimFromEmail = $nimMatch[1];
             $directMatch = Member::with(['department', 'branch'])
@@ -101,7 +124,7 @@ class CompleteProfile extends Component
             
             if ($directMatch) {
                 $this->autoDetected = true;
-                $this->searchResults = collect([$directMatch]);
+                $this->entryMode = 'mahasiswa';
                 $this->selectedPddiktiId = $directMatch->id;
                 $this->selectedPddikti = $directMatch;
                 $this->nim = $directMatch->member_id;
@@ -109,15 +132,29 @@ class CompleteProfile extends Component
                 $this->department_id = $directMatch->department_id;
                 $this->faculty_id = $directMatch->faculty_id;
                 $this->gender = $directMatch->gender ?? '';
-                $mahasiswaType = MemberType::where('name', 'like', '%Mahasiswa%')->first();
-                $this->member_type_id = $mahasiswaType?->id ?? $directMatch->member_type_id;
+                $this->member_type_id = MemberType::where('name', 'like', '%Mahasiswa%')->first()?->id;
                 return;
             }
         }
         
-        // === PHASE 1: Extract all possible identifiers ===
+        // === PRIORITY 3: Name matching for students (existing logic) ===
+        $this->autoDetectByName();
+    }
+    
+    /**
+     * Auto-detect by name matching (for students without NIM in email)
+     */
+    protected function autoDetectByName()
+    {
+        $email = $this->member->email;
+        $googleName = $this->member->name ?? '';
+        if (!$googleName) return;
         
-        // Extract prodi from domain (e.g., student.ei.unida.gontor.ac.id → EI)
+        $emailParts = explode('@', $email);
+        $username = $emailParts[0] ?? '';
+        $domain = $emailParts[1] ?? '';
+        
+        // Extract prodi from domain
         $prodiCode = null;
         if (preg_match('/student\.([a-z0-9]+)\.unida/', $domain, $dm)) {
             $prodiCode = strtoupper($dm[1]);
@@ -140,8 +177,7 @@ class CompleteProfile extends Component
             $prodiDeptId = $dept?->id;
         }
         
-        // === PHASE 2: Score-based matching ===
-        
+        // Score-based matching
         // Base query: unlinked members only
         $candidates = Member::with(['department', 'branch'])
             ->where('profile_completed', false)
@@ -303,14 +339,16 @@ class CompleteProfile extends Component
     }
 
     /**
-     * Search student data by name or NIM in members table (SIAKAD data)
+     * Search all data (mahasiswa from SIAKAD + dosen/tendik from Employee)
      */
     public function searchPddikti()
     {
         $this->isSearching = true;
         $this->searchResults = [];
+        $this->employeeResults = [];
         $this->selectedPddiktiId = null;
         $this->selectedPddikti = null;
+        $this->selectedEmployee = null;
         
         $search = trim($this->searchName);
         
@@ -319,100 +357,67 @@ class CompleteProfile extends Component
             return;
         }
 
-        // Check if search is NIM (numeric, 10-15 digits)
-        $isNim = preg_match('/^\d{10,15}$/', $search);
+        $isNumeric = preg_match('/^\d{4,}$/', $search);
+        $searchUpper = strtoupper($search);
         
-        if ($isNim) {
-            // Exact NIM search - should return 1 result
-            $results = Member::with(['department', 'branch'])
-                ->where(function($q) use ($search) {
-                    $q->where('member_id', $search)
-                      ->orWhere('nim_nidn', $search);
-                })
-                ->where(function($q) {
-                    $q->whereNull('email')->orWhere('email', '');
-                })
+        // === Search Mahasiswa (SIAKAD) ===
+        if ($isNumeric && strlen($search) >= 10) {
+            // NIM search
+            $mahasiswa = Member::with(['department', 'branch'])
+                ->where(fn($q) => $q->where('member_id', $search)->orWhere('nim_nidn', $search))
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->where('profile_completed', false)
-                ->limit(5)
-                ->get();
-            
-            // Mark as exact NIM match (100%)
-            $results->each(fn($r) => $r->_matchScore = 100);
-            $this->searchResults = $results;
+                ->limit(5)->get();
+            $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
-            // Name search - more accurate matching with scoring
-            $searchUpper = strtoupper($search);
-            $words = array_filter(explode(' ', $searchUpper), fn($w) => strlen($w) >= 2);
-            
-            $results = Member::with(['department', 'branch'])
-                ->where(function($q) {
-                    $q->whereNull('email')->orWhere('email', '');
-                })
+            // Name search
+            $mahasiswa = Member::with(['department', 'branch'])
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->where('profile_completed', false)
-                ->where(function($q) use ($searchUpper, $words) {
-                    // Exact match
-                    $q->whereRaw('UPPER(name) = ?', [$searchUpper]);
-                    // Starts with
-                    $q->orWhereRaw('UPPER(name) LIKE ?', [$searchUpper . '%']);
-                    // Contains full search
-                    $q->orWhereRaw('UPPER(name) LIKE ?', ['%' . $searchUpper . '%']);
-                    // All words must match
-                    if (count($words) > 1) {
-                        $q->orWhere(function($sub) use ($words) {
-                            foreach ($words as $word) {
-                                $sub->whereRaw('UPPER(name) LIKE ?', ['%' . $word . '%']);
-                            }
-                        });
-                    }
-                })
-                ->limit(50)
-                ->get();
+                ->where('name', 'like', "%{$search}%")
+                ->limit(10)->get();
             
-            // Score and label results
-            $scored = $results->map(function($r) use ($searchUpper, $words) {
+            $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
-                $score = 0;
-                
-                // Exact match = 100%
-                if ($nameUpper === $searchUpper) {
-                    $score = 100;
-                }
-                // Starts with = 90%
-                elseif (str_starts_with($nameUpper, $searchUpper)) {
-                    $score = 90;
-                }
-                // All words match
-                elseif (count($words) > 1) {
-                    $matchCount = 0;
-                    foreach ($words as $word) {
-                        if (str_contains($nameUpper, $word)) $matchCount++;
-                    }
-                    $score = (int) round(($matchCount / count($words)) * 85);
-                }
-                // Contains = 70%
-                elseif (str_contains($nameUpper, $searchUpper)) {
-                    $score = 70;
-                }
-                // Single word partial
+                if ($nameUpper === $searchUpper) $r->_matchScore = 100;
+                elseif (str_starts_with($nameUpper, $searchUpper)) $r->_matchScore = 90;
                 else {
-                    $searchLen = strlen($searchUpper);
-                    $nameLen = strlen($nameUpper);
                     similar_text($searchUpper, $nameUpper, $percent);
-                    $score = (int) round($percent * 0.5);
+                    $r->_matchScore = (int) round($percent);
                 }
-                
-                $r->_matchScore = $score;
-                return $r;
             });
-            
-            // Sort by score, filter minimum 20%
-            $this->searchResults = $scored->filter(fn($r) => $r->_matchScore >= 20)
-                ->sortByDesc('_matchScore')
-                ->values();
         }
-
+        
+        // === Search Dosen/Tendik (Employee) ===
+        if ($isNumeric) {
+            // NIY/NIDN search
+            $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
+                ->limit(5)->get();
+            $employees->each(fn($e) => $e->_matchScore = 100);
+        } else {
+            // Name search
+            $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
+                ->limit(10)->get();
+            
+            $employees->each(function($e) use ($searchUpper) {
+                $nameUpper = strtoupper($e->full_name ?? $e->name);
+                if ($nameUpper === $searchUpper) $e->_matchScore = 100;
+                elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
+                else {
+                    similar_text($searchUpper, $nameUpper, $percent);
+                    $e->_matchScore = (int) round($percent);
+                }
+            });
+        }
+        
+        $this->searchResults = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
+        $this->employeeResults = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
+        
         $this->isSearching = false;
     }
+    
+    // Property for employee search results
+    public $employeeResults = [];
 
     /**
      * Select a SIAKAD record (member data)
@@ -421,20 +426,16 @@ class CompleteProfile extends Component
     {
         $this->selectedPddiktiId = $id;
         $this->selectedPddikti = Member::find($id);
+        $this->selectedEmployee = null; // Clear employee selection
+        $this->entryMode = 'mahasiswa';
         
         if ($this->selectedPddikti) {
-            // Auto-fill NIM from member data
             $this->nim = $this->selectedPddikti->member_id ?? '';
-            
-            // Auto-fill from selected member
             $this->branch_id = $this->selectedPddikti->branch_id;
             $this->department_id = $this->selectedPddikti->department_id;
             $this->faculty_id = $this->selectedPddikti->faculty_id;
             $this->gender = $this->selectedPddikti->gender ?? '';
-            
-            // Set member type to Mahasiswa by default
-            $mahasiswaType = MemberType::where('name', 'like', '%Mahasiswa%')->first();
-            $this->member_type_id = $mahasiswaType?->id ?? $this->selectedPddikti->member_type_id;
+            $this->member_type_id = MemberType::where('name', 'like', '%Mahasiswa%')->first()?->id;
         }
     }
 
@@ -443,7 +444,7 @@ class CompleteProfile extends Component
      */
     public function proceedWithSelection()
     {
-        if (!$this->selectedPddiktiId && !$this->showManualEntry) {
+        if (!$this->selectedPddiktiId && !$this->selectedEmployee && !$this->showManualEntry) {
             return;
         }
         
@@ -580,62 +581,6 @@ class CompleteProfile extends Component
             $this->selectEmployee($employee->id);
             $this->autoDetected = true;
         }
-        
-        // Stay on step 1 for search
-    }
-    
-    /**
-     * Search employee (dosen/tendik) by NIY, NIDN, or name
-     */
-    public function searchEmployee()
-    {
-        $this->isSearching = true;
-        $this->searchResults = collect();
-        $this->selectedEmployee = null;
-        
-        $search = trim($this->searchName);
-        if (strlen($search) < 2) {
-            $this->isSearching = false;
-            return;
-        }
-        
-        $type = $this->entryMode; // 'dosen' or 'tendik'
-        $searchUpper = strtoupper($search);
-        
-        // Check if search is NIY/NIDN (numeric)
-        $isNumeric = preg_match('/^\d{4,}$/', $search);
-        
-        $query = \App\Models\Employee::where('type', $type);
-        
-        if ($isNumeric) {
-            // Search by NIY or NIDN
-            $query->where(function($q) use ($search) {
-                $q->where('niy', $search)
-                  ->orWhere('nidn', $search);
-            });
-        } else {
-            // Search by name
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('full_name', 'like', "%{$search}%");
-            });
-        }
-        
-        $results = $query->limit(10)->get();
-        
-        // Add match score
-        $results->each(function($emp) use ($searchUpper, $isNumeric, $search) {
-            if ($isNumeric) {
-                $emp->_matchScore = ($emp->niy === $search || $emp->nidn === $search) ? 100 : 80;
-            } else {
-                $nameUpper = strtoupper($emp->full_name ?? $emp->name);
-                similar_text($searchUpper, $nameUpper, $percent);
-                $emp->_matchScore = (int) round($percent);
-            }
-        });
-        
-        $this->searchResults = $results->sortByDesc('_matchScore')->values();
-        $this->isSearching = false;
     }
     
     /**
@@ -647,10 +592,20 @@ class CompleteProfile extends Component
         if (!$employee) return;
         
         $this->selectedEmployee = $employee;
+        $this->selectedPddiktiId = null; // Clear mahasiswa selection
+        $this->selectedPddikti = null;
+        $this->entryMode = $employee->type; // 'dosen' or 'tendik'
+        
         $this->nim = $employee->niy ?? '';
-        $this->searchName = $employee->full_name ?? $employee->name;
         $this->satker = $employee->satker ?? '';
         $this->gender = $employee->gender ?? '';
+        
+        // Set member type
+        if ($employee->type === 'dosen') {
+            $this->member_type_id = MemberType::where('name', 'like', '%Dosen%')->first()?->id;
+        } else {
+            $this->member_type_id = MemberType::firstOrCreate(['name' => 'Tendik'], ['description' => 'Tenaga Kependidikan'])->id;
+        }
         
         // Set faculty if available
         if ($employee->faculty) {

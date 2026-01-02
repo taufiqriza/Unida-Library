@@ -47,65 +47,12 @@
                     @if($autoDetected && $selectedPddikti)
                     {{-- AUTO-DETECTED: Quick Confirm View --}}
                     <div class="space-y-4">
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-                            <div class="flex items-center gap-2 mb-3">
-                                <i class="fas fa-magic text-green-600"></i>
-                                <span class="font-semibold text-green-700">Data SIAKAD Terdeteksi!</span>
-                            </div>
-                            <div class="bg-white rounded-lg p-4 border border-green-100">
-                                <p class="font-bold text-gray-800 text-lg">{{ $selectedPddikti->name }}</p>
-                                <div class="mt-2 space-y-1 text-sm text-gray-600">
-                                    <p><i class="fas fa-id-card w-5 text-gray-400"></i> {{ $selectedPddikti->member_id }}</p>
-                                    @if($selectedPddikti->department)
-                                    <p><i class="fas fa-graduation-cap w-5 text-gray-400"></i> {{ $selectedPddikti->department->name }}</p>
-                                    @endif
-                                    @if($selectedPddikti->branch)
-                                    <p><i class="fas fa-building w-5 text-gray-400"></i> {{ $selectedPddikti->branch->name }}</p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button type="button" wire:click="quickConfirm" 
-                            wire:loading.attr="disabled"
-                            class="w-full py-3.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
-                            <span wire:loading.remove wire:target="quickConfirm">
-                                <i class="fas fa-check-circle"></i> Ya, Ini Data Saya
-                            </span>
-                            <span wire:loading wire:target="quickConfirm">
-                                <i class="fas fa-spinner fa-spin"></i> Memproses...
-                            </span>
-                        </button>
-                        
-                        <button type="button" wire:click="$set('autoDetected', false)" 
-                            class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
-                            <i class="fas fa-search mr-1"></i> Bukan data saya, cari manual
-                        </button>
-                    </div>
-                    
-                    @elseif($entryMode === 'dosen' || $entryMode === 'tendik')
-                    {{-- STEP 1: Employee Search (Dosen/Tendik) --}}
-                    <div class="space-y-4">
-                        <div class="bg-{{ $entryMode === 'dosen' ? 'green' : 'blue' }}-50 border border-{{ $entryMode === 'dosen' ? 'green' : 'blue' }}-200 rounded-xl p-3 mb-2">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas {{ $entryMode === 'dosen' ? 'fa-chalkboard-teacher text-green-500' : 'fa-user-cog text-blue-500' }}"></i>
-                                    <span class="font-medium {{ $entryMode === 'dosen' ? 'text-green-700' : 'text-blue-700' }}">
-                                        Cari Data {{ $entryMode === 'dosen' ? 'Dosen' : 'Tendik' }}
-                                    </span>
-                                </div>
-                                <button type="button" wire:click="$set('entryMode', 'mahasiswa')" class="text-xs text-gray-500 hover:text-gray-700">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        @if($autoDetected && $selectedEmployee)
-                        {{-- Auto-detected Employee --}}
+                        @if($selectedEmployee)
+                        {{-- Auto-detected Employee (Dosen/Tendik) --}}
                         <div class="bg-green-50 border border-green-200 rounded-xl p-4">
                             <div class="flex items-center gap-2 mb-3">
                                 <i class="fas fa-link text-green-600"></i>
-                                <span class="font-semibold text-green-700">Data SDM Terdeteksi!</span>
+                                <span class="font-semibold text-green-700">Data {{ $entryMode === 'dosen' ? 'Dosen' : 'Tendik' }} Terdeteksi!</span>
                             </div>
                             <div class="bg-white rounded-lg p-4 border border-green-100">
                                 <p class="font-bold text-gray-800 text-lg">{{ $selectedEmployee->full_name ?? $selectedEmployee->name }}</p>
@@ -124,224 +71,173 @@
                             <span wire:loading wire:target="quickConfirmEmployee"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
                         </button>
                         
-                        <button type="button" wire:click="$set('autoDetected', false)" class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
+                        @elseif($selectedPddikti)
+                        {{-- Auto-detected Mahasiswa --}}
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-link text-green-600"></i>
+                                <span class="font-semibold text-green-700">Data Mahasiswa Terdeteksi!</span>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-green-100">
+                                <p class="font-bold text-gray-800 text-lg">{{ $selectedPddikti->name }}</p>
+                                <div class="mt-2 space-y-1 text-sm text-gray-600">
+                                    <p><i class="fas fa-id-card w-5 text-gray-400"></i> {{ $selectedPddikti->member_id }}</p>
+                                    @if($selectedPddikti->department)
+                                    <p><i class="fas fa-graduation-cap w-5 text-gray-400"></i> {{ $selectedPddikti->department->name }}</p>
+                                    @endif
+                                    @if($selectedPddikti->branch)
+                                    <p><i class="fas fa-building w-5 text-gray-400"></i> {{ $selectedPddikti->branch->name }}</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" wire:click="quickConfirm" wire:loading.attr="disabled"
+                            class="w-full py-3.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition flex items-center justify-center gap-2">
+                            <span wire:loading.remove wire:target="quickConfirm"><i class="fas fa-check-circle"></i> Ya, Ini Data Saya</span>
+                            <span wire:loading wire:target="quickConfirm"><i class="fas fa-spinner fa-spin"></i> Memproses...</span>
+                        </button>
+                        @endif
+                        
+                        <button type="button" wire:click="$set('autoDetected', false)" 
+                            class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
                             <i class="fas fa-search mr-1"></i> Bukan data saya, cari manual
                         </button>
-                        
-                        @else
-                        {{-- Search Employee --}}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">
-                                <i class="fas fa-search mr-1 text-primary-500"></i> Cari berdasarkan NIY/NIDN/Nama
-                            </label>
-                            <div class="flex gap-2">
-                                <input type="text" wire:model="searchName" wire:keydown.enter="searchEmployee"
-                                    placeholder="Masukkan NIY, NIDN, atau Nama..."
-                                    class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                <button type="button" wire:click="searchEmployee" wire:loading.attr="disabled"
-                                    class="px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition disabled:opacity-50">
-                                    <span wire:loading.remove wire:target="searchEmployee"><i class="fas fa-search"></i></span>
-                                    <span wire:loading wire:target="searchEmployee"><i class="fas fa-spinner fa-spin"></i></span>
-                                </button>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-1.5">
-                                <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
-                                <strong>Tips:</strong> Gunakan NIY/NIDN untuk hasil lebih akurat
-                            </p>
-                        </div>
-
-                        {{-- Employee Search Results --}}
-                        @if($searchResults && count($searchResults) > 0)
-                        <div class="border border-gray-200 rounded-xl overflow-hidden">
-                            <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                                <p class="text-sm font-medium text-gray-700">
-                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                                    Ditemukan {{ count($searchResults) }} data {{ $entryMode === 'dosen' ? 'dosen' : 'tendik' }}
-                                </p>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto">
-                                @foreach($searchResults as $emp)
-                                @php
-                                    $score = $emp->_matchScore ?? 0;
-                                    $colorClass = $score >= 90 ? 'bg-green-100 text-green-700 border-green-300' : 
-                                                 ($score >= 70 ? 'bg-blue-100 text-blue-700 border-blue-300' : 
-                                                 ($score >= 50 ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-amber-100 text-amber-700 border-amber-300'));
-                                @endphp
-                                <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedEmployee && $selectedEmployee->id == $emp->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
-                                    <input type="radio" wire:click="selectEmployee({{ $emp->id }})" name="employee_selection" value="{{ $emp->id }}"
-                                        {{ $selectedEmployee && $selectedEmployee->id == $emp->id ? 'checked' : '' }}
-                                        class="w-4 h-4 text-primary-600 focus:ring-primary-500">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center gap-2">
-                                            <p class="text-sm font-medium text-gray-900 truncate">{{ $emp->full_name ?? $emp->name }}</p>
-                                            <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
-                                        </div>
-                                        <p class="text-xs text-gray-500">
-                                            NIY: {{ $emp->niy ?? '-' }}
-                                            @if($emp->nidn) · NIDN: {{ $emp->nidn }}@endif
-                                            @if($emp->faculty) · {{ $emp->faculty }}@endif
-                                        </p>
-                                    </div>
-                                </label>
-                                @endforeach
-                            </div>
-                        </div>
-                        @elseif($searchResults !== null && count($searchResults) === 0 && strlen($searchName) >= 2 && !$isSearching)
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                            <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
-                            <p class="text-xs text-amber-600 mt-2">Pastikan NIY/NIDN atau nama sudah benar.</p>
-                        </div>
-                        @endif
-
-                        {{-- Selected Employee Info --}}
-                        @if($selectedEmployee)
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
-                            <p class="text-sm text-green-700">
-                                <i class="fas fa-check-circle mr-1"></i>
-                                Anda memilih: <strong>{{ $selectedEmployee->full_name ?? $selectedEmployee->name }}</strong> ({{ $selectedEmployee->niy }})
-                            </p>
-                        </div>
-                        
-                        <button type="button" wire:click="quickConfirmEmployee" wire:loading.attr="disabled"
-                            class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
-                            <span wire:loading.remove wire:target="quickConfirmEmployee"><i class="fas fa-check mr-2"></i> Konfirmasi & Lanjutkan</span>
-                            <span wire:loading wire:target="quickConfirmEmployee"><i class="fas fa-spinner fa-spin"></i></span>
-                        </button>
-                        @endif
-                        
-                        <button type="button" wire:click="skipToManualEntry" class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
-                            <i class="fas fa-edit mr-1"></i> Data tidak ada? Input manual
-                        </button>
-                        @endif
                     </div>
                     
                     @else
-                    {{-- STEP 1: SIAKAD Search (Mahasiswa) --}}
+                    {{-- STEP 1: Unified Search (Mahasiswa + Dosen + Tendik) --}}
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
                                 <i class="fas fa-search mr-1 text-primary-500"></i> Cari Data Anda
                             </label>
                             <div class="flex gap-2">
-                                <input type="text" 
-                                    wire:model="searchName" 
-                                    wire:keydown.enter="searchPddikti"
-                                    placeholder="Masukkan Nama Lengkap atau NIM..."
+                                <input type="text" wire:model="searchName" wire:keydown.enter="searchPddikti"
+                                    placeholder="Masukkan NIM, NIY, NIDN, atau Nama..."
                                     class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500">
-                                <button type="button" 
-                                    wire:click="searchPddikti" 
-                                    wire:loading.attr="disabled"
+                                <button type="button" wire:click="searchPddikti" wire:loading.attr="disabled"
                                     class="px-5 py-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition disabled:opacity-50">
-                                    <span wire:loading.remove wire:target="searchPddikti">
-                                        <i class="fas fa-search"></i>
-                                    </span>
-                                    <span wire:loading wire:target="searchPddikti">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
+                                    <span wire:loading.remove wire:target="searchPddikti"><i class="fas fa-search"></i></span>
+                                    <span wire:loading wire:target="searchPddikti"><i class="fas fa-spinner fa-spin"></i></span>
                                 </button>
                             </div>
                             <p class="text-xs text-gray-500 mt-1.5">
                                 <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
-                                <strong>Tips:</strong> Gunakan NIM untuk hasil lebih akurat
+                                Cari mahasiswa, dosen, atau tendik sekaligus
                             </p>
                         </div>
 
-                        {{-- Search Results --}}
+                        {{-- Mahasiswa Results --}}
                         @if(count($searchResults) > 0)
                         <div class="border border-gray-200 rounded-xl overflow-hidden">
-                            <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                                <p class="text-sm font-medium text-gray-700">
-                                    @if(count($searchResults) === 1 && !$isSearching && strlen($searchName) < 3)
-                                    <i class="fas fa-lightbulb text-amber-500 mr-1"></i>
-                                    Mungkin ini data Anda? Silakan pilih atau cari manual
-                                    @elseif(count($searchResults) > 1 && !$isSearching && strlen($searchName) < 3)
-                                    <i class="fas fa-users text-blue-500 mr-1"></i>
-                                    Ditemukan {{ count($searchResults) }} data yang mirip - pilih yang sesuai
-                                    @else
-                                    <i class="fas fa-check-circle text-green-500 mr-1"></i>
-                                    Ditemukan {{ count($searchResults) }} data mahasiswa UNIDA Gontor
-                                    @endif
+                            <div class="bg-blue-50 px-4 py-2 border-b border-gray-200">
+                                <p class="text-sm font-medium text-blue-700">
+                                    <i class="fas fa-user-graduate mr-1"></i> Mahasiswa ({{ count($searchResults) }})
                                 </p>
                             </div>
-                            <div class="max-h-64 overflow-y-auto">
+                            <div class="max-h-40 overflow-y-auto">
                                 @foreach($searchResults as $result)
                                 @php
                                     $score = $result->_matchScore ?? 0;
-                                    // Color based on percentage
-                                    if ($score >= 90) {
-                                        $colorClass = 'bg-green-100 text-green-700 border-green-300';
-                                    } elseif ($score >= 70) {
-                                        $colorClass = 'bg-blue-100 text-blue-700 border-blue-300';
-                                    } elseif ($score >= 50) {
-                                        $colorClass = 'bg-cyan-100 text-cyan-700 border-cyan-300';
-                                    } elseif ($score >= 30) {
-                                        $colorClass = 'bg-amber-100 text-amber-700 border-amber-300';
-                                    } else {
-                                        $colorClass = 'bg-gray-100 text-gray-600 border-gray-300';
-                                    }
+                                    $colorClass = $score >= 90 ? 'bg-green-100 text-green-700 border-green-300' : 
+                                                 ($score >= 70 ? 'bg-blue-100 text-blue-700 border-blue-300' : 
+                                                 ($score >= 50 ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-amber-100 text-amber-700 border-amber-300'));
                                 @endphp
-                                <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedPddiktiId == $result->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
-                                    <input type="radio" 
-                                        wire:click="selectPddikti({{ $result->id }})"
-                                        name="siakad_selection" 
-                                        value="{{ $result->id }}"
-                                        {{ $selectedPddiktiId == $result->id ? 'checked' : '' }}
-                                        class="w-4 h-4 text-primary-600 focus:ring-primary-500">
+                                <label class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedPddiktiId == $result->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
+                                    <input type="radio" wire:click="selectPddikti({{ $result->id }})" name="data_selection" value="m_{{ $result->id }}"
+                                        {{ $selectedPddiktiId == $result->id ? 'checked' : '' }} class="w-4 h-4 text-primary-600">
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-medium text-gray-900 truncate">{{ $result->name }}</p>
                                             <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
                                         </div>
-                                        <p class="text-xs text-gray-500">
-                                            {{ $result->member_id ?? '-' }}
-                                            @if($result->department) · {{ $result->department->code ?? $result->department->name }}@endif
-                                            @if($result->branch) · {{ $result->branch->name }}@endif
-                                        </p>
+                                        <p class="text-xs text-gray-500">{{ $result->member_id ?? '-' }}@if($result->department) · {{ $result->department->code ?? $result->department->name }}@endif</p>
                                     </div>
                                 </label>
                                 @endforeach
                             </div>
                         </div>
+                        @endif
 
-                        {{-- Selected info --}}
+                        {{-- Dosen/Tendik Results --}}
+                        @if(isset($employeeResults) && count($employeeResults) > 0)
+                        <div class="border border-gray-200 rounded-xl overflow-hidden">
+                            <div class="bg-green-50 px-4 py-2 border-b border-gray-200">
+                                <p class="text-sm font-medium text-green-700">
+                                    <i class="fas fa-chalkboard-teacher mr-1"></i> Dosen / Tendik ({{ count($employeeResults) }})
+                                </p>
+                            </div>
+                            <div class="max-h-40 overflow-y-auto">
+                                @foreach($employeeResults as $emp)
+                                @php
+                                    $score = $emp->_matchScore ?? 0;
+                                    $colorClass = $score >= 90 ? 'bg-green-100 text-green-700 border-green-300' : 
+                                                 ($score >= 70 ? 'bg-blue-100 text-blue-700 border-blue-300' : 
+                                                 ($score >= 50 ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-amber-100 text-amber-700 border-amber-300'));
+                                    $typeLabel = $emp->type === 'dosen' ? 'Dosen' : 'Tendik';
+                                @endphp
+                                <label class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition {{ $selectedEmployee && $selectedEmployee->id == $emp->id ? 'bg-primary-50 border-l-4 border-l-primary-500' : '' }}">
+                                    <input type="radio" wire:click="selectEmployee({{ $emp->id }})" name="data_selection" value="e_{{ $emp->id }}"
+                                        {{ $selectedEmployee && $selectedEmployee->id == $emp->id ? 'checked' : '' }} class="w-4 h-4 text-primary-600">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <p class="text-sm font-medium text-gray-900 truncate">{{ $emp->full_name ?? $emp->name }}</p>
+                                            <span class="text-[9px] px-1.5 py-0.5 rounded {{ $emp->type === 'dosen' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">{{ $typeLabel }}</span>
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500">NIY: {{ $emp->niy ?? '-' }}@if($emp->nidn) · NIDN: {{ $emp->nidn }}@endif</p>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
+                        {{-- No Results --}}
+                        @if(count($searchResults) === 0 && (!isset($employeeResults) || count($employeeResults) === 0) && strlen($searchName) >= 2 && !$isSearching)
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                            <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
+                            <p class="text-xs text-amber-600 mt-2">Coba gunakan NIM/NIY/NIDN untuk hasil lebih akurat</p>
+                        </div>
+                        @endif
+
+                        {{-- Selected Info --}}
                         @if($selectedPddikti)
-                        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-3">
                             <p class="text-sm text-green-700">
                                 <i class="fas fa-check-circle mr-1"></i>
-                                Anda memilih: <strong>{{ $selectedPddikti->name }}</strong> ({{ $selectedPddikti->nim_nidn }})
+                                <strong>{{ $selectedPddikti->name }}</strong> ({{ $selectedPddikti->member_id }}) - Mahasiswa
+                            </p>
+                        </div>
+                        @elseif($selectedEmployee)
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-3">
+                            <p class="text-sm text-green-700">
+                                <i class="fas fa-check-circle mr-1"></i>
+                                <strong>{{ $selectedEmployee->full_name ?? $selectedEmployee->name }}</strong> ({{ $selectedEmployee->niy }}) - {{ $selectedEmployee->type === 'dosen' ? 'Dosen' : 'Tendik' }}
                             </p>
                         </div>
                         @endif
-                        @elseif(count($searchResults) === 0 && strlen($searchName) >= 2 && !$isSearching)
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                            <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
-                            <p class="text-xs text-amber-600 mt-2">Coba cari menggunakan <strong>NIM</strong> untuk hasil lebih akurat.</p>
-                        </div>
-                        @endif
 
-                        {{-- Action buttons --}}
-                        <div class="flex flex-col gap-2 pt-4">
+                        {{-- Action Buttons --}}
+                        <div class="flex flex-col gap-2 pt-2">
                             @if($selectedPddiktiId)
-                            <button type="button" wire:click="proceedWithSelection" 
-                                class="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl transition">
-                                <i class="fas fa-arrow-right mr-2"></i> Lanjutkan dengan Data Terpilih
+                            <button type="button" wire:click="quickConfirm" wire:loading.attr="disabled"
+                                class="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition">
+                                <span wire:loading.remove wire:target="quickConfirm"><i class="fas fa-check mr-2"></i> Konfirmasi Data Mahasiswa</span>
+                                <span wire:loading wire:target="quickConfirm"><i class="fas fa-spinner fa-spin"></i></span>
+                            </button>
+                            @elseif($selectedEmployee)
+                            <button type="button" wire:click="quickConfirmEmployee" wire:loading.attr="disabled"
+                                class="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl shadow-lg shadow-green-500/30 hover:shadow-xl transition">
+                                <span wire:loading.remove wire:target="quickConfirmEmployee"><i class="fas fa-check mr-2"></i> Konfirmasi Data {{ $selectedEmployee->type === 'dosen' ? 'Dosen' : 'Tendik' }}</span>
+                                <span wire:loading wire:target="quickConfirmEmployee"><i class="fas fa-spinner fa-spin"></i></span>
                             </button>
                             @endif
                             
-                            <div class="flex gap-2">
-                                <button type="button" wire:click="skipAsDosen" 
-                                    class="flex-1 py-2.5 border border-green-200 text-green-600 font-medium rounded-xl hover:bg-green-50 transition text-sm">
-                                    <i class="fas fa-chalkboard-teacher mr-1"></i> Dosen
-                                </button>
-                                <button type="button" wire:click="skipAsTendik" 
-                                    class="flex-1 py-2.5 border border-blue-200 text-blue-600 font-medium rounded-xl hover:bg-blue-50 transition text-sm">
-                                    <i class="fas fa-user-cog mr-1"></i> Tendik
-                                </button>
-                                <button type="button" wire:click="skipToManualEntry" 
-                                    class="flex-1 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition text-sm">
-                                    <i class="fas fa-edit mr-1"></i> Manual
-                                </button>
-                            </div>
+                            <button type="button" wire:click="skipToManualEntry" class="w-full py-2.5 text-gray-500 text-sm hover:text-gray-700 transition">
+                                <i class="fas fa-edit mr-1"></i> Data tidak ditemukan? Input manual
+                            </button>
                         </div>
                     </div>
                     @endif {{-- End of autoDetected else --}}
