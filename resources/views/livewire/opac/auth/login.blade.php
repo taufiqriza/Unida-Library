@@ -4,49 +4,59 @@
             <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
                 <div class="flex flex-col lg:flex-row">
                     <!-- Left - Info (Hidden on Mobile) -->
-                    <div class="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-primary-600 to-primary-800 p-8 flex-col justify-center text-white">
-                        <div class="mb-8">
-                            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
-                                <i class="fas fa-book-reader text-3xl"></i>
+                    <div class="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-primary-600 to-primary-800 p-8 flex-col justify-between text-white">
+                        <div>
+                            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+                                <i class="fas fa-book-reader text-2xl"></i>
                             </div>
-                            <h2 class="text-2xl font-bold mb-2">{{ __('opac.auth.login.digital_library') }}</h2>
-                            <p class="text-primary-200">{{ __('opac.auth.login.digital_library_desc') }}</p>
+                            <h2 class="text-xl font-bold mb-1">{{ __('opac.auth.login.digital_library') }}</h2>
+                            <p class="text-primary-200 text-sm mb-6">{{ __('opac.auth.login.digital_library_desc') }}</p>
                         </div>
-                        <div class="space-y-4">
+                        
+                        <div class="space-y-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-book text-lg"></i>
+                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-book"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium">{{ __('opac.auth.login.online_loan') }}</p>
-                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.online_loan_desc') }}</p>
+                                    <p class="font-medium text-sm">{{ __('opac.auth.login.online_loan') }}</p>
+                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.online_loan_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-file-pdf text-lg"></i>
+                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-file-pdf"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium">{{ __('opac.auth.login.ebook_ethesis') }}</p>
-                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.ebook_ethesis_desc') }}</p>
+                                    <p class="font-medium text-sm">{{ __('opac.auth.login.ebook_ethesis') }}</p>
+                                    <p class="text-primary-200 text-xs">{{ __('opac.auth.login.ebook_ethesis_desc') }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-history text-lg"></i>
+                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-upload"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium">{{ __('opac.auth.login.complete_history') }}</p>
-                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.complete_history_desc') }}</p>
+                                    <p class="font-medium text-sm">Unggah Mandiri</p>
+                                    <p class="text-primary-200 text-xs">Submit skripsi/tesis/disertasi online</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-upload text-lg"></i>
+                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-search-plus"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium">{{ __('opac.auth.login.upload_thesis') }}</p>
-                                    <p class="text-primary-200 text-sm">{{ __('opac.auth.login.upload_thesis_desc') }}</p>
+                                    <p class="font-medium text-sm">Cek Plagiasi</p>
+                                    <p class="text-primary-200 text-xs">Integrasi Turnitin untuk similarity check</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-sm">Bebas Pustaka</p>
+                                    <p class="text-primary-200 text-xs">Pengajuan surat bebas pustaka digital</p>
                                 </div>
                             </div>
                         </div>
@@ -151,13 +161,16 @@
                                 <span class="text-gray-700 font-medium">{{ __('opac.auth.login.google_login') }}</span>
                             </a>
                             
-                            <!-- Info Box untuk Civitas -->
-                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-3 mb-4">
-                                <div class="flex items-start gap-2">
-                                    <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+                            <!-- Info Box untuk Civitas - Dismissible -->
+                            <div x-data="{ show: true }" x-show="show" x-transition class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-3 mb-4 relative">
+                                <button @click="show = false" class="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                                <div class="flex items-start gap-2 pr-4">
+                                    <i class="fas fa-magic text-blue-500 mt-0.5"></i>
                                     <div class="text-xs text-blue-700">
-                                        <p class="font-medium mb-1">Civitas UNIDA Gontor</p>
-                                        <p class="text-blue-600">Login dengan email <span class="font-semibold">@unida.gontor.ac.id</span> atau <span class="font-semibold">@student.*.unida.gontor.ac.id</span> akan otomatis terhubung dengan data SIAKAD/SDM.</p>
+                                        <p class="font-medium mb-1">Auto-Link Civitas UNIDA</p>
+                                        <p class="text-blue-600">Email <span class="font-semibold">@unida.gontor.ac.id</span> atau <span class="font-semibold">@student.*.unida.gontor.ac.id</span> otomatis terhubung dengan data SIAKAD/SDM.</p>
                                     </div>
                                 </div>
                             </div>
