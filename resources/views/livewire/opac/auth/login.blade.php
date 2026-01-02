@@ -164,7 +164,7 @@
                                 <span class="text-gray-700 font-medium">{{ __('opac.auth.login.google_login') }}</span>
                             </a>
                             <p class="text-xs text-gray-500 text-center mt-2 mb-5">
-                                <i class="fas fa-magic text-primary-500 mr-1"></i>
+                                <i class="fas fa-link text-primary-500 mr-1"></i>
                                 Civitas UNIDA otomatis terhubung data SIAKAD/SDM
                             </p>
 
