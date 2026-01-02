@@ -129,17 +129,18 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Klasifikasi (DDC)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Klasifikasi (DDC) <span class="text-red-500">*</span></label>
                 <div class="flex gap-2">
                     <input type="text" wire:model="classification" class="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="297.12">
                     <button type="button" @click="$dispatch('open-ddc-modal')" class="px-4 py-2.5 bg-purple-100 text-purple-700 text-sm font-medium rounded-xl hover:bg-purple-200 transition flex items-center gap-1.5">
                         <i class="fas fa-search"></i> DDC
                     </button>
                 </div>
+                @error('classification') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-1.5">
-                    <label class="text-sm font-medium text-gray-700">No. Panggil</label>
+                    <label class="text-sm font-medium text-gray-700">No. Panggil <span class="text-red-500">*</span></label>
                     <span class="text-xs text-amber-600"><i class="fas fa-info-circle"></i> Isi judul, klasifikasi & penulis dulu</span>
                 </div>
                 <div class="flex gap-2">
@@ -148,6 +149,7 @@
                         <i class="fas fa-bolt"></i> Generate
                     </button>
                 </div>
+                @error('call_number') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
     </div>
