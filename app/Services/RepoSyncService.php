@@ -12,114 +12,131 @@ class RepoSyncService
     protected string $baseUrl = 'https://repo.unida.gontor.ac.id/cgi/oai2';
     protected int $timeout = 60;
 
-    public function sync(): array
+    // OAI-PMH set codes
+    const SET_THESIS = '74797065733D746865736973';
+    const SET_ARTICLE = '74797065733D61727469636C65';
+
+    public function sync(?string $type = null): array
     {
         $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0, 'errors' => 0];
-        $url = "{$this->baseUrl}?verb=ListRecords&metadataPrefix=oai_dc";
+
+        if (!$type || $type === 'thesis') {
+            $result = $this->syncSet(self::SET_THESIS, 'thesis');
+            $stats['thesis'] = $result['saved'];
+            $stats['skipped'] += $result['skipped'];
+            $stats['errors'] += $result['errors'];
+        }
+
+        if (!$type || $type === 'article') {
+            $result = $this->syncSet(self::SET_ARTICLE, 'article');
+            $stats['article'] = $result['saved'];
+            $stats['skipped'] += $result['skipped'];
+            $stats['errors'] += $result['errors'];
+        }
+
+        return $stats;
+    }
+
+    public function syncSet(string $setSpec, string $targetType): array
+    {
+        $stats = ['saved' => 0, 'skipped' => 0, 'errors' => 0];
+        $url = "{$this->baseUrl}?verb=ListRecords&metadataPrefix=oai_dc&set={$setSpec}";
         $pageCount = 0;
 
         while ($url) {
             try {
                 $pageCount++;
-                Log::info("Syncing page {$pageCount}...");
-                
+                Log::info("Syncing {$targetType} page {$pageCount}...");
+
                 $response = Http::retry(3, 2000)->timeout($this->timeout)->get($url);
                 if (!$response->successful()) {
-                    Log::warning("HTTP error on page {$pageCount}", ['status' => $response->status()]);
+                    Log::warning("HTTP error", ['page' => $pageCount, 'status' => $response->status()]);
                     $stats['errors']++;
-                    // Try to get next page anyway
-                    $url = $this->getNextPageUrl($response->body());
-                    continue;
+                    break;
                 }
 
-                $result = $this->processPage($response->body());
-                $stats['thesis'] += $result['thesis'];
-                $stats['article'] += $result['article'];
+                $result = $this->processPage($response->body(), $targetType);
+                $stats['saved'] += $result['saved'];
                 $stats['skipped'] += $result['skipped'];
-                $stats['errors'] += $result['errors'] ?? 0;
+                $stats['errors'] += $result['errors'];
 
-                // Get next page
                 $url = $this->getNextPageUrl($response->body());
-                
-                if ($url) usleep(500000); // 500ms delay
+                if ($url) usleep(500000);
             } catch (\Exception $e) {
-                Log::error('Repo sync page error', ['page' => $pageCount, 'error' => $e->getMessage()]);
+                Log::error('Sync error', ['type' => $targetType, 'page' => $pageCount, 'error' => $e->getMessage()]);
                 $stats['errors']++;
-                // Don't break - try to continue if there might be more pages
                 break;
             }
         }
 
-        Log::info("Sync completed", ['pages' => $pageCount, 'stats' => $stats]);
+        Log::info("Sync {$targetType} completed", ['pages' => $pageCount, 'stats' => $stats]);
         return $stats;
     }
 
-    protected function processPage(string $xml): array
+    protected function processPage(string $xml, string $targetType): array
     {
-        $stats = ['thesis' => 0, 'article' => 0, 'skipped' => 0, 'errors' => 0];
-        
+        $stats = ['saved' => 0, 'skipped' => 0, 'errors' => 0];
+
         preg_match_all('/<record>(.*?)<\/record>/s', $xml, $matches);
-        
+
         foreach ($matches[1] as $record) {
             try {
-                $result = $this->processRecord($record);
-                if ($result === 'thesis') $stats['thesis']++;
-                elseif ($result === 'article') $stats['article']++;
-                else $stats['skipped']++;
+                $saved = $targetType === 'thesis'
+                    ? $this->processThesis($record)
+                    : $this->processArticle($record);
+                $saved ? $stats['saved']++ : $stats['skipped']++;
             } catch (\Exception $e) {
-                Log::warning('Record process error', ['error' => substr($e->getMessage(), 0, 200)]);
+                Log::warning('Record error', ['error' => substr($e->getMessage(), 0, 200)]);
                 $stats['errors']++;
             }
         }
-        
+
         return $stats;
     }
 
-    protected function processRecord(string $record): ?string
+    protected function processThesis(string $record): bool
     {
-        // Extract identifier
-        preg_match('/<identifier>oai:repo\.unida\.gontor\.ac\.id:(\d+)<\/identifier>/', $record, $idMatch);
-        $externalId = $idMatch[1] ?? null;
-        if (!$externalId) return null;
+        preg_match('/<identifier>oai:repo\.unida\.gontor\.ac\.id:(\d+)<\/identifier>/', $record, $m);
+        $externalId = $m[1] ?? null;
+        if (!$externalId) return false;
 
-        // Extract type
-        $types = $this->extractAll($record, 'dc:type');
-        $isThesis = in_array('Thesis', $types);
-        $isArticle = in_array('Article', $types) || in_array('PeerReviewed', $types);
-
-        if ($isThesis) {
-            return $this->saveThesis($record, $externalId);
-        } elseif ($isArticle) {
-            return $this->saveArticle($record, $externalId);
+        if (Ethesis::where('source_type', 'repo')->where('external_id', $externalId)->exists()) {
+            return false;
         }
 
-        return null;
+        return (bool) $this->saveThesis($record, $externalId);
+    }
+
+    protected function processArticle(string $record): bool
+    {
+        preg_match('/<identifier>oai:repo\.unida\.gontor\.ac\.id:(\d+)<\/identifier>/', $record, $m);
+        $externalId = $m[1] ?? null;
+        if (!$externalId) return false;
+
+        if (JournalArticle::where('source_type', 'repo')->where('external_id', $externalId)->exists()) {
+            return false;
+        }
+
+        return (bool) $this->saveArticle($record, $externalId);
     }
 
     protected function saveThesis(string $record, string $externalId): ?string
     {
-        // Skip if exists
-        if (Ethesis::where('source_type', 'repo')->where('external_id', $externalId)->exists()) {
-            return null;
-        }
-
         $title = $this->extract($record, 'dc:title');
         if (!$title) return null;
 
         $creators = $this->extractAll($record, 'dc:creator');
         $author = $creators[0] ?? 'Unknown';
-        
+
         $abstract = $this->extract($record, 'dc:description');
         $date = $this->extract($record, 'dc:date');
         $year = $date ? (int) substr($date, 0, 4) : null;
-        
-        // Get URL
+
         $relations = $this->extractAll($record, 'dc:relation');
         $url = collect($relations)->first(fn($r) => str_contains($r, 'repo.unida.gontor.ac.id'));
-        
-        // Get PDF URL
+
         $identifiers = $this->extractAll($record, 'dc:identifier');
-        $pdfUrl = collect($identifiers)->first(fn($i) => str_ends_with($i, '.pdf'));
+        $pdfUrl = collect($identifiers)->first(fn($i) => str_ends_with(strtolower($i), '.pdf'));
 
         Ethesis::create([
             'source_type' => 'repo',
@@ -129,7 +146,7 @@ class RepoSyncService
             'author' => $author,
             'abstract' => $abstract,
             'year' => $year,
-            'type' => 'skripsi', // Default, bisa di-refine
+            'type' => 'skripsi',
             'is_public' => true,
             'file_path' => $pdfUrl,
         ]);
@@ -139,53 +156,31 @@ class RepoSyncService
 
     protected function saveArticle(string $record, string $externalId): ?string
     {
-        // Skip if exists
-        if (JournalArticle::where('source_type', 'repo')->where('external_id', $externalId)->exists()) {
-            return null;
-        }
-
         $title = $this->extract($record, 'dc:title');
         if (!$title) return null;
 
         $creators = $this->extractAll($record, 'dc:creator');
         $authors = array_map(fn($c) => ['name' => trim($c)], $creators);
-        
+
         $abstract = $this->extract($record, 'dc:description');
         $date = $this->extract($record, 'dc:date');
         $year = $date ? (int) substr($date, 0, 4) : null;
-        
-        // Get URLs
+
         $relations = $this->extractAll($record, 'dc:relation');
         $repoUrl = collect($relations)->first(fn($r) => str_contains($r, 'repo.unida.gontor.ac.id'));
         $ojsUrl = collect($relations)->first(fn($r) => str_contains($r, 'ejournal.unida.gontor.ac.id'));
-        
-        // Extract journal info from identifier
-        $identifiers = $this->extractAll($record, 'dc:identifier');
-        $citation = collect($identifiers)->first(fn($i) => str_contains($i, 'ISSN') || str_contains($i, 'pp.'));
-        
-        $journalName = 'UNIDA Repository';
-        $volume = null;
-        $issue = null;
-        
-        if ($citation && preg_match('/([A-Za-z\s]+),\s*(\d+)\s*\((\d+)\)/', $citation, $m)) {
-            $journalName = trim($m[1]);
-            $volume = $m[2];
-            $issue = $m[3];
-        }
 
-        // Get PDF URL
-        $pdfUrl = collect($identifiers)->first(fn($i) => str_ends_with($i, '.pdf'));
+        $identifiers = $this->extractAll($record, 'dc:identifier');
+        $pdfUrl = collect($identifiers)->first(fn($i) => str_ends_with(strtolower($i), '.pdf'));
 
         JournalArticle::create([
             'source_type' => 'repo',
             'external_id' => $externalId,
             'journal_code' => 'repo',
-            'journal_name' => $journalName,
+            'journal_name' => 'UNIDA Repository',
             'title' => $title,
             'abstract' => $abstract,
             'authors' => $authors,
-            'volume' => $volume,
-            'issue' => $issue,
             'publish_year' => $year,
             'published_at' => $date,
             'url' => $ojsUrl ?? $repoUrl ?? "https://repo.unida.gontor.ac.id/{$externalId}/",
