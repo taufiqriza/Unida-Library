@@ -392,10 +392,20 @@
                 </button>
 
                 {{-- System Info --}}
-                <div class="mt-3 text-center transition-all duration-300" :class="sidebarCollapsed ? 'opacity-0' : 'opacity-100'">
+                <div class="mt-3 text-center">
                     <a href="https://wa.me/6282117049501" target="_blank" class="group">
-                        <p class="text-[10px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">SYSTEM ILMU v2</p>
-                        <p class="text-[9px] text-blue-400/50 group-hover:text-blue-300/70 transition">Integrated Library Management UNIDA</p>
+                        <template x-if="!sidebarCollapsed">
+                            <div>
+                                <p class="text-[10px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">SYSTEM ILMU v2</p>
+                                <p class="text-[9px] text-blue-400/50 group-hover:text-blue-300/70 transition">Integrated Library Management UNIDA</p>
+                            </div>
+                        </template>
+                        <template x-if="sidebarCollapsed">
+                            <div>
+                                <p class="text-[9px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">ILMU</p>
+                                <p class="text-[8px] text-blue-400/50 group-hover:text-blue-300/70 transition">v2</p>
+                            </div>
+                        </template>
                     </a>
                 </div>
 
