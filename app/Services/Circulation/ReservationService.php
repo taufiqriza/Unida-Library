@@ -42,9 +42,17 @@ class ReservationService
             return ['success' => false, 'message' => "Batas reservasi tercapai (maksimal {$maxReservations})"];
         }
 
+        // If no branch specified, get from first borrowed item or member's branch
+        if (!$branchId) {
+            $borrowedItem = Item::where('book_id', $book->id)
+                ->whereHas('loans', fn($q) => $q->where('is_returned', false))
+                ->first();
+            $branchId = $borrowedItem?->branch_id ?? $member->branch_id ?? 1;
+        }
+
         // Check if book available - no need to reserve
         $availableItem = Item::where('book_id', $book->id)
-            ->where('branch_id', $branchId)
+            ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
             ->whereDoesntHave('loans', fn($q) => $q->where('is_returned', false))
             ->first();
 
@@ -54,7 +62,7 @@ class ReservationService
 
         // Calculate queue position
         $queuePosition = Reservation::where('book_id', $book->id)
-            ->where('branch_id', $branchId)
+            ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
             ->pending()
             ->count() + 1;
 
