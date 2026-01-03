@@ -209,6 +209,8 @@ class CirculationTransaction extends Component
             $this->itemSuggestions = [];
         }
     }
+
+    public function selectItem($itemId): void
     {
         $this->itemBarcode = Item::find($itemId)?->barcode ?? '';
         $this->itemSuggestions = [];
