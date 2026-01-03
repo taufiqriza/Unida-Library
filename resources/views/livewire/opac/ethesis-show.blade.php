@@ -116,7 +116,7 @@
                             <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
                         </button>
                         @else
-                        <a href="{{ route('opac.login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
+                        <a href="{{ route('login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
                             <i class="fas fa-sign-in-alt"></i>
                             <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
                         </a>
