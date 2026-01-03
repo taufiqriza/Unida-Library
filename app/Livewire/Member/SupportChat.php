@@ -53,7 +53,7 @@ class SupportChat extends Component
     public function openChat()
     {
         if (!auth('member')->check()) {
-            return redirect()->route('member.login');
+            return redirect()->route('login');
         }
         
         $this->loadRoom();
