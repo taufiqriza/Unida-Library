@@ -170,9 +170,6 @@
                 <a href="{{ route('opac.home') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
                     <i class="fas fa-search"></i> Cari Buku
                 </a>
-                <a href="{{ route('opac.member.history') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
-                    <i class="fas fa-history"></i> Riwayat
-                </a>
             </div>
 
 
