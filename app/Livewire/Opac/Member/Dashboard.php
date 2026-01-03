@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Dashboard extends Component
 {
@@ -21,6 +22,9 @@ class Dashboard extends Component
     public $clearanceLetters;
     public $plagiarismCertificates;
     public $photo;
+    
+    // Digital Card
+    public bool $showDigitalCard = false;
 
     public function mount()
     {
@@ -57,6 +61,17 @@ class Dashboard extends Component
         $this->photo = null;
         
         $this->dispatch('notify', type: 'success', message: 'Foto profil berhasil diperbarui');
+    }
+
+    public function getQrCodeProperty(): string
+    {
+        $token = encrypt([
+            'id' => $this->member->id,
+            'member_id' => $this->member->member_id,
+            'exp' => now()->addDay()->timestamp
+        ]);
+        
+        return base64_encode(QrCode::format('svg')->size(200)->margin(1)->generate($token));
     }
 
     public function render()

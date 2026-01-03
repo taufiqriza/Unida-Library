@@ -162,6 +162,19 @@
                 </div>
             </div>
 
+            {{-- Quick Actions --}}
+            <div class="flex gap-2 mb-3 lg:mb-4 overflow-x-auto pb-1 -mx-3 px-3 lg:mx-0 lg:px-0">
+                <button wire:click="$set('showDigitalCard', true)" class="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition flex items-center gap-2">
+                    <i class="fas fa-id-card"></i> Kartu Digital
+                </button>
+                <a href="{{ route('opac.catalog') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
+                    <i class="fas fa-search"></i> Cari Buku
+                </a>
+                <a href="{{ route('opac.member.history') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
+                    <i class="fas fa-history"></i> Riwayat
+                </a>
+            </div>
+
 
             {{-- Main Content Grid --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -843,4 +856,109 @@
             </div>
         </div>
     </div>
+
+    {{-- Digital Card Modal --}}
+    @if($showDigitalCard)
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" x-data x-transition @click.self="$wire.set('showDigitalCard', false)">
+        <div class="w-full max-w-sm">
+            {{-- Card --}}
+            <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl shadow-2xl overflow-hidden relative" id="digital-card">
+                {{-- Pattern --}}
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                    <div class="absolute bottom-0 left-0 w-32 h-32 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                </div>
+                
+                {{-- Header --}}
+                <div class="relative p-5 pb-3">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book-reader text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-bold text-sm">PERPUSTAKAAN</p>
+                                <p class="text-blue-200 text-[10px]">UNIDA GONTOR</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-blue-200 text-[10px]">KARTU ANGGOTA</p>
+                            <p class="text-white font-mono text-xs">{{ $member->member_id }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Content --}}
+                <div class="relative bg-white mx-3 rounded-2xl p-4 mb-3">
+                    <div class="flex gap-4">
+                        {{-- Photo --}}
+                        <div class="w-20 h-24 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 border-2 border-gray-200">
+                            @if($member->photo)
+                            <img src="{{ asset('storage/' . $member->photo) }}" class="w-full h-full object-cover">
+                            @else
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                                <i class="fas fa-user text-gray-400 text-2xl"></i>
+                            </div>
+                            @endif
+                        </div>
+                        {{-- Info --}}
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-gray-900 text-sm leading-tight line-clamp-2">{{ $member->name }}</h3>
+                            <p class="text-gray-500 text-xs mt-1">{{ $member->institution ?? $member->memberType?->name ?? 'Anggota' }}</p>
+                            @if($member->faculty)
+                            <p class="text-gray-400 text-[10px]">{{ $member->faculty->name ?? '' }}</p>
+                            @endif
+                            <div class="mt-2 flex items-center gap-1">
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-semibold rounded-full">
+                                    <i class="fas fa-check-circle mr-0.5"></i> Aktif
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- QR Code --}}
+                <div class="relative px-3 pb-4">
+                    <div class="bg-white rounded-2xl p-3 flex items-center gap-3">
+                        <div class="w-20 h-20 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+                            <img src="data:image/svg+xml;base64,{{ $this->qrCode }}" class="w-full h-full">
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[10px] text-gray-400 mb-1">Scan untuk verifikasi</p>
+                            <p class="text-xs text-gray-600">Berlaku s/d</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $member->expire_date?->format('d M Y') ?? 'Seumur Hidup' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex gap-2 mt-4 justify-center">
+                <button onclick="downloadCard()" class="px-4 py-2.5 bg-white text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100 transition flex items-center gap-2">
+                    <i class="fas fa-download"></i> Simpan
+                </button>
+                <button onclick="window.print()" class="px-4 py-2.5 bg-white text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-100 transition flex items-center gap-2">
+                    <i class="fas fa-print"></i> Cetak
+                </button>
+                <button wire:click="$set('showDigitalCard', false)" class="px-4 py-2.5 bg-white/20 text-white text-xs font-semibold rounded-xl hover:bg-white/30 transition flex items-center gap-2">
+                    <i class="fas fa-times"></i> Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function downloadCard() {
+        html2canvas(document.getElementById('digital-card'), {
+            scale: 2,
+            backgroundColor: null
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'kartu-anggota-{{ $member->member_id }}.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    }
+    </script>
+    @endif
 </div>

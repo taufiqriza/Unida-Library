@@ -65,7 +65,7 @@ class BookImportService
         $spreadsheet->setActiveSheetIndex(0);
 
         // Save to temp file
-        $filename = 'template_import_koleksi_' . Str::slug($branch->name) . '_' . date('Ymd') . '.xlsx';
+        $filename = 'Template_Import_ILMU_' . Str::slug($branch->name) . '_' . date('Ymd') . '.xlsx';
         $path = storage_path('app/temp/' . $filename);
         
         if (!is_dir(storage_path('app/temp'))) {
@@ -85,12 +85,12 @@ class BookImportService
 
         // Header branding
         $sheet->mergeCells('A1:L1');
-        $sheet->setCellValue('A1', 'PERPUSTAKAAN UNIDA GONTOR');
+        $sheet->setCellValue('A1', 'SYSTEM ILMU - UNIDA GONTOR');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $sheet->mergeCells('A2:L2');
-        $sheet->setCellValue('A2', 'Template Import Koleksi Buku v1.0');
+        $sheet->setCellValue('A2', 'Template Import Koleksi v2.0');
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Info section
@@ -174,7 +174,7 @@ class BookImportService
         $sheet->setTitle('📖 Panduan');
 
         $guide = [
-            ['PANDUAN PENGISIAN TEMPLATE IMPORT KOLEKSI', ''],
+            ['PANDUAN PENGISIAN TEMPLATE IMPORT SYSTEM ILMU', ''],
             ['', ''],
             ['1. JUDUL (Wajib)', 'Tulis judul buku lengkap sesuai cover'],
             ['   Contoh:', 'Fiqih Islam Lengkap'],
