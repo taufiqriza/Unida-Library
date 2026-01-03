@@ -168,6 +168,32 @@
                 </div>
             </div>
 
+            {{-- Layanan Sirkulasi --}}
+            @if($loans->count() > 0 || ($reservations ?? collect())->count() > 0)
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-3 mb-3 lg:mb-4 border border-blue-100">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <div class="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-sync-alt text-white text-sm"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-blue-900">Layanan Sirkulasi</p>
+                            <p class="text-[10px] text-blue-600">
+                                @if($loans->filter(fn($l) => $l->canRenew())->count() > 0)
+                                    {{ $loans->filter(fn($l) => $l->canRenew())->count() }} buku bisa diperpanjang
+                                @else
+                                    Perpanjang pinjaman & reservasi buku
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ route('opac.member.loans') }}" class="px-3 py-1.5 bg-blue-500 text-white text-xs font-medium rounded-lg hover:bg-blue-600 transition flex-shrink-0">
+                        Kelola <i class="fas fa-arrow-right ml-1 text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+            @endif
+
             {{-- Main Content Grid --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 
@@ -728,9 +754,18 @@
                             </h2>
                         </div>
                         <div class="p-2 space-y-1">
-                            <a href="{{ route('opac.home') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                            <a href="{{ route('opac.member.loans') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
                                 <div class="w-7 h-7 bg-blue-50 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-search text-blue-500 text-[10px]"></i>
+                                    <i class="fas fa-sync-alt text-blue-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">Pinjaman Saya</span>
+                                @if($loans->count() > 0)
+                                <span class="ml-auto px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-bold rounded">{{ $loans->count() }}</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('opac.home') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-search text-emerald-500 text-[10px]"></i>
                                 </div>
                                 <span class="text-xs text-gray-700">Cari Buku</span>
                             </a>

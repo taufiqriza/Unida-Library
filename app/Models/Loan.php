@@ -13,7 +13,7 @@ class Loan extends Model
 
     protected $fillable = [
         'branch_id', 'member_id', 'item_id', 'loan_date', 'due_date',
-        'return_date', 'is_returned', 'extend_count'
+        'return_date', 'is_returned', 'extend_count', 'renewal_count', 'max_renewals'
     ];
 
     protected $casts = [
@@ -26,6 +26,7 @@ class Loan extends Model
     public function member(): BelongsTo { return $this->belongsTo(Member::class); }
     public function item(): BelongsTo { return $this->belongsTo(Item::class); }
     public function fines(): HasMany { return $this->hasMany(Fine::class); }
+    public function renewals(): HasMany { return $this->hasMany(LoanRenewal::class); }
 
     public function isOverdue(): bool
     {
@@ -36,5 +37,12 @@ class Loan extends Model
     {
         if (!$this->isOverdue()) return 0;
         return now()->diffInDays($this->due_date);
+    }
+    
+    public function canRenew(): bool
+    {
+        if ($this->is_returned || $this->isOverdue()) return false;
+        $maxRenewals = $this->max_renewals ?? $this->member?->memberType?->max_renewals ?? 2;
+        return ($this->renewal_count ?? 0) < $maxRenewals;
     }
 }

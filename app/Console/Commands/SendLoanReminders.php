@@ -2,53 +2,47 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Loan;
-use App\Services\MemberNotificationService;
+use App\Models\{Loan, Reservation};
+use App\Services\Circulation\{NotificationService, ReservationService};
 use Illuminate\Console\Command;
 
 class SendLoanReminders extends Command
 {
     protected $signature = 'loans:send-reminders';
-    protected $description = 'Send push notifications for loan due dates';
+    protected $description = 'Send due date reminders and overdue notices';
 
-    public function handle(MemberNotificationService $notificationService): int
+    public function handle(NotificationService $notificationService): int
     {
         $this->info('Sending loan reminders...');
 
-        // 3 days before due
-        $dueSoon = Loan::with(['member', 'item.book'])
-            ->where('is_returned', false)
-            ->whereDate('due_date', now()->addDays(3)->toDateString())
-            ->get();
+        // Due date reminders (3 days, 1 day, same day)
+        foreach ([3, 1, 0] as $days) {
+            $loans = Loan::with('member', 'item.book')
+                ->where('is_returned', false)
+                ->whereDate('due_date', now()->addDays($days))
+                ->get();
 
-        $this->info("Found {$dueSoon->count()} loans due in 3 days");
-        foreach ($dueSoon as $loan) {
-            $notificationService->sendLoanDueReminder($loan);
+            foreach ($loans as $loan) {
+                $notificationService->sendDueDateReminder($loan, $days);
+            }
+
+            $this->info("Sent {$loans->count()} reminders for {$days} days left");
         }
 
-        // Due today
-        $dueToday = Loan::with(['member', 'item.book'])
-            ->where('is_returned', false)
-            ->whereDate('due_date', now()->toDateString())
-            ->get();
+        // Overdue notices (1, 3, 7 days overdue)
+        foreach ([1, 3, 7] as $days) {
+            $loans = Loan::with('member', 'item.book')
+                ->where('is_returned', false)
+                ->whereDate('due_date', now()->subDays($days))
+                ->get();
 
-        $this->info("Found {$dueToday->count()} loans due today");
-        foreach ($dueToday as $loan) {
-            $notificationService->sendLoanDueToday($loan);
+            foreach ($loans as $loan) {
+                $notificationService->sendOverdueNotice($loan, $days);
+            }
+
+            $this->info("Sent {$loans->count()} overdue notices for {$days} days overdue");
         }
 
-        // Overdue (1 day)
-        $overdue = Loan::with(['member', 'item.book'])
-            ->where('is_returned', false)
-            ->whereDate('due_date', now()->subDay()->toDateString())
-            ->get();
-
-        $this->info("Found {$overdue->count()} loans overdue 1 day");
-        foreach ($overdue as $loan) {
-            $notificationService->sendLoanOverdue($loan);
-        }
-
-        $this->info('Done!');
         return Command::SUCCESS;
     }
 }

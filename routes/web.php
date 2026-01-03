@@ -88,6 +88,7 @@ Route::middleware('auth:member')->group(function () {
 // Member Area (Livewire - Protected)
 Route::middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->prefix('member')->name('opac.member.')->group(function () {
     Route::get('/', \App\Livewire\Opac\Member\Dashboard::class)->name('dashboard');
+    Route::get('/loans', \App\Livewire\Opac\Member\MyLoans::class)->name('loans');
     Route::get('/submissions', fn() => view('opac.member.submissions'))->name('submissions');
     Route::get('/submit-thesis', fn() => view('opac.member.submit-thesis'))->name('submit-thesis');
     Route::get('/submit-thesis/{submissionId}', fn($id) => view('opac.member.submit-thesis', ['submissionId' => $id]))->name('edit-submission');
