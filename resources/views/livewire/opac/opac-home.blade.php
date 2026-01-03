@@ -63,7 +63,7 @@
                     <i class="fas fa-book text-blue-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['books'] >= 1000 ? round($stats['books']/1000) . 'K' : $stats['books'] }}</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">{{ $stats['books'] >= 1000 ? round($stats['books']/1000) . 'K' : $stats['books'] }}</span><span class="hidden lg:inline">{{ number_format($stats['books']) }}</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.books') }}</div>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                     <i class="fas fa-graduation-cap text-purple-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['etheses'] >= 1000 ? round($stats['etheses']/1000) . 'K' : $stats['etheses'] }}</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">{{ $stats['etheses'] >= 1000 ? round($stats['etheses']/1000) . 'K' : $stats['etheses'] }}</span><span class="hidden lg:inline">{{ number_format($stats['etheses']) }}</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.ethesis') }}</div>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                     <i class="fas fa-book-quran text-emerald-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">8.4K</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">8.4K</span><span class="hidden lg:inline">8,400</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.shamela') }}</div>
                 </div>
             </div>
@@ -93,7 +93,7 @@
                     <i class="fas fa-file-pdf text-orange-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['ebooks'] >= 1000 ? round($stats['ebooks']/1000) . 'K' : $stats['ebooks'] }}</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">{{ $stats['ebooks'] >= 1000 ? round($stats['ebooks']/1000) . 'K' : $stats['ebooks'] }}</span><span class="hidden lg:inline">{{ number_format($stats['ebooks']) }}</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.ebook') }}</div>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                     <i class="fas fa-newspaper text-red-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ $stats['journals'] >= 1000 ? round($stats['journals']/1000) . 'K' : $stats['journals'] }}</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">{{ $stats['journals'] >= 1000 ? round($stats['journals']/1000) . 'K' : $stats['journals'] }}</span><span class="hidden lg:inline">{{ number_format($stats['journals']) }}</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.journals') }}</div>
                 </div>
             </div>
@@ -113,7 +113,7 @@
                     <i class="fas fa-users text-cyan-600 text-xs lg:text-base"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="text-sm lg:text-xl font-bold text-gray-900">{{ ($stats['members'] ?? 12500) >= 1000 ? round(($stats['members'] ?? 12500)/1000) . 'K' : ($stats['members'] ?? 12500) }}</div>
+                    <div class="text-sm lg:text-xl font-bold text-gray-900"><span class="lg:hidden">{{ ($stats['members'] ?? 12500) >= 1000 ? round(($stats['members'] ?? 12500)/1000) . 'K' : ($stats['members'] ?? 12500) }}</span><span class="hidden lg:inline">{{ number_format($stats['members'] ?? 12500) }}</span></div>
                     <div class="text-[8px] lg:text-[10px] text-gray-500">{{ __('opac.stats.members') }}</div>
                 </div>
             </div>
