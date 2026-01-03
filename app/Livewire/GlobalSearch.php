@@ -655,35 +655,21 @@ class GlobalSearch extends Component
 
     protected function getBookCount(?string $search): int
     {
+        $query = Book::withoutGlobalScopes()
+            ->where(function($q) {
+                $q->where('is_opac_visible', true)->orWhereNull('is_opac_visible');
+            });
+            
         if ($search) {
-            try {
-                $searchBuilder = Book::search($search);
-                
-                // Apply same filters as searchBooks
-                if ($this->branchId) {
-                    $searchBuilder->where('branch_id', $this->branchId);
-                }
-                if ($this->language) {
-                    $searchBuilder->where('language', $this->language);
-                }
-                if ($this->yearFrom) {
-                    $searchBuilder->where('year', '>=', (int) $this->yearFrom);
-                }
-                if ($this->yearTo) {
-                    $searchBuilder->where('year', '<=', (int) $this->yearTo);
-                }
-                
-                $result = $searchBuilder->raw();
-                return $result['estimatedTotalHits'] ?? 0;
-            } catch (\Exception $e) {
-                return Book::withoutGlobalScopes()->where('title', 'like', "%{$search}%")->count();
-            }
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$search}%"))
+                  ->orWhere('abstract', 'like', "%{$search}%");
+            });
         }
         
-        // No search - count from DB with filters
-        $query = Book::withoutGlobalScopes();
         if ($this->branchId) {
-            $query->where('branch_id', $this->branchId);
+            $query->whereHas('items', fn($i) => $i->where('branch_id', $this->branchId));
         }
         if ($this->language) {
             $query->where('language', $this->language);
@@ -694,6 +680,7 @@ class GlobalSearch extends Component
         if ($this->yearTo) {
             $query->where('publish_year', '<=', $this->yearTo);
         }
+        
         return $query->count();
     }
 
