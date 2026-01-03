@@ -411,12 +411,23 @@
                             </h2>
                             <a href="{{ route('opac.member.plagiarism.index') }}" class="text-xs text-primary-600 hover:underline">Lihat Semua</a>
                         </div>
+                        
+                        {{-- Banner Maintenance --}}
+                        <div class="mx-4 mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                            <div class="flex items-start gap-2">
+                                <i class="fas fa-tools text-amber-500 mt-0.5"></i>
+                                <div class="text-xs text-amber-700">
+                                    <span class="font-semibold">Layanan dalam pemeliharaan.</span>
+                                    Gunakan opsi cek eksternal di bawah.
+                                </div>
+                            </div>
+                        </div>
+                        
                         @if($latestChecks->count() > 0)
                         <div class="divide-y divide-gray-50">
                             @foreach($latestChecks as $check)
                             <a href="{{ route('opac.member.plagiarism.show', $check) }}" class="group block p-4 hover:bg-gray-50 transition-all duration-200">
                                 <div class="flex items-center gap-4">
-                                    {{-- 1. Score Badge (Fixed Left) --}}
                                     <div class="flex-shrink-0">
                                         <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center transition-transform group-hover:scale-105
                                             @if($check->isCompleted())
@@ -441,36 +452,23 @@
                                             @endif
                                         </div>
                                     </div>
-
-                                    {{-- 2. Main Content (Flex Grow) --}}
                                     <div class="flex-1 min-w-0 py-0.5">
                                         <div class="flex items-center gap-2 mb-1.5">
                                             <h3 class="font-bold text-gray-900 text-sm truncate group-hover:text-primary-600 transition-colors">
                                                 {{ $check->document_title }}
                                             </h3>
-                                            {{-- Status Pill Inline --}}
                                             @if($check->isCompleted())
                                                 @if($check->isPassed())
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">
-                                                    Lolos
-                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">Lolos</span>
                                                 @else
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-100 text-red-700 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">
-                                                    Review
-                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-100 text-red-700 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">Review</span>
                                                 @endif
                                             @elseif($check->isFailed())
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-100 text-red-600 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">
-                                                    Gagal
-                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-red-100 text-red-600 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">Gagal</span>
                                             @elseif($check->isProcessing())
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-primary-100 text-primary-600 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">
-                                                    Proses
-                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-md bg-primary-100 text-primary-600 text-[10px] font-bold tracking-wide uppercase flex-shrink-0">Proses</span>
                                             @endif
                                         </div>
-
-                                        {{-- Meta Row --}}
                                         <div class="flex items-center gap-3 text-xs text-gray-500 font-medium">
                                             <div class="flex items-center gap-1.5">
                                                 <i class="far fa-calendar-alt text-gray-400"></i>
@@ -481,15 +479,8 @@
                                                 <i class="far fa-clock text-gray-400"></i>
                                                 {{ $check->created_at->format('H:i') }}
                                             </div>
-                                            <div class="w-1 h-1 rounded-full bg-gray-300"></div>
-                                            <div class="flex items-center gap-1.5 text-primary-600/80">
-                                                <img src="{{ asset('images/certificates/logo-ithenticate.png') }}" class="h-3.5 w-auto object-contain opacity-80" alt="iThenticate" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'">
-                                                <span style="display:none" class="font-bold">iThenticate</span>
-                                            </div>
                                         </div>
                                     </div>
-
-                                    {{-- 3. Action (Fixed Right) --}}
                                     <div class="flex-shrink-0 pl-2">
                                         @if($check->isCompleted())
                                             <div class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 border border-gray-100 group-hover:bg-primary-50 group-hover:text-primary-600 group-hover:border-primary-100 transition-all shadow-sm">
@@ -510,18 +501,11 @@
                                 <div class="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <i class="fas fa-search-plus text-teal-300 text-xl"></i>
                                 </div>
-                                <p class="text-sm text-gray-500 mb-3">Belum ada riwayat cek plagiasi</p>
-                                <a href="{{ route('opac.member.plagiarism.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 transition">
-                                    <i class="fas fa-plus"></i>
-                                    Cek Sekarang
-                                </a>
+                                <p class="text-sm text-gray-500">Belum ada riwayat cek plagiasi</p>
                             </div>
                         @endif
                     </div>
                     @endif
-
-
-
 
                     {{-- Submission Tugas Akhir --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

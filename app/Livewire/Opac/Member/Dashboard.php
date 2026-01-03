@@ -81,7 +81,9 @@ class Dashboard extends Component
 
     public function render()
     {
-        return view('livewire.opac.member.dashboard')
+        $latestChecks = PlagiarismCheck::where('member_id', $this->member->id)->latest()->take(3)->get();
+        
+        return view('livewire.opac.member.dashboard', compact('latestChecks'))
             ->layout('components.opac.layout', ['title' => 'Dashboard Member']);
     }
 }
