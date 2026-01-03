@@ -32,6 +32,9 @@
                         <i class="fas fa-exchange-alt text-sm"></i>
                     </a>
                     @endif
+                    <button wire:click="$set('showDigitalCard', true)" class="w-9 h-9 bg-amber-500/80 text-white rounded-full flex items-center justify-center hover:bg-amber-500 transition" title="Kartu Digital">
+                        <i class="fas fa-id-card text-sm"></i>
+                    </button>
                     <a href="{{ route('opac.member.settings') }}" class="w-9 h-9 bg-white/10 text-white rounded-full flex items-center justify-center hover:bg-white/20 transition">
                         <i class="fas fa-cog text-sm"></i>
                     </a>
@@ -106,6 +109,9 @@
                             <a href="{{ route('opac.member.settings') }}" class="group bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-white/20 shadow-sm backdrop-blur-md h-8">
                                 <i class="fas fa-cog group-hover:rotate-90 transition-transform duration-500"></i> <span class="hidden sm:inline">Pengaturan</span>
                             </a>
+                            <button wire:click="$set('showDigitalCard', true)" class="bg-amber-500/80 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-amber-400/50 shadow-sm h-8">
+                                <i class="fas fa-id-card"></i> <span class="hidden sm:inline">Kartu</span>
+                            </button>
                             <a href="{{ route('opac.logout') }}" class="px-3 py-1.5 bg-white/10 hover:bg-red-500/80 text-white rounded-xl transition flex items-center justify-center gap-2 border border-transparent hover:border-red-400 text-xs font-medium h-8">
                                 <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Keluar</span>
                             </a>
