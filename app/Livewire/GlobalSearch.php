@@ -181,56 +181,122 @@ class GlobalSearch extends Component
     // Computed: Results
     public function getResultsProperty(): Collection
     {
+        // For single resource types, use DB pagination directly
+        if ($this->resourceType === 'book') {
+            return $this->searchBooks();
+        }
+        
+        if ($this->resourceType === 'ethesis') {
+            return $this->searchEthesesPaginated();
+        }
+
+        // For 'all' and other types, merge and slice
         $results = collect();
         $offset = ($this->page - 1) * $this->perPage;
 
-        if ($this->resourceType === 'all' || $this->resourceType === 'book') {
+        if ($this->resourceType === 'all') {
             $results = $results->merge($this->searchBooks());
-        }
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
+            $results = $results->merge($this->searchEbooks());
+            $results = $results->merge($this->searchEtheses());
+            $results = $results->merge($this->searchJournals());
+            if ($this->query) {
+                $results = $results->merge($this->searchExternal());
+                $results = $results->merge($this->searchShamela());
+            }
+        } elseif ($this->resourceType === 'ebook') {
             if (!$this->ebookSource || $this->ebookSource === 'local') {
                 $results = $results->merge($this->searchEbooks());
             }
             if (!$this->ebookSource || $this->ebookSource === 'kubuku') {
                 $results = $results->merge($this->searchKubuku());
             }
-        }
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'ethesis') {
-            $results = $results->merge($this->searchEtheses());
-        }
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
+        } elseif ($this->resourceType === 'journal') {
             $results = $results->merge($this->searchJournals());
-        }
-
-        if (($this->resourceType === 'all' || $this->resourceType === 'external') && $this->query) {
+        } elseif ($this->resourceType === 'external' && $this->query) {
             $results = $results->merge($this->searchExternal());
-        }
-
-        if (($this->resourceType === 'all' || $this->resourceType === 'shamela') && $this->query) {
+        } elseif ($this->resourceType === 'shamela' && $this->query) {
             $results = $results->merge($this->searchShamela());
         }
 
-        // Apply sorting
         $sorted = $this->applySorting($results);
-        
-        // Safe pagination - ensure we don't go beyond available results
-        $total = $sorted->count();
-        $maxPage = max(1, ceil($total / $this->perPage));
-        
-        if ($this->page > $maxPage) {
-            $this->page = $maxPage;
-            $offset = ($this->page - 1) * $this->perPage;
-        }
-        
         return $sorted->slice($offset, $this->perPage)->values();
+    }
+    
+    protected function searchEthesesPaginated(): Collection
+    {
+        $query = Ethesis::query()
+            ->where('is_public', true)
+            ->with('department.faculty');
+
+        $searchTerm = $this->query;
+
+        if ($searchTerm) {
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                  ->orWhere('author', 'like', "%{$searchTerm}%")
+                  ->orWhere('nim', 'like', "%{$searchTerm}%")
+                  ->orWhere('abstract', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($this->facultyId) {
+            $query->whereHas('department', fn($d) => $d->where('faculty_id', $this->facultyId));
+        }
+        if ($this->departmentId) {
+            $query->where('department_id', $this->departmentId);
+        }
+        if ($this->thesisType) {
+            $query->where('type', $this->thesisType);
+        }
+        if ($this->yearFrom) {
+            $query->where('year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('year', '<=', $this->yearTo);
+        }
+
+        // Apply sorting
+        if ($this->sortBy === 'newest' || $this->sortBy === 'relevance') {
+            $query->orderByDesc('year')->orderByDesc('created_at');
+        } elseif ($this->sortBy === 'oldest') {
+            $query->orderBy('year');
+        } elseif ($this->sortBy === 'title_asc') {
+            $query->orderBy('title');
+        } elseif ($this->sortBy === 'title_desc') {
+            $query->orderByDesc('title');
+        }
+
+        $offset = ($this->page - 1) * $this->perPage;
+        
+        return $query->skip($offset)->take($this->perPage)->get()->map(function($thesis) use ($searchTerm) {
+            return [
+                'type' => 'ethesis',
+                'id' => $thesis->id,
+                'title' => $thesis->title,
+                'title_highlighted' => $this->highlightText($thesis->title, $searchTerm),
+                'author' => $thesis->author,
+                'author_highlighted' => $this->highlightText($thesis->author, $searchTerm),
+                'cover' => $thesis->cover_url,
+                'year' => $thesis->year,
+                'badge' => $thesis->source_type === 'repo' ? 'Repo' : $thesis->getTypeLabel(),
+                'badgeColor' => $thesis->source_type === 'repo' ? 'indigo' : 'purple',
+                'icon' => 'fa-graduation-cap',
+                'url' => route('opac.ethesis.show', $thesis->id),
+                'description' => $thesis->abstract ? $this->highlightText(\Str::limit(strip_tags($thesis->abstract), 120), $searchTerm) : null,
+                'relevance_score' => 0,
+                'sort_year' => $thesis->year ?? 0,
+                'meta' => [
+                    'department' => $thesis->department?->name,
+                    'faculty' => $thesis->department?->faculty?->name,
+                    'nim' => $thesis->nim,
+                ],
+            ];
+        });
     }
 
     public function getTotalResultsProperty(): int
     {
-        // Calculate actual count based on current filters
+        // Calculate actual count based on current filters - no cap
         $total = 0;
         
         if ($this->resourceType === 'all' || $this->resourceType === 'book') {
@@ -246,7 +312,7 @@ class GlobalSearch extends Component
             $total += $this->getJournalCount($this->query);
         }
         
-        return min($total, 1000); // Cap at 1000 for performance
+        return $total;
     }
     
     protected function getFilteredBookCount(): int
@@ -324,10 +390,8 @@ class GlobalSearch extends Component
             });
 
         $searchTerm = $this->query;
-        $relevanceScores = [];
 
         if ($searchTerm) {
-            // Prioritized search: title > author > abstract
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
                   ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"))
@@ -335,7 +399,6 @@ class GlobalSearch extends Component
             });
         }
 
-        // Apply filters
         if ($this->branchId) {
             $query->whereHas('items', fn($i) => $i->where('branch_id', $this->branchId));
         }
@@ -355,18 +418,32 @@ class GlobalSearch extends Component
             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
         }
 
-        // Default order by newest
-        $query->orderByDesc('publish_year')->orderByDesc('created_at');
+        // Apply sorting at DB level
+        if ($this->sortBy === 'newest' || $this->sortBy === 'relevance') {
+            $query->orderByDesc('publish_year')->orderByDesc('created_at');
+        } elseif ($this->sortBy === 'oldest') {
+            $query->orderBy('publish_year')->orderBy('created_at');
+        } elseif ($this->sortBy === 'title_asc') {
+            $query->orderBy('title');
+        } elseif ($this->sortBy === 'title_desc') {
+            $query->orderByDesc('title');
+        }
 
-        return $query->limit(1000)->get()->map(function($book) use ($searchTerm) {
-            // Calculate relevance score for sorting
+        // For book-only view, use DB pagination
+        if ($this->resourceType === 'book') {
+            $offset = ($this->page - 1) * $this->perPage;
+            $books = $query->skip($offset)->take($this->perPage)->get();
+        } else {
+            $books = $query->limit(200)->get(); // Limit for 'all' view
+        }
+
+        return $books->map(function($book) use ($searchTerm) {
             $score = 0;
             if ($searchTerm) {
                 $titleLower = strtolower($book->title);
                 $searchLower = strtolower($searchTerm);
                 if (str_starts_with($titleLower, $searchLower)) $score += 100;
                 elseif (str_contains($titleLower, $searchLower)) $score += 50;
-                if ($book->author_names && str_contains(strtolower($book->author_names), $searchLower)) $score += 30;
             }
             
             return [
