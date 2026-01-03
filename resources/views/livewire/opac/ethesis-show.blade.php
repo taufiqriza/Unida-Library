@@ -187,7 +187,7 @@
                                     </div>
                                 </div>
                                 
-                                {{-- PDF Viewer --}}
+                                {{-- PDF Viewer via Google Docs (no download option) --}}
                                 <iframe 
                                     x-ref="pdfFrame"
                                     x-show="!error"
@@ -195,10 +195,8 @@
                                     x-on:error="onFrameError()"
                                     class="w-full h-full"
                                     frameborder="0"
-                                    oncontextmenu="return false;">
+                                    sandbox="allow-scripts allow-same-origin">
                                 </iframe>
-                                {{-- Overlay to prevent right-click --}}
-                                <div class="absolute inset-0 z-[1]" oncontextmenu="return false;" style="pointer-events: none;"></div>
                             </div>
                             
                             {{-- Modal Footer --}}
@@ -268,7 +266,7 @@
                                         }
                                     }, 15000);
                                     
-                                    frame.src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
+                                    frame.src = 'https://docs.google.com/viewer?url=' + encodeURIComponent(this.currentUrl) + '&embedded=true';
                                 },
                                 
                                 onFrameLoad() {
