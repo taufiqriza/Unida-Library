@@ -255,12 +255,11 @@ class GlobalSearch extends Component
         $relevanceScores = [];
 
         if ($searchTerm) {
-            // Prioritized search: title > author > abstract/keywords
+            // Prioritized search: title > author > abstract
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
                   ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"))
-                  ->orWhere('abstract', 'like', "%{$searchTerm}%")
-                  ->orWhere('keywords', 'like', "%{$searchTerm}%");
+                  ->orWhere('abstract', 'like', "%{$searchTerm}%");
             });
         }
 
