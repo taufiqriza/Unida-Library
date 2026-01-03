@@ -30,7 +30,7 @@ class CertificateGenerator
         $data = [
             'check' => $this->check,
             'member' => $this->check->member,
-            'qrCode' => $this->generateQrCode($verifyUrl, 80),
+            'qrCode' => $this->generateQrCode($verifyUrl, 70),
             'verifyUrl' => $verifyUrl,
             'institutionName' => Setting::get('app_name', 'Perpustakaan UNIDA Gontor'),
             'institutionLogo' => $this->getOptimizedLogo(),
@@ -38,8 +38,6 @@ class CertificateGenerator
             'issuedDate' => now()->translatedFormat('d F Y'),
             'isPassed' => $this->check->isPassed(),
             'passThreshold' => (float) Setting::get('plagiarism_pass_threshold', 25),
-            'signatureQr' => $this->generateQrCode("SIG:{$headLibrarian}:" . now()->format('Ymd'), 50),
-            'downloadQr' => $this->check->external_report_url ? $this->generateQrCode($this->check->external_report_url, 60) : null,
             'hasArabicTitle' => (bool) preg_match('/[\x{0600}-\x{06FF}]/u', $this->check->document_title),
         ];
 
