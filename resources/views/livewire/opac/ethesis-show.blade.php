@@ -194,8 +194,11 @@
                                     x-on:load="onFrameLoad()"
                                     x-on:error="onFrameError()"
                                     class="w-full h-full"
-                                    frameborder="0">
+                                    frameborder="0"
+                                    oncontextmenu="return false;">
                                 </iframe>
+                                {{-- Overlay to prevent right-click --}}
+                                <div class="absolute inset-0 z-[1]" oncontextmenu="return false;" style="pointer-events: none;"></div>
                             </div>
                             
                             {{-- Modal Footer --}}
