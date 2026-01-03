@@ -96,28 +96,7 @@ class OpacHome extends Component
 
     protected function getEthesisCount(): int
     {
-        return Cache::remember('ethesis_total_count', 86400, function () {
-            try {
-                $response = Http::timeout(10)->get('https://repo.unida.gontor.ac.id/cgi/oai2', [
-                    'verb' => 'ListIdentifiers',
-                    'metadataPrefix' => 'oai_dc',
-                    'set' => '74797065733D746865736973',
-                ]);
-                
-                if ($response->successful()) {
-                    $body = $response->body();
-                    $firstPageCount = substr_count($body, '<identifier>');
-                    
-                    if (preg_match('/offset%3D(\d+)/', $body, $matches)) {
-                        return (int) $matches[1];
-                    }
-                    
-                    return $firstPageCount;
-                }
-            } catch (\Exception $e) {
-                // Fallback to local count
-            }
-            
+        return Cache::remember('ethesis_total_count', 3600, function () {
             return Ethesis::count();
         });
     }
