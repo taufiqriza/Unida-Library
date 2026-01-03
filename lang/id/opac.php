@@ -1174,6 +1174,7 @@ return [
         'close' => 'Tutup',
         'full_text' => 'Full Text (Lengkap)',
         'members_only' => 'Hanya untuk anggota perpustakaan',
+        'access_granted' => 'Akses tersedia',
         'not_available' => 'Tidak tersedia',
         'login' => 'Login',
         'fulltext_info' => 'Untuk mengakses full text, silakan login sebagai anggota perpustakaan. Jika belum terdaftar, kunjungi perpustakaan untuk mendaftar.',
