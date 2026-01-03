@@ -190,7 +190,7 @@ class CirculationTransaction extends Component
         if (strlen($value) >= 2) {
             $branchId = auth()->user()->branch_id;
             $query = Item::withoutGlobalScopes()
-                ->with('book')
+                ->with('book', 'location')
                 ->whereDoesntHave('loans', fn($q) => $q->where('is_returned', false))
                 ->where(function($q) use ($value) {
                     $q->where('barcode', 'like', "%{$value}%")
@@ -198,7 +198,10 @@ class CirculationTransaction extends Component
                 });
             
             if ($branchId) {
-                $query->where('branch_id', $branchId);
+                $query->where(function($q) use ($branchId) {
+                    $q->where('branch_id', $branchId)
+                      ->orWhereHas('location', fn($l) => $l->where('branch_id', $branchId));
+                });
             }
             
             $this->itemSuggestions = $query->limit(8)->get();
@@ -206,8 +209,6 @@ class CirculationTransaction extends Component
             $this->itemSuggestions = [];
         }
     }
-
-    public function selectItem($itemId): void
     {
         $this->itemBarcode = Item::find($itemId)?->barcode ?? '';
         $this->itemSuggestions = [];
@@ -247,8 +248,9 @@ class CirculationTransaction extends Component
         }
 
         $currentBranchId = auth()->user()->branch_id;
-        if ($currentBranchId && $item->branch_id !== $currentBranchId) {
-            $itemBranch = $item->branch?->name ?? "ID: {$item->branch_id}";
+        $itemBranchId = $item->location?->branch_id ?? $item->branch_id;
+        if ($currentBranchId && $itemBranchId !== $currentBranchId) {
+            $itemBranch = $item->location?->branch?->name ?? $item->branch?->name ?? "ID: {$itemBranchId}";
             $this->alert('error', 'Item milik cabang lain', "Item: {$itemBranch}");
             return;
         }
