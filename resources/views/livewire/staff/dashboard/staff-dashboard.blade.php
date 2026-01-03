@@ -392,7 +392,7 @@
                     @else
                     <span class="px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-lg">Dipinjam</span>
                     @endif
-                    <p class="text-[10px] text-gray-400 mt-1">{{ $loan->loan_date?->diffForHumans(short: true) }}</p>
+                    <p class="text-[10px] text-gray-400 mt-1">{{ $loan->created_at?->diffForHumans(short: true) }}</p>
                 </div>
             </div>
             @empty
@@ -429,7 +429,7 @@
                         @else
                         <span class="px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-700 rounded-full">Dipinjam</span>
                         @endif
-                        <p class="text-[10px] text-gray-400 mt-1">{{ $loan->loan_date?->format('d/m H:i') }}</p>
+                        <p class="text-[10px] text-gray-400 mt-1">{{ $loan->created_at?->format('d/m H:i') }}</p>
                     </div>
                 </div>
                 @empty
