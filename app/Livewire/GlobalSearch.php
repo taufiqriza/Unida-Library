@@ -278,7 +278,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('publish_year')->orderByDesc('created_at');
 
-        return $query->limit(500)->get()->map(function($book) use ($searchTerm) {
+        return $query->limit(1000)->get()->map(function($book) use ($searchTerm) {
             // Calculate relevance score for sorting
             $score = 0;
             if ($searchTerm) {
@@ -351,7 +351,7 @@ class GlobalSearch extends Component
             $query->where('language', $this->language);
         }
 
-        return $query->limit(500)->get()->map(fn($ebook) => [
+        return $query->limit(1000)->get()->map(fn($ebook) => [
             'type' => 'ebook',
             'id' => $ebook->id,
             'title' => $ebook->title,
@@ -409,7 +409,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('year')->orderByDesc('created_at');
 
-        return $query->limit(500)->get()->map(function($thesis) use ($searchTerm) {
+        return $query->limit(1000)->get()->map(function($thesis) use ($searchTerm) {
             $score = 0;
             if ($searchTerm) {
                 $titleLower = strtolower($thesis->title);
@@ -509,7 +509,7 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->orderByDesc('published_at')->limit(500)->get()->map(function($article) {
+        return $query->orderByDesc('published_at')->limit(1000)->get()->map(function($article) {
             $typeLabels = [
                 'article' => 'Artikel',
                 'conference' => 'Prosiding',
