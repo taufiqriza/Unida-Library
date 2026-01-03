@@ -162,14 +162,6 @@
                 </div>
             </div>
 
-            {{-- Quick Actions --}}
-            <div class="flex gap-2 mb-3 lg:mb-4 overflow-x-auto pb-1 -mx-3 px-3 lg:mx-0 lg:px-0">
-                <button wire:click="$set('showDigitalCard', true)" class="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition flex items-center gap-2">
-                    <i class="fas fa-id-card"></i> Kartu Digital
-                </button>
-            </div>
-
-
             {{-- Main Content Grid --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 
