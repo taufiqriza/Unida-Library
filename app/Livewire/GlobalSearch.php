@@ -9,7 +9,6 @@ use App\Models\Department;
 use App\Models\Ebook;
 use App\Models\Ethesis;
 use App\Models\Faculty;
-use App\Models\News;
 use App\Models\Subject;
 use App\Models\JournalSource;
 use App\Services\OpenLibraryService;
@@ -181,41 +180,48 @@ class GlobalSearch extends Component
     // Computed: Results
     public function getResultsProperty(): Collection
     {
-        $results = collect();
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'book') {
-            $results = $results->merge($this->searchBooks());
+        // Single resource types - already paginated from DB/Meilisearch
+        if ($this->resourceType === 'book') {
+            return $this->searchBooks();
         }
 
-        if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
+        // For other types, merge and slice
+        $results = collect();
+        $offset = ($this->page - 1) * $this->perPage;
+
+        if ($this->resourceType === 'all') {
+            $results = $results->merge($this->searchBooks());
             if (!$this->ebookSource || $this->ebookSource === 'local') {
                 $results = $results->merge($this->searchEbooks());
             }
             if (!$this->ebookSource || $this->ebookSource === 'kubuku') {
                 $results = $results->merge($this->searchKubuku());
             }
-        }
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'ethesis') {
             $results = $results->merge($this->searchEtheses());
-        }
-
-        if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
             $results = $results->merge($this->searchJournals());
-        }
-
-        if (($this->resourceType === 'all' || $this->resourceType === 'external') && $this->query) {
+            if ($this->query) {
+                $results = $results->merge($this->searchExternal());
+                $results = $results->merge($this->searchShamela());
+            }
+        } elseif ($this->resourceType === 'ebook') {
+            if (!$this->ebookSource || $this->ebookSource === 'local') {
+                $results = $results->merge($this->searchEbooks());
+            }
+            if (!$this->ebookSource || $this->ebookSource === 'kubuku') {
+                $results = $results->merge($this->searchKubuku());
+            }
+        } elseif ($this->resourceType === 'ethesis') {
+            $results = $results->merge($this->searchEtheses());
+        } elseif ($this->resourceType === 'journal') {
+            $results = $results->merge($this->searchJournals());
+        } elseif ($this->resourceType === 'external' && $this->query) {
             $results = $results->merge($this->searchExternal());
-        }
-
-        if (($this->resourceType === 'all' || $this->resourceType === 'shamela') && $this->query) {
+        } elseif ($this->resourceType === 'shamela' && $this->query) {
             $results = $results->merge($this->searchShamela());
         }
 
-        // Apply sorting then paginate
         $sorted = $this->applySorting($results);
-        
-        return $sorted->slice(($this->page - 1) * $this->perPage, $this->perPage)->values();
+        return $sorted->slice($offset, $this->perPage)->values();
     }
 
     public function getTotalResultsProperty(): int
@@ -240,18 +246,59 @@ class GlobalSearch extends Component
             });
 
         $searchTerm = $this->query;
-        $relevanceScores = [];
+        $offset = ($this->page - 1) * $this->perPage;
 
+        // Use Meilisearch for search with pagination
         if ($searchTerm) {
-            // Prioritized search: title > author > abstract
+            try {
+                $searchBuilder = Book::search($searchTerm);
+                
+                // Meilisearch handles pagination natively
+                $searchResults = $searchBuilder
+                    ->query(function ($query) {
+                        $query->with(['authors', 'publisher', 'items.branch'])
+                              ->withCount('items')
+                              ->where(function($q) {
+                                  $q->where('is_opac_visible', true)->orWhereNull('is_opac_visible');
+                              });
+                        
+                        // Apply DB-level filters that Meilisearch can't handle
+                        if ($this->branchId) {
+                            $query->whereHas('items', fn($i) => $i->where('branch_id', $this->branchId));
+                        }
+                        if ($this->language) {
+                            $query->where('language', $this->language);
+                        }
+                        if ($this->yearFrom) {
+                            $query->where('publish_year', '>=', $this->yearFrom);
+                        }
+                        if ($this->yearTo) {
+                            $query->where('publish_year', '<=', $this->yearTo);
+                        }
+                        if (!empty($this->selectedSubjects)) {
+                            $query->whereHas('subjects', fn($s) => $s->whereIn('subjects.id', $this->selectedSubjects));
+                        }
+                        if ($this->collectionTypeId) {
+                            $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
+                        }
+                    })
+                    ->paginate($this->perPage, 'page', $this->page);
+                
+                return collect($searchResults->items())->map(fn($book) => $this->formatBook($book, $searchTerm));
+            } catch (\Exception $e) {
+                // Fallback to DB search if Meilisearch fails
+                \Log::warning('Meilisearch failed, using DB fallback: ' . $e->getMessage());
+            }
+        }
+
+        // DB fallback or no search term - use DB pagination
+        if ($searchTerm) {
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"))
-                  ->orWhere('abstract', 'like', "%{$searchTerm}%");
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$searchTerm}%"));
             });
         }
 
-        // Apply filters
         if ($this->branchId) {
             $query->whereHas('items', fn($i) => $i->where('branch_id', $this->branchId));
         }
@@ -271,45 +318,38 @@ class GlobalSearch extends Component
             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
         }
 
-        // Default order by newest
         $query->orderByDesc('publish_year')->orderByDesc('created_at');
 
-        return $query->get()->map(function($book) use ($searchTerm) {
-            // Calculate relevance score for sorting
-            $score = 0;
-            if ($searchTerm) {
-                $titleLower = strtolower($book->title);
-                $searchLower = strtolower($searchTerm);
-                if (str_starts_with($titleLower, $searchLower)) $score += 100;
-                elseif (str_contains($titleLower, $searchLower)) $score += 50;
-                if ($book->author_names && str_contains(strtolower($book->author_names), $searchLower)) $score += 30;
-            }
-            
-            return [
-                'type' => 'book',
-                'id' => $book->id,
-                'title' => $book->title,
-                'title_highlighted' => $this->highlightText($book->title, $searchTerm),
-                'author' => $book->author_names ?: '-',
-                'author_highlighted' => $this->highlightText($book->author_names ?: '-', $searchTerm),
-                'cover' => $book->cover_url,
-                'year' => $book->publish_year,
-                'publisher' => $book->publisher?->name,
-                'badge' => $book->items_count . ' eksemplar',
-                'badgeColor' => 'blue',
-                'icon' => 'fa-book',
-                'url' => route('opac.catalog.show', $book->id),
-                'description' => $book->abstract ? $this->highlightText(\Str::limit(strip_tags($book->abstract), 120), $searchTerm) : null,
-                'relevance_score' => $score,
-                'sort_year' => $book->publish_year ?? 0,
-                'meta' => [
-                    'isbn' => $book->isbn,
-                    'call_number' => $book->call_number,
-                    'branch' => $book->items->first()?->branch?->name,
-                    'branches' => $book->items->pluck('branch.name')->unique()->filter()->values()->toArray(),
-                ],
-            ];
-        });
+        // DB-level pagination
+        return $query->skip($offset)->take($this->perPage)->get()
+            ->map(fn($book) => $this->formatBook($book, $searchTerm));
+    }
+    
+    protected function formatBook($book, ?string $searchTerm = null): array
+    {
+        return [
+            'type' => 'book',
+            'id' => $book->id,
+            'title' => $book->title,
+            'title_highlighted' => $this->highlightText($book->title, $searchTerm),
+            'author' => $book->author_names ?: '-',
+            'author_highlighted' => $this->highlightText($book->author_names ?: '-', $searchTerm),
+            'cover' => $book->cover_url,
+            'year' => $book->publish_year,
+            'publisher' => $book->publisher?->name,
+            'badge' => $book->items_count . ' eksemplar',
+            'badgeColor' => 'blue',
+            'icon' => 'fa-book',
+            'url' => route('opac.catalog.show', $book->id),
+            'description' => $book->abstract ? $this->highlightText(\Str::limit(strip_tags($book->abstract), 120), $searchTerm) : null,
+            'relevance_score' => 0,
+            'sort_year' => $book->publish_year ?? 0,
+            'meta' => [
+                'isbn' => $book->isbn,
+                'call_number' => $book->call_number,
+                'branch' => $book->items->first()?->branch?->name,
+            ],
+        ];
     }
 
     /**
@@ -439,46 +479,6 @@ class GlobalSearch extends Component
                 ],
             ];
         });
-    }
-
-    protected function searchNews(): Collection
-    {
-        $query = News::query()
-            ->published()
-            ->with('category');
-
-        if ($this->query) {
-            $searchTerm = $this->query;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('title', 'like', "%{$searchTerm}%")
-                  ->orWhere('excerpt', 'like', "%{$searchTerm}%")
-                  ->orWhere('content', 'like', "%{$searchTerm}%");
-            });
-        }
-
-        if ($this->yearFrom) {
-            $query->whereYear('published_at', '>=', $this->yearFrom);
-        }
-        if ($this->yearTo) {
-            $query->whereYear('published_at', '<=', $this->yearTo);
-        }
-
-        return $query->limit(50)->get()->map(fn($news) => [
-            'type' => 'news',
-            'id' => $news->id,
-            'title' => $news->title,
-            'author' => $news->author?->name ?? 'Admin',
-            'cover' => $news->image_url,
-            'year' => $news->published_at?->format('d M Y'),
-            'badge' => $news->category?->name ?? 'Berita',
-            'badgeColor' => 'green',
-            'icon' => 'fa-newspaper',
-            'url' => route('opac.news.show', $news->slug),
-            'description' => $news->excerpt ? \Str::limit(strip_tags($news->excerpt), 120) : null,
-            'meta' => [
-                'views' => $news->views,
-            ],
-        ]);
     }
 
     protected function searchJournals(): Collection
@@ -700,15 +700,6 @@ class GlobalSearch extends Component
         if ($search) {
             $query->where(fn($q) => $q->where('title', 'like', "%{$search}%")
                 ->orWhere('author', 'like', "%{$search}%"));
-        }
-        return $query->count();
-    }
-
-    protected function getNewsCount(?string $search): int
-    {
-        $query = News::published();
-        if ($search) {
-            $query->where('title', 'like', "%{$search}%");
         }
         return $query->count();
     }
