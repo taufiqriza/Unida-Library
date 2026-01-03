@@ -1056,4 +1056,10 @@
 
     {{-- Advanced Search Modal Component --}}
     <x-opac.advanced-search-modal />
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.SearchSplash) SearchSplash.hide();
+    });
+    </script>
 </div>

@@ -1254,6 +1254,9 @@
     {{-- Support Chat Widget --}}
     @livewire('member.support-chat')
     
+    {{-- Search Splash Loading --}}
+    <x-opac.search-splash />
+    
     @livewireScripts
 </body>
 </html>

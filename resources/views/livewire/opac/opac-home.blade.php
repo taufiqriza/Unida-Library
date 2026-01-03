@@ -10,7 +10,7 @@
             <p class="text-blue-200 text-sm lg:text-base mb-6">{{ __('opac.university') }}</p>
             
             <!-- Search Box - Powerful Rounded Full Design -->
-            <form id="searchForm" action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto">
+            <form id="searchForm" action="{{ route('opac.search') }}" method="GET" class="max-w-2xl mx-auto" onsubmit="return handleSearchSubmit(this)">
                 <div class="relative group">
                     <!-- Glow effect -->
                     <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 via-white to-blue-400 rounded-full opacity-30 group-hover:opacity-50 blur-lg transition duration-500"></div>
@@ -44,10 +44,10 @@
                 <!-- Quick search tags -->
                 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
                     <span class="text-blue-200 text-xs">{{ __('opac.homepage.popular_tags') }}:</span>
-                    <a href="{{ route('opac.search') }}?q=islam" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
-                    <a href="{{ route('opac.search') }}?q=ekonomi" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
-                    <a href="{{ route('opac.search') }}?q=pendidikan" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
-                    <a href="{{ route('opac.search') }}?q=hukum" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
+                    <a href="{{ route('opac.search') }}?q=islam" onclick="SearchSplash?.show('islam')" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Islam</a>
+                    <a href="{{ route('opac.search') }}?q=ekonomi" onclick="SearchSplash?.show('ekonomi')" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Ekonomi</a>
+                    <a href="{{ route('opac.search') }}?q=pendidikan" onclick="SearchSplash?.show('pendidikan')" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition">Pendidikan</a>
+                    <a href="{{ route('opac.search') }}?q=hukum" onclick="SearchSplash?.show('hukum')" class="px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-full transition hidden sm:inline-block">Hukum</a>
                 </div>
             </form>
         </div>
@@ -687,4 +687,14 @@
 
     <!-- Advanced Search Modal Component -->
     <x-opac.advanced-search-modal />
+    
+    <script>
+    function handleSearchSubmit(form) {
+        const query = form.querySelector('input[name="q"]').value.trim();
+        if (query && window.SearchSplash) {
+            SearchSplash.show(query);
+        }
+        return true;
+    }
+    </script>
 </div>
