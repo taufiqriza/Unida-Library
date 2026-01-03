@@ -182,6 +182,7 @@ class GlobalSearch extends Component
     public function getResultsProperty(): Collection
     {
         $results = collect();
+        $offset = ($this->page - 1) * $this->perPage;
 
         if ($this->resourceType === 'all' || $this->resourceType === 'book') {
             $results = $results->merge($this->searchBooks());
@@ -212,27 +213,98 @@ class GlobalSearch extends Component
             $results = $results->merge($this->searchShamela());
         }
 
-        // Store total for pagination before slicing
-        $this->actualTotal = $results->count();
-
-        // Apply sorting then paginate
+        // Apply sorting
         $sorted = $this->applySorting($results);
         
-        // Ensure page is within bounds
-        $maxPage = max(1, ceil($this->actualTotal / $this->perPage));
+        // Safe pagination - ensure we don't go beyond available results
+        $total = $sorted->count();
+        $maxPage = max(1, ceil($total / $this->perPage));
+        
         if ($this->page > $maxPage) {
             $this->page = $maxPage;
+            $offset = ($this->page - 1) * $this->perPage;
         }
         
-        return $sorted->slice(($this->page - 1) * $this->perPage, $this->perPage)->values();
+        return $sorted->slice($offset, $this->perPage)->values();
     }
-
-    protected int $actualTotal = 0;
 
     public function getTotalResultsProperty(): int
     {
-        // Use actual count from results, not estimated counts
-        return $this->actualTotal ?: ($this->counts[$this->resourceType] ?? 0);
+        // Calculate actual count based on current filters
+        $total = 0;
+        
+        if ($this->resourceType === 'all' || $this->resourceType === 'book') {
+            $total += $this->getFilteredBookCount();
+        }
+        if ($this->resourceType === 'all' || $this->resourceType === 'ebook') {
+            $total += $this->getEbookCount($this->query);
+        }
+        if ($this->resourceType === 'all' || $this->resourceType === 'ethesis') {
+            $total += $this->getFilteredEthesisCount();
+        }
+        if ($this->resourceType === 'all' || $this->resourceType === 'journal') {
+            $total += $this->getJournalCount($this->query);
+        }
+        
+        return min($total, 1000); // Cap at 1000 for performance
+    }
+    
+    protected function getFilteredBookCount(): int
+    {
+        $query = Book::withoutGlobalScopes()
+            ->where(function($q) {
+                $q->where('is_opac_visible', true)->orWhereNull('is_opac_visible');
+            });
+            
+        if ($this->query) {
+            $query->where(function($q) {
+                $q->where('title', 'like', "%{$this->query}%")
+                  ->orWhereHas('authors', fn($a) => $a->where('name', 'like', "%{$this->query}%"));
+            });
+        }
+        if ($this->branchId) {
+            $query->whereHas('items', fn($i) => $i->where('branch_id', $this->branchId));
+        }
+        if ($this->language) {
+            $query->where('language', $this->language);
+        }
+        if ($this->yearFrom) {
+            $query->where('publish_year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('publish_year', '<=', $this->yearTo);
+        }
+        
+        return $query->count();
+    }
+    
+    protected function getFilteredEthesisCount(): int
+    {
+        $query = Ethesis::where('is_public', true);
+        
+        if ($this->query) {
+            $query->where(function($q) {
+                $q->where('title', 'like', "%{$this->query}%")
+                  ->orWhere('author', 'like', "%{$this->query}%");
+            });
+        }
+        if ($this->facultyId) {
+            $query->whereHas('department', fn($d) => $d->where('faculty_id', $this->facultyId));
+        }
+        if ($this->departmentId) {
+            $query->where('department_id', $this->departmentId);
+        }
+        if ($this->thesisType) {
+            $query->where('type', $this->thesisType);
+        }
+        if ($this->yearFrom) {
+            $query->where('year', '>=', $this->yearFrom);
+        }
+        if ($this->yearTo) {
+            $query->where('year', '<=', $this->yearTo);
+        }
+        
+        return $query->count();
     }
 
     public function getTotalPagesProperty(): int
@@ -286,7 +358,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('publish_year')->orderByDesc('created_at');
 
-        return $query->limit(500)->get()->map(function($book) use ($searchTerm) {
+        return $query->limit(1000)->get()->map(function($book) use ($searchTerm) {
             // Calculate relevance score for sorting
             $score = 0;
             if ($searchTerm) {
@@ -359,7 +431,7 @@ class GlobalSearch extends Component
             $query->where('language', $this->language);
         }
 
-        return $query->limit(500)->get()->map(fn($ebook) => [
+        return $query->limit(1000)->get()->map(fn($ebook) => [
             'type' => 'ebook',
             'id' => $ebook->id,
             'title' => $ebook->title,
@@ -417,7 +489,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('year')->orderByDesc('created_at');
 
-        return $query->limit(500)->get()->map(function($thesis) use ($searchTerm) {
+        return $query->limit(1000)->get()->map(function($thesis) use ($searchTerm) {
             $score = 0;
             if ($searchTerm) {
                 $titleLower = strtolower($thesis->title);
@@ -517,7 +589,7 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->orderByDesc('published_at')->limit(500)->get()->map(function($article) {
+        return $query->orderByDesc('published_at')->limit(1000)->get()->map(function($article) {
             $typeLabels = [
                 'article' => 'Artikel',
                 'conference' => 'Prosiding',
