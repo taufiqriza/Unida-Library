@@ -26,6 +26,7 @@ class Ethesis extends Model
     public function department() { return $this->belongsTo(Department::class); }
     public function subjects() { return $this->belongsToMany(Subject::class, 'ethesis_subject'); }
     public function user() { return $this->belongsTo(User::class); }
+    public function submission() { return $this->hasOne(ThesisSubmission::class); }
     
     public function fingerprint(): MorphOne
     {
@@ -48,11 +49,25 @@ class Ethesis extends Model
             return asset('storage/thesis.png');
         }
         
-        // Cover stored in thesis/covers/ folder
         $path = str_starts_with($this->cover_path, 'covers/') 
             ? 'thesis/' . $this->cover_path 
             : $this->cover_path;
             
         return asset('storage/' . $path);
+    }
+    
+    public function getPreviewUrlAttribute(): ?string
+    {
+        $sub = $this->submission;
+        if ($sub && $sub->preview_file && $sub->preview_visible) {
+            return asset('storage/thesis/' . $sub->preview_file);
+        }
+        return null;
+    }
+    
+    public function getFulltextUrlAttribute(): ?string
+    {
+        if (!$this->file_path) return null;
+        return asset('storage/thesis/' . $this->file_path);
     }
 }

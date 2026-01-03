@@ -66,14 +66,36 @@
                     </h3>
                 </div>
                 <div class="p-4 space-y-3" x-data="ethesisViewer({
-                    fileUrl: '{{ $thesis->file_path ? asset('storage/thesis/' . $thesis->file_path) : '' }}'
+                    previewUrl: '{{ $thesis->preview_url ?? '' }}',
+                    fulltextUrl: '{{ $thesis->fulltext_url ?? '' }}'
                 })">
-                    {{-- Full Text / Preview --}}
-                    @if($thesis->file_path)
+                    {{-- Preview BAB 1-3 --}}
+                    @if($thesis->preview_url)
+                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.bab_preview') }}</p>
+                                <p class="text-xs text-green-600 flex items-center gap-1">
+                                    <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.public_access') }}
+                                </p>
+                            </div>
+                        </div>
+                        <button @click="openPreview()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-eye"></i>
+                            <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
+                        </button>
+                    </div>
+                    @endif
+                    
+                    {{-- Full Text --}}
+                    @if($thesis->fulltext_url)
                     <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-file-pdf text-blue-600 text-xl"></i>
+                                <i class="fas fa-book text-blue-600 text-xl"></i>
                             </div>
                             <div>
                                 <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
@@ -89,7 +111,7 @@
                             </div>
                         </div>
                         @if(auth('member')->check())
-                        <button @click="openModal()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                        <button @click="openFulltext()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                             <i class="fas fa-eye"></i>
                             <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
                         </button>
@@ -100,6 +122,7 @@
                         </a>
                         @endif
                     </div>
+                    @endif
                     
                     {{-- Modal PDF Viewer --}}
                     <div x-show="showModal" 
@@ -183,7 +206,6 @@
                             </div>
                         </div>
                     </div>
-                    @endif
 
                     {{-- Info Box --}}
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
@@ -199,8 +221,23 @@
                                 showModal: false,
                                 loading: true,
                                 error: false,
-                                fileUrl: config.fileUrl,
+                                previewUrl: config.previewUrl,
+                                fulltextUrl: config.fulltextUrl,
+                                currentUrl: '',
+                                modalTitle: '',
                                 loadTimeout: null,
+                                
+                                openPreview() {
+                                    this.currentUrl = this.previewUrl;
+                                    this.modalTitle = '{{ __("opac.ethesis_show.bab_preview") }}';
+                                    this.openModal();
+                                },
+                                
+                                openFulltext() {
+                                    this.currentUrl = this.fulltextUrl;
+                                    this.modalTitle = '{{ __("opac.ethesis_show.full_text") }}';
+                                    this.openModal();
+                                },
                                 
                                 openModal() {
                                     this.showModal = true;
@@ -219,7 +256,7 @@
                                 
                                 loadPdf() {
                                     const frame = this.$refs.pdfFrame;
-                                    if (!frame || !this.fileUrl) return;
+                                    if (!frame || !this.currentUrl) return;
                                     
                                     this.loadTimeout = setTimeout(() => {
                                         if (this.loading) {
@@ -228,7 +265,7 @@
                                         }
                                     }, 15000);
                                     
-                                    frame.src = this.fileUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
+                                    frame.src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
                                 },
                                 
                                 onFrameLoad() {
