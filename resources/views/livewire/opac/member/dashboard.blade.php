@@ -167,7 +167,7 @@
                 <button wire:click="$set('showDigitalCard', true)" class="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition flex items-center gap-2">
                     <i class="fas fa-id-card"></i> Kartu Digital
                 </button>
-                <a href="{{ route('opac.catalog') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
+                <a href="{{ route('opac.home') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
                     <i class="fas fa-search"></i> Cari Buku
                 </a>
                 <a href="{{ route('opac.member.history') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
