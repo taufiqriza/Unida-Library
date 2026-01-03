@@ -37,13 +37,17 @@ class CatalogShow extends Component
             return redirect()->route('login');
         }
 
-        $result = app(ReservationService::class)->reserve($member, $this->book);
-        
-        if ($result['success']) {
-            session()->flash('success', $result['message']);
-            return redirect()->route('opac.member.loans');
-        } else {
-            $this->dispatch('notify', type: 'error', message: $result['message']);
+        try {
+            $result = app(ReservationService::class)->reserve($member, $this->book);
+            
+            if ($result['success']) {
+                session()->flash('success', $result['message']);
+                return redirect()->route('opac.member.loans');
+            } else {
+                $this->dispatch('notify', type: 'error', message: $result['message']);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
