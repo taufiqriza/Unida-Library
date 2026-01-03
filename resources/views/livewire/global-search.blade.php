@@ -117,7 +117,7 @@
         <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
             
             {{-- Sidebar Filters --}}
-            <aside class="w-full lg:w-80 flex-shrink-0">
+            <aside class="w-full lg:w-80 flex-shrink-0" x-data="{ collapsed: false }">
                 {{-- Mobile Filter Toggle --}}
                 <button 
                     wire:click="$toggle('showMobileFilters')"
@@ -136,24 +136,28 @@
                 <div class="{{ $showMobileFilters ? 'block' : 'hidden lg:block' }} space-y-4">
                     {{-- Filter Card --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        {{-- Filter Header --}}
-                        <div class="p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                            <div class="flex items-center justify-between">
-                                <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-filter text-primary-600 text-sm"></i>
-                                    </div>
-                                    {{ __('opac.global_search.filters') }}
-                                </h3>
+                        {{-- Filter Header with Collapse Toggle --}}
+                        <button @click="collapsed = !collapsed" class="w-full p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 flex items-center justify-between hover:bg-gray-50 transition">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-filter text-primary-600 text-sm"></i>
+                                </div>
+                                {{ __('opac.global_search.filters') }}
                                 @if($this->activeFiltersCount > 0)
-                                    <button wire:click="clearAllFilters" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
+                                    <span class="px-2 py-0.5 text-xs bg-primary-100 text-primary-700 rounded-full">{{ $this->activeFiltersCount }}</span>
+                                @endif
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                @if($this->activeFiltersCount > 0)
+                                    <button wire:click.stop="clearAllFilters" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50">
                                         <i class="fas fa-times"></i> {{ __('opac.global_search.reset') }}
                                     </button>
                                 @endif
+                                <i class="fas fa-chevron-down text-gray-400 transition-transform" :class="collapsed && 'rotate-180'"></i>
                             </div>
-                        </div>
+                        </button>
 
-                        <div class="p-4 space-y-5">
+                        <div x-show="!collapsed" x-collapse class="p-4 space-y-5">
                             {{-- Branch/Location Filter (Dropdown) --}}
                             <div class="filter-section">
                                 <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
@@ -703,11 +707,11 @@
                                         {{-- Info Section --}}
                                         <div class="p-2.5">
                                             <h3 class="font-semibold text-gray-900 text-xs line-clamp-2 group-hover:text-primary-600 transition-colors leading-snug min-h-[2.5rem]">
-                                                {{ $item['title'] }}
+                                                {!! $item['title_highlighted'] ?? e($item['title']) !!}
                                             </h3>
                                             <p class="text-[11px] text-gray-500 mt-1 line-clamp-1 flex items-center gap-1">
                                                 <i class="fas fa-pen-nib text-gray-400 text-[9px]"></i>
-                                                <span class="truncate">{{ $item['author'] }}</span>
+                                                <span class="truncate">{!! $item['author_highlighted'] ?? e($item['author']) !!}</span>
                                             </p>
                                             @if(isset($item['meta']['branch']) && $item['meta']['branch'])
                                             <p class="text-[10px] text-emerald-600 mt-1 flex items-center gap-1">
@@ -757,7 +761,7 @@
                                     <div class="flex-1 min-w-0 py-0.5">
                                         <div class="flex items-start justify-between gap-2">
                                             <h3 class="font-semibold text-gray-900 text-sm group-hover:text-primary-600 transition-colors line-clamp-2 leading-snug">
-                                                {{ $item['title'] }}
+                                                {!! $item['title_highlighted'] ?? e($item['title']) !!}
                                             </h3>
                                             @if($item['year'])
                                             <span class="flex-shrink-0 px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-600 rounded">
@@ -768,11 +772,11 @@
                                         
                                         <p class="text-xs text-gray-600 mt-1.5 flex items-center gap-1.5">
                                             <i class="fas fa-pen-nib text-gray-400 text-[10px]"></i>
-                                            <span class="line-clamp-1">{{ $item['author'] }}</span>
+                                            <span class="line-clamp-1">{!! $item['author_highlighted'] ?? e($item['author']) !!}</span>
                                         </p>
                                         
                                         @if($item['description'])
-                                            <p class="text-[11px] text-gray-500 mt-1.5 line-clamp-2 hidden sm:block">{{ $item['description'] }}</p>
+                                            <p class="text-[11px] text-gray-500 mt-1.5 line-clamp-2 hidden sm:block">{!! $item['description'] !!}</p>
                                         @endif
                                         
                                         <div class="flex items-center flex-wrap gap-x-3 gap-y-1 mt-2">
