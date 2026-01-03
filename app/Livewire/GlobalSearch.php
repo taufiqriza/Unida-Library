@@ -225,11 +225,7 @@ class GlobalSearch extends Component
 
     public function getTotalPagesProperty(): int
     {
-        $total = $this->totalResults;
-        // Cap at reasonable max for performance (50 pages = 1000 items with perPage=20)
-        $maxPages = 50;
-        $calculated = ceil($total / $this->perPage);
-        return max(1, min($calculated, $maxPages));
+        return max(1, ceil($this->totalResults / $this->perPage));
     }
 
     protected function searchBooks(): Collection
@@ -278,7 +274,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('publish_year')->orderByDesc('created_at');
 
-        return $query->limit(1000)->get()->map(function($book) use ($searchTerm) {
+        return $query->get()->map(function($book) use ($searchTerm) {
             // Calculate relevance score for sorting
             $score = 0;
             if ($searchTerm) {
@@ -351,7 +347,7 @@ class GlobalSearch extends Component
             $query->where('language', $this->language);
         }
 
-        return $query->limit(1000)->get()->map(fn($ebook) => [
+        return $query->get()->map(fn($ebook) => [
             'type' => 'ebook',
             'id' => $ebook->id,
             'title' => $ebook->title,
@@ -409,7 +405,7 @@ class GlobalSearch extends Component
         // Default order by newest
         $query->orderByDesc('year')->orderByDesc('created_at');
 
-        return $query->limit(1000)->get()->map(function($thesis) use ($searchTerm) {
+        return $query->get()->map(function($thesis) use ($searchTerm) {
             $score = 0;
             if ($searchTerm) {
                 $titleLower = strtolower($thesis->title);
@@ -509,7 +505,7 @@ class GlobalSearch extends Component
             $query->where('publish_year', '<=', $this->yearTo);
         }
 
-        return $query->orderByDesc('published_at')->limit(1000)->get()->map(function($article) {
+        return $query->orderByDesc('published_at')->get()->map(function($article) {
             $typeLabels = [
                 'article' => 'Artikel',
                 'conference' => 'Prosiding',
