@@ -282,6 +282,16 @@ class CirculationTransaction extends Component
 
         $loanPeriod = $this->activeMember->memberType->loan_period ?? 7;
 
+        // Check if there's a reservation for this book
+        $reservation = \App\Models\Reservation::where('book_id', $item->book_id)
+            ->where('member_id', $this->activeMember->id)
+            ->where('status', 'ready')
+            ->first();
+        
+        if ($reservation) {
+            $reservation->update(['status' => 'completed']);
+        }
+
         Loan::create([
             'branch_id' => $item->branch_id,
             'member_id' => $this->activeMember->id,
@@ -289,6 +299,8 @@ class CirculationTransaction extends Component
             'loan_date' => now(),
             'due_date' => now()->addDays($loanPeriod),
         ]);
+        
+        $item->update(['status' => 'borrowed']);
 
         $this->loadActiveLoans();
         $this->loadStats();
@@ -334,8 +346,21 @@ class CirculationTransaction extends Component
             $this->alert('success', 'Berhasil dikembalikan!', $bookTitle);
         }
         
-        // Process reservation queue
-        app(\App\Services\Circulation\ReservationService::class)->processReturn($loan->item->book);
+        // Process reservation queue and notify staff
+        $nextReservation = \App\Models\Reservation::where('book_id', $loan->item->book_id)
+            ->where('status', 'pending')
+            ->orderBy('queue_position')
+            ->with('member')
+            ->first();
+            
+        if ($nextReservation) {
+            app(\App\Services\Circulation\ReservationService::class)->processReturn($loan->item->book);
+            $this->dispatch('showReservationAlert', [
+                'memberName' => $nextReservation->member->name,
+                'memberId' => $nextReservation->member->member_id,
+                'bookTitle' => $bookTitle,
+            ]);
+        }
 
         $this->loadActiveLoans();
         $this->loadStats();

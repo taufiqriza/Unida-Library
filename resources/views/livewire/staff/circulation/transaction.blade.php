@@ -1,6 +1,30 @@
 @section('title', 'Sirkulasi')
 
-<div class="space-y-4" x-data="circulationAlerts()" @circulation-alert.window="showAlert($event.detail)">
+<div class="space-y-4" x-data="circulationAlerts()" @circulation-alert.window="showAlert($event.detail)" @show-reservation-alert.window="showReservationModal($event.detail)">
+    {{-- Reservation Alert Modal --}}
+    <template x-teleport="body">
+        <div x-show="reservationModal.show" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition>
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" @click.outside="reservationModal.show = false">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bookmark text-amber-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Ada Reservasi!</h3>
+                    <p class="text-gray-600 mb-4">Buku ini direservasi oleh member:</p>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                        <p class="font-bold text-gray-900" x-text="reservationModal.memberName"></p>
+                        <p class="text-sm text-gray-600" x-text="reservationModal.memberId"></p>
+                        <p class="text-xs text-amber-700 mt-2"><i class="fas fa-book mr-1"></i><span x-text="reservationModal.bookTitle"></span></p>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Member akan diberitahu via email. Buku ditahan 48 jam.</p>
+                    <button @click="reservationModal.show = false" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl transition">
+                        Mengerti
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
     {{-- Custom Toast Alerts --}}
     <template x-teleport="body">
         <div class="fixed top-6 right-6 z-[99999] space-y-3 pointer-events-none">
@@ -549,6 +573,7 @@ function circulationAlerts() {
     return {
         alerts: [],
         alertId: 0,
+        reservationModal: { show: false, memberName: '', memberId: '', bookTitle: '' },
         
         showAlert(detail) {
             const id = ++this.alertId;
@@ -577,6 +602,15 @@ function circulationAlerts() {
                     this.alerts = this.alerts.filter(x => x.id !== id);
                 }, 300);
             }
+        },
+        
+        showReservationModal(detail) {
+            this.reservationModal = {
+                show: true,
+                memberName: detail[0]?.memberName || '',
+                memberId: detail[0]?.memberId || '',
+                bookTitle: detail[0]?.bookTitle || ''
+            };
         }
     }
 }
