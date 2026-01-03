@@ -66,29 +66,41 @@
                     </h3>
                 </div>
                 <div class="p-4 space-y-3" x-data="ethesisViewer({
-                    previewUrl: '{{ $thesis->preview_path ? asset('storage/thesis/previews/' . basename($thesis->preview_path)) : '' }}',
-                    fulltextUrl: '{{ $thesis->fulltext_path ? asset('storage/thesis/fulltext/' . basename($thesis->fulltext_path)) : '' }}'
-                })"
-                >>
-                    {{-- Preview/BAB 1-3 --}}
-                    @if($thesis->preview_path)
-                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
+                    fileUrl: '{{ $thesis->file_path ? asset('storage/thesis/' . $thesis->file_path) : '' }}'
+                })">
+                    {{-- Full Text / Preview --}}
+                    @if($thesis->file_path)
+                    <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-file-pdf text-green-600 text-xl"></i>
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-blue-600 text-xl"></i>
                             </div>
                             <div>
-                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.bab_preview') }}</p>
-                                <p class="text-xs text-green-600 flex items-center gap-1">
-                                    <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.public_access') }}
+                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
+                                @if(auth('member')->check())
+                                <p class="text-xs text-blue-600 flex items-center gap-1">
+                                    <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.access_granted') }}
                                 </p>
+                                @else
+                                <p class="text-xs text-gray-500 flex items-center gap-1">
+                                    <i class="fas fa-lock"></i> {{ __('opac.ethesis_show.members_only') }}
+                                </p>
+                                @endif
                             </div>
                         </div>
-                        <button @click="openPreview()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                        @if(auth('member')->check())
+                        <button @click="openModal()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                             <i class="fas fa-eye"></i>
                             <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
                         </button>
+                        @else
+                        <a href="{{ route('opac.login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
+                        </a>
+                        @endif
                     </div>
+                    @endif
                     
                     {{-- Modal PDF Viewer --}}
                     <div x-show="showModal" 
@@ -114,15 +126,14 @@
                              class="relative w-full max-w-6xl h-[95vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                             
                             {{-- Modal Header --}}
-                            <div class="flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 text-white flex-shrink-0"
-                                 :class="modalType === 'preview' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'">
+                            <div class="flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 text-white flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600">
                                 <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                                     <div class="w-8 h-8 lg:w-10 lg:h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                         <i class="fas fa-file-pdf text-sm lg:text-base"></i>
                                     </div>
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-xs lg:text-base line-clamp-1">{{ Str::limit($thesis->title, 40) }}</h3>
-                                        <p class="text-white/70 text-[10px] lg:text-xs" x-text="modalType === 'preview' ? '{{ __('opac.ethesis_show.bab_preview') }}' : '{{ __('opac.ethesis_show.full_text') }}'"></p>
+                                        <p class="text-white/70 text-[10px] lg:text-xs">{{ __('opac.ethesis_show.full_text') }}</p>
                                     </div>
                                 </div>
                                 <button @click="closeModal()" class="w-8 h-8 lg:w-9 lg:h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
@@ -175,34 +186,6 @@
                     </div>
                     @endif
 
-                    {{-- Full Text - Members Only --}}
-                    @if($thesis->fulltext_path)
-                    <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                                <i class="fas fa-book text-blue-600 text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
-                                <p class="text-xs text-blue-600 flex items-center gap-1">
-                                    <i class="fas fa-lock"></i> {{ __('opac.ethesis_show.members_only') }}
-                                </p>
-                            </div>
-                        </div>
-                        @if(auth('member')->check())
-                            <button @click="openFulltext()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                                <i class="fas fa-eye"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
-                            </button>
-                        @else
-                            <a href="{{ route('opac.login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
-                            </a>
-                        @endif
-                    </div>
-                    @endif
-
                     {{-- Info Box --}}
                     <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
                         <p class="text-xs text-amber-700 flex items-start gap-2">
@@ -215,25 +198,10 @@
                         function ethesisViewer(config) {
                             return {
                                 showModal: false,
-                                modalType: 'preview',
                                 loading: true,
                                 error: false,
-                                previewUrl: config.previewUrl,
-                                fulltextUrl: config.fulltextUrl,
-                                currentUrl: '',
+                                fileUrl: config.fileUrl,
                                 loadTimeout: null,
-                                
-                                openPreview() {
-                                    this.modalType = 'preview';
-                                    this.currentUrl = this.previewUrl;
-                                    this.openModal();
-                                },
-                                
-                                openFulltext() {
-                                    this.modalType = 'fulltext';
-                                    this.currentUrl = this.fulltextUrl;
-                                    this.openModal();
-                                },
                                 
                                 openModal() {
                                     this.showModal = true;
@@ -252,7 +220,7 @@
                                 
                                 loadPdf() {
                                     const frame = this.$refs.pdfFrame;
-                                    if (!frame || !this.currentUrl) return;
+                                    if (!frame || !this.fileUrl) return;
                                     
                                     this.loadTimeout = setTimeout(() => {
                                         if (this.loading) {
@@ -261,7 +229,7 @@
                                         }
                                     }, 15000);
                                     
-                                    frame.src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
+                                    frame.src = this.fileUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
                                 },
                                 
                                 onFrameLoad() {
