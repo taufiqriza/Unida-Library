@@ -69,8 +69,8 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                                         <div wire:click="applyCover('{{ $cover['url'] }}')" class="flex-shrink-0 w-24 cursor-pointer group">
                                             <div class="relative w-24 h-32 rounded-lg overflow-hidden border-2 border-transparent group-hover:border-blue-500 group-hover:shadow-lg transition shadow-sm bg-gray-100">
                                                 <img src="{{ $cover['url'] }}" class="w-full h-full object-cover" onerror="this.parentElement.parentElement.style.display='none'">
-                                                <span class="absolute top-0.5 left-0.5 px-1 py-px text-[7px] font-medium rounded {{ $cover['source'] === 'Google' ? 'bg-blue-600' : 'bg-emerald-600' }} text-white inline-flex items-center gap-0.5 leading-none">
-                                                    <i class="fab {{ $cover['source'] === 'Google' ? 'fa-google' : 'fa-readme' }} text-[6px]"></i>{{ $cover['source'] === 'Google' ? 'Books' : 'OpenLib' }}
+                                                <span class="absolute top-0.5 left-0.5 px-1 py-px text-[7px] font-medium rounded {{ $cover['source'] === 'Google' ? 'bg-blue-600' : ($cover['source'] === 'Internal' ? 'bg-emerald-600' : 'bg-orange-500') }} text-white inline-flex items-center gap-0.5 leading-none">
+                                                    <i class="{{ $cover['source'] === 'Google' ? 'fab fa-google' : ($cover['source'] === 'Internal' ? 'fas fa-database' : 'fas fa-book-open') }} text-[6px]"></i>{{ $cover['source'] === 'Google' ? 'Books' : ($cover['source'] === 'Internal' ? 'Lokal' : 'OL') }}
                                                 </span>
                                             </div>
                                             <p class="text-[9px] text-gray-600 text-center mt-1.5 line-clamp-2 leading-tight">{{ Str::limit($cover['title'] ?: '-', 35) }}</p>
@@ -173,8 +173,8 @@ $config = ['gradient' => 'from-blue-500 to-indigo-600', 'bg' => 'blue', 'icon' =
                         <div wire:click="applyCover('{{ $cover['url'] }}')" class="flex-shrink-0 w-24 cursor-pointer group/cover">
                             <div class="relative w-24 h-32 rounded-lg overflow-hidden border-2 border-transparent group-hover/cover:border-blue-500 group-hover/cover:shadow-lg transition shadow-sm bg-gray-100">
                                 <img src="{{ $cover['url'] }}" class="w-full h-full object-cover" onerror="this.parentElement.parentElement.style.display='none'">
-                                <span class="absolute top-0.5 left-0.5 px-1 py-px text-[7px] font-medium rounded {{ $cover['source'] === 'Google' ? 'bg-blue-600' : 'bg-emerald-600' }} text-white inline-flex items-center gap-0.5 leading-none">
-                                    <i class="fab {{ $cover['source'] === 'Google' ? 'fa-google' : 'fa-readme' }} text-[6px]"></i>{{ $cover['source'] === 'Google' ? 'Books' : 'OpenLib' }}
+                                <span class="absolute top-0.5 left-0.5 px-1 py-px text-[7px] font-medium rounded {{ $cover['source'] === 'Google' ? 'bg-blue-600' : ($cover['source'] === 'Internal' ? 'bg-emerald-600' : 'bg-orange-500') }} text-white inline-flex items-center gap-0.5 leading-none">
+                                    <i class="{{ $cover['source'] === 'Google' ? 'fab fa-google' : ($cover['source'] === 'Internal' ? 'fas fa-database' : 'fas fa-book-open') }} text-[6px]"></i>{{ $cover['source'] === 'Google' ? 'Books' : ($cover['source'] === 'Internal' ? 'Lokal' : 'OL') }}
                                 </span>
                             </div>
                             <p class="text-[9px] text-gray-600 text-center mt-1.5 line-clamp-2 leading-tight">{{ Str::limit($cover['title'] ?: '-', 35) }}</p>

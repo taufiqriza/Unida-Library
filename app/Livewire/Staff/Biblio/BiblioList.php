@@ -142,29 +142,84 @@ class BiblioList extends Component
 
         $title = trim($book->title);
         $author = $book->authors->first()?->name ?? '';
-        $isbn = preg_replace('/[^0-9X]/', '', $book->isbn ?? '');
+        
+        // 1. Internal - cari dari koleksi lain yang sudah punya cover
+        $keywords = preg_split('/\s+/', $title);
+        $keywords = array_filter($keywords, fn($w) => strlen($w) > 3); // kata > 3 huruf
+        
+        $internalQuery = Book::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->where('id', '!=', $bookId);
+        
+        // Prioritas 1: ISBN sama (paling akurat)
+        if ($book->isbn) {
+            $isbnMatch = (clone $internalQuery)->where('isbn', $book->isbn)->first();
+            if ($isbnMatch && $isbnMatch->cover_url) {
+                $this->coverSearchResults[] = [
+                    'url' => $isbnMatch->cover_url,
+                    'source' => 'Internal',
+                    'title' => $isbnMatch->title
+                ];
+            }
+        }
+        
+        // Prioritas 2: Judul persis sama
+        $exactMatch = (clone $internalQuery)
+            ->where('title', $title)
+            ->whereNotIn('id', collect($this->coverSearchResults)->pluck('title')->toArray() ? [$bookId] : [$bookId])
+            ->first();
+        if ($exactMatch && $exactMatch->cover_url) {
+            $exists = collect($this->coverSearchResults)->contains('url', $exactMatch->cover_url);
+            if (!$exists) {
+                $this->coverSearchResults[] = [
+                    'url' => $exactMatch->cover_url,
+                    'source' => 'Internal',
+                    'title' => $exactMatch->title
+                ];
+            }
+        }
+        
+        // Prioritas 3: Judul mirip (mengandung kata kunci utama)
+        if (count($keywords) >= 2) {
+            $similarBooks = (clone $internalQuery)
+                ->where(function($q) use ($keywords) {
+                    foreach (array_slice($keywords, 0, 3) as $word) {
+                        $q->where('title', 'like', '%' . $word . '%');
+                    }
+                })
+                ->limit(3)
+                ->get();
+            
+            foreach ($similarBooks as $similar) {
+                if ($similar->cover_url) {
+                    $exists = collect($this->coverSearchResults)->contains('url', $similar->cover_url);
+                    if (!$exists) {
+                        $this->coverSearchResults[] = [
+                            'url' => $similar->cover_url,
+                            'source' => 'Internal',
+                            'title' => $similar->title
+                        ];
+                    }
+                }
+            }
+        }
+        
+        $query = $author ? "{$title} {$author}" : $title;
         
         try {
-            // Google Books - search with title + author for better accuracy
-            $googleQuery = urlencode($title);
-            if ($author) {
-                $googleQuery .= '+inauthor:' . urlencode($author);
-            }
-            
+            // 2. Google Books
             $googleData = @file_get_contents(
-                "https://www.googleapis.com/books/v1/volumes?q={$googleQuery}&maxResults=12&printType=books",
+                "https://www.googleapis.com/books/v1/volumes?q=" . urlencode($query) . "&maxResults=10",
                 false,
-                stream_context_create(['http' => ['timeout' => 8]])
+                stream_context_create(['http' => ['timeout' => 5]])
             );
             if ($googleData) {
                 $data = json_decode($googleData, true);
                 foreach ($data['items'] ?? [] as $item) {
-                    $imageLinks = $item['volumeInfo']['imageLinks'] ?? [];
-                    // Prefer larger images
-                    $thumb = $imageLinks['medium'] ?? $imageLinks['small'] ?? $imageLinks['thumbnail'] ?? null;
+                    $thumb = $item['volumeInfo']['imageLinks']['thumbnail'] ?? null;
                     if ($thumb) {
                         $this->coverSearchResults[] = [
-                            'url' => str_replace(['http://', 'zoom=1', '&edge=curl'], ['https://', 'zoom=2', ''], $thumb),
+                            'url' => str_replace('http://', 'https://', $thumb),
                             'source' => 'Google',
                             'title' => $item['volumeInfo']['title'] ?? ''
                         ];
@@ -172,50 +227,21 @@ class BiblioList extends Component
                 }
             }
             
-            // Open Library - search by ISBN first (most accurate)
-            if ($isbn && strlen($isbn) >= 10) {
-                $olIsbnData = @file_get_contents(
-                    "https://openlibrary.org/api/books?bibkeys=ISBN:{$isbn}&format=json&jscmd=data",
-                    false,
-                    stream_context_create(['http' => ['timeout' => 5]])
-                );
-                if ($olIsbnData) {
-                    $data = json_decode($olIsbnData, true);
-                    foreach ($data as $key => $info) {
-                        $cover = $info['cover']['large'] ?? $info['cover']['medium'] ?? null;
-                        if ($cover) {
-                            $this->coverSearchResults[] = [
-                                'url' => $cover,
-                                'source' => 'OL',
-                                'title' => $info['title'] ?? ''
-                            ];
-                        }
-                    }
-                }
-            }
-            
-            // Open Library - search by title + author
-            $olQuery = urlencode($title);
-            $olUrl = "https://openlibrary.org/search.json?title={$olQuery}&limit=10";
-            if ($author) {
-                $olUrl .= '&author=' . urlencode($author);
-            }
-            
-            $olData = @file_get_contents($olUrl, false, stream_context_create(['http' => ['timeout' => 8]]));
+            // 3. Open Library
+            $olData = @file_get_contents(
+                "https://openlibrary.org/search.json?q=" . urlencode($query) . "&limit=8",
+                false,
+                stream_context_create(['http' => ['timeout' => 5]])
+            );
             if ($olData) {
                 $data = json_decode($olData, true);
                 foreach ($data['docs'] ?? [] as $doc) {
                     if (!empty($doc['cover_i'])) {
-                        // Check if not duplicate
-                        $coverUrl = "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg";
-                        $exists = collect($this->coverSearchResults)->contains('url', $coverUrl);
-                        if (!$exists) {
-                            $this->coverSearchResults[] = [
-                                'url' => $coverUrl,
-                                'source' => 'OL',
-                                'title' => $doc['title'] ?? ''
-                            ];
-                        }
+                        $this->coverSearchResults[] = [
+                            'url' => "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg",
+                            'source' => 'OL',
+                            'title' => $doc['title'] ?? ''
+                        ];
                     }
                 }
             }
