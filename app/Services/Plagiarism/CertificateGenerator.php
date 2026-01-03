@@ -31,6 +31,7 @@ class CertificateGenerator
             'check' => $this->check,
             'member' => $this->check->member,
             'qrCode' => $this->generateQrCode($verifyUrl, 70),
+            'qrHeadLibrarian' => $this->generateQrCode($this->generateHeadLibrarianSignature(), 50),
             'verifyUrl' => $verifyUrl,
             'institutionName' => Setting::get('app_name', 'Perpustakaan UNIDA Gontor'),
             'institutionLogo' => $this->getOptimizedLogo(),
@@ -61,6 +62,17 @@ class CertificateGenerator
     {
         $qr = QrCode::format('svg')->size($size)->margin(0)->generate($data);
         return 'data:image/svg+xml;base64,' . base64_encode($qr);
+    }
+
+    protected function generateHeadLibrarianSignature(): string
+    {
+        return json_encode([
+            'type' => 'head_librarian_signature',
+            'certificate' => $this->check->certificate_number,
+            'signer' => Setting::get('plagiarism_head_librarian', 'Kepala Perpustakaan'),
+            'issued' => now()->format('Y-m-d H:i:s'),
+            'institution' => Setting::get('app_name', 'Perpustakaan UNIDA Gontor')
+        ]);
     }
 
     protected function getOptimizedLogo(): ?string
