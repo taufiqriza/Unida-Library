@@ -2,7 +2,7 @@
     <div class="lg:max-w-7xl lg:mx-auto lg:px-4 lg:py-8">
         
         {{-- Hero Section --}}
-        <div class="relative bg-gradient-to-b from-purple-600 via-purple-700 to-purple-800 lg:rounded-2xl lg:overflow-hidden">
+        <div class="relative bg-gradient-to-b from-blue-600 via-blue-700 to-indigo-800 lg:rounded-2xl lg:overflow-hidden">
             <div class="absolute inset-0 overflow-hidden">
                 <img src="{{ $thesis->cover_url }}" class="w-full h-full object-cover opacity-20 blur-2xl scale-110">
             </div>
@@ -36,17 +36,17 @@
                     <div class="text-center lg:text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} flex-1">
                         <span class="inline-block px-3 py-1 bg-white/20 text-white text-xs font-semibold rounded-full mb-2">{{ $thesis->getTypeLabel() }}</span>
                         <h1 class="text-xl lg:text-3xl font-bold text-white leading-tight">{{ $thesis->title }}</h1>
-                        <p class="text-purple-200 mt-2 text-sm lg:text-base">{{ $thesis->author }}</p>
+                        <p class="text-blue-200 mt-2 text-sm lg:text-base">{{ $thesis->author }}</p>
                         
                         <div class="flex items-center justify-center lg:justify-start gap-4 mt-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->year }}</div>
-                                <div class="text-xs text-purple-200">{{ __('opac.ethesis_show.year') }}</div>
+                                <div class="text-xs text-blue-200">{{ __('opac.ethesis_show.year') }}</div>
                             </div>
                             <div class="w-px h-10 bg-white/20"></div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-white">{{ $thesis->views ?? 0 }}</div>
-                                <div class="text-xs text-purple-200">{{ __('opac.ethesis_show.views') }}</div>
+                                <div class="text-xs text-blue-200">{{ __('opac.ethesis_show.views') }}</div>
                             </div>
                         </div>
                     </div>
@@ -59,9 +59,9 @@
             
             {{-- Files Section - Clear & Detailed --}}
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="px-4 py-3 bg-gradient-to-r from-purple-50 to-white border-b border-gray-100">
+                <div class="px-4 py-3 bg-gradient-to-r from-blue-50 to-white border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
-                        <i class="fas fa-folder-open text-purple-500"></i>
+                        <i class="fas fa-folder-open text-blue-500"></i>
                         {{ __('opac.ethesis_show.documents_available') }}
                     </h3>
                 </div>
@@ -109,7 +109,7 @@
                          x-transition:leave="transition ease-in duration-200"
                          x-transition:leave-start="opacity-100"
                          x-transition:leave-end="opacity-0"
-                         class="fixed inset-0 z-[99999] flex items-center justify-center p-2 lg:p-4 bg-black/80 backdrop-blur-sm"
+                         class="fixed inset-0 z-[99999] flex items-center justify-center pt-16 lg:pt-20 px-2 pb-2 lg:px-4 lg:pb-4 bg-black/80 backdrop-blur-sm"
                          @keydown.escape.window="closeModal()"
                          style="display: none;">
                         
@@ -122,7 +122,7 @@
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
                              @click.away="closeModal()"
-                             class="relative w-full max-w-6xl h-[95vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+                             class="relative w-full max-w-6xl h-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                             
                             {{-- Modal Header --}}
                             <div class="flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 text-white flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600">
@@ -257,7 +257,7 @@
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
-                        <i class="fas fa-info-circle text-purple-500"></i>
+                        <i class="fas fa-info-circle text-blue-500"></i>
                         {{ __('opac.ethesis_show.thesis_info') }}
                     </h3>
                 </div>
@@ -265,8 +265,8 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {{-- Penulis --}}
                         <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-user text-purple-600 text-sm"></i>
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user text-blue-600 text-sm"></i>
                             </div>
                             <div class="min-w-0">
                                 <p class="text-[10px] text-gray-500 uppercase tracking-wide">{{ __('opac.ethesis_show.author') }}</p>
@@ -367,7 +367,7 @@
                                 <p class="text-[10px] text-gray-500 uppercase tracking-wide mb-2">{{ __('opac.ethesis_show.keywords') }}</p>
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach(explode(',', $thesis->keywords) as $keyword)
-                                        <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg border border-purple-100">{{ trim($keyword) }}</span>
+                                        <span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg border border-blue-100">{{ trim($keyword) }}</span>
                                     @endforeach
                                 </div>
                             </div>
@@ -424,7 +424,7 @@
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <h3 class="font-semibold text-gray-900 flex items-center gap-2">
-                        <i class="fas fa-align-left text-purple-500"></i>
+                        <i class="fas fa-align-left text-blue-500"></i>
                         {{ __('opac.ethesis_show.abstract') }}
                     </h3>
                 </div>
@@ -460,7 +460,7 @@
                         <div class="aspect-[3/4] bg-white rounded-xl shadow-lg overflow-hidden mb-2">
                             <img src="{{ $related->cover_url }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                         </div>
-                        <h3 class="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-purple-600 transition">{{ $related->title }}</h3>
+                        <h3 class="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition">{{ $related->title }}</h3>
                         <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">{{ $related->author }}</p>
                     </a>
                     @endforeach
