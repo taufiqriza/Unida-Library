@@ -250,6 +250,44 @@
                         @endif
                     </div>
                     @endforeach
+                    
+                    {{-- Reservation Button --}}
+                    @if($book->items->where('status', 'available')->count() === 0)
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        @auth('member')
+                            @if($this->existingReservation)
+                                <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-clock text-blue-600"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-semibold text-blue-800">Anda sudah reservasi buku ini</p>
+                                            <p class="text-xs text-blue-600">
+                                                @if($this->existingReservation->status === 'ready')
+                                                    Buku siap diambil hingga {{ $this->existingReservation->expires_at->format('d M Y H:i') }}
+                                                @else
+                                                    Antrian ke-{{ $this->existingReservation->queue_position }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif($this->canReserve)
+                                <button wire:click="reserve" wire:loading.attr="disabled" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition disabled:opacity-50">
+                                    <i class="fas fa-bookmark" wire:loading.remove wire:target="reserve"></i>
+                                    <i class="fas fa-spinner fa-spin" wire:loading wire:target="reserve"></i>
+                                    <span>Reservasi Buku Ini</span>
+                                </button>
+                                <p class="text-xs text-gray-500 text-center mt-2">Anda akan diberitahu saat buku tersedia</p>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="block w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl text-center transition">
+                                <i class="fas fa-sign-in-alt mr-2"></i>Login untuk Reservasi
+                            </a>
+                        @endauth
+                    </div>
+                    @endif
                 </div>
                 @else
                 <div class="p-8 text-center">

@@ -310,6 +310,9 @@ class CirculationTransaction extends Component
             'return_date' => now(),
             'is_returned' => true,
         ]);
+        
+        // Update item status
+        $loan->item->update(['status' => 'available']);
 
         $bookTitle = Str::limit($loan->item->book->title ?? 'Buku', 35);
 
@@ -330,6 +333,9 @@ class CirculationTransaction extends Component
         } else {
             $this->alert('success', 'Berhasil dikembalikan!', $bookTitle);
         }
+        
+        // Process reservation queue
+        app(\App\Services\Circulation\ReservationService::class)->processReturn($loan->item->book);
 
         $this->loadActiveLoans();
         $this->loadStats();

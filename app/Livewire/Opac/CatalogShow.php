@@ -3,6 +3,9 @@
 namespace App\Livewire\Opac;
 
 use App\Models\Book;
+use App\Models\Reservation;
+use App\Services\Circulation\ReservationService;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class CatalogShow extends Component
@@ -25,6 +28,48 @@ class CatalogShow extends Component
                 ->take(4)
                 ->get();
         }
+    }
+
+    public function reserve()
+    {
+        $member = Auth::guard('member')->user();
+        if (!$member) {
+            return redirect()->route('login');
+        }
+
+        $result = app(ReservationService::class)->reserve($member, $this->book);
+        
+        if ($result['success']) {
+            $this->dispatch('notify', type: 'success', message: $result['message']);
+        } else {
+            $this->dispatch('notify', type: 'error', message: $result['message']);
+        }
+    }
+
+    public function getCanReserveProperty(): bool
+    {
+        $member = Auth::guard('member')->user();
+        if (!$member) return false;
+        
+        // Semua eksemplar harus tidak tersedia
+        if ($this->book->items->where('status', 'available')->count() > 0) return false;
+        
+        // Belum punya reservasi aktif untuk buku ini
+        return !Reservation::where('member_id', $member->id)
+            ->where('book_id', $this->book->id)
+            ->whereIn('status', ['pending', 'ready'])
+            ->exists();
+    }
+
+    public function getExistingReservationProperty()
+    {
+        $member = Auth::guard('member')->user();
+        if (!$member) return null;
+        
+        return Reservation::where('member_id', $member->id)
+            ->where('book_id', $this->book->id)
+            ->whereIn('status', ['pending', 'ready'])
+            ->first();
     }
 
     public function render()

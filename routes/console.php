@@ -67,3 +67,6 @@ Schedule::command('voice:cleanup')->dailyAt('04:00');
 
 // Send loan due reminders daily at 8:00 AM
 Schedule::command('loans:send-reminders')->dailyAt('08:00');
+
+// Expire reservations that weren't picked up (every hour)
+Schedule::command('reservations:expire')->hourly();
