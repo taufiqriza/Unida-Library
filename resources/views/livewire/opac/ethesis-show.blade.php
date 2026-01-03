@@ -187,15 +187,14 @@
                                     </div>
                                 </div>
                                 
-                                {{-- PDF Viewer via Google Docs (no download option) --}}
+                                {{-- PDF Viewer --}}
                                 <iframe 
                                     x-ref="pdfFrame"
                                     x-show="!error"
                                     x-on:load="onFrameLoad()"
                                     x-on:error="onFrameError()"
                                     class="w-full h-full"
-                                    frameborder="0"
-                                    sandbox="allow-scripts allow-same-origin">
+                                    frameborder="0">
                                 </iframe>
                             </div>
                             
@@ -266,7 +265,7 @@
                                         }
                                     }, 15000);
                                     
-                                    frame.src = 'https://docs.google.com/viewer?url=' + encodeURIComponent(this.currentUrl) + '&embedded=true';
+                                    frame.src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
                                 },
                                 
                                 onFrameLoad() {
