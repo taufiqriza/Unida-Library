@@ -42,6 +42,10 @@ class CertificateGenerator
         $signatureData = "DIGITAL SIGNATURE\n{$headLibrarian}\nKepala Perpustakaan\n" . now()->format('Y-m-d H:i:s');
         $signatureQr = $this->generateQrCode($signatureData);
 
+        // Check if title or name contains Arabic
+        $hasArabicTitle = preg_match('/[\x{0600}-\x{06FF}]/u', $this->check->document_title);
+        $hasArabicName = preg_match('/[\x{0600}-\x{06FF}]/u', $this->check->member->name);
+
         // Prepare data for certificate
         $data = [
             'check' => $this->check,
@@ -58,6 +62,8 @@ class CertificateGenerator
             'logoIthenticate' => $this->getAssetBase64('images/certificates/logo-ithenticate.png'),
             'signatureQr' => $signatureQr,
             'downloadQr' => $downloadQr,
+            'hasArabicTitle' => $hasArabicTitle,
+            'hasArabicName' => $hasArabicName,
         ];
 
         // Generate PDF
@@ -152,13 +158,13 @@ class CertificateGenerator
 
     /**
      * Get the PDF content for download
+     * Always regenerate to ensure latest template and proper Arabic font rendering
      */
     public function getPdfContent(): string
     {
-        if (!$this->check->certificate_path || !Storage::disk('local')->exists($this->check->certificate_path)) {
-            $this->generate();
-            $this->check->refresh();
-        }
+        // Always regenerate for fresh download with proper fonts
+        $this->generate();
+        $this->check->refresh();
 
         return Storage::disk('local')->get($this->check->certificate_path) ?? '';
     }

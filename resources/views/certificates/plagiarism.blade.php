@@ -12,13 +12,23 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'DejaVu Sans', 'XB Riyaz', sans-serif;
             margin: 0;
             padding: 0;
             color: #1e3a8a;
             background: #ffffff;
             font-size: 10px;
             line-height: 1.3;
+        }
+        /* Arabic text support */
+        .arabic, [lang="ar"] {
+            font-family: 'DejaVu Sans', 'XB Riyaz', sans-serif;
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: bidi-override;
+        }
+        .mixed-text {
+            unicode-bidi: embed;
         }
         
         .certificate {
@@ -397,13 +407,13 @@
             <!-- Recipient -->
             <div class="recipient">
                 <div class="label">Diberikan kepada:</div>
-                <div class="name">{{ strtoupper($member->name) }}</div>
+                <div class="name" @if($hasArabicName ?? false) dir="rtl" @endif>{{ strtoupper($member->name) }}</div>
                 <div class="nim">NIM: {{ $member->member_id }}@if($member->memberType) • {{ $member->memberType->name }}@endif</div>
             </div>
             
             <!-- Document Info -->
             <div class="document-box">
-                <div class="doc-title">"{{ $check->document_title }}"</div>
+                <div class="doc-title" @if($hasArabicTitle ?? false) dir="rtl" @endif>"{{ $check->document_title }}"</div>
                 <div class="doc-meta">
                     {{ $check->original_filename }} • {{ $check->completed_at ? $check->completed_at->translatedFormat('d F Y, H:i') : $issuedDate }} WIB
                     @if($check->word_count) • {{ number_format($check->word_count) }} kata @endif
