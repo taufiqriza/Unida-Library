@@ -40,6 +40,8 @@ class CatalogShow extends Component
         try {
             $result = app(ReservationService::class)->reserve($member, $this->book);
             
+            \Log::info('Reservation result', ['result' => $result, 'member' => $member->id, 'book' => $this->book->id]);
+            
             if ($result['success']) {
                 session()->flash('success', $result['message']);
                 return redirect()->route('opac.member.loans');
@@ -47,6 +49,7 @@ class CatalogShow extends Component
                 $this->dispatch('showError', message: $result['message'], title: 'Reservasi Gagal');
             }
         } catch (\Exception $e) {
+            \Log::error('Reservation error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->dispatch('showError', message: $e->getMessage(), title: 'Terjadi Kesalahan');
         }
     }
