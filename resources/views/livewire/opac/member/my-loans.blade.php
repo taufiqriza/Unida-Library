@@ -1,11 +1,26 @@
-<div class="min-h-screen bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 py-6">
-        {{-- Header --}}
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Pinjaman & Denda</h1>
-            <p class="text-gray-500 text-sm">Kelola pinjaman, reservasi, dan pembayaran denda</p>
+<div>
+    {{-- Header --}}
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div class="max-w-5xl mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('opac.member.dashboard') }}" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold">Pinjaman Saya</h1>
+                        <p class="text-blue-200 text-sm">Kelola pinjaman, reservasi, dan denda</p>
+                    </div>
+                </div>
+                <a href="{{ route('opac.home') }}" class="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition flex items-center gap-2">
+                    <i class="fas fa-search"></i>
+                    <span class="hidden sm:inline">Cari Buku</span>
+                </a>
+            </div>
         </div>
+    </div>
 
+    <div class="max-w-5xl mx-auto px-4 py-6">
         {{-- Stats Cards --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <div class="bg-white rounded-xl p-4 border border-gray-100">
