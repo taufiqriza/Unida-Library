@@ -554,9 +554,9 @@
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
                     <!-- Search Button -->
-                    <button @click="searchOpen = true" class="hidden lg:flex items-center justify-center text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium shadow-sm h-10 border border-white/10 group px-3 gap-2">
-                        <i class="fas fa-search"></i>
-                        <span class="w-0 overflow-hidden group-hover:w-[75px] transition-[width] duration-200 whitespace-nowrap">Cari Koleksi</span>
+                    <button @click="searchOpen = true" class="hidden lg:flex items-center justify-center text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium shadow-sm h-10 w-10 border border-white/10 group overflow-hidden">
+                        <i class="fas fa-search flex-shrink-0"></i>
+                        <span class="w-0 overflow-hidden group-hover:w-[85px] group-hover:ml-2 transition-[width,margin] duration-200 whitespace-nowrap">Cari Koleksi</span>
                     </button>
                     
                     <!-- Auth Buttons Desktop -->
