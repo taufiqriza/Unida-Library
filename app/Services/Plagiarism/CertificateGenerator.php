@@ -71,17 +71,20 @@ class CertificateGenerator
             return self::$logoCache['main'];
         }
 
-        // Use smaller logo.png instead of logo-portal.png
-        $logoPath = storage_path('app/public/logo.png');
+        // Use logo-portal.png for premium look
+        $logoPath = storage_path('app/public/logo-portal.png');
+        if (!file_exists($logoPath)) {
+            $logoPath = storage_path('app/public/logo.png');
+        }
         if (!file_exists($logoPath)) {
             return null;
         }
 
         $content = file_get_contents($logoPath);
         
-        // Resize if GD available and image is large
-        if (function_exists('imagecreatefromstring') && strlen($content) > 50000) {
-            $content = $this->resizeImage($content, 150);
+        // Resize to max 120px height for certificate
+        if (function_exists('imagecreatefromstring')) {
+            $content = $this->resizeImage($content, 120);
         }
 
         self::$logoCache['main'] = 'data:image/png;base64,' . base64_encode($content);
