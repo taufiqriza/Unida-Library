@@ -31,6 +31,12 @@ class BiblioList extends Component
     public $filterBranch = '';
     public $showBulkDeleteModal = false;
     
+    // Quick Cover Search
+    public ?int $coverSearchBookId = null;
+    public array $coverSearchResults = [];
+    public $coverSearchTop = 0;
+    public $coverSearchLeft = 0;
+    
     // Modal for master data CRUD
     public $showModal = false;
     public $modalMode = 'create'; // create or edit
@@ -124,6 +130,92 @@ class BiblioList extends Component
     // Quick View
     public function quickView($id) { $this->quickViewId = $id; }
     public function closeQuickView() { $this->quickViewId = null; }
+
+    // Quick Cover Search
+    public function openCoverSearch(int $bookId): void
+    {
+        $this->coverSearchBookId = $bookId;
+        $this->coverSearchResults = [];
+        
+        $book = Book::find($bookId);
+        if (!$book) return;
+
+        $query = urlencode($book->title);
+        
+        try {
+            // Google Books
+            $googleData = @file_get_contents(
+                "https://www.googleapis.com/books/v1/volumes?q={$query}&maxResults=8",
+                false,
+                stream_context_create(['http' => ['timeout' => 5]])
+            );
+            if ($googleData) {
+                $data = json_decode($googleData, true);
+                foreach ($data['items'] ?? [] as $item) {
+                    $thumb = $item['volumeInfo']['imageLinks']['thumbnail'] ?? null;
+                    if ($thumb) {
+                        $this->coverSearchResults[] = [
+                            'url' => str_replace(['http://', 'zoom=1'], ['https://', 'zoom=2'], $thumb),
+                            'source' => 'Google',
+                            'title' => $item['volumeInfo']['title'] ?? ''
+                        ];
+                    }
+                }
+            }
+            
+            // Open Library
+            $olData = @file_get_contents(
+                "https://openlibrary.org/search.json?title={$query}&limit=6",
+                false,
+                stream_context_create(['http' => ['timeout' => 5]])
+            );
+            if ($olData) {
+                $data = json_decode($olData, true);
+                foreach ($data['docs'] ?? [] as $doc) {
+                    if (!empty($doc['cover_i'])) {
+                        $this->coverSearchResults[] = [
+                            'url' => "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg",
+                            'source' => 'OL',
+                            'title' => $doc['title'] ?? ''
+                        ];
+                    }
+                }
+            }
+        } catch (\Exception $e) {}
+    }
+
+    public function closeCoverSearch(): void
+    {
+        $this->coverSearchBookId = null;
+        $this->coverSearchResults = [];
+    }
+
+    public function applyCover(string $url): void
+    {
+        if (!$this->coverSearchBookId) return;
+        
+        $book = Book::find($this->coverSearchBookId);
+        if (!$book) return;
+
+        try {
+            $ctx = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'Mozilla/5.0']]);
+            $imageData = @file_get_contents($url, false, $ctx);
+            
+            if ($imageData && strlen($imageData) > 1000) {
+                $ext = 'jpg';
+                $filename = 'covers/cover_' . \Str::slug(substr($book->title, 0, 50)) . '-' . now()->format('YmdHis') . '.' . $ext;
+                \Storage::disk('public')->put($filename, $imageData);
+                
+                $book->update(['image' => $filename]);
+                
+                $this->dispatch('notify', type: 'success', message: 'Cover berhasil diterapkan');
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Gagal mengunduh cover');
+        }
+
+        $this->closeCoverSearch();
+    }
     
     public function getQuickViewBookProperty()
     {
