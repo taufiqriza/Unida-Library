@@ -65,9 +65,13 @@
                         {{ __('opac.ethesis_show.documents_available') }}
                     </h3>
                 </div>
-                <div class="p-4 space-y-3" x-data="pdfViewer('{{ $thesis->file_path ? asset('storage/' . $thesis->file_path) : '' }}')">
+                <div class="p-4 space-y-3" x-data="ethesisViewer({
+                    previewUrl: '{{ $thesis->preview_path ? asset('storage/thesis/previews/' . basename($thesis->preview_path)) : '' }}',
+                    fulltextUrl: '{{ $thesis->fulltext_path ? asset('storage/thesis/fulltext/' . basename($thesis->fulltext_path)) : '' }}'
+                })"
+                >>
                     {{-- Preview/BAB 1-3 --}}
-                    @if($thesis->file_path)
+                    @if($thesis->preview_path)
                     <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-xl">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
@@ -80,31 +84,26 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button @click="openModal()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
-                                <i class="fas fa-eye"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
-                            </button>
-                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-3 py-2 bg-green-100 text-green-700 text-sm font-medium rounded-lg hover:bg-green-200 transition" title="{{ __('opac.ethesis_show.open_new_tab') }}">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
+                        <button @click="openPreview()" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+                            <i class="fas fa-eye"></i>
+                            <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
+                        </button>
                     </div>
                     
-                    {{-- Modal Preview PDF --}}
-                    <div x-show="showPreview" 
+                    {{-- Modal PDF Viewer --}}
+                    <div x-show="showModal" 
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0"
                          x-transition:enter-end="opacity-100"
                          x-transition:leave="transition ease-in duration-200"
                          x-transition:leave-start="opacity-100"
                          x-transition:leave-end="opacity-0"
-                         class="fixed inset-0 z-50 flex items-center justify-center p-2 lg:p-4 bg-black/80 backdrop-blur-sm"
+                         class="fixed inset-0 z-[99999] flex items-center justify-center p-2 lg:p-4 bg-black/80 backdrop-blur-sm"
                          @keydown.escape.window="closeModal()"
                          style="display: none;">
                         
                         {{-- Modal Content --}}
-                        <div x-show="showPreview"
+                        <div x-show="showModal"
                              x-transition:enter="transition ease-out duration-300"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100"
@@ -115,43 +114,20 @@
                              class="relative w-full max-w-6xl h-[95vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                             
                             {{-- Modal Header --}}
-                            <div class="flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white flex-shrink-0">
+                            <div class="flex items-center justify-between px-3 lg:px-4 py-2 lg:py-3 text-white flex-shrink-0"
+                                 :class="modalType === 'preview' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'">
                                 <div class="flex items-center gap-2 lg:gap-3 min-w-0 flex-1">
                                     <div class="w-8 h-8 lg:w-10 lg:h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                                         <i class="fas fa-file-pdf text-sm lg:text-base"></i>
                                     </div>
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-xs lg:text-base line-clamp-1">{{ Str::limit($thesis->title, 40) }}</h3>
-                                        <p class="text-green-200 text-[10px] lg:text-xs">{{ __('opac.ethesis_show.bab_preview') }}</p>
+                                        <p class="text-white/70 text-[10px] lg:text-xs" x-text="modalType === 'preview' ? '{{ __('opac.ethesis_show.bab_preview') }}' : '{{ __('opac.ethesis_show.full_text') }}'"></p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-1 lg:gap-2 flex-shrink-0">
-                                    <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-2 lg:px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs lg:text-sm font-medium transition flex items-center gap-1">
-                                        <i class="fas fa-external-link-alt text-[10px] lg:text-xs"></i>
-                                        <span class="hidden lg:inline">{{ __('opac.ethesis_show.new_tab') }}</span>
-                                    </a>
-                                    <a href="{{ asset('storage/' . $thesis->file_path) }}" download class="px-2 lg:px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-xs lg:text-sm font-medium transition flex items-center gap-1">
-                                        <i class="fas fa-download text-[10px] lg:text-xs"></i>
-                                        <span class="hidden lg:inline">{{ __('opac.ethesis_show.download') }}</span>
-                                    </a>
-                                    <button @click="closeModal()" class="w-8 h-8 lg:w-9 lg:h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {{-- Warning for Download Extensions --}}
-                            <div x-show="showWarning" x-transition class="px-4 py-2 bg-amber-50 border-b border-amber-200 flex-shrink-0">
-                                <div class="flex items-start gap-2">
-                                    <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
-                                    <div class="flex-1">
-                                        <p class="text-xs text-amber-800 font-medium">{{ __('opac.ethesis_show.pdf_warning') }}</p>
-                                        <p class="text-[10px] text-amber-700 mt-0.5">{{ __('opac.ethesis_show.pdf_warning_desc') }}</p>
-                                    </div>
-                                    <button @click="showWarning = false" class="text-amber-500 hover:text-amber-700">
-                                        <i class="fas fa-times text-xs"></i>
-                                    </button>
-                                </div>
+                                <button @click="closeModal()" class="w-8 h-8 lg:w-9 lg:h-9 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             
                             {{-- PDF Viewer Container --}}
@@ -159,7 +135,7 @@
                                 {{-- Loading State --}}
                                 <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
                                     <div class="text-center">
-                                        <div class="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                                        <div class="w-12 h-12 border-4 border-white/50 border-t-white rounded-full animate-spin mx-auto mb-3"></div>
                                         <p class="text-white text-sm">{{ __('opac.ethesis_show.loading_document') }}</p>
                                     </div>
                                 </div>
@@ -171,126 +147,126 @@
                                             <i class="fas fa-exclamation-circle text-red-400 text-2xl"></i>
                                         </div>
                                         <h4 class="text-white font-bold mb-2">{{ __('opac.ethesis_show.load_failed') }}</h4>
-                                        <p class="text-gray-400 text-sm mb-4">{{ __('opac.ethesis_show.possible_causes') }}</p>
-                                        <ul class="text-gray-400 text-xs text-{{ app()->getLocale() === 'ar' ? 'right' : 'left' }} space-y-1 mb-4">
-                                            <li class="flex items-start gap-2">
-                                                <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>{{ __('opac.ethesis_show.cause_1') }}</span>
-                                            </li>
-                                            <li class="flex items-start gap-2">
-                                                <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>{{ __('opac.ethesis_show.cause_2') }}</span>
-                                            </li>
-                                            <li class="flex items-start gap-2">
-                                                <i class="fas fa-check-circle text-amber-400 mt-0.5"></i>
-                                                <span>{{ __('opac.ethesis_show.cause_3') }}</span>
-                                            </li>
-                                        </ul>
-                                        <div class="flex gap-2 justify-center">
-                                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
-                                                <i class="fas fa-external-link-alt {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.ethesis_show.open_new_tab') }}
-                                            </a>
-                                            <button @click="retryLoad()" class="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-600 transition">
-                                                <i class="fas fa-redo {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i> {{ __('opac.ethesis_show.retry') }}
-                                            </button>
-                                        </div>
+                                        <p class="text-gray-400 text-sm mb-4">{{ __('opac.ethesis_show.try_again_later') }}</p>
+                                        <button @click="retryLoad()" class="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-600 transition">
+                                            <i class="fas fa-redo mr-1"></i> {{ __('opac.ethesis_show.retry') }}
+                                        </button>
                                     </div>
                                 </div>
                                 
-                                {{-- PDF.js Viewer (using Google Docs Viewer as fallback-proof solution) --}}
+                                {{-- PDF Viewer --}}
                                 <iframe 
                                     x-ref="pdfFrame"
                                     x-show="!error"
                                     x-on:load="onFrameLoad()"
                                     x-on:error="onFrameError()"
                                     class="w-full h-full"
-                                    frameborder="0"
-                                    allowfullscreen>
+                                    frameborder="0">
                                 </iframe>
                             </div>
                             
                             {{-- Modal Footer --}}
-                            <div class="px-3 lg:px-4 py-2 bg-gray-100 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
-                                <p class="text-[10px] lg:text-xs text-gray-500 hidden sm:block">
-                                    <i class="fas fa-info-circle {{ app()->getLocale() === 'ar' ? 'ml-1' : 'mr-1' }}"></i>
-                                    {{ __('opac.ethesis_show.navigation_hint') }}
-                                </p>
-                                <div class="flex items-center gap-2 {{ app()->getLocale() === 'ar' ? 'mr-auto' : 'ml-auto' }}">
-                                    <button @click="toggleViewer()" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-medium rounded-lg transition flex items-center gap-1">
-                                        <i class="fas fa-sync-alt"></i>
-                                        <span class="hidden sm:inline">{{ __('opac.ethesis_show.switch_viewer') }}</span>
-                                    </button>
-                                    <button @click="closeModal()" class="px-4 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-xs lg:text-sm font-medium rounded-lg transition">
-                                        {{ __('opac.ethesis_show.close') }}
-                                    </button>
-                                </div>
+                            <div class="px-3 lg:px-4 py-2 bg-gray-100 border-t border-gray-200 flex items-center justify-end flex-shrink-0">
+                                <button @click="closeModal()" class="px-4 py-1.5 bg-gray-700 hover:bg-gray-800 text-white text-xs lg:text-sm font-medium rounded-lg transition">
+                                    {{ __('opac.ethesis_show.close') }}
+                                </button>
                             </div>
                         </div>
                     </div>
+                    @endif
+
+                    {{-- Full Text - Members Only --}}
+                    @if($thesis->fulltext_path)
+                    <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-book text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
+                                <p class="text-xs text-blue-600 flex items-center gap-1">
+                                    <i class="fas fa-lock"></i> {{ __('opac.ethesis_show.members_only') }}
+                                </p>
+                            </div>
+                        </div>
+                        @if(auth('member')->check())
+                            <button @click="openFulltext()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                                <i class="fas fa-eye"></i>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.read') }}</span>
+                            </button>
+                        @else
+                            <a href="{{ route('opac.login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
+                            </a>
+                        @endif
+                    </div>
+                    @endif
+
+                    {{-- Info Box --}}
+                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                        <p class="text-xs text-amber-700 flex items-start gap-2">
+                            <i class="fas fa-info-circle mt-0.5"></i>
+                            <span>{{ __('opac.ethesis_show.fulltext_info') }}</span>
+                        </p>
+                    </div>
                     
                     <script>
-                        function pdfViewer(pdfUrl) {
+                        function ethesisViewer(config) {
                             return {
-                                showPreview: false,
+                                showModal: false,
+                                modalType: 'preview',
                                 loading: true,
                                 error: false,
-                                showWarning: true,
-                                pdfUrl: pdfUrl,
-                                viewerType: 'native', // 'native', 'google', 'mozilla'
+                                previewUrl: config.previewUrl,
+                                fulltextUrl: config.fulltextUrl,
+                                currentUrl: '',
                                 loadTimeout: null,
                                 
+                                openPreview() {
+                                    this.modalType = 'preview';
+                                    this.currentUrl = this.previewUrl;
+                                    this.openModal();
+                                },
+                                
+                                openFulltext() {
+                                    this.modalType = 'fulltext';
+                                    this.currentUrl = this.fulltextUrl;
+                                    this.openModal();
+                                },
+                                
                                 openModal() {
-                                    this.showPreview = true;
+                                    this.showModal = true;
                                     this.loading = true;
                                     this.error = false;
-                                    this.$nextTick(() => {
-                                        this.loadPdf();
-                                    });
+                                    document.body.style.overflow = 'hidden';
+                                    this.$nextTick(() => this.loadPdf());
                                 },
                                 
                                 closeModal() {
-                                    this.showPreview = false;
-                                    if (this.$refs.pdfFrame) {
-                                        this.$refs.pdfFrame.src = '';
-                                    }
+                                    this.showModal = false;
+                                    document.body.style.overflow = '';
+                                    if (this.$refs.pdfFrame) this.$refs.pdfFrame.src = '';
                                     clearTimeout(this.loadTimeout);
                                 },
                                 
                                 loadPdf() {
                                     const frame = this.$refs.pdfFrame;
-                                    if (!frame) return;
+                                    if (!frame || !this.currentUrl) return;
                                     
-                                    // Set timeout for loading (10 seconds)
                                     this.loadTimeout = setTimeout(() => {
                                         if (this.loading) {
                                             this.error = true;
                                             this.loading = false;
                                         }
-                                    }, 10000);
+                                    }, 15000);
                                     
-                                    // Choose viewer based on type
-                                    let src = '';
-                                    switch(this.viewerType) {
-                                        case 'google':
-                                            src = `https://docs.google.com/viewer?url=${encodeURIComponent(this.pdfUrl)}&embedded=true`;
-                                            break;
-                                        case 'mozilla':
-                                            src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(this.pdfUrl)}`;
-                                            break;
-                                        default:
-                                            src = this.pdfUrl + '#toolbar=1&navpanes=1&scrollbar=1&view=FitH';
-                                    }
-                                    
-                                    frame.src = src;
+                                    frame.src = this.currentUrl + '#toolbar=0&navpanes=0&scrollbar=1&view=FitH';
                                 },
                                 
                                 onFrameLoad() {
                                     clearTimeout(this.loadTimeout);
                                     this.loading = false;
-                                    // Hide warning after successful load
-                                    setTimeout(() => {
-                                        this.showWarning = false;
-                                    }, 3000);
                                 },
                                 
                                 onFrameError() {
@@ -303,71 +279,10 @@
                                     this.error = false;
                                     this.loading = true;
                                     this.loadPdf();
-                                },
-                                
-                                toggleViewer() {
-                                    // Cycle through viewers
-                                    const viewers = ['native', 'google', 'mozilla'];
-                                    const currentIndex = viewers.indexOf(this.viewerType);
-                                    this.viewerType = viewers[(currentIndex + 1) % viewers.length];
-                                    this.error = false;
-                                    this.loading = true;
-                                    this.loadPdf();
                                 }
                             }
                         }
                     </script>
-                    @endif
-
-                    {{-- Full Text --}}
-                    <div class="flex items-center justify-between p-4 {{ $thesis->is_fulltext_public ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200' }} border rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 {{ $thesis->is_fulltext_public ? 'bg-blue-100' : 'bg-gray-100' }} rounded-xl flex items-center justify-center">
-                                <i class="fas fa-book {{ $thesis->is_fulltext_public ? 'text-blue-600' : 'text-gray-400' }} text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-900">{{ __('opac.ethesis_show.full_text') }}</p>
-                                @if($thesis->is_fulltext_public)
-                                    <p class="text-xs text-blue-600 flex items-center gap-1">
-                                        <i class="fas fa-unlock"></i> {{ __('opac.ethesis_show.public_access') }}
-                                    </p>
-                                @else
-                                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                                        <i class="fas fa-lock"></i> {{ __('opac.ethesis_show.members_only') }}
-                                    </p>
-                                @endif
-                            </div>
-                        </div>
-                        @if($thesis->is_fulltext_public && $thesis->file_path)
-                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                                <i class="fas fa-download"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.download') }}</span>
-                            </a>
-                        @elseif(auth('member')->check() && $thesis->file_path)
-                            <a href="{{ asset('storage/' . $thesis->file_path) }}" target="_blank" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                                <i class="fas fa-download"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.download') }}</span>
-                            </a>
-                        @elseif(!$thesis->file_path)
-                            <span class="px-4 py-2 bg-gray-300 text-gray-500 text-sm font-medium rounded-lg flex items-center gap-2">
-                                <i class="fas fa-file-excel"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.not_available') }}</span>
-                            </span>
-                        @else
-                            <a href="{{ route('login') }}" class="px-4 py-2 bg-gray-400 text-white text-sm font-medium rounded-lg hover:bg-gray-500 transition flex items-center gap-2">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span class="hidden sm:inline">{{ __('opac.ethesis_show.login') }}</span>
-                            </a>
-                        @endif
-                    </div>
-
-                    {{-- Info Box --}}
-                    <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                        <p class="text-xs text-amber-700 flex items-start gap-2">
-                            <i class="fas fa-info-circle mt-0.5"></i>
-                            <span>{{ __('opac.ethesis_show.fulltext_info') }}</span>
-                        </p>
-                    </div>
                 </div>
             </div>
 
