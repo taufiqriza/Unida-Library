@@ -167,9 +167,6 @@
                 <button wire:click="$set('showDigitalCard', true)" class="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition flex items-center gap-2">
                     <i class="fas fa-id-card"></i> Kartu Digital
                 </button>
-                <a href="{{ route('opac.home') }}" class="flex-shrink-0 px-4 py-2.5 bg-white text-gray-700 text-xs font-medium rounded-xl border border-gray-200 hover:bg-gray-50 transition flex items-center gap-2">
-                    <i class="fas fa-search"></i> Cari Buku
-                </a>
             </div>
 
 
@@ -254,27 +251,20 @@
 
                     {{-- CTA Buttons Grid --}}
                     <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                        {{-- Cek Plagiasi CTA (Left) --}}
-                        @if(\App\Services\Plagiarism\PlagiarismService::isEnabled())
-                        @php
-                            $plagiarismQuota = 3;
-                            $plagiarismUsed = auth('member')->user()->plagiarismChecks()->count();
-                            $plagiarismRemaining = max(0, $plagiarismQuota - $plagiarismUsed);
-                            $latestChecks = auth('member')->user()->plagiarismChecks()->latest()->take(3)->get();
-                        @endphp
-                        <a href="{{ route('opac.member.plagiarism.index') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
+                        {{-- Cek Plagiasi CTA (Left) - Maintenance Mode --}}
+                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md relative overflow-hidden">
+                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-amber-500 text-[8px] font-bold rounded">MAINTENANCE</div>
                             <div class="flex items-center gap-2 lg:gap-3">
                                 <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-shield-alt text-base lg:text-xl"></i>
+                                    <i class="fas fa-tools text-base lg:text-xl"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
-                                    <p class="text-teal-200 text-[10px] lg:text-xs truncate">Kuota: {{ $plagiarismRemaining }}/{{ $plagiarismQuota }}</p>
-                                    <p class="text-teal-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-certificate mr-0.5"></i>Dapatkan sertifikat</p>
+                                    <p class="text-gray-200 text-[10px] lg:text-xs">Sedang maintenance</p>
+                                    <p class="text-gray-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-arrow-right mr-0.5"></i>Gunakan opsi eksternal</p>
                                 </div>
                             </div>
-                        </a>
-                        @endif
+                        </div>
 
                         {{-- Unggah Tugas Akhir CTA (Right) --}}
                         <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
@@ -291,17 +281,20 @@
                         </a>
                     </div>
                     
-                    {{-- External Plagiarism Banner --}}
-                    <a href="{{ route('opac.member.plagiarism.external') }}" class="block p-3 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition">
+                    {{-- External Plagiarism Banner - Highlighted --}}
+                    <a href="{{ route('opac.member.plagiarism.external') }}" class="block p-3 bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-300 rounded-xl hover:border-teal-400 hover:shadow-md transition">
                         <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-external-link-alt text-blue-600 text-sm"></i>
+                            <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
+                                <i class="fas fa-file-upload text-white text-sm"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold text-blue-800 text-xs">Punya Hasil Cek Plagiasi Eksternal?</h4>
-                                <p class="text-blue-600 text-[10px]">Submit hasil Turnitin/iThenticate untuk surat bebas plagiasi</p>
+                                <h4 class="font-bold text-teal-800 text-xs">Upload Hasil Cek Plagiasi Eksternal</h4>
+                                <p class="text-teal-600 text-[10px]">Submit hasil Turnitin/iThenticate untuk mendapatkan sertifikat bebas plagiasi</p>
                             </div>
-                            <i class="fas fa-chevron-right text-blue-400 text-xs"></i>
+                            <div class="flex flex-col items-center">
+                                <span class="px-2 py-0.5 bg-teal-500 text-white text-[8px] font-bold rounded mb-1">TERSEDIA</span>
+                                <i class="fas fa-chevron-right text-teal-400 text-xs"></i>
+                            </div>
                         </div>
                     </a>
 

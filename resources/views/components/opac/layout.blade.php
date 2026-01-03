@@ -553,15 +553,6 @@
 
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
-                    <!-- Search Button with Card Style -->
-                    <button 
-                        @click="searchOpen = true" 
-                        class="hidden lg:flex items-center gap-2 px-3 py-1 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm h-10 border border-white/10"
-                    >
-                        <i class="fas fa-search"></i>
-                        <span>{{ __('opac.search') }}</span>
-                    </button>
-                    
                     <!-- Auth Buttons Desktop -->
                     @auth('member')
                         <div class="hidden lg:block relative" x-data="{ openProfile: false }">
@@ -631,6 +622,10 @@
                                      <a href="{{ route('opac.member.settings') }}" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-300 transition group flex flex-col items-center gap-2 text-center">
                                          <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-cog"></i></div>
                                          <span class="text-xs font-bold text-gray-600 group-hover:text-gray-900">{{ __('opac.member.settings') }}</span>
+                                     </a>
+                                     <a href="{{ route('opac.member.dashboard') }}?card=1" class="p-3 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-amber-200 transition group flex flex-col items-center gap-2 text-center">
+                                         <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition shadow-inner"><i class="fas fa-id-card"></i></div>
+                                         <span class="text-xs font-bold text-gray-600 group-hover:text-amber-600">Kartu Digital</span>
                                      </a>
                                  </div>
                                  @else

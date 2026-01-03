@@ -29,6 +29,11 @@ class Dashboard extends Component
     public function mount()
     {
         $this->loadData();
+        
+        // Auto-open digital card from URL parameter
+        if (request()->has('card')) {
+            $this->showDigitalCard = true;
+        }
     }
 
     public function loadData()
