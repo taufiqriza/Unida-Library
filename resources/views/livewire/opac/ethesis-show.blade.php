@@ -100,7 +100,6 @@
                         </a>
                         @endif
                     </div>
-                    @endif
                     
                     {{-- Modal PDF Viewer --}}
                     <div x-show="showModal" 
