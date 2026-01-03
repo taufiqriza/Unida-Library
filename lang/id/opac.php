@@ -1223,6 +1223,7 @@ return [
         'all_locations' => 'Semua Lokasi',
         'collection_type' => 'Jenis Koleksi',
         'all_types' => 'Semua Jenis',
+        'all_subjects' => 'Semua Subjek',
         'faculty_dept' => 'Fakultas & Prodi',
         'all_faculties' => 'Semua Fakultas',
         'all_departments' => 'Semua Program Studi',

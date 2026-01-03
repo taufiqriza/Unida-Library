@@ -26,7 +26,7 @@
             </div>
             
             <!-- Body -->
-            <form action="{{ route('opac.search') }}" method="GET" class="relative px-6 lg:px-8 pb-6 lg:pb-8">
+            <form action="{{ route('opac.search') }}" method="GET" class="relative px-6 lg:px-8 pb-6 lg:pb-8" onsubmit="return handleAdvancedSearch(this)">
                 <!-- Kata Kunci -->
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -171,6 +171,15 @@
             modal.classList.add('hidden');
             document.body.style.overflow = '';
         }, 300);
+    }
+    
+    function handleAdvancedSearch(form) {
+        const query = form.querySelector('input[name="q"]').value.trim();
+        if (window.SearchSplash) {
+            closeAdvancedSearch();
+            SearchSplash.show(query || 'Pencarian Lanjutan');
+        }
+        return true;
     }
     
     document.addEventListener('keydown', function(e) {

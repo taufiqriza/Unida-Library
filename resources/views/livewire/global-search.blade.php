@@ -52,7 +52,7 @@
                 </div>
             </div>
 
-            {{-- Resource Type Tabs - Flex wrap for all languages, no scroll --}}
+            {{-- Resource Type Tabs - Horizontal scroll on mobile --}}
             @php 
                 $tabs = [
                     'all' => ['icon' => 'fa-layer-group', 'label' => __('opac.global_search.tab_all')],
@@ -71,22 +71,24 @@
                 };
             @endphp
             
-            <div class="flex flex-wrap items-center justify-center gap-2 mt-8 px-4">
-                @foreach($tabs as $key => $tab)
-                    <button 
-                        wire:click="setResourceType('{{ $key }}')"
-                        class="flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all
-                            {{ $resourceType === $key 
-                                ? 'bg-white text-primary-700 shadow-lg scale-105' 
-                                : 'bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm' }}"
-                    >
-                        <i class="fas {{ $tab['icon'] }}"></i>
-                        <span>{{ $tab['label'] }}</span>
-                        <span class="px-2 py-0.5 text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
-                            {{ $formatCompact($counts[$key] ?? 0) }}
-                        </span>
-                    </button>
-                @endforeach
+            <div class="mt-6 lg:mt-8 -mx-4 px-4 overflow-x-auto scrollbar-hide">
+                <div class="flex lg:flex-wrap lg:justify-center gap-2 pb-2 min-w-max lg:min-w-0">
+                    @foreach($tabs as $key => $tab)
+                        <button 
+                            wire:click="setResourceType('{{ $key }}')"
+                            class="flex items-center gap-1.5 px-3 lg:px-4 py-2 lg:py-2.5 rounded-full text-xs lg:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0
+                                {{ $resourceType === $key 
+                                    ? 'bg-white text-primary-700 shadow-lg' 
+                                    : 'bg-white/10 text-white hover:bg-white/20' }}"
+                        >
+                            <i class="fas {{ $tab['icon'] }} text-xs"></i>
+                            <span>{{ $tab['label'] }}</span>
+                            <span class="px-1.5 py-0.5 text-[10px] lg:text-xs rounded-full {{ $resourceType === $key ? 'bg-primary-100 text-primary-700' : 'bg-white/20' }}">
+                                {{ $formatCompact($counts[$key] ?? 0) }}
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
             </div>
         </div>
         
@@ -157,38 +159,45 @@
                             </div>
                         </button>
 
-                        <div x-show="!collapsed" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="p-4 space-y-5">
-                            {{-- Branch/Location Filter (Dropdown) --}}
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-red-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-map-marker-alt text-red-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.library_location') }}
+                        <div x-show="!collapsed" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="p-4 space-y-4">
+                            {{-- Branch/Location Filter - Only for books --}}
+                            @if($resourceType === 'all' || $resourceType === 'book')
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-map-marker-alt text-red-500 mr-1.5"></i>{{ __('opac.global_search.library_location') }}
                                 </label>
-                                <select wire:model.live="branchId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                <select wire:model.live="branchId" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                                     <option value="">{{ __('opac.global_search.all_locations') }}</option>
                                     @foreach($this->branches as $branch)
                                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-
-                            <hr class="border-gray-100">
+                            @endif
 
                             {{-- Collection Type (for Books) --}}
                             @if($resourceType === 'all' || $resourceType === 'book')
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-layer-group text-blue-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.collection_type') }}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-layer-group text-blue-500 mr-1.5"></i>{{ __('opac.global_search.collection_type') }}
                                 </label>
-                                <select wire:model.live="collectionTypeId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                <select wire:model.live="collectionTypeId" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                                     <option value="">{{ __('opac.global_search.all_types') }}</option>
                                     @foreach($this->collectionTypes as $type)
                                         <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Subject Filter - Dropdown --}}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-tags text-amber-500 mr-1.5"></i>{{ __('opac.global_search.subject') }}
+                                </label>
+                                <select wire:model.live="subjectId" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
+                                    <option value="">{{ __('opac.global_search.all_subjects') }}</option>
+                                    @foreach($this->subjects as $subject)
+                                        <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -196,22 +205,19 @@
 
                             {{-- Faculty & Department (for E-Thesis) --}}
                             @if($resourceType === 'all' || $resourceType === 'ethesis')
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-purple-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-university text-purple-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.faculty_dept') }}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-university text-purple-500 mr-1.5"></i>{{ __('opac.global_search.faculty_dept') }}
                                 </label>
                                 <div class="space-y-2">
-                                    <select wire:model.live="facultyId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                    <select wire:model.live="facultyId" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                                         <option value="">{{ __('opac.global_search.all_faculties') }}</option>
                                         @foreach($this->faculties as $faculty)
                                             <option value="{{ $faculty->id }}">{{ $faculty->name }}</option>
                                         @endforeach
                                     </select>
                                     @if($facultyId)
-                                    <select wire:model.live="departmentId" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                    <select wire:model.live="departmentId" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                                         <option value="">{{ __('opac.global_search.all_departments') }}</option>
                                         @foreach($this->departments as $dept)
                                             <option value="{{ $dept->id }}">{{ $dept->name }}</option>
@@ -222,39 +228,26 @@
                             </div>
 
                             {{-- Thesis Type --}}
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-scroll text-pink-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.thesis_type') }}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-scroll text-pink-500 mr-1.5"></i>{{ __('opac.global_search.thesis_type') }}
                                 </label>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach(['skripsi' => __('opac.global_search.thesis_skripsi'), 'tesis' => __('opac.global_search.thesis_tesis'), 'disertasi' => __('opac.global_search.thesis_disertasi')] as $key => $label)
-                                        <button 
-                                            wire:click="$set('thesisType', '{{ $thesisType === $key ? '' : $key }}')"
-                                            class="px-3 py-1.5 text-xs font-medium rounded-full transition
-                                                {{ $thesisType === $key 
-                                                    ? 'bg-purple-600 text-white' 
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                        >
-                                            {{ $label }}
-                                        </button>
-                                    @endforeach
-                                </div>
+                                <select wire:model.live="thesisType" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
+                                    <option value="">{{ __('opac.global_search.all_types') }}</option>
+                                    <option value="skripsi">{{ __('opac.global_search.thesis_skripsi') }}</option>
+                                    <option value="tesis">{{ __('opac.global_search.thesis_tesis') }}</option>
+                                    <option value="disertasi">{{ __('opac.global_search.thesis_disertasi') }}</option>
+                                </select>
                             </div>
                             @endif
 
                             {{-- Journal Source Filter --}}
-                            @if($resourceType === 'all' || $resourceType === 'journal')
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-file-lines text-indigo-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.journal_source') }}
+                            @if($resourceType === 'journal')
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-newspaper text-indigo-500 mr-1.5"></i>{{ __('opac.global_search.journal_source') }}
                                 </label>
-                                <select wire:model.live="journalCode" class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white transition">
+                                <select wire:model.live="journalCode" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
                                     <option value="">{{ __('opac.global_search.all_journals') }}</option>
                                     @foreach($this->journalSources as $source)
                                         <option value="{{ $source->code }}">{{ $source->name }}</option>
@@ -265,165 +258,48 @@
 
                             {{-- E-Book Source Filter --}}
                             @if($resourceType === 'ebook')
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-book-reader text-emerald-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.ebook_source') }}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-book-reader text-emerald-500 mr-1.5"></i>{{ __('opac.global_search.ebook_source') }}
                                 </label>
-                                <div class="flex flex-wrap gap-2">
-                                    <button 
-                                        wire:click="$set('ebookSource', null)"
-                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition
-                                            {{ !$ebookSource ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                    >
-                                        {{ __('opac.global_search.all_sources') }}
-                                    </button>
-                                    <button 
-                                        wire:click="$set('ebookSource', 'local')"
-                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition flex items-center gap-1
-                                            {{ $ebookSource === 'local' ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                    >
-                                        <i class="fas fa-database text-[10px]"></i> Local
-                                    </button>
-                                    <button 
-                                        wire:click="$set('ebookSource', 'kubuku')"
-                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition flex items-center gap-1
-                                            {{ $ebookSource === 'kubuku' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                    >
-                                        <i class="fas fa-cloud text-[10px]"></i> KUBUKU
-                                    </button>
-                                </div>
+                                <select wire:model.live="ebookSource" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
+                                    <option value="">{{ __('opac.global_search.all_sources') }}</option>
+                                    <option value="local">Local</option>
+                                    <option value="kubuku">KUBUKU</option>
+                                </select>
                             </div>
                             @endif
 
-                            {{-- Subject Filter --}}
-                            @if($resourceType === 'all' || $resourceType === 'book')
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-amber-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-tags text-amber-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.subject') }}
+                            {{-- Language Filter - Only for books/ebooks --}}
+                            @if($resourceType === 'all' || $resourceType === 'book' || $resourceType === 'ebook')
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-globe text-cyan-500 mr-1.5"></i>{{ __('opac.global_search.language') }}
                                 </label>
-                                
-                                {{-- Selected Subjects --}}
-                                @if(!empty($selectedSubjects))
-                                <div class="flex flex-wrap gap-1.5 mb-3">
-                                    @foreach($this->subjects->whereIn('id', $selectedSubjects) as $subject)
-                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
-                                            {{ \Str::limit($subject->name, 20) }}
-                                            <button wire:click="removeSubject({{ $subject->id }})" class="hover:text-amber-900">
-                                                <i class="fas fa-times text-[10px]"></i>
-                                            </button>
-                                        </span>
-                                    @endforeach
-                                </div>
-                                @endif
-
-                                {{-- Popular Subjects --}}
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach($this->popularSubjects->take(8) as $subject)
-                                        @if(!in_array($subject->id, $selectedSubjects))
-                                        <button 
-                                            wire:click="toggleSubject({{ $subject->id }})"
-                                            class="px-2.5 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-amber-100 hover:text-amber-700 transition"
-                                        >
-                                            {{ \Str::limit($subject->name, 15) }}
-                                        </button>
-                                        @endif
-                                    @endforeach
-                                </div>
-                                
-                                <button 
-                                    @click="showSubjectModal = true"
-                                    class="mt-2 text-xs text-primary-600 hover:text-primary-700 font-medium"
-                                >
-                                    <i class="fas fa-plus mr-1"></i> {{ __('opac.global_search.view_all_subjects') }}
-                                </button>
-                            </div>
-                            @endif
-
-                            <hr class="border-gray-100">
-
-                            {{-- Language Filter --}}
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-cyan-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-globe text-cyan-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.language') }}
-                                </label>
-                                <div class="flex flex-wrap gap-2">
-                                    <button 
-                                        wire:click="$set('language', null)"
-                                        class="px-3 py-1.5 text-xs font-medium rounded-full transition
-                                            {{ !$language ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                    >
-                                        {{ __('opac.global_search.all_languages') }}
-                                    </button>
+                                <select wire:model.live="language" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white">
+                                    <option value="">{{ __('opac.global_search.all_languages') }}</option>
                                     @foreach($this->languages as $code => $name)
-                                        <button 
-                                            wire:click="$set('language', '{{ $language === $code ? '' : $code }}')"
-                                            class="px-3 py-1.5 text-xs font-medium rounded-full transition
-                                                {{ $language === $code 
-                                                    ? 'bg-cyan-600 text-white' 
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}"
-                                        >
-                                            {{ $name }}
-                                        </button>
+                                        <option value="{{ $code }}">{{ $name }}</option>
                                     @endforeach
-                                </div>
+                                </select>
                             </div>
+                            @endif
 
                             {{-- Year Range --}}
-                            <div class="filter-section">
-                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3">
-                                    <span class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-calendar text-green-500 text-xs"></i>
-                                    </span>
-                                    {{ __('opac.global_search.year_published') }}
+                            <div>
+                                <label class="text-xs font-semibold text-gray-600 mb-1.5 block">
+                                    <i class="fas fa-calendar text-green-500 mr-1.5"></i>{{ __('opac.global_search.year_published') }}
                                 </label>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <input 
-                                            type="number" 
-                                            wire:model.live.debounce.500ms="yearFrom" 
-                                            placeholder="{{ __('opac.global_search.year_from') }}" 
-                                            min="1900" 
-                                            max="{{ date('Y') }}" 
-                                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                        >
-                                    </div>
-                                    <div>
-                                        <input 
-                                            type="number" 
-                                            wire:model.live.debounce.500ms="yearTo" 
-                                            placeholder="{{ __('opac.global_search.year_to') }}" 
-                                            min="1900" 
-                                            max="{{ date('Y') }}" 
-                                            class="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                        >
-                                    </div>
-                                </div>
-                                {{-- Quick Year Buttons --}}
-                                <div class="flex flex-wrap gap-1.5 mt-2">
-                                    @foreach([date('Y'), date('Y')-1, date('Y')-2, date('Y')-5] as $year)
-                                        <button 
-                                            wire:click="$set('yearFrom', {{ $year }})"
-                                            class="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-lg hover:bg-green-100 hover:text-green-700 transition"
-                                        >
-                                            {{ $year == date('Y') ? __('opac.global_search.this_year') : ($year == date('Y')-1 ? __('opac.global_search.last_year') : $year) }}
-                                        </button>
-                                    @endforeach
+                                    <input type="number" wire:model.live.debounce.500ms="yearFrom" placeholder="{{ __('opac.global_search.year_from') }}" min="1900" max="{{ date('Y') }}" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <input type="number" wire:model.live.debounce.500ms="yearTo" placeholder="{{ __('opac.global_search.year_to') }}" min="1900" max="{{ date('Y') }}" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {{-- Statistics Card --}}
-                    <div class="bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-700 rounded-2xl p-5 text-white shadow-lg">
+                    <div class="hidden lg:block bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-700 rounded-2xl p-5 text-white shadow-lg mt-4">
                         <h4 class="font-bold mb-4 flex items-center gap-2">
                             <i class="fas fa-chart-pie"></i> {{ __('opac.global_search.collection_stats') }}
                         </h4>
@@ -487,7 +363,7 @@
             </aside>
 
             {{-- Results Section --}}
-            <main class="flex-1 min-w-0">
+            <main class="flex-1 min-w-0 pb-8">
                 {{-- Results Header --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
@@ -826,37 +702,42 @@
                         
                         {{-- Pagination --}}
                         @if($this->totalPages > 1)
-                        <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
-                            <div class="text-sm text-gray-500">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-8 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                            <div class="text-sm text-gray-500 order-2 sm:order-1">
                                 {{ __('opac.global_search.page_of', ['page' => $page, 'total' => $this->totalPages]) }}
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 order-1 sm:order-2">
                                 <button 
                                     wire:click="previousPage"
                                     {{ $page <= 1 ? 'disabled' : '' }}
-                                    class="px-4 py-2 text-sm font-medium rounded-xl transition flex items-center gap-2
+                                    class="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-1 sm:gap-2
                                         {{ $page <= 1 
                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
+                                            : 'bg-primary-50 text-primary-700 hover:bg-primary-100' }}"
                                 >
                                     <i class="fas fa-chevron-left text-xs"></i>
                                     <span class="hidden sm:inline">{{ __('opac.global_search.previous') }}</span>
                                 </button>
                                 
-                                {{-- Page Numbers --}}
+                                {{-- Mobile: Current page indicator --}}
+                                <div class="sm:hidden px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg">
+                                    {{ $page }} / {{ $this->totalPages }}
+                                </div>
+                                
+                                {{-- Desktop: Page Numbers --}}
                                 <div class="hidden sm:flex items-center gap-1">
                                     @php
                                         $start = max(1, $page - 2);
                                         $end = min($this->totalPages, $page + 2);
                                     @endphp
                                     @if($start > 1)
-                                        <button wire:click="gotoPage(1)" class="w-10 h-10 text-sm rounded-xl hover:bg-gray-100">1</button>
+                                        <button wire:click="gotoPage(1)" class="w-10 h-10 text-sm rounded-lg hover:bg-gray-100">1</button>
                                         @if($start > 2)<span class="px-1 text-gray-400">...</span>@endif
                                     @endif
                                     @for($i = $start; $i <= $end; $i++)
                                         <button 
                                             wire:click="gotoPage({{ $i }})"
-                                            class="w-10 h-10 text-sm rounded-xl transition
+                                            class="w-10 h-10 text-sm rounded-lg transition
                                                 {{ $i === $page 
                                                     ? 'bg-primary-600 text-white' 
                                                     : 'hover:bg-gray-100' }}"
@@ -864,17 +745,17 @@
                                     @endfor
                                     @if($end < $this->totalPages)
                                         @if($end < $this->totalPages - 1)<span class="px-1 text-gray-400">...</span>@endif
-                                        <button wire:click="gotoPage({{ $this->totalPages }})" class="w-10 h-10 text-sm rounded-xl hover:bg-gray-100">{{ $this->totalPages }}</button>
+                                        <button wire:click="gotoPage({{ $this->totalPages }})" class="w-10 h-10 text-sm rounded-lg hover:bg-gray-100">{{ $this->totalPages }}</button>
                                     @endif
                                 </div>
                                 
                                 <button 
                                     wire:click="nextPage"
                                     {{ $page >= $this->totalPages ? 'disabled' : '' }}
-                                    class="px-4 py-2 text-sm font-medium rounded-xl transition flex items-center gap-2
+                                    class="px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-1 sm:gap-2
                                         {{ $page >= $this->totalPages 
                                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-primary-300' }}"
+                                            : 'bg-primary-50 text-primary-700 hover:bg-primary-100' }}"
                                 >
                                     <span class="hidden sm:inline">{{ __('opac.global_search.next') }}</span>
                                     <i class="fas fa-chevron-right text-xs"></i>
@@ -1060,6 +941,28 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         if (window.SearchSplash) SearchSplash.hide();
+        
+        let splashTimeout = null;
+        
+        // Hook into Livewire requests - show splash only if loading > 500ms
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('commit', ({ component, commit, respond, fail }) => {
+                if (window.SearchSplash) {
+                    splashTimeout = setTimeout(() => {
+                        const input = document.getElementById('searchInput');
+                        SearchSplash.show(input?.value || 'Mencari...');
+                    }, 500);
+                }
+                respond(() => {
+                    clearTimeout(splashTimeout);
+                    if (window.SearchSplash) SearchSplash.hide();
+                });
+                fail(() => {
+                    clearTimeout(splashTimeout);
+                    if (window.SearchSplash) SearchSplash.hide();
+                });
+            });
+        }
     });
     </script>
 </div>

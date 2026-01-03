@@ -29,6 +29,7 @@ class GlobalSearch extends Component
     
     // Advanced Filters
     public array $selectedSubjects = [];
+    public $subjectId = null;
     public $collectionTypeId = null;
     public $facultyId = null;
     public $departmentId = null;
@@ -201,7 +202,6 @@ class GlobalSearch extends Component
             $results = $results->merge($this->searchJournals());
             if ($this->query) {
                 $results = $results->merge($this->searchExternal());
-                $results = $results->merge($this->searchShamela());
             }
         } elseif ($this->resourceType === 'ebook') {
             if (!$this->ebookSource || $this->ebookSource === 'local') {
@@ -275,8 +275,8 @@ class GlobalSearch extends Component
                         if ($this->yearTo) {
                             $query->where('publish_year', '<=', $this->yearTo);
                         }
-                        if (!empty($this->selectedSubjects)) {
-                            $query->whereHas('subjects', fn($s) => $s->whereIn('subjects.id', $this->selectedSubjects));
+                        if ($this->subjectId) {
+                            $query->whereHas('subjects', fn($s) => $s->where('subjects.id', $this->subjectId));
                         }
                         if ($this->collectionTypeId) {
                             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
@@ -311,8 +311,8 @@ class GlobalSearch extends Component
         if ($this->yearTo) {
             $query->where('publish_year', '<=', $this->yearTo);
         }
-        if (!empty($this->selectedSubjects)) {
-            $query->whereHas('subjects', fn($s) => $s->whereIn('subjects.id', $this->selectedSubjects));
+        if ($this->subjectId) {
+            $query->whereHas('subjects', fn($s) => $s->where('subjects.id', $this->subjectId));
         }
         if ($this->collectionTypeId) {
             $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
@@ -679,6 +679,12 @@ class GlobalSearch extends Component
         }
         if ($this->yearTo) {
             $query->where('publish_year', '<=', $this->yearTo);
+        }
+        if ($this->subjectId) {
+            $query->whereHas('subjects', fn($s) => $s->where('subjects.id', $this->subjectId));
+        }
+        if ($this->collectionTypeId) {
+            $query->whereHas('items', fn($i) => $i->where('collection_type_id', $this->collectionTypeId));
         }
         
         return $query->count();
