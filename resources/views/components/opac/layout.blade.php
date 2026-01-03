@@ -554,9 +554,9 @@
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
                     <!-- Search Button -->
-                    <button @click="searchOpen = true" class="hidden lg:flex items-center justify-center text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition-all shadow-sm w-10 h-10 hover:w-auto hover:px-3 hover:gap-2 border border-white/10 group">
+                    <button @click="searchOpen = true" class="hidden lg:flex items-center justify-center text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium shadow-sm h-10 border border-white/10 group px-3 gap-2">
                         <i class="fas fa-search"></i>
-                        <span class="max-w-0 overflow-hidden group-hover:max-w-[60px] transition-all duration-300 whitespace-nowrap">{{ __('opac.search') }}</span>
+                        <span class="w-0 overflow-hidden group-hover:w-[75px] transition-[width] duration-200 whitespace-nowrap">Cari Koleksi</span>
                     </button>
                     
                     <!-- Auth Buttons Desktop -->
