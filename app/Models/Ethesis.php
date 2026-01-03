@@ -44,8 +44,15 @@ class Ethesis extends Model
 
     public function getCoverUrlAttribute(): string
     {
-        return $this->cover_path 
-            ? asset('storage/' . $this->cover_path) 
-            : asset('storage/thesis.png');
+        if (!$this->cover_path) {
+            return asset('storage/thesis.png');
+        }
+        
+        // Cover stored in thesis/covers/ folder
+        $path = str_starts_with($this->cover_path, 'covers/') 
+            ? 'thesis/' . $this->cover_path 
+            : $this->cover_path;
+            
+        return asset('storage/' . $path);
     }
 }
