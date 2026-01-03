@@ -248,7 +248,8 @@ class CirculationTransaction extends Component
 
         $currentBranchId = auth()->user()->branch_id;
         if ($currentBranchId && $item->branch_id !== $currentBranchId) {
-            $this->alert('error', 'Item milik cabang lain', 'Tidak dapat dipinjam');
+            $itemBranch = $item->branch?->name ?? "ID: {$item->branch_id}";
+            $this->alert('error', 'Item milik cabang lain', "Item: {$itemBranch}");
             return;
         }
 
