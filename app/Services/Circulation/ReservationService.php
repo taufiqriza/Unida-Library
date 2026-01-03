@@ -10,7 +10,7 @@ class ReservationService
 {
     public function __construct(protected NotificationService $notificationService) {}
 
-    public function reserve(Member $member, Book $book, int $branchId): array
+    public function reserve(Member $member, Book $book, ?int $branchId = null): array
     {
         // Validations
         if ($member->isExpired()) {
