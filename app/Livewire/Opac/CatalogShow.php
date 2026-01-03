@@ -44,10 +44,10 @@ class CatalogShow extends Component
                 session()->flash('success', $result['message']);
                 return redirect()->route('opac.member.loans');
             } else {
-                $this->dispatch('notify', type: 'error', message: $result['message']);
+                $this->dispatch('showError', message: $result['message'], title: 'Reservasi Gagal');
             }
         } catch (\Exception $e) {
-            $this->dispatch('notify', type: 'error', message: 'Terjadi kesalahan: ' . $e->getMessage());
+            $this->dispatch('showError', message: $e->getMessage(), title: 'Terjadi Kesalahan');
         }
     }
 
