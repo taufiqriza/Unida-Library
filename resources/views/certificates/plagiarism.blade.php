@@ -1,395 +1,422 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Sertifikat {{ $check->certificate_number }}</title>
     <style>
         @page {
-            size: A4 portrait;
+            size: 210mm 297mm;
             margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
             font-size: 11pt;
+            color: #0f172a;
             line-height: 1.4;
         }
 
         .page {
             width: 210mm;
             height: 297mm;
-            padding: 12mm;
+            padding: 15mm;
             position: relative;
         }
 
+        /* Border Dekoratif */
         .border-outer {
-            border: 3pt solid #5b21b6;
-            height: 100%;
-            padding: 3mm;
+            position: absolute;
+            top: 10mm;
+            left: 10mm;
+            right: 10mm;
+            bottom: 10mm;
+            border: 1pt solid #e2e8f0;
+            border-radius: 8mm;
         }
 
-        .border-inner {
-            border: 1pt solid #a78bfa;
-            height: 100%;
-            position: relative;
+        /* Corner Accents */
+        .corner-tl {
+            position: absolute;
+            top: 10mm;
+            left: 10mm;
+            width: 25mm;
+            height: 25mm;
+            border-top: 3pt solid #c5a059;
+            border-left: 3pt solid #c5a059;
+            border-top-left-radius: 8mm;
         }
 
-        /* Header */
-        .header {
-            background-color: #5b21b6;
-            color: #ffffff;
-            text-align: center;
-            padding: 18pt 20pt;
-        }
-
-        .logo {
-            height: 55pt;
-            margin-bottom: 10pt;
-        }
-
-        .inst-name {
-            font-size: 16pt;
-            font-weight: bold;
-            letter-spacing: 2pt;
-            margin-bottom: 4pt;
-        }
-
-        .inst-sub {
-            font-size: 9pt;
-            letter-spacing: 1pt;
+        .corner-br {
+            position: absolute;
+            bottom: 10mm;
+            right: 10mm;
+            width: 25mm;
+            height: 25mm;
+            border-bottom: 3pt solid #c5a059;
+            border-right: 3pt solid #c5a059;
+            border-bottom-right-radius: 8mm;
         }
 
         /* Content */
         .content {
-            padding: 25pt 35pt;
+            position: relative;
+            padding: 8mm 12mm;
             text-align: center;
         }
 
-        /* Title */
-        .cert-title {
-            font-size: 28pt;
+        /* Header */
+        .header {
+            margin-bottom: 8mm;
+        }
+
+        .logo-box {
+            width: 18mm;
+            height: 18mm;
+            margin: 0 auto 4mm;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .inst-name {
+            font-size: 14pt;
             font-weight: bold;
-            color: #5b21b6;
-            letter-spacing: 6pt;
-            margin-bottom: 6pt;
+            text-transform: uppercase;
+            letter-spacing: 2pt;
+            color: #0f172a;
+            margin-bottom: 2mm;
+        }
+
+        .inst-sub {
+            font-size: 9pt;
+            font-weight: bold;
+            color: #c5a059;
+            text-transform: uppercase;
+            letter-spacing: 1pt;
+        }
+
+        /* Title */
+        .title-block {
+            margin-bottom: 8mm;
+        }
+
+        .cert-title {
+            font-size: 32pt;
+            font-weight: bold;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 3pt;
+            margin-bottom: 2mm;
         }
 
         .cert-subtitle {
             font-size: 10pt;
-            color: #666;
-            letter-spacing: 2pt;
-            margin-bottom: 18pt;
-            padding-bottom: 15pt;
-            border-bottom: 1pt solid #e5e5e5;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 3pt;
+            margin-bottom: 4mm;
         }
 
-        /* Certificate Number */
-        .cert-number-box {
-            margin-bottom: 20pt;
-        }
-
-        .cert-number {
+        .cert-id {
             display: inline-block;
-            background-color: #5b21b6;
+            background-color: #0f172a;
             color: #ffffff;
-            padding: 6pt 25pt;
-            font-size: 9pt;
+            padding: 2mm 5mm;
+            font-size: 8pt;
             font-weight: bold;
-            letter-spacing: 2pt;
+            border-radius: 10mm;
         }
 
         /* Recipient */
-        .recipient-label {
+        .recipient-block {
+            margin-bottom: 8mm;
+        }
+
+        .intro-text {
             font-size: 10pt;
-            color: #888;
-            margin-bottom: 8pt;
+            font-style: italic;
+            color: #64748b;
+            margin-bottom: 3mm;
         }
 
         .recipient-name {
             font-size: 22pt;
             font-weight: bold;
-            color: #1a1a1a;
-            margin-bottom: 6pt;
+            color: #0f172a;
+            padding-bottom: 2mm;
+            border-bottom: 2pt solid #c5a059;
+            display: inline-block;
+            margin-bottom: 3mm;
         }
 
-        .recipient-id {
-            font-size: 10pt;
-            color: #666;
-            margin-bottom: 25pt;
+        .recipient-meta {
+            font-size: 11pt;
+            color: #0f172a;
+            font-weight: 500;
         }
 
-        /* Document Box */
-        .doc-box {
-            background-color: #f8f5ff;
-            border: 1pt solid #e9e3ff;
-            padding: 15pt 20pt;
-            margin: 0 20pt 25pt 20pt;
+        /* Result Card */
+        .result-card {
+            border: 1pt solid #f1f5f9;
+            border-radius: 6mm;
+            padding: 5mm;
+            margin: 0 8mm 6mm 8mm;
+        }
+
+        .result-table {
+            width: 100%;
+        }
+
+        .gauge-cell {
+            width: 35mm;
+            vertical-align: middle;
             text-align: center;
         }
 
-        .doc-title {
-            font-size: 11pt;
+        .gauge-circle {
+            width: 32mm;
+            height: 32mm;
+            border: 6pt solid {{ $isPassed ? '#10b981' : '#f59e0b' }};
+            border-radius: 50%;
+            display: inline-block;
+            text-align: center;
+            padding-top: 7mm;
+        }
+
+        .percentage {
+            font-size: 28pt;
             font-weight: bold;
-            color: #333;
+            color: {{ $isPassed ? '#10b981' : '#f59e0b' }};
+            line-height: 1;
+        }
+
+        .gauge-label {
+            font-size: 7pt;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        .doc-cell {
+            vertical-align: middle;
+            text-align: right;
+            padding-left: 5mm;
+        }
+
+        .doc-title-ar {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #0f172a;
             line-height: 1.6;
-            margin-bottom: 8pt;
+            margin-bottom: 3mm;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .doc-title-en {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #0f172a;
+            line-height: 1.5;
+            margin-bottom: 3mm;
+            text-align: right;
         }
 
         .doc-meta {
             font-size: 8pt;
-            color: #888;
+            color: #64748b;
+            text-align: right;
         }
 
-        /* Score Section */
-        .score-section {
-            margin: 25pt 0;
-        }
-
-        .score-box {
+        /* Status Badge */
+        .status-badge {
             display: inline-block;
-            border: 3pt solid {{ $isPassed ? '#059669' : '#d97706' }};
-            padding: 15pt 45pt;
-            text-align: center;
-        }
-
-        .score-value {
-            font-size: 42pt;
-            font-weight: bold;
-            color: {{ $isPassed ? '#059669' : '#d97706' }};
-            line-height: 1;
-        }
-
-        .score-label {
-            font-size: 8pt;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 2pt;
-            margin-top: 6pt;
-        }
-
-        .status-box {
-            margin-top: 15pt;
-        }
-
-        .status-text {
-            display: inline-block;
-            background-color: {{ $isPassed ? '#059669' : '#d97706' }};
-            color: #ffffff;
-            padding: 8pt 25pt;
+            background-color: {{ $isPassed ? '#dcfce7' : '#fef3c7' }};
+            color: {{ $isPassed ? '#10b981' : '#f59e0b' }};
+            border: 1pt solid {{ $isPassed ? '#bbf7d0' : '#fde68a' }};
+            padding: 2mm 5mm;
+            border-radius: 3mm;
             font-size: 10pt;
             font-weight: bold;
-            letter-spacing: 1pt;
+            margin-bottom: 5mm;
         }
 
         /* Info Text */
         .info-text {
             font-size: 9pt;
-            color: #666;
-            line-height: 1.7;
-            margin: 20pt 30pt;
-            padding: 12pt 15pt;
-            background-color: #fafafa;
-            border-left: 3pt solid #5b21b6;
-            text-align: left;
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 140mm;
+            margin: 0 auto 8mm;
         }
 
-        /* Footer Grid */
-        .footer-section {
-            margin-top: 25pt;
-            padding-top: 20pt;
-            border-top: 1pt solid #e5e5e5;
-        }
-
+        /* Footer */
         .footer-table {
             width: 100%;
+            margin-top: 5mm;
         }
 
-        .footer-col {
-            width: 33.33%;
-            text-align: center;
-            vertical-align: top;
-            padding: 0 10pt;
+        .footer-left {
+            width: 50%;
+            text-align: left;
+            vertical-align: bottom;
+            padding-left: 10mm;
         }
 
-        .qr-img {
-            width: 60pt;
-            height: 60pt;
+        .footer-right {
+            width: 50%;
+            text-align: right;
+            vertical-align: bottom;
+            padding-right: 10mm;
         }
 
-        .qr-label {
-            font-size: 7pt;
-            color: #999;
-            margin-top: 5pt;
-        }
-
-        .sig-date {
-            font-size: 9pt;
-            color: #666;
-            margin-bottom: 8pt;
-        }
-
-        .sig-qr {
-            width: 50pt;
-            height: 50pt;
-            margin-bottom: 8pt;
-        }
-
-        .sig-line {
-            border-top: 1pt solid #333;
-            width: 120pt;
-            margin: 0 auto;
-            padding-top: 5pt;
-        }
-
-        .sig-name {
+        .location-date {
             font-size: 10pt;
+            color: #64748b;
+            margin-bottom: 12mm;
+        }
+
+        .signer-name {
+            font-size: 12pt;
             font-weight: bold;
-            color: #333;
+            color: #0f172a;
+            margin-bottom: 1mm;
         }
 
-        .sig-title {
-            font-size: 8pt;
-            color: #5b21b6;
-            margin-top: 2pt;
-        }
-
-        .provider-label {
-            font-size: 7pt;
-            color: #999;
-            margin-bottom: 6pt;
-        }
-
-        .provider-badge {
-            display: inline-block;
-            background-color: #5b21b6;
-            color: #ffffff;
-            padding: 6pt 15pt;
+        .signer-title {
             font-size: 9pt;
             font-weight: bold;
+            color: #c5a059;
         }
 
-        /* Bottom Bar */
-        .bottom-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #f5f5f5;
-            padding: 10pt 20pt;
-            text-align: center;
-            font-size: 7pt;
-            color: #888;
+        .qr-box {
+            width: 22mm;
+            height: 22mm;
+            border: 1pt solid #e2e8f0;
+            border-radius: 3mm;
+            padding: 1mm;
+            display: inline-block;
+            margin-bottom: 2mm;
+        }
+
+        .qr-box img {
+            width: 100%;
+            height: 100%;
         }
 
         .verify-url {
-            color: #5b21b6;
-            font-weight: bold;
+            font-size: 6pt;
+            color: #64748b;
+            word-break: break-all;
+        }
+
+        .verify-note {
+            font-size: 6pt;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5pt;
+            margin-top: 2mm;
         }
     </style>
 </head>
 <body>
     <div class="page">
-        <div class="border-outer">
-            <div class="border-inner">
+        <!-- Decorative Elements -->
+        <div class="border-outer"></div>
+        <div class="corner-tl"></div>
+        <div class="corner-br"></div>
 
-                <!-- Header -->
-                <div class="header">
-                    @if($institutionLogo)
-                    <img src="{{ $institutionLogo }}" class="logo" alt="Logo"><br>
-                    @endif
-                    <div class="inst-name">{{ strtoupper($institutionName) }}</div>
-                    <div class="inst-sub">UNIVERSITAS DARUSSALAM GONTOR - PONOROGO - JAWA TIMUR</div>
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                @if($institutionLogo)
+                <div class="logo-box">
+                    <img src="{{ $institutionLogo }}" alt="Logo">
                 </div>
-
-                <!-- Content -->
-                <div class="content">
-
-                    <!-- Title -->
-                    <div class="cert-title">SERTIFIKAT</div>
-                    <div class="cert-subtitle">HASIL PEMERIKSAAN ORIGINALITAS DOKUMEN</div>
-
-                    <!-- Number -->
-                    <div class="cert-number-box">
-                        <span class="cert-number">{{ $check->certificate_number }}</span>
-                    </div>
-
-                    <!-- Recipient -->
-                    <div class="recipient-label">Diberikan kepada:</div>
-                    <div class="recipient-name">{{ strtoupper($member->name) }}</div>
-                    <div class="recipient-id">NIM: {{ $member->member_id }}@if($member->memberType) - {{ $member->memberType->name }}@endif</div>
-
-                    <!-- Document -->
-                    <div class="doc-box">
-                        <div class="doc-title">"{{ $check->document_title }}"</div>
-                        <div class="doc-meta">
-                            {{ $check->original_filename }} | 
-                            {{ $check->completed_at ? $check->completed_at->translatedFormat('d F Y, H:i') : $issuedDate }} WIB
-                            @if($check->word_count) | {{ number_format($check->word_count) }} kata @endif
-                        </div>
-                    </div>
-
-                    <!-- Score -->
-                    <div class="score-section">
-                        <div class="score-box">
-                            <div class="score-value">{{ number_format($check->similarity_score, 0) }}%</div>
-                            <div class="score-label">SIMILARITY INDEX</div>
-                        </div>
-                        <div class="status-box">
-                            <span class="status-text">
-                                @if($isPassed)
-                                LOLOS - MEMENUHI STANDAR ORIGINALITAS
-                                @else
-                                PERLU REVISI - MELEBIHI BATAS TOLERANSI
-                                @endif
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Info -->
-                    <div class="info-text">
-                        Dokumen telah diperiksa menggunakan <strong>iThenticate by Turnitin</strong> - 
-                        standar internasional untuk deteksi kesamaan akademik. 
-                        Tingkat similarity {{ $isPassed ? 'di bawah' : 'melebihi' }} batas toleransi institusi ({{ $passThreshold }}%).
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="footer-section">
-                        <table class="footer-table">
-                            <tr>
-                                <td class="footer-col">
-                                    <img src="{{ $qrCode }}" class="qr-img" alt="QR"><br>
-                                    <div class="qr-label">Scan untuk verifikasi</div>
-                                </td>
-                                <td class="footer-col">
-                                    <div class="sig-date">Ponorogo, {{ $issuedDate }}</div>
-                                    @if($signatureQr)
-                                    <img src="{{ $signatureQr }}" class="sig-qr" alt="Sig"><br>
-                                    @endif
-                                    <div class="sig-line">
-                                        <div class="sig-name">{{ $headLibrarian }}</div>
-                                        <div class="sig-title">Kepala Perpustakaan</div>
-                                    </div>
-                                </td>
-                                <td class="footer-col">
-                                    <div class="provider-label">Powered by</div>
-                                    <div class="provider-badge">iThenticate</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                </div>
-
-                <!-- Bottom -->
-                <div class="bottom-bar">
-                    Verifikasi: <span class="verify-url">{{ $verifyUrl }}</span> | 
-                    Sertifikat ini dihasilkan secara otomatis dan sah tanpa tanda tangan basah
-                </div>
-
+                @endif
+                <div class="inst-name">{{ $institutionName }}</div>
+                <div class="inst-sub">Perpustakaan &amp; Unida Library</div>
             </div>
+
+            <!-- Title -->
+            <div class="title-block">
+                <div class="cert-title">Sertifikat</div>
+                <div class="cert-subtitle">Originalitas Dokumen Akademik</div>
+                <span class="cert-id">No: {{ $check->certificate_number }}</span>
+            </div>
+
+            <!-- Recipient -->
+            <div class="recipient-block">
+                <div class="intro-text">Sertifikat ini diberikan dengan hormat kepada:</div>
+                <div class="recipient-name">{{ strtoupper($member->name) }}</div>
+                <div class="recipient-meta">NIM: {{ $member->member_id }} @if($member->memberType)— {{ $member->memberType->name }}@endif</div>
+            </div>
+
+            <!-- Result Card -->
+            <div class="result-card">
+                <table class="result-table">
+                    <tr>
+                        <td class="gauge-cell">
+                            <div class="gauge-circle">
+                                <div class="percentage">{{ number_format($check->similarity_score, 0) }}%</div>
+                                <div class="gauge-label">Similarity</div>
+                            </div>
+                        </td>
+                        <td class="doc-cell">
+                            @if($hasArabicTitle ?? false)
+                            <div class="doc-title-ar">{{ $check->document_title }}</div>
+                            @else
+                            <div class="doc-title-en">{{ $check->document_title }}</div>
+                            @endif
+                            <div class="doc-meta">
+                                File: {{ $check->original_filename }}<br>
+                                Diperiksa pada: {{ $check->completed_at ? $check->completed_at->translatedFormat('d F Y, H:i') : $issuedDate }} WIB
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Status -->
+            <div class="status-badge">
+                @if($isPassed)
+                ✓ LOLOS MEMENUHI STANDAR ORIGINALITAS
+                @else
+                ⚠ PERLU REVISI - MELEBIHI BATAS TOLERANSI
+                @endif
+            </div>
+
+            <!-- Info -->
+            <div class="info-text">
+                Dokumen ini telah melalui proses pemindaian menggunakan teknologi iThenticate by Turnitin
+                dengan standar internasional. Tingkat kemiripan {{ $isPassed ? 'berada di bawah' : 'melebihi' }} batas toleransi institusi ({{ $passThreshold }}%).
+            </div>
+
+            <!-- Footer -->
+            <table class="footer-table">
+                <tr>
+                    <td class="footer-left">
+                        <div class="location-date">Ponorogo, {{ $issuedDate }}</div>
+                        <div class="signer-name">{{ $headLibrarian }}</div>
+                        <div class="signer-title">Kepala Perpustakaan</div>
+                    </td>
+                    <td class="footer-right">
+                        <div class="qr-box">
+                            <img src="{{ $qrCode }}" alt="QR">
+                        </div><br>
+                        <div class="verify-url">{{ $verifyUrl }}</div>
+                        <div class="verify-note">Verifikasi Digital Sah Tanpa Tanda Tangan Basah</div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </body>
