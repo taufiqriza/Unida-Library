@@ -553,6 +553,12 @@
 
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
+                    <!-- Search Button -->
+                    <button @click="searchOpen = true" class="hidden lg:flex items-center gap-2 px-3 py-1 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm h-10 border border-white/10">
+                        <i class="fas fa-search"></i>
+                        <span>{{ __('opac.search') }}</span>
+                    </button>
+                    
                     <!-- Auth Buttons Desktop -->
                     @auth('member')
                         <div class="hidden lg:block relative" x-data="{ openProfile: false }">
