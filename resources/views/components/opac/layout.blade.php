@@ -554,9 +554,9 @@
                 <!-- Right Side -->
                 <div class="flex items-center gap-2">
                     <!-- Search Button -->
-                    <button @click="searchOpen = true" class="hidden lg:flex items-center gap-2 px-3 py-1 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition shadow-sm h-10 border border-white/10">
+                    <button @click="searchOpen = true" class="hidden lg:flex items-center gap-2 px-3 py-1 text-white bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl text-sm font-medium transition-all shadow-sm h-10 border border-white/10 group">
                         <i class="fas fa-search"></i>
-                        <span>{{ __('opac.search') }}</span>
+                        <span class="max-w-0 overflow-hidden group-hover:max-w-[60px] transition-all duration-300">{{ __('opac.search') }}</span>
                     </button>
                     
                     <!-- Auth Buttons Desktop -->
