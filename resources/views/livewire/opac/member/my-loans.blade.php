@@ -21,6 +21,14 @@
     </div>
 
     <div class="max-w-5xl mx-auto px-4 py-6">
+        {{-- Flash Message --}}
+        @if(session('success'))
+        <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+            <i class="fas fa-check-circle text-green-500"></i>
+            <span class="text-green-800 text-sm font-medium">{{ session('success') }}</span>
+        </div>
+        @endif
+
         {{-- Stats Cards --}}
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
             <div class="bg-white rounded-xl p-4 border border-gray-100">

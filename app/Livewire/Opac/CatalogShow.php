@@ -40,7 +40,8 @@ class CatalogShow extends Component
         $result = app(ReservationService::class)->reserve($member, $this->book);
         
         if ($result['success']) {
-            $this->dispatch('notify', type: 'success', message: $result['message']);
+            session()->flash('success', $result['message']);
+            return redirect()->route('opac.member.loans');
         } else {
             $this->dispatch('notify', type: 'error', message: $result['message']);
         }
