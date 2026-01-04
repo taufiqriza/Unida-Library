@@ -119,6 +119,13 @@ Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismControl
 // Public Certificate Download (for admin/staff to share via WhatsApp)
 Route::get('/certificate/{check}/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'publicDownload'])->name('plagiarism.certificate.download');
 
+// Testing route for certificate
+Route::get('/test-certificate/{id}', function($id) {
+    $check = \App\Models\PlagiarismCheck::findOrFail($id);
+    $generator = new \App\Services\Plagiarism\CertificateGenerator($check);
+    return response($generator->getHtmlContent(), 200, ['Content-Type' => 'text/html']);
+})->name('test.certificate');
+
 // Alias for member.dashboard (Livewire)
 Route::get('/member/dashboard', \App\Livewire\Opac\Member\Dashboard::class)->middleware(['auth:member', \App\Http\Middleware\EnsureMemberProfileCompleted::class])->name('member.dashboard');
 

@@ -132,13 +132,26 @@ class CertificateGenerator
 
     public function getHtmlContent(): string
     {
-        // Only regenerate if not exists
-        if (!$this->check->certificate_path || !Storage::disk('local')->exists($this->check->certificate_path)) {
-            $this->generate();
-            $this->check->refresh();
-        }
+        // Always generate fresh HTML for PNG template
+        $verifyUrl = route('plagiarism.verify', $this->check->certificate_number);
+        $headLibrarian = Setting::get('plagiarism_head_librarian', 'Kepala Perpustakaan');
 
-        return Storage::disk('local')->get($this->check->certificate_path) ?? '';
+        $data = [
+            'check' => $this->check,
+            'member' => $this->check->member,
+            'qrCode' => $this->generateQrCode($verifyUrl, 70),
+            'qrHeadLibrarian' => $this->generateQrCode($this->generateHeadLibrarianSignature(), 50),
+            'verifyUrl' => $verifyUrl,
+            'institutionName' => Setting::get('app_name', 'Perpustakaan UNIDA Gontor'),
+            'institutionLogo' => $this->getOptimizedLogo(),
+            'headLibrarian' => $headLibrarian,
+            'issuedDate' => now()->translatedFormat('d F Y'),
+            'isPassed' => $this->check->isPassed(),
+            'passThreshold' => (float) Setting::get('plagiarism_pass_threshold', 25),
+            'hasArabicTitle' => (bool) preg_match('/[\x{0600}-\x{06FF}]/u', $this->check->document_title),
+        ];
+
+        return view('certificates.plagiarism-png', $data)->render();
     }
 
     public function getDownloadFilename(): string
