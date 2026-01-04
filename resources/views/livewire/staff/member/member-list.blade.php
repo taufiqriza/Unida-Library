@@ -356,14 +356,12 @@
     @endphp
     <template x-teleport="body">
         <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
-            x-data 
-            x-init="document.body.classList.add('overflow-hidden')" 
-            x-on:click.self="$wire.closeDetail()"
-            @close-modal.window="document.body.classList.remove('overflow-hidden')">
+            x-data="{ init() { document.body.classList.add('overflow-hidden') }, destroy() { document.body.classList.remove('overflow-hidden') } }"
+            x-on:click.self="document.body.classList.remove('overflow-hidden'); $wire.closeDetail()">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
                 <div class="bg-gradient-to-r {{ $modalColor }} px-6 py-4 text-white flex items-center justify-between">
                     <h3 class="text-lg font-bold">Detail {{ $isSantri ? 'Santri' : ($isUmum ? 'Anggota Umum' : 'Anggota') }}</h3>
-                    <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    <button wire:click="closeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div class="flex items-center gap-4">
@@ -406,7 +404,7 @@
                     </div>
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                    <button wire:click="closeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
+                    <button wire:click="closeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
                     <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r {{ $modalColor }} text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
                 </div>
             </div>
@@ -418,14 +416,12 @@
     @if($showEmployeeModal && $selectedEmployee)
     <template x-teleport="body">
         <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
-            x-data 
-            x-init="document.body.classList.add('overflow-hidden')" 
-            x-on:click.self="$wire.closeEmployeeDetail()"
-            @close-modal.window="document.body.classList.remove('overflow-hidden')">
+            x-data="{ init() { document.body.classList.add('overflow-hidden') }, destroy() { document.body.classList.remove('overflow-hidden') } }"
+            x-on:click.self="document.body.classList.remove('overflow-hidden'); $wire.closeEmployeeDetail()">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
                 <div class="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white flex items-center justify-between">
                     <h3 class="text-lg font-bold">Detail {{ $selectedEmployee->type === 'dosen' ? 'Dosen' : 'Tendik' }}</h3>
-                    <button wire:click="closeEmployeeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    <button wire:click="closeEmployeeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div class="flex items-center gap-4">
@@ -456,7 +452,7 @@
                     </div>
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                    <button wire:click="closeEmployeeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
+                    <button wire:click="closeEmployeeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
                 </div>
             </div>
         </div>
