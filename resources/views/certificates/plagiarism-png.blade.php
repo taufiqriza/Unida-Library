@@ -103,24 +103,7 @@
         }
 
         .corner-accent {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: #c5a059;
-            z-index: 3;
-            border-radius: 8px;
-        }
-
-        .top-left {
-            top: 30px;
-            left: 30px;
-            clip-path: polygon(0 0, 100% 0, 0 100%);
-        }
-
-        .bottom-right {
-            bottom: 30px;
-            right: 30px;
-            clip-path: polygon(100% 0, 100% 100%, 0 100%);
+            display: none;
         }
 
         /* Content Area */
@@ -358,12 +341,13 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            margin-top: -20px;
         }
 
         .location-date {
             font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .qr-kepala {
@@ -377,7 +361,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .qr-kepala img {
@@ -402,7 +386,7 @@
 
         .verification-section {
             text-align: right;
-            margin-top: -60px;
+            margin-top: -80px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -412,7 +396,7 @@
         .qr-container {
             display: flex;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             justify-content: flex-end;
         }
 
@@ -441,7 +425,7 @@
             word-break: break-all;
             text-align: right;
             line-height: 1.2;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .verify-note {
@@ -482,8 +466,6 @@
     <div class="certificate-container" id="certificate">
         <!-- Border Dekoratif -->
         <div class="decorative-border"></div>
-        <div class="corner-accent top-left"></div>
-        <div class="corner-accent bottom-right"></div>
 
         <div class="content">
             <!-- Header -->
