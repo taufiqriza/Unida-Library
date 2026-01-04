@@ -414,6 +414,7 @@
 
         .verification-section {
             text-align: right;
+            margin-top: -20px;
         }
 
         .qr-container {
@@ -459,7 +460,7 @@
             text-align: right;
         }
 
-        /* Print Styles - Ensure colors match preview */
+        /* Print Styles - Minimal untuk konsistensi */
         @media print {
             body {
                 background: none;
@@ -474,35 +475,6 @@
                 box-shadow: none;
                 border-radius: 0;
             }
-            
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            .corner-accent {
-                background: #c5a059 !important;
-            }
-            
-            .sub-institution {
-                color: #c5a059 !important;
-            }
-            
-            .signer-title {
-                color: #c5a059 !important;
-            }
-            
-            .qr-kepala {
-                border-color: #c5a059 !important;
-            }
-        }
-
-        /* Canvas rendering styles - for html2canvas */
-        .certificate-container * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            color-adjust: exact;
         }
     </style>
 </head>
@@ -530,8 +502,8 @@
                 <div class="uni-logo">
                     <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: var(--primary-dark); font-size: 24px; font-weight: 800;\'>U</div>';">
                 </div>
-                <div class="institution-name">Universitas Darussalam Gontor</div>
-                <div class="sub-institution">Perpustakaan &amp; Unida Library</div>
+                <div class="institution-name">{{ $institutionName }}</div>
+                <div class="sub-institution">Universitas Darussalam Gontor</div>
             </div>
 
             <!-- Title -->
@@ -613,17 +585,11 @@
             html2canvas(certificate, {
                 width: 794,
                 height: 1123,
-                scale: 2, // High quality
+                scale: 2,
                 useCORS: true,
                 allowTaint: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                imageTimeout: 0,
-                removeContainer: false,
-                foreignObjectRendering: true,
-                ignoreElements: function(element) {
-                    return element.classList.contains('print-actions');
-                }
+                backgroundColor: null,
+                logging: false
             }).then(canvas => {
                 // Show actions again
                 actions.style.display = 'flex';
