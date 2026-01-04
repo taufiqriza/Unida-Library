@@ -251,7 +251,7 @@
                     </div>
                 </div>
 
-                {{-- Matched Sources --}}
+                {{-- Matched Sources / iThenticate Report --}}
                 @if($check->similarity_sources && count($check->similarity_sources) > 0)
                 <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                     <div class="p-4 bg-gray-50 border-b border-gray-200">
@@ -286,19 +286,32 @@
                         @endforeach
                     </div>
                 </div>
+                @elseif($check->provider === 'ithenticate' && $check->external_id)
+                {{-- iThenticate: Detail sources only available in full report --}}
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <div class="w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-file-alt text-2xl text-blue-600"></i>
+                        </div>
+                        <div class="flex-1 text-center md:text-left">
+                            <h3 class="font-bold text-blue-800">Detail Sumber Kecocokan</h3>
+                            <p class="text-sm text-blue-600 mt-1">Lihat daftar lengkap sumber yang cocok dan highlight teks di report iThenticate</p>
+                        </div>
+                        <a href="{{ route('opac.member.plagiarism.report', $check) }}" 
+                           target="_blank"
+                           class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow-lg">
+                            <i class="fas fa-external-link-alt"></i>
+                            Buka Report Lengkap
+                        </a>
+                    </div>
+                </div>
                 @else
                 <div class="bg-emerald-50 rounded-2xl border border-emerald-200 p-6 text-center">
                     <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-check-double text-2xl text-emerald-600"></i>
                     </div>
                     <p class="font-semibold text-emerald-800">Tidak ditemukan kecocokan signifikan</p>
-                    <p class="text-sm text-emerald-600 mt-1">
-                        @if($check->provider === 'ithenticate' || $check->provider === 'turnitin')
-                        Dokumen Anda memiliki tingkat keaslian yang baik berdasarkan pengecekan iThenticate/Turnitin.
-                        @else
-                        Dokumen Anda tidak memiliki similarity yang perlu diperhatikan dengan database E-Thesis.
-                        @endif
-                    </p>
+                    <p class="text-sm text-emerald-600 mt-1">Dokumen Anda tidak memiliki similarity yang perlu diperhatikan dengan database E-Thesis.</p>
                 </div>
                 @endif
 
@@ -338,14 +351,6 @@
                 {{-- Provider Info --}}
                 <div class="text-center text-xs text-gray-400">
                     <p>Diperiksa menggunakan: {{ $check->provider_label }}</p>
-                    @if($check->provider === 'ithenticate' && $check->external_id)
-                    <a href="{{ route('opac.member.plagiarism.report', $check) }}" 
-                       target="_blank"
-                       class="inline-flex items-center gap-1 mt-2 text-teal-600 hover:text-teal-700">
-                        <i class="fas fa-external-link-alt"></i>
-                        Lihat Report Lengkap di iThenticate
-                    </a>
-                    @endif
                 </div>
             </div>
             @endif
