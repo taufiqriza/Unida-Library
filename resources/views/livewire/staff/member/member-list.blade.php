@@ -211,13 +211,16 @@
         @if($members->count() > 0)
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gradient-to-r {{ $activeTab === 'santri' ? 'from-cyan-500 to-teal-600' : 'from-purple-500 to-pink-600' }} text-white">
+                <thead class="bg-gradient-to-r {{ $activeTab === 'santri' ? 'from-cyan-500 to-teal-600' : ($activeTab === 'umum' ? 'from-violet-500 to-purple-600' : 'from-purple-500 to-pink-600') }} text-white">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium">Anggota</th>
                         @if($activeTab === 'santri')
                         <th class="px-4 py-3 text-left font-medium">Kelas</th>
                         <th class="px-4 py-3 text-left font-medium">Rayon/Kamar</th>
                         <th class="px-4 py-3 text-left font-medium">Cabang</th>
+                        @elseif($activeTab === 'umum')
+                        <th class="px-4 py-3 text-left font-medium">Institusi</th>
+                        <th class="px-4 py-3 text-left font-medium">Kontak</th>
                         @else
                         <th class="px-4 py-3 text-left font-medium w-28">Tipe</th>
                         <th class="px-4 py-3 text-left font-medium">NIM/NIDN</th>
@@ -233,7 +236,6 @@
                     @foreach($members as $member)
                     @php 
                         $isExpired = $member->expire_date && $member->expire_date < now();
-                        // Parse santri notes: "Kelas | Rayon | Kamar"
                         $santriInfo = $activeTab === 'santri' && $member->notes ? explode(' | ', $member->notes) : [];
                     @endphp
                     <tr class="hover:bg-purple-50/30 transition {{ $isExpired ? 'bg-red-50/30' : '' }}">
@@ -260,6 +262,19 @@
                         </td>
                         <td class="px-4 py-3">
                             <span class="text-xs text-gray-600">{{ $member->branch?->name ?? '-' }}</span>
+                        </td>
+                        @elseif($activeTab === 'umum')
+                        <td class="px-4 py-3">
+                            @if($member->institution)
+                            <p class="text-sm text-gray-700">{{ $member->institution }}</p>
+                            @if($member->institution_city)<p class="text-xs text-gray-500">{{ $member->institution_city }}</p>@endif
+                            @else
+                            <span class="text-gray-400 text-xs">Tidak diisi</span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-3">
+                            @if($member->email)<p class="text-xs text-gray-600 truncate max-w-[150px]"><i class="fas fa-envelope text-gray-400 mr-1"></i>{{ $member->email }}</p>@endif
+                            @if($member->phone)<p class="text-xs text-gray-500"><i class="fas fa-phone text-gray-400 mr-1"></i>{{ $member->phone }}</p>@endif
                         </td>
                         @else
                         <td class="px-4 py-3">
@@ -334,7 +349,10 @@
     @if($showDetailModal && $selectedMember)
     @php
         $isSantri = $selectedMember->memberType?->name === 'Santri';
+        $isUmum = $selectedMember->memberType?->name === 'Umum';
         $santriInfo = $isSantri && $selectedMember->notes ? explode(' | ', $selectedMember->notes) : [];
+        $modalColor = $isSantri ? 'from-cyan-500 to-teal-600' : ($isUmum ? 'from-violet-500 to-purple-600' : 'from-purple-600 to-pink-600');
+        $avatarColor = $isSantri ? 'from-cyan-400 to-teal-500' : ($isUmum ? 'from-violet-400 to-purple-500' : 'from-purple-400 to-pink-500');
     @endphp
     <template x-teleport="body">
         <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
@@ -343,13 +361,13 @@
             x-on:click.self="$wire.closeDetail()"
             @close-modal.window="document.body.classList.remove('overflow-hidden')">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
-                <div class="bg-gradient-to-r {{ $isSantri ? 'from-cyan-500 to-teal-600' : 'from-purple-600 to-pink-600' }} px-6 py-4 text-white flex items-center justify-between">
-                    <h3 class="text-lg font-bold">Detail {{ $isSantri ? 'Santri' : 'Anggota' }}</h3>
+                <div class="bg-gradient-to-r {{ $modalColor }} px-6 py-4 text-white flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Detail {{ $isSantri ? 'Santri' : ($isUmum ? 'Anggota Umum' : 'Anggota') }}</h3>
                     <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gradient-to-br {{ $isSantri ? 'from-cyan-400 to-teal-500' : 'from-purple-400 to-pink-500' }} rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br {{ $avatarColor }} rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                             @if($selectedMember->photo)<img src="{{ asset('storage/' . $selectedMember->photo) }}" class="w-full h-full object-cover rounded-xl">@else{{ strtoupper(substr($selectedMember->name, 0, 1)) }}@endif
                         </div>
                         <div>
@@ -366,6 +384,14 @@
                         <div class="bg-cyan-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tanggal Lahir</p><p class="font-medium text-gray-900">{{ $selectedMember->birth_date?->format('d M Y') ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Alamat</p><p class="font-medium text-gray-900 text-xs">{{ $selectedMember->address ?? '-' }}</p></div>
+                        @elseif($isUmum)
+                        <div class="bg-violet-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Institusi</p><p class="font-medium text-gray-900">{{ $selectedMember->institution ?: 'Tidak diisi' }}</p></div>
+                        @if($selectedMember->institution_city)
+                        <div class="bg-violet-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Kota Institusi</p><p class="font-medium text-gray-900">{{ $selectedMember->institution_city }}</p></div>
+                        @endif
+                        <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Email</p><p class="font-medium text-gray-900">{{ $selectedMember->email ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Telepon</p><p class="font-medium text-gray-900">{{ $selectedMember->phone ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
                         @else
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tipe</p><p class="font-medium text-gray-900">{{ $selectedMember->memberType?->name ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
@@ -381,7 +407,7 @@
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
                     <button wire:click="closeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
-                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r {{ $isSantri ? 'from-cyan-500 to-teal-600' : 'from-purple-600 to-pink-600' }} text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
+                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r {{ $modalColor }} text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
                 </div>
             </div>
         </div>
