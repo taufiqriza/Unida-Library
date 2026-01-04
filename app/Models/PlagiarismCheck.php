@@ -127,7 +127,7 @@ class PlagiarismCheck extends Model
 
     public function hasCertificate(): bool
     {
-        return $this->certificate_number && $this->certificate_path;
+        return $this->certificate_number;
     }
 
     /**
