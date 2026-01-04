@@ -7,7 +7,6 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class IthenticateProvider
 {
@@ -19,252 +18,245 @@ class IthenticateProvider
     public function __construct()
     {
         $this->baseUrl = rtrim(Setting::get('ithenticate_base_url', 'https://unidagontor.turnitin.com'), '/');
-        $this->integrationName = Setting::get('ithenticate_integration_name', '');
+        $this->integrationName = Setting::get('ithenticate_integration_name', 'Library-Portal-API');
         $this->apiKey = Setting::get('ithenticate_api_key', '');
         $this->apiSecret = Setting::get('ithenticate_api_secret', '');
     }
 
-    /**
-     * Check if provider is configured
-     */
     public function isConfigured(): bool
     {
-        return !empty($this->apiKey) && !empty($this->apiSecret);
+        return !empty($this->apiSecret);
     }
 
-    /**
-     * Get authorization headers
-     * TCA uses the signing secret directly as the API key
-     */
     protected function getHeaders(): array
     {
         return [
             'Authorization' => 'Bearer ' . $this->apiSecret,
-            'X-Turnitin-Integration-Name' => $this->integrationName ?: 'Library-Portal-API',
+            'X-Turnitin-Integration-Name' => $this->integrationName,
             'X-Turnitin-Integration-Version' => '1.0.0',
             'Content-Type' => 'application/json',
         ];
     }
 
     /**
-     * Make HTTP request with default timeout settings
-     */
-    protected function httpClient()
-    {
-        return Http::withHeaders($this->getHeaders())
-            ->timeout(60)
-            ->connectTimeout(30);
-    }
-
-    /**
-     * Submit document for plagiarism check
+     * Submit document - returns immediately after submission
+     * Polling handled separately by scheduler
      */
     public function submit(PlagiarismCheck $check): array
     {
         if (!$this->isConfigured()) {
-            throw new \Exception('iThenticate API belum dikonfigurasi. Silakan isi credentials di App Settings.');
+            throw new \Exception('iThenticate API belum dikonfigurasi');
         }
 
-        Log::info("iThenticate: Starting submission for check #{$check->id}");
+        Log::info("iThenticate: Starting submission #{$check->id}");
 
-        try {
-            $member = $check->member;
-            $userId = $member->email ?? $member->member_id . '@student.unida.gontor.ac.id';
-            
-            // Step 0: Accept EULA for user (if not already accepted)
-            $this->acceptEula($userId);
-            
-            // Step 1: Create submission
-            $submission = $this->createSubmission($check);
-            
-            // Step 2: Upload file
-            $this->uploadFile($check, $submission['id']);
-            
-            // Step 3: Request similarity report
-            $this->requestSimilarityReport($submission['id']);
-            
-            // Step 4: Wait a bit before polling (Turnitin needs time to process)
-            Log::info("iThenticate: Waiting 30 seconds before polling for results...");
-            sleep(30);
-            
-            // Step 5: Poll for results
-            $result = $this->pollForResults($submission['id']);
-            
-            return $result;
+        // Step 1: Accept EULA
+        $userId = $check->member->email ?? $check->member->member_id . '@student.unida.gontor.ac.id';
+        $this->acceptEula($userId);
 
-        } catch (\Exception $e) {
-            Log::error("iThenticate error: " . $e->getMessage());
-            throw $e;
-        }
+        // Step 2: Create submission
+        $submissionId = $this->createSubmission($check);
+        Log::info("iThenticate: Submission created: {$submissionId}");
+
+        // Step 3: Upload file
+        $this->uploadFile($check, $submissionId);
+        Log::info("iThenticate: File uploaded for {$submissionId}");
+
+        // Step 4: Wait for file processing (Turnitin needs time to process the upload)
+        sleep(5);
+
+        // Step 5: Request similarity report with retry
+        $this->requestSimilarityReportWithRetry($submissionId);
+        Log::info("iThenticate: Similarity report requested for {$submissionId}");
+
+        // Step 6: Poll for results (max 5 minutes for quick results)
+        $result = $this->pollForResults($submissionId, 20, 15); // 20 attempts x 15 sec = 5 min
+
+        return $result;
     }
 
-    /**
-     * Accept EULA for a user
-     */
     protected function acceptEula(string $userId): void
     {
-        // First get the latest EULA version
-        $eulaResponse = $this->httpClient()
-            ->get("{$this->baseUrl}/api/v1/eula/latest");
-        
-        if (!$eulaResponse->successful()) {
-            Log::warning("Could not get EULA version: " . $eulaResponse->body());
-            return;
-        }
-        
-        $eulaVersion = $eulaResponse->json('version', 'v1beta');
-        
-        // Accept EULA for the user
-        $response = $this->httpClient()
-            ->post("{$this->baseUrl}/api/v1/eula/{$eulaVersion}/accept", [
-                'user_id' => $userId,
-                'accepted_timestamp' => now()->toIso8601String(),
-                'language' => 'en-US',
-            ]);
-        
-        if ($response->successful()) {
-            Log::info("iThenticate: EULA accepted for user: {$userId}");
-        } elseif ($response->status() === 409) {
-            // Already accepted - this is fine
-            Log::info("iThenticate: EULA already accepted for user: {$userId}");
-        } else {
-            Log::warning("iThenticate: Could not accept EULA for user {$userId}: " . $response->body());
+        try {
+            $response = Http::withHeaders($this->getHeaders())
+                ->timeout(30)
+                ->get("{$this->baseUrl}/api/v1/eula/latest");
+
+            if (!$response->successful()) {
+                Log::warning("iThenticate: Could not get EULA: " . $response->body());
+                return;
+            }
+
+            $eulaVersion = $response->json('version', 'v1beta');
+
+            $acceptResponse = Http::withHeaders($this->getHeaders())
+                ->timeout(30)
+                ->post("{$this->baseUrl}/api/v1/eula/{$eulaVersion}/accept", [
+                    'user_id' => $userId,
+                    'accepted_timestamp' => now()->toIso8601String(),
+                    'language' => 'en-US',
+                ]);
+
+            if ($acceptResponse->successful() || $acceptResponse->status() === 409) {
+                Log::info("iThenticate: EULA accepted for {$userId}");
+            }
+        } catch (\Exception $e) {
+            Log::warning("iThenticate: EULA error: " . $e->getMessage());
         }
     }
 
-    /**
-     * Create a new submission
-     */
-    protected function createSubmission(PlagiarismCheck $check): array
+    protected function createSubmission(PlagiarismCheck $check): string
     {
         $member = $check->member;
-        
-        $response = $this->httpClient()
+        $ownerId = $member->member_id ?? $member->id;
+        $submitterEmail = $member->email ?? $ownerId . '@student.unida.gontor.ac.id';
+
+        $response = Http::withHeaders($this->getHeaders())
+            ->timeout(60)
             ->post("{$this->baseUrl}/api/v1/submissions", [
-                'owner' => $member->member_id,
+                'owner' => (string) $ownerId,
                 'title' => $check->document_title ?? $check->original_filename,
-                'submitter' => $member->email ?? $member->member_id . '@student.unida.gontor.ac.id',
+                'submitter' => $submitterEmail,
                 'owner_default_permission_set' => 'LEARNER',
                 'submitter_default_permission_set' => 'INSTRUCTOR',
                 'extract_text_only' => false,
-                'metadata' => [
-                    'group' => [
-                        'id' => 'library-portal',
-                        'name' => 'Library Portal Submission',
-                    ],
-                ],
             ]);
 
         if (!$response->successful()) {
-            Log::error("iThenticate createSubmission failed: " . $response->body());
-            throw new \Exception('Gagal membuat submission: ' . $response->json('message', 'Unknown error'));
+            Log::error("iThenticate: Create submission failed: " . $response->body());
+            throw new \Exception('Gagal membuat submission: ' . ($response->json('message') ?? $response->body()));
         }
 
-        $data = $response->json();
-        
-        // Store external ID
-        $check->update([
-            'external_id' => $data['id'],
-        ]);
+        $submissionId = $response->json('id');
+        $check->update(['external_id' => $submissionId]);
 
-        Log::info("iThenticate: Submission created with ID: " . $data['id']);
-
-        return $data;
+        return $submissionId;
     }
 
-    /**
-     * Upload file to submission
-     */
     protected function uploadFile(PlagiarismCheck $check, string $submissionId): void
     {
         $filePath = Storage::disk('local')->path($check->file_path);
-        $fileContent = file_get_contents($filePath);
         
+        if (!file_exists($filePath)) {
+            throw new \Exception("File tidak ditemukan: {$check->file_path}");
+        }
+
+        $fileContent = file_get_contents($filePath);
+        $filename = $check->original_filename ?? basename($check->file_path);
+
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiSecret,
-            'X-Turnitin-Integration-Name' => $this->integrationName ?: 'Library-Portal-API',
+            'X-Turnitin-Integration-Name' => $this->integrationName,
             'X-Turnitin-Integration-Version' => '1.0.0',
             'Content-Type' => 'binary/octet-stream',
-            'Content-Disposition' => 'inline; filename="' . $check->original_filename . '"',
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
         ])
-        ->timeout(120) // 2 minutes for file upload
-        ->connectTimeout(30)
+        ->timeout(180)
         ->withBody($fileContent, 'binary/octet-stream')
         ->put("{$this->baseUrl}/api/v1/submissions/{$submissionId}/original");
 
         if (!$response->successful()) {
-            Log::error("iThenticate uploadFile failed: " . $response->body());
-            throw new \Exception('Gagal mengupload file: ' . $response->json('message', 'Unknown error'));
+            Log::error("iThenticate: Upload failed: " . $response->body());
+            throw new \Exception('Gagal upload file: ' . ($response->json('message') ?? $response->body()));
         }
-
-        Log::info("iThenticate: File uploaded for submission: {$submissionId}");
     }
 
     /**
-     * Request similarity report generation
+     * Request similarity report with retry mechanism
      */
-    protected function requestSimilarityReport(string $submissionId): void
+    protected function requestSimilarityReportWithRetry(string $submissionId, int $maxRetries = 3): void
     {
-        $response = $this->httpClient()
-            ->put("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity", [
-                'generation_settings' => [
-                    'search_repositories' => [
-                        'INTERNET',
-                        'SUBMITTED_WORK',
-                        'PUBLICATION',
-                        'CROSSREF',
-                        'CROSSREF_POSTED_CONTENT',
-                    ],
-                    'auto_exclude_self_matching_scope' => 'ALL',
-                ],
-                'view_settings' => [
-                    'exclude_quotes' => true,
-                    'exclude_bibliography' => true,
-                    'exclude_citations' => true,
-                    'exclude_abstract' => false,
-                    'exclude_methods' => false,
-                    'exclude_small_matches' => 8,
-                    'exclude_internet' => false,
-                    'exclude_publications' => false,
-                    'exclude_submitted_works' => false,
-                ],
-                'indexing_settings' => [
-                    'add_to_index' => true,
-                ],
-            ]);
+        $lastError = null;
 
-        if (!$response->successful()) {
-            // Check if report already requested
-            if ($response->status() !== 409) {
-                Log::error("iThenticate requestSimilarityReport failed: " . $response->body());
-                throw new \Exception('Gagal meminta similarity report: ' . $response->json('message', 'Unknown error'));
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $response = Http::withHeaders($this->getHeaders())
+                    ->timeout(60)
+                    ->put("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity", [
+                        'generation_settings' => [
+                            'search_repositories' => [
+                                'INTERNET',
+                                'SUBMITTED_WORK',
+                                'PUBLICATION',
+                                'CROSSREF',
+                                'CROSSREF_POSTED_CONTENT',
+                            ],
+                            'auto_exclude_self_matching_scope' => 'ALL',
+                        ],
+                        'view_settings' => [
+                            'exclude_quotes' => true,
+                            'exclude_bibliography' => true,
+                            'exclude_citations' => true,
+                            'exclude_small_matches' => 8,
+                        ],
+                        'indexing_settings' => [
+                            'add_to_index' => true,
+                        ],
+                    ]);
+
+                // 202 = Accepted, 409 = Already requested
+                if ($response->status() === 202 || $response->status() === 409) {
+                    Log::info("iThenticate: Similarity report request accepted (attempt {$attempt})");
+                    return;
+                }
+
+                // 400 with "PROCESSING" means file still being processed
+                if ($response->status() === 400) {
+                    $error = $response->json('message', '');
+                    if (str_contains(strtoupper($error), 'PROCESSING') || str_contains(strtoupper($error), 'NOT_READY')) {
+                        Log::info("iThenticate: File still processing, waiting... (attempt {$attempt})");
+                        sleep(10);
+                        continue;
+                    }
+                }
+
+                $lastError = "Status {$response->status()}: " . $response->body();
+                Log::warning("iThenticate: Similarity request attempt {$attempt} failed: {$lastError}");
+
+            } catch (\Exception $e) {
+                $lastError = $e->getMessage();
+                Log::warning("iThenticate: Similarity request attempt {$attempt} error: {$lastError}");
+            }
+
+            if ($attempt < $maxRetries) {
+                sleep(5);
             }
         }
 
-        Log::info("iThenticate: Similarity report requested for: {$submissionId}");
+        throw new \Exception("Gagal request similarity report setelah {$maxRetries} percobaan: {$lastError}");
     }
 
     /**
      * Poll for similarity results
-     * maxAttempts: 120, delaySeconds: 15 = max 30 minutes
      */
-    protected function pollForResults(string $submissionId, int $maxAttempts = 120, int $delaySeconds = 15): array
+    protected function pollForResults(string $submissionId, int $maxAttempts = 20, int $delaySeconds = 15): array
     {
-        Log::info("iThenticate: Polling for results on submission: {$submissionId}");
+        Log::info("iThenticate: Polling for results: {$submissionId}");
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
                 $response = Http::withHeaders($this->getHeaders())
-                    ->timeout(60)
-                    ->connectTimeout(30)
-                    ->get($this->baseUrl . "/api/v1/submissions/{$submissionId}/similarity");
+                    ->timeout(30)
+                    ->get("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity");
 
-                // 404 means report not ready yet - continue polling
                 if ($response->status() === 404) {
-                    Log::info("iThenticate: Poll attempt {$attempt}, report not ready yet (404)");
-                    if ($attempt < $maxAttempts) {
-                        sleep($delaySeconds);
+                    // Report not ready yet - request it again
+                    if ($attempt === 1 || $attempt === 5) {
+                        Log::info("iThenticate: Report not found, re-requesting...");
+                        try {
+                            $this->requestSimilarityReportWithRetry($submissionId, 1);
+                        } catch (\Exception $e) {
+                            // Ignore, continue polling
+                        }
                     }
+                    Log::info("iThenticate: Poll {$attempt}/{$maxAttempts} - not ready (404)");
+                    sleep($delaySeconds);
+                    continue;
+                }
+
+                if ($response->status() === 403) {
+                    Log::warning("iThenticate: Poll {$attempt} - 403 Forbidden. Check API permissions.");
+                    sleep($delaySeconds);
                     continue;
                 }
 
@@ -272,15 +264,18 @@ class IthenticateProvider
                     $data = $response->json();
                     $status = $data['status'] ?? 'PENDING';
 
-                    Log::info("iThenticate: Poll attempt {$attempt}, status: {$status}");
+                    Log::info("iThenticate: Poll {$attempt}/{$maxAttempts} - status: {$status}");
 
                     if ($status === 'COMPLETE') {
+                        $score = $data['overall_match_percentage'] ?? 0;
+                        Log::info("iThenticate: Report complete! Score: {$score}%");
+
                         return [
-                            'score' => $data['overall_match_percentage'] ?? 0,
-                            'sources' => $this->formatSources($data['top_sources'] ?? []),
+                            'score' => $score,
+                            'sources' => $this->formatSources($data),
                             'report' => [
                                 'submission_id' => $submissionId,
-                                'overall_match_percentage' => $data['overall_match_percentage'] ?? 0,
+                                'overall_match_percentage' => $score,
                                 'internet_match_percentage' => $data['internet_match_percentage'] ?? 0,
                                 'publication_match_percentage' => $data['publication_match_percentage'] ?? 0,
                                 'submitted_works_match_percentage' => $data['submitted_works_match_percentage'] ?? 0,
@@ -291,83 +286,88 @@ class IthenticateProvider
                     }
 
                     if (in_array($status, ['FAILED', 'ERROR'])) {
-                        throw new \Exception('Similarity check failed: ' . ($data['error_message'] ?? 'Unknown error'));
+                        throw new \Exception('Turnitin report failed: ' . ($data['error_message'] ?? 'Unknown error'));
                     }
-                } else {
-                    Log::warning("iThenticate: Poll attempt {$attempt} failed with status: " . $response->status());
                 }
+
             } catch (\Illuminate\Http\Client\ConnectionException $e) {
-                Log::warning("iThenticate: Poll attempt {$attempt} connection error: " . $e->getMessage());
-                // Continue polling on connection errors
+                Log::warning("iThenticate: Poll {$attempt} connection error: " . $e->getMessage());
             }
 
-            // Wait before next attempt
             if ($attempt < $maxAttempts) {
                 sleep($delaySeconds);
             }
         }
 
-        throw new \Exception("Timeout: Similarity report tidak selesai dalam waktu yang ditentukan.");
+        // Timeout - but submission exists, mark for async polling
+        Log::warning("iThenticate: Polling timeout for {$submissionId}, will continue via scheduler");
+        
+        throw new \Exception("Report masih diproses. Hasil akan dikirim via email setelah selesai.");
     }
 
-    /**
-     * Format sources for storage
-     */
-    protected function formatSources(array $sources): array
+    protected function formatSources(array $data): array
     {
+        $sources = $data['top_sources'] ?? $data['top_source_largest_matched_word_count_list'] ?? [];
+        
         return array_map(function ($source) {
             return [
                 'source_type' => $source['source_type'] ?? 'INTERNET',
-                'title' => $source['name'] ?? 'Unknown Source',
-                'author' => $source['author'] ?? null,
-                'year' => $source['publication_year'] ?? null,
+                'title' => $source['name'] ?? $source['title'] ?? 'Unknown',
+                'similarity' => $source['percent_match'] ?? $source['match_percentage'] ?? 0,
                 'url' => $source['url'] ?? null,
-                'similarity' => $source['percent_match'] ?? 0,
             ];
-        }, array_slice($sources, 0, 10)); // Top 10 sources
+        }, array_slice($sources, 0, 10));
     }
 
     /**
-     * Get similarity report URL for viewing in browser
+     * Check submission status (for async polling)
      */
+    public function checkStatus(string $submissionId): ?array
+    {
+        try {
+            $response = Http::withHeaders($this->getHeaders())
+                ->timeout(30)
+                ->get("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity");
+
+            if ($response->status() === 404) {
+                // Try to request report
+                $this->requestSimilarityReportWithRetry($submissionId, 1);
+                return null;
+            }
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (($data['status'] ?? '') === 'COMPLETE') {
+                    return [
+                        'score' => $data['overall_match_percentage'] ?? 0,
+                        'sources' => $this->formatSources($data),
+                        'report' => $data,
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning("iThenticate checkStatus error: " . $e->getMessage());
+        }
+
+        return null;
+    }
+
     public function getReportUrl(string $submissionId): ?string
     {
         try {
-            $response = $this->httpClient()
+            $response = Http::withHeaders($this->getHeaders())
+                ->timeout(30)
                 ->post("{$this->baseUrl}/api/v1/submissions/{$submissionId}/viewer-url", [
                     'viewer_user_id' => 'admin',
-                    'locale' => 'id',
-                    'viewer_default_permission_set' => 'INSTRUCTOR',
+                    'locale' => 'en-US',
+                    'viewer_default_permission_set' => 'ADMINISTRATOR',
                 ]);
 
             if ($response->successful()) {
                 return $response->json('viewer_url');
             }
         } catch (\Exception $e) {
-            Log::error("Failed to get report URL: " . $e->getMessage());
-        }
-
-        return null;
-    }
-
-    /**
-     * Download PDF report from iThenticate
-     */
-    public function downloadPdfReport(string $submissionId): ?string
-    {
-        try {
-            $response = $this->httpClient()
-                ->post("{$this->baseUrl}/api/v1/submissions/{$submissionId}/similarity/pdf", [
-                    'locale' => 'id',
-                ]);
-
-            if ($response->successful()) {
-                return $response->json('download_url');
-            }
-            
-            Log::error("Failed to get PDF download URL: " . $response->body());
-        } catch (\Exception $e) {
-            Log::error("Failed to get PDF report: " . $e->getMessage());
+            Log::error("iThenticate getReportUrl error: " . $e->getMessage());
         }
 
         return null;
