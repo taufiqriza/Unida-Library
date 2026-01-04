@@ -17,17 +17,15 @@ class ProcessPlagiarismCheck implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-    public int $timeout = 600; // 10 minutes max
-    public int $backoff = 60;
+    public int $tries = 2;
+    public int $timeout = 300; // 5 minutes
+    public int $backoff = 30;
 
-    public function __construct(
-        public PlagiarismCheck $check
-    ) {}
+    public function __construct(public PlagiarismCheck $check) {}
 
     public function handle(PlagiarismService $service): void
     {
-        Log::info("Processing plagiarism check #{$this->check->id}");
+        Log::info("Processing plagiarism #{$this->check->id}");
 
         $this->check->update([
             'status' => PlagiarismCheck::STATUS_PROCESSING,
@@ -49,23 +47,19 @@ class ProcessPlagiarismCheck implements ShouldQueue
 
             Log::info("Plagiarism #{$this->check->id} completed. Score: {$result['score']}%");
 
-            // Generate certificate
             (new CertificateGenerator($this->check))->generate();
-
-            // Send notification
-            $this->sendNotification();
+            $this->notify();
 
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            Log::error("Plagiarism #{$this->check->id} failed: {$message}");
+            Log::error("Plagiarism #{$this->check->id} error: {$message}");
 
-            // If it's a timeout but submission exists, mark as submitted for async polling
-            if (str_contains($message, 'masih diproses') || str_contains($message, 'timeout')) {
+            // Async poll marker - submission exists, just waiting for report
+            if (str_starts_with($message, 'ASYNC_POLL:')) {
                 $this->check->update([
                     'status' => 'submitted',
-                    'error_message' => 'Menunggu hasil dari Turnitin. Akan dikirim via email.',
+                    'error_message' => 'Menunggu hasil dari Turnitin...',
                 ]);
-                Log::info("Plagiarism #{$this->check->id} marked for async polling");
                 return;
             }
 
@@ -75,52 +69,28 @@ class ProcessPlagiarismCheck implements ShouldQueue
                 'completed_at' => now(),
             ]);
 
-            // Only retry on transient errors
-            if ($this->attempts() < $this->tries && $this->isRetryableError($message)) {
-                throw $e;
-            }
-
-            $this->sendNotification();
+            $this->notify();
         }
     }
 
-    protected function isRetryableError(string $message): bool
+    public function failed(\Throwable $e): void
     {
-        $retryable = ['connection', 'timeout', 'temporarily', '503', '502', '504'];
-        foreach ($retryable as $keyword) {
-            if (stripos($message, $keyword) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function failed(\Throwable $exception): void
-    {
-        Log::error("Plagiarism job failed for #{$this->check->id}: " . $exception->getMessage());
-
         $this->check->update([
             'status' => PlagiarismCheck::STATUS_FAILED,
-            'error_message' => 'Proses gagal: ' . $exception->getMessage(),
+            'error_message' => $e->getMessage(),
             'completed_at' => now(),
         ]);
-
-        $this->sendNotification();
+        $this->notify();
     }
 
-    protected function sendNotification(): void
+    protected function notify(): void
     {
         try {
-            $member = $this->check->member;
-            if ($member?->email) {
-                $member->notify(new PlagiarismCheckCompleted($this->check->fresh()));
-            }
-
-            if ($member && $this->check->status === PlagiarismCheck::STATUS_COMPLETED) {
-                app(\App\Services\MemberNotificationService::class)->sendPlagiarismComplete($this->check);
+            if ($this->check->member?->email) {
+                $this->check->member->notify(new PlagiarismCheckCompleted($this->check->fresh()));
             }
         } catch (\Exception $e) {
-            Log::error("Notification failed for #{$this->check->id}: " . $e->getMessage());
+            Log::warning("Notification failed: " . $e->getMessage());
         }
     }
 }
