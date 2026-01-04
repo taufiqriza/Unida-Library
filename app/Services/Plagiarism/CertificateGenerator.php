@@ -4,7 +4,6 @@ namespace App\Services\Plagiarism;
 
 use App\Models\PlagiarismCheck;
 use App\Models\Setting;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -42,12 +41,11 @@ class CertificateGenerator
             'hasArabicTitle' => (bool) preg_match('/[\x{0600}-\x{06FF}]/u', $this->check->document_title),
         ];
 
-        $pdf = Pdf::loadView('certificates.plagiarism', $data);
-        $pdf->setPaper('a4', 'portrait');
-        $pdf->getDomPDF()->set_option('compress', true);
+        // Generate HTML view for PNG conversion
+        $html = view('certificates.plagiarism-png', $data)->render();
         
-        $filename = 'certificates/' . $this->check->certificate_number . '.pdf';
-        Storage::disk('local')->put($filename, $pdf->output());
+        $filename = 'certificates/' . $this->check->certificate_number . '.html';
+        Storage::disk('local')->put($filename, $html);
 
         $this->check->update([
             'certificate_number' => $this->check->certificate_number,
@@ -132,7 +130,7 @@ class CertificateGenerator
         return $result;
     }
 
-    public function getPdfContent(): string
+    public function getHtmlContent(): string
     {
         // Only regenerate if not exists
         if (!$this->check->certificate_path || !Storage::disk('local')->exists($this->check->certificate_path)) {
@@ -145,7 +143,7 @@ class CertificateGenerator
 
     public function getDownloadFilename(): string
     {
-        return 'Sertifikat-Plagiasi-' . $this->check->certificate_number . '.pdf';
+        return 'Sertifikat-Plagiasi-' . $this->check->certificate_number . '.html';
     }
 
     /**

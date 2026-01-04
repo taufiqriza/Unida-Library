@@ -194,9 +194,9 @@ class PlagiarismController extends Controller
 
         $generator = new CertificateGenerator($check);
         
-        return response($generator->getPdfContent(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $generator->getDownloadFilename() . '"',
+        // Return HTML view for PNG generation
+        return response($generator->getHtmlContent(), 200, [
+            'Content-Type' => 'text/html',
         ]);
     }
 
@@ -211,9 +211,9 @@ class PlagiarismController extends Controller
 
         $generator = new CertificateGenerator($check);
         
-        return response($generator->getPdfContent(), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="' . $generator->getDownloadFilename() . '"',
+        // Return HTML view for PNG generation
+        return response($generator->getHtmlContent(), 200, [
+            'Content-Type' => 'text/html',
         ]);
     }
 
