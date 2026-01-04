@@ -314,10 +314,10 @@
 
         .arabic-title {
             font-family: 'Amiri', serif;
-            font-size: 24px;
+            font-size: 18px;
             color: var(--primary-dark);
             margin-bottom: 15px;
-            line-height: 1.4;
+            line-height: 1.3;
             direction: rtl;
             text-align: right;
             font-weight: 700;
@@ -367,12 +367,35 @@
 
         .signature-section {
             text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
         .location-date {
             font-size: 14px;
             color: var(--text-muted);
-            margin-bottom: 40px;
+            margin-bottom: 25px;
+        }
+
+        .qr-kepala {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border: 2px solid var(--accent-gold);
+            border-radius: 10px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .qr-kepala img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .signer-name {
@@ -411,11 +434,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .qr-head {
-            border-color: var(--accent-gold);
-            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
         }
 
         .qr-box img {
@@ -534,20 +552,18 @@
             <div class="footer">
                 <div class="signature-section">
                     <div class="location-date">Ponorogo, {{ $issuedDate }}</div>
+                    @if(isset($qrHeadLibrarian))
+                    <div class="qr-kepala">
+                        <img src="{{ $qrHeadLibrarian }}" alt="QR Kepala">
+                    </div>
+                    @endif
                     <div class="signer-name">{{ $headLibrarian }}</div>
                     <div class="signer-title">Kepala Perpustakaan</div>
                 </div>
 
                 <div class="verification-section">
-                    <div class="qr-container">
-                        @if(isset($qrHeadLibrarian))
-                        <div class="qr-box qr-head">
-                            <img src="{{ $qrHeadLibrarian }}" alt="QR Kepala">
-                        </div>
-                        @endif
-                        <div class="qr-box">
-                            <img src="{{ $qrCode }}" alt="QR Verification">
-                        </div>
+                    <div class="qr-box">
+                        <img src="{{ $qrCode }}" alt="QR Verification">
                     </div>
                     <div class="verify-url">{{ $verifyUrl }}</div>
                     <div class="verify-note">Verifikasi Digital Sah Tanpa Tanda Tangan Basah</div>
