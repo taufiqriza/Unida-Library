@@ -56,7 +56,7 @@
             {{-- Stats --}}
             <div class="flex gap-6 text-center">
                 <div>
-                    <p class="text-2xl font-bold">{{ $user->created_at->diffInDays(now()) }}</p>
+                    <p class="text-2xl font-bold">{{ number_format($user->created_at->diffInDays(now()), 0) }}</p>
                     <p class="text-xs text-blue-200">Hari Aktif</p>
                 </div>
                 <div class="w-px bg-white/20"></div>
@@ -165,7 +165,7 @@
                 @else
                 <div class="p-5 flex items-center gap-3 text-gray-500">
                     <i class="fas fa-lock"></i>
-                    <span class="text-sm">Password terakhir diubah: <span class="font-medium">{{ $user->updated_at->diffForHumans() }}</span></span>
+                    <span class="text-sm">Password terakhir diubah: <span class="font-medium">{{ $user->updated_at->format('d M Y, H:i') }} WIB</span></span>
                 </div>
                 @endif
             </div>
