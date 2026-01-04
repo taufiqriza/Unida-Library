@@ -464,17 +464,6 @@
                             <a href="{{ route('opac.member.plagiarism.index') }}" class="text-xs text-primary-600 hover:underline">Lihat Semua</a>
                         </div>
                         
-                        {{-- Banner Maintenance --}}
-                        <div class="mx-4 mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                            <div class="flex items-start gap-2">
-                                <i class="fas fa-tools text-amber-500 mt-0.5"></i>
-                                <div class="text-xs text-amber-700">
-                                    <span class="font-semibold">Layanan dalam pemeliharaan.</span>
-                                    Gunakan opsi cek eksternal di bawah.
-                                </div>
-                            </div>
-                        </div>
-                        
                         @if($latestChecks->count() > 0)
                         <div class="divide-y divide-gray-50">
                             @foreach($latestChecks as $check)
