@@ -211,12 +211,18 @@
         @if($members->count() > 0)
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gradient-to-r from-purple-500 to-pink-600 text-white">
+                <thead class="bg-gradient-to-r {{ $activeTab === 'santri' ? 'from-cyan-500 to-teal-600' : 'from-purple-500 to-pink-600' }} text-white">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium">Anggota</th>
+                        @if($activeTab === 'santri')
+                        <th class="px-4 py-3 text-left font-medium">Kelas</th>
+                        <th class="px-4 py-3 text-left font-medium">Rayon/Kamar</th>
+                        <th class="px-4 py-3 text-left font-medium">Cabang</th>
+                        @else
                         <th class="px-4 py-3 text-left font-medium w-28">Tipe</th>
                         <th class="px-4 py-3 text-left font-medium">NIM/NIDN</th>
                         <th class="px-4 py-3 text-left font-medium">Kontak</th>
+                        @endif
                         <th class="px-4 py-3 text-center font-medium w-32">Kadaluarsa</th>
                         <th class="px-4 py-3 text-center font-medium w-20">Pinjam</th>
                         <th class="px-4 py-3 text-center font-medium w-20">Status</th>
@@ -225,7 +231,11 @@
                 </thead>
                 <tbody class="divide-y divide-gray-50">
                     @foreach($members as $member)
-                    @php $isExpired = $member->expire_date && $member->expire_date < now(); @endphp
+                    @php 
+                        $isExpired = $member->expire_date && $member->expire_date < now();
+                        // Parse santri notes: "Kelas | Rayon | Kamar"
+                        $santriInfo = $activeTab === 'santri' && $member->notes ? explode(' | ', $member->notes) : [];
+                    @endphp
                     <tr class="hover:bg-purple-50/30 transition {{ $isExpired ? 'bg-red-50/30' : '' }}">
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-3">
@@ -240,6 +250,18 @@
                                 </div>
                             </div>
                         </td>
+                        @if($activeTab === 'santri')
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 bg-cyan-100 text-cyan-700 text-xs font-medium rounded-full">{{ $santriInfo[0] ?? '-' }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm text-gray-700">{{ $santriInfo[1] ?? '-' }}</p>
+                            @if(isset($santriInfo[2]))<p class="text-xs text-gray-500">{{ $santriInfo[2] }}</p>@endif
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="text-xs text-gray-600">{{ $member->branch?->name ?? '-' }}</span>
+                        </td>
+                        @else
                         <td class="px-4 py-3">
                             @php
                             $typeColors = [
@@ -259,6 +281,7 @@
                             @if($member->email)<p class="text-xs text-gray-600 truncate max-w-[150px]"><i class="fas fa-envelope text-gray-400 mr-1"></i>{{ $member->email }}</p>@endif
                             @if($member->phone)<p class="text-xs text-gray-500"><i class="fas fa-phone text-gray-400 mr-1"></i>{{ $member->phone }}</p>@endif
                         </td>
+                        @endif
                         <td class="px-4 py-3 text-center">
                             <span class="px-2 py-1 text-xs font-medium rounded-full {{ $isExpired ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700' }}">
                                 {{ $member->expire_date?->format('d M Y') ?? '-' }}

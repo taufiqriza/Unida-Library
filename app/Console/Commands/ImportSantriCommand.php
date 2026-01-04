@@ -92,7 +92,7 @@ class ImportSantriCommand extends Command
                             'address' => $address,
                             'notes' => $notes,
                             'register_date' => now(),
-                            'expire_date' => now()->addYears(3),
+                            'expire_date' => now()->addYears(6),
                             'is_active' => true,
                         ]
                     );
