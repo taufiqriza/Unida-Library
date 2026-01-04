@@ -117,4 +117,12 @@ class Member extends Authenticatable
     {
         return $this->hasMany(SocialAccount::class);
     }
+
+    /**
+     * Check if member can access plagiarism check (must be linked to SIAKAD data)
+     */
+    public function canAccessPlagiarism(): bool
+    {
+        return $this->pddikti_id !== null;
+    }
 }

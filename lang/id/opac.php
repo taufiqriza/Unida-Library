@@ -1553,7 +1553,7 @@ return [
             'service_desc' => 'Layanan pengecekan similarity dokumen menggunakan <span class="text-teal-600 font-semibold">iThenticate/Turnitin</span> untuk memastikan keaslian karya tugas akhir Anda sebelum disubmit ke repository.',
             'important' => 'Penting!',
             'note_1' => 'Layanan ini <strong>khusus untuk dokumen tugas akhir</strong> (Skripsi/Tesis/Disertasi)',
-            'note_2' => 'Setiap mahasiswa memiliki <strong>kuota 3x pengecekan</strong>',
+            'note_2' => 'Setiap mahasiswa memiliki <strong>kuota 5x pengecekan</strong>',
             'note_3' => 'Hasil pengecekan akan tersedia dalam <strong>5-15 menit</strong>',
             'note_4' => 'Sertifikat dapat diunduh setelah pengecekan selesai',
             'flow_title' => 'Alur Pengecekan (4 Langkah)',

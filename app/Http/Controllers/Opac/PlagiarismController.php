@@ -34,7 +34,7 @@ class PlagiarismController extends Controller
     /**
      * Quota limit per member
      */
-    protected const QUOTA_LIMIT = 3;
+    protected const QUOTA_LIMIT = 5;
 
     /**
      * Show create form
@@ -47,6 +47,12 @@ class PlagiarismController extends Controller
         }
 
         $member = Auth::guard('member')->user();
+        
+        // Check eligibility (must be linked to SIAKAD)
+        if (!$member->canAccessPlagiarism()) {
+            return redirect()->route('opac.member.dashboard')
+                ->with('error', 'Layanan cek plagiasi hanya tersedia untuk civitas UNIDA yang terdaftar di SIAKAD. Silakan hubungkan akun Anda dengan data SIAKAD terlebih dahulu.');
+        }
         
         // Check quota
         $usedQuota = $member->plagiarismChecks()->count();

@@ -273,22 +273,50 @@
                     </div>
                     @endif
 
+                    {{-- Turnitin Active Banner --}}
+                    <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-emerald-800 text-xs font-semibold">Integrasi Turnitin/iThenticate Aktif</p>
+                                <p class="text-emerald-600 text-[10px]">Layanan cek plagiasi telah normal kembali. Kuota 5x per member.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- CTA Buttons Grid --}}
                     <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                        {{-- Cek Plagiasi CTA (Left) - Maintenance Mode --}}
-                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md relative overflow-hidden">
-                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-amber-500 text-[8px] font-bold rounded">MAINTENANCE</div>
+                        {{-- Cek Plagiasi CTA (Left) --}}
+                        @if($member->canAccessPlagiarism())
+                        <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
                             <div class="flex items-center gap-2 lg:gap-3">
                                 <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-tools text-base lg:text-xl"></i>
+                                    <i class="fas fa-search-plus text-base lg:text-xl"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
-                                    <p class="text-gray-200 text-[10px] lg:text-xs">Sedang maintenance</p>
-                                    <p class="text-gray-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-arrow-right mr-0.5"></i>Gunakan opsi eksternal</p>
+                                    <p class="text-teal-200 text-[10px] lg:text-xs">iThenticate/Turnitin</p>
+                                    <p class="text-teal-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-bolt mr-0.5"></i>Kuota 5x cek</p>
+                                </div>
+                            </div>
+                        </a>
+                        @else
+                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md relative overflow-hidden">
+                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-amber-500 text-[8px] font-bold rounded">TERBATAS</div>
+                            <div class="flex items-center gap-2 lg:gap-3">
+                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-lock text-base lg:text-xl"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
+                                    <p class="text-gray-200 text-[10px] lg:text-xs">Khusus civitas UNIDA</p>
+                                    <p class="text-gray-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-info-circle mr-0.5"></i>Hubungkan data SIAKAD</p>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Unggah Tugas Akhir CTA (Right) --}}
                         <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">

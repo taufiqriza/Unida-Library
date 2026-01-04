@@ -14,7 +14,7 @@ class PlagiarismCreate extends Component
 {
     use WithFileUploads;
 
-    protected const QUOTA_LIMIT = 3;
+    protected const QUOTA_LIMIT = 5;
 
     public $member;
     public $submissions;
@@ -34,6 +34,13 @@ class PlagiarismCreate extends Component
         }
 
         $this->member = Auth::guard('member')->user();
+        
+        // Check eligibility (must be linked to SIAKAD)
+        if (!$this->member->canAccessPlagiarism()) {
+            session()->flash('error', 'Layanan cek plagiasi hanya tersedia untuk civitas UNIDA yang terdaftar di SIAKAD.');
+            return redirect()->route('opac.member.dashboard');
+        }
+        
         $this->usedQuota = $this->member->plagiarismChecks()->count();
         $this->remainingQuota = self::QUOTA_LIMIT - $this->usedQuota;
 

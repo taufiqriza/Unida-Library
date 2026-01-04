@@ -1472,7 +1472,7 @@ return [
             'service_desc' => 'Document similarity checking service using <span class="text-teal-600 font-semibold">iThenticate/Turnitin</span> to ensure the originality of your thesis before submitting to the repository.',
             'important' => 'Important!',
             'note_1' => 'This service is <strong>for thesis documents only</strong> (Undergraduate/Master/Doctoral)',
-            'note_2' => 'Each student has a <strong>quota of 3 checks</strong>',
+            'note_2' => 'Each student has a <strong>quota of 5 checks</strong>',
             'note_3' => 'Results will be available in <strong>5-15 minutes</strong>',
             'note_4' => 'Certificate can be downloaded after checking is complete',
             'flow_title' => 'Check Process (4 Steps)',
