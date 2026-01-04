@@ -396,7 +396,7 @@
                     <a href="https://wa.me/6282117049501" target="_blank" class="group">
                         <template x-if="!sidebarCollapsed">
                             <div>
-                                <p class="text-[10px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">SYSTEM ILMU v2</p>
+                                <p class="text-[10px] text-blue-300/70 group-hover:text-blue-200 font-medium transition">SYSTEM ILMU v2.0</p>
                                 <p class="text-[9px] text-blue-400/50 group-hover:text-blue-300/70 transition">Integrated Library Management UNIDA</p>
                             </div>
                         </template>
