@@ -351,17 +351,17 @@
         }
 
         .qr-kepala {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background: white;
-            border: 2px solid var(--accent-gold);
-            border-radius: 10px;
-            padding: 5px;
+            border: 2px solid var(--primary-dark);
+            border-radius: 12px;
+            padding: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
-            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
         }
 
         .qr-kepala img {
@@ -386,7 +386,7 @@
 
         .verification-section {
             text-align: right;
-            margin-top: -80px;
+            margin-top: -95px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -404,7 +404,7 @@
             width: 80px;
             height: 80px;
             background: white;
-            border: 2px solid #e2e8f0;
+            border: 2px solid var(--primary-dark);
             border-radius: 12px;
             padding: 6px;
             display: flex;
@@ -425,7 +425,8 @@
             word-break: break-all;
             text-align: right;
             line-height: 1.2;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            margin-top: 4px;
         }
 
         .verify-note {
@@ -434,6 +435,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: right;
+            margin-top: 2px;
         }
 
         /* Print Styles - Minimal untuk konsistensi */
