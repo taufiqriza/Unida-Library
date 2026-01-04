@@ -119,10 +119,12 @@ class Member extends Authenticatable
     }
 
     /**
-     * Check if member can access plagiarism check (must be linked to SIAKAD data)
+     * Check if member can access plagiarism check
+     * Must be internal civitas (Mahasiswa/Dosen/Tendik), not Umum/Santri
      */
     public function canAccessPlagiarism(): bool
     {
-        return $this->pddikti_id !== null;
+        $typeName = $this->memberType?->name;
+        return $typeName && !in_array($typeName, ['Umum', 'Santri']);
     }
 }
