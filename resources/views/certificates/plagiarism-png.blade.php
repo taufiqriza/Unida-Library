@@ -30,11 +30,11 @@
             min-height: 100vh;
         }
 
-        /* Certificate Container - Fixed A4 Dimensions */
+        /* Background - Konsisten untuk preview dan download */
         .certificate-container {
             width: 794px;  /* A4 width in pixels at 96 DPI */
             height: 1123px; /* A4 height in pixels at 96 DPI */
-            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            background: #ffffff;
             position: relative;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -90,20 +90,15 @@
             z-index: 1;
         }
 
-        /* Border Dekoratif */
+        /* Border Dekoratif - Konsisten */
         .decorative-border {
             position: absolute;
             top: 30px;
             left: 30px;
             right: 30px;
             bottom: 30px;
-            border: 3px solid transparent;
+            border: 2px solid #c5a059;
             border-radius: 25px;
-            background: linear-gradient(135deg, var(--accent-gold), var(--primary-dark)) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: subtract;
-            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            mask-composite: subtract;
             z-index: 2;
         }
 
@@ -111,7 +106,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--accent-gold), #d4af37);
+            background: #c5a059;
             z-index: 3;
             border-radius: 8px;
         }
@@ -191,14 +186,10 @@
             font-family: 'Montserrat', sans-serif;
             font-size: 48px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary-dark), var(--accent-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary-dark);
             text-transform: uppercase;
             line-height: 1;
             margin-bottom: 12px;
-            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .cert-subtitle {
@@ -211,13 +202,12 @@
 
         .cert-id {
             display: inline-block;
-            background: linear-gradient(135deg, var(--primary-dark), #1e293b);
+            background: var(--primary-dark);
             color: white;
             padding: 6px 20px;
             border-radius: 25px;
             font-size: 12px;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.3);
         }
 
         /* Recipient */
@@ -265,13 +255,13 @@
         }
 
         .result-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            background: #ffffff;
             border: 2px solid #e2e8f0;
             border-radius: 25px;
             padding: 30px;
             margin: 0 auto;
             width: 88%;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -282,14 +272,13 @@
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f8fafc, #ffffff);
+            background: #f8fafc;
             border: 8px solid {{ $isPassed ? 'var(--success)' : '#f59e0b' }};
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .percentage {
@@ -336,7 +325,7 @@
         }
 
         .status-badge {
-            background: {{ $isPassed ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05))' : 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05))' }};
+            background: {{ $isPassed ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)' }};
             color: {{ $isPassed ? 'var(--success)' : '#f59e0b' }};
             padding: 10px 25px;
             border-radius: 12px;
@@ -345,7 +334,6 @@
             display: inline-block;
             border: 2px solid {{ $isPassed ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)' }};
             margin-bottom: 15px;
-            box-shadow: 0 4px 15px {{ $isPassed ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)' }};
         }
 
         .info-text {
@@ -414,7 +402,11 @@
 
         .verification-section {
             text-align: right;
-            margin-top: -20px;
+            margin-top: -60px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-start;
         }
 
         .qr-container {
@@ -488,9 +480,6 @@
     </div>
 
     <div class="certificate-container" id="certificate">
-        <!-- Background Pattern -->
-        <div class="bg-pattern"></div>
-        
         <!-- Border Dekoratif -->
         <div class="decorative-border"></div>
         <div class="corner-accent top-left"></div>
