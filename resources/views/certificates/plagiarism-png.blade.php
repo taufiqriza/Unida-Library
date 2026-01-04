@@ -341,7 +341,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            margin-top: -20px;
+            margin-top: -40px;
         }
 
         .location-date {
@@ -386,7 +386,7 @@
 
         .verification-section {
             text-align: right;
-            margin-top: -95px;
+            margin-top: -115px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
