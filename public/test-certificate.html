@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sertifikat PLAG-202512-00002</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --accent-gold: #c5a059;
+            --success: #10b981;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Background - Konsisten untuk preview dan download */
+        .certificate-container {
+            width: 794px;  /* A4 width in pixels at 96 DPI */
+            height: 1123px; /* A4 height in pixels at 96 DPI */
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 20px;
+        }
+
+        /* Print Actions */
+        .print-actions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Background Pattern */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--accent-gold) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--primary-dark) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+        }
+
+        /* Border Dekoratif - Konsisten */
+        .decorative-border {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            bottom: 30px;
+            border: 2px solid #c5a059;
+            border-radius: 25px;
+            z-index: 2;
+        }
+
+        .corner-accent {
+            display: none;
+        }
+
+        /* Content Area */
+        .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            padding: 50px 50px 40px;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .uni-logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            margin: 0 auto 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border: 3px solid var(--accent-gold);
+        }
+
+        .uni-logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .institution-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .sub-institution {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Title */
+        .title-section {
+            margin-bottom: 25px;
+        }
+
+        .cert-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .cert-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .cert-id {
+            display: inline-block;
+            background: var(--primary-dark);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 25px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Recipient */
+        .recipient-section {
+            margin-bottom: 25px;
+        }
+
+        .intro-text {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .recipient-name {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 12px 0;
+            position: relative;
+            display: inline-block;
+            padding: 0 40px;
+        }
+
+        .recipient-name::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        .recipient-meta {
+            font-size: 18px;
+            color: var(--primary-dark);
+            font-weight: 500;
+            margin-top: 15px;
+        }
+
+        /* Result Card */
+        .result-section {
+            margin-bottom: 20px;
+        }
+
+        .result-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            padding: 30px;
+            margin: 0 auto;
+            width: 88%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .similarity-gauge {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #f8fafc;
+            border: 8px solid var(--success);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .percentage {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--success);
+            line-height: 1;
+        }
+
+        .gauge-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .document-info {
+            flex: 1;
+            text-align: right;
+        }
+
+        .arabic-title {
+            font-family: 'Amiri', serif;
+            font-size: 18px;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            line-height: 1.3;
+            direction: rtl;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .doc-file-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        /* Status */
+        .status-section {
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 10px 25px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-block;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 30px;
+        }
+
+        .signature-section {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 15px;
+        }
+
+        .location-date {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        .qr-kepala {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 2px solid var(--primary-dark);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
+        }
+
+        .qr-kepala img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .signer-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .signer-title {
+            font-size: 12px;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .verification-section {
+            text-align: right;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .qr-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+            justify-content: flex-end;
+        }
+
+        .qr-box {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 2px solid var(--primary-dark);
+            border-radius: 12px;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .verify-url {
+            font-size: 9px;
+            color: var(--text-muted);
+            word-break: break-all;
+            text-align: right;
+            line-height: 1.2;
+            margin-bottom: 2px;
+            margin-top: 4px;
+        }
+
+        .verify-note {
+            font-size: 9px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: right;
+            margin-top: 2px;
+        }
+
+        /* Print Styles - Minimal untuk konsistensi */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            
+            .print-actions {
+                display: none;
+            }
+            
+            .certificate-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Actions -->
+    <div class="print-actions">
+        <button class="btn btn-download" onclick="downloadAsPNG()">
+            <i class="fas fa-download"></i>
+            Download PNG
+        </button>
+    </div>
+
+    <div class="certificate-container" id="certificate">
+        <!-- Border Dekoratif -->
+        <div class="decorative-border"></div>
+
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <div class="uni-logo">
+                    <img src="http://127.0.0.1:8000/storage/logo-portal.png" alt="Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: var(--primary-dark); font-size: 24px; font-weight: 800;\'>U</div>';">
+                </div>
+                <div class="institution-name">Perpustakaan</div>
+                <div class="sub-institution">Universitas Darussalam Gontor</div>
+            </div>
+
+            <!-- Title -->
+            <div class="title-section">
+                <h1 class="cert-title">Sertifikat</h1>
+                <div class="cert-subtitle">Originalitas Dokumen Akademik</div>
+                <div class="cert-id">No: PLAG-202512-00002</div>
+            </div>
+
+            <!-- Recipient -->
+            <div class="recipient-section">
+                <div class="intro-text">Sertifikat ini diberikan dengan hormat kepada:</div>
+                <div class="recipient-name">ALIF BRYLIAN</div>
+                <div class="recipient-meta">NIM: 462025111007 — Mahasiswa</div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-section">
+                <div class="result-card">
+                    <div class="similarity-gauge">
+                        <div class="percentage">4%</div>
+                        <div class="gauge-label">Similarity</div>
+                    </div>
+                    <div class="document-info">
+                        <div class="arabic-title">Implementasi Portal Terpadu System Perpustakaan Universitas Darussalam Gontor Ponorogo</div>
+                        <div class="doc-file-info">
+                            File: 1-1230-Erika-Rishan-Adillah.pdf<br>
+                            Diperiksa pada: 13 Desember 2025, 14:59 WIB
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="status-section">
+                <div class="status-badge">
+                    ✓ LOLOS MEMENUHI STANDAR ORIGINALITAS
+                                    </div>
+                <div class="info-text">
+                    Dokumen ini telah melalui proses pemindaian menggunakan teknologi iThenticate by Turnitin
+                    dengan standar internasional. Tingkat kemiripan berada di bawah batas toleransi institusi (25%).
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="signature-section">
+                    <div class="location-date">Ponorogo, 04 Januari 2026</div>
+                                        <div class="qr-kepala">
+                        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiB2aWV3Qm94PSIwIDAgNTAgNTAiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iI2ZmZmZmZiIvPjxnIHRyYW5zZm9ybT0ic2NhbGUoMS4wMikiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsMCkiPjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTkgMEw5IDFMOCAxTDggMkw5IDJMOSAzTDggM0w4IDRMOSA0TDkgNUw4IDVMOCA3TDkgN0w5IDVMMTAgNUwxMCA4TDYgOEw2IDlMNyA5TDcgMTBMNiAxMEw2IDExTDUgMTFMNSAxMkw0IDEyTDQgMTFMMyAxMUwzIDEwTDQgMTBMNCA5TDUgOUw1IDhMMCA4TDAgOUwzIDlMMyAxMEwxIDEwTDEgMTFMMiAxMUwyIDEyTDQgMTJMNCAxM0wzIDEzTDMgMTRMMiAxNEwyIDE2TDEgMTZMMSAxN0wwIDE3TDAgMTlMMSAxOUwxIDIwTDAgMjBMMCAyMkwyIDIyTDIgMjRMMSAyNEwxIDIzTDAgMjNMMCAyNUwzIDI1TDMgMjdMMSAyN0wxIDI2TDAgMjZMMCAyN0wxIDI3TDEgMjlMMiAyOUwyIDI4TDMgMjhMMyAzMEwwIDMwTDAgMzFMMSAzMUwxIDMyTDIgMzJMMiAzMUwzIDMxTDMgMzJMNCAzMkw0IDMzTDUgMzNMNSAzNEwwIDM0TDAgMzVMNCAzNUw0IDM2TDYgMzZMNiAzN0w1IDM3TDUgMzlMNyAzOUw3IDM4TDggMzhMOCA0MEw5IDQwTDkgNDFMOCA0MUw4IDQzTDEwIDQzTDEwIDQ0TDggNDRMOCA0OUwxMSA0OUwxMSA0OEwxMiA0OEwxMiA0N0wxMSA0N0wxMSA0NkwxMiA0NkwxMiA0NUwxMyA0NUwxMyA0NkwxNCA0NkwxNCA0N0wxMyA0N0wxMyA0OEwxNCA0OEwxNCA0N0wxNiA0N0wxNiA0OEwxNyA0OEwxNyA0OUwyMSA0OUwyMSA0OEwyMyA0OEwyMyA0N0wyMiA0N0wyMiA0NkwyMyA0NkwyMyA0NUwyNiA0NUwyNiA0N0wyOCA0N0wyOCA0OEwyOSA0OEwyOSA0OUwzMCA0OUwzMCA0OEwzMyA0OEwzMyA0OUwzNCA0OUwzNCA0N0wzNSA0N0wzNSA0OEwzNiA0OEwzNiA0OUwzNyA0OUwzNyA0OEwzNiA0OEwzNiA0N0wzNyA0N0wzNyA0NkwzOCA0NkwzOCA0N0wzOSA0N0wzOSA0OEwzOCA0OEwzOCA0OUw0MCA0OUw0MCA0OEw0MyA0OEw0MyA0N0w0NCA0N0w0NCA0OEw0NSA0OEw0NSA0OUw0OSA0OUw0OSA0N0w0OCA0N0w0OCA0OEw0NiA0OEw0NiA0Nkw0NyA0Nkw0NyA0NUw0OSA0NUw0OSA0Mkw0NyA0Mkw0NyA0MUw0OCA0MUw0OCA0MEw0OSA0MEw0OSAzOEw0OCAzOEw0OCAzNkw0NiAzNkw0NiAzNUw0OSAzNUw0OSAzNEw0OCAzNEw0OCAzM0w0NyAzM0w0NyAzNEw0NiAzNEw0NiAzMkw0NSAzMkw0NSAzMUw0NCAzMUw0NCAzMEw0MiAzMEw0MiAzMUw0MyAzMUw0MyAzMkw0NCAzMkw0NCAzM0w0MiAzM0w0MiAzMkw0MSAzMkw0MSAzMUw0MCAzMUw0MCAzMEwzOCAzMEwzOCAyOUw0MSAyOUw0MSAyN0w0MyAyN0w0MyAyOEw0MiAyOEw0MiAyOUw0MyAyOUw0MyAyOEw0NCAyOEw0NCAyOUw0NiAyOUw0NiAzMEw0NyAzMEw0NyAyOUw0OSAyOUw0OSAyNkw0OCAyNkw0OCAyNUw0OSAyNUw0OSAyNEw0OCAyNEw0OCAyNUw0NyAyNUw0NyAyN0w0OCAyN0w0OCAyOEw0NiAyOEw0NiAyN0w0NSAyN0w0NSAyNUw0NiAyNUw0NiAyNEw0NSAyNEw0NSAyM0w0NiAyM0w0NiAyMUw0NyAyMUw0NyAyM0w0OSAyM0w0OSAyMkw0OCAyMkw0OCAyMUw0OSAyMUw0OSAxOEw0NyAxOEw0NyAyMEw0NSAyMEw0NSAxOUw0NiAxOUw0NiAxN0w0OSAxN0w0OSAxNEw0OCAxNEw0OCAxMkw0NiAxMkw0NiAxM0w0NyAxM0w0NyAxNEw0NiAxNEw0NiAxNUw0NSAxNUw0NSAxN0w0NCAxN0w0NCAxNkw0MyAxNkw0MyAxNEw0NCAxNEw0NCAxMkw0NSAxMkw0NSAxMEw0NyAxMEw0NyAxMUw0OSAxMUw0OSAxMEw0NyAxMEw0NyA5TDQ4IDlMNDggOEw0NyA4TDQ3IDlMNDYgOUw0NiA4TDQ1IDhMNDUgMTBMNDMgMTBMNDMgOUw0NCA5TDQ0IDhMNDMgOEw0MyA5TDQyIDlMNDIgOEw0MSA4TDQxIDZMNDAgNkw0MCA3TDM5IDdMMzkgNUwzOCA1TDM4IDNMMzUgM0wzNSA0TDM3IDRMMzcgNUwzNiA1TDM2IDdMMzUgN0wzNSA1TDM0IDVMMzQgNEwzMiA0TDMyIDNMMzMgM0wzMyAyTDM1IDJMMzUgMUwzNiAxTDM2IDJMMzkgMkwzOSA0TDQwIDRMNDAgM0w0MSAzTDQxIDBMNDAgMEw0MCAxTDM3IDFMMzcgMEwzNSAwTDM1IDFMMzQgMUwzNCAwTDMzIDBMMzMgMkwzMiAyTDMyIDNMMzEgM0wzMSAyTDMwIDJMMzAgM0wyOSAzTDI5IDFMMjYgMUwyNiAwTDI0IDBMMjQgMkwyMyAyTDIzIDFMMjIgMUwyMiAwTDIxIDBMMjEgMUwyMCAxTDIwIDJMMjEgMkwyMSA1TDIyIDVMMjIgOUwyMSA5TDIxIDZMMjAgNkwyMCA1TDE5IDVMMTkgNEwxOCA0TDE4IDNMMTcgM0wxNyA0TDE4IDRMMTggN0wxOSA3TDE5IDhMMTggOEwxOCA5TDE3IDlMMTcgOEwxNiA4TDE2IDdMMTcgN0wxNyA2TDE2IDZMMTYgN0wxNSA3TDE1IDVMMTYgNUwxNiA0TDE1IDRMMTUgMEwxNCAwTDE0IDFMMTMgMUwxMyAyTDEyIDJMMTIgM0wxMSAzTDExIDJMMTAgMkwxMCAxTDEyIDFMMTIgMFpNMzAgMEwzMCAxTDMyIDFMMzIgMFpNMTcgMUwxNyAyTDE4IDJMMTggMVpNMjEgMUwyMSAyTDIyIDJMMjIgNEwyMyA0TDIzIDJMMjIgMkwyMiAxWk0yNSAxTDI1IDJMMjQgMkwyNCAzTDI1IDNMMjUgNEwyNyA0TDI3IDNMMjggM0wyOCA0TDI5IDRMMjkgM0wyOCAzTDI4IDJMMjYgMkwyNiAxWk0xMyAyTDEzIDNMMTIgM0wxMiA0TDExIDRMMTEgM0w5IDNMOSA0TDEwIDRMMTAgNUwxMiA1TDEyIDZMMTEgNkwxMSA3TDEyIDdMMTIgOEwxMSA4TDExIDlMMTAgOUwxMCAxMUw5IDExTDkgMTJMOCAxMkw4IDExTDYgMTFMNiAxMkw1IDEyTDUgMTRMMyAxNEwzIDE1TDQgMTVMNCAxNkwyIDE2TDIgMTdMNCAxN0w0IDE2TDUgMTZMNSAxN0w2IDE3TDYgMThMNCAxOEw0IDE5TDMgMTlMMyAyMUw2IDIxTDYgMjJMNyAyMkw3IDIxTDYgMjFMNiAyMEw3IDIwTDcgMTlMOCAxOUw4IDIwTDkgMjBMOSAyNUwxMSAyNUwxMSAyNEwxMCAyNEwxMCAyM0wxMSAyM0wxMSAyMkwxMyAyMkwxMyAyM0wxMiAyM0wxMiAyNUwxMyAyNUwxMyAyNkwxMiAyNkwxMiAyOUwxMCAyOUwxMCAzMEw5IDMwTDkgMjlMOCAyOUw4IDI4TDExIDI4TDExIDI2TDkgMjZMOSAyN0w0IDI3TDQgMzBMMyAzMEwzIDMxTDQgMzFMNCAzMkw3IDMyTDcgMzNMNiAzM0w2IDM0TDUgMzRMNSAzNUw2IDM1TDYgMzZMNyAzNkw3IDM3TDYgMzdMNiAzOEw3IDM4TDcgMzdMOCAzN0w4IDM2TDEwIDM2TDEwIDM3TDkgMzdMOSA0MEwxMCA0MEwxMCAzOUwxMSAzOUwxMSA0MEwxMiA0MEwxMiAzOUwxMSAzOUwxMSAzOEwxMiAzOEwxMiAzN0wxMSAzN0wxMSAzNkwxMiAzNkwxMiAzNUwxMCAzNUwxMCAzNEwxNCAzNEwxNCAzM0wxNSAzM0wxNSAzNUwxNyAzNUwxNyAzNkwxNSAzNkwxNSAzN0wxMyAzN0wxMyAzOEwxNCAzOEwxNCAzOUwxMyAzOUwxMyA0MEwxNCA0MEwxNCA0MUwxMyA0MUwxMyA0M0wxNCA0M0wxNCA0NEwxMyA0NEwxMyA0NUwxNCA0NUwxNCA0NkwxNiA0NkwxNiA0NUwxOCA0NUwxOCA0NEwxNyA0NEwxNyA0M0wxOCA0M0wxOCA0MkwxOSA0MkwxOSA0MUwyMCA0MUwyMCA0MkwyMSA0MkwyMSA0M0wxOSA0M0wxOSA0NUwyMCA0NUwyMCA0NkwyMSA0NkwyMSA0NUwyMiA0NUwyMiA0NEwyMSA0NEwyMSA0M0wyMiA0M0wyMiA0MkwyMSA0MkwyMSA0MUwyMCA0MUwyMCA0MEwyMSA0MEwyMSAzOUwyMiAzOUwyMiA0MEwyNCA0MEwyNCAzOUwyOCAzOUwyOCAzOEwyOSAzOEwyOSAzOUwzMCAzOUwzMCA0MEwyNyA0MEwyNyA0MUwyOCA0MUwyOCA0MkwyNyA0MkwyNyA0M0wyOCA0M0wyOCA0NEwyNyA0NEwyNyA0NUwyOCA0NUwyOCA0N0wyOSA0N0wyOSA0OEwzMCA0OEwzMCA0N0wyOSA0N0wyOSA0NUwzMSA0NUwzMSA0N0wzNCA0N0wzNCA0NkwzNSA0NkwzNSA0NEwzOCA0NEwzOCA0NkwzOSA0NkwzOSA0N0w0MSA0N0w0MSA0Nkw0NCA0Nkw0NCA0N0w0NSA0N0w0NSA0Nkw0NiA0Nkw0NiA0NUw0NSA0NUw0NSA0Nkw0NCA0Nkw0NCA0NUw0MSA0NUw0MSA0NkwzOSA0NkwzOSA0NEwzOCA0NEwzOCA0M0wzNiA0M0wzNiA0MEwzNyA0MEwzNyA0MkwzOSA0MkwzOSA0M0w0MCA0M0w0MCA0MkwzOSA0MkwzOSA0MUwzOCA0MUwzOCA0MEw0MCA0MEw0MCAzOEw0MSAzOEw0MSA0MEw0NSA0MEw0NSAzOUw0NiAzOUw0NiA0MEw0OCA0MEw0OCAzOUw0NyAzOUw0NyAzN0w0NiAzN0w0NiAzNkw0NCAzNkw0NCAzNUw0NSAzNUw0NSAzM0w0NCAzM0w0NCAzNEw0MyAzNEw0MyAzNUw0MSAzNUw0MSAzNkw0MiAzNkw0MiAzN0w0MCAzN0w0MCAzOEwzOSAzOEwzOSAzN0wzOCAzN0wzOCAzOEwzNyAzOEwzNyAzN0wzNCAzN0wzNCAzNkw0MCAzNkw0MCAzNUwzOCAzNUwzOCAzNEw0MiAzNEw0MiAzM0w0MSAzM0w0MSAzMkw0MCAzMkw0MCAzMUwzOSAzMUwzOSAzMkw0MCAzMkw0MCAzM0wzOCAzM0wzOCAzMUwzNiAzMUwzNiAzMEwzNSAzMEwzNSAyOUwzMyAyOUwzMyAyOEwzMiAyOEwzMiAyNkwzMyAyNkwzMyAyNEwzNCAyNEwzNCAyNkwzOSAyNkwzOSAyOEw0MCAyOEw0MCAyNkwzOSAyNkwzOSAyNUwzOCAyNUwzOCAyNEwzOSAyNEwzOSAyM0w0MCAyM0w0MCAyMkw0MSAyMkw0MSAyMUw0MCAyMUw0MCAyMEw0MSAyMEw0MSAxOUw0MiAxOUw0MiAyMUw0MyAyMUw0MyAyMEw0NCAyMEw0NCAyMkw0NSAyMkw0NSAyMEw0NCAyMEw0NCAxOUw0MyAxOUw0MyAxOEw0NCAxOEw0NCAxN0w0MyAxN0w0MyAxNkw0MiAxNkw0MiAxNUw0MCAxNUw0MCAxNkwzOSAxNkwzOSAxNUwzOCAxNUwzOCAxNEw0MSAxNEw0MSAxM0w0MiAxM0w0MiAxMkw0MSAxMkw0MSA5TDM5IDlMMzkgN0wzOCA3TDM4IDVMMzcgNUwzNyA3TDM2IDdMMzYgOEwzNCA4TDM0IDZMMzMgNkwzMyA1TDMwIDVMMzAgNkwyOSA2TDI5IDVMMjggNUwyOCA2TDI3IDZMMjcgN0wyOCA3TDI4IDZMMjkgNkwyOSA4TDI3IDhMMjcgOUwyMiA5TDIyIDEyTDIxIDEyTDIxIDlMMjAgOUwyMCAxMkwyMSAxMkwyMSAxM0wyMCAxM0wyMCAxNEwxNyAxNEwxNyAxN0wxNiAxN0wxNiAxNUwxNSAxNUwxNSAxNEwxNiAxNEwxNiAxM0wxOCAxM0wxOCAxMkwxNyAxMkwxNyAxMUwxOCAxMUwxOCAxMEwxOSAxMEwxOSA5TDE4IDlMMTggMTBMMTcgMTBMMTcgOUwxNiA5TDE2IDhMMTUgOEwxNSA3TDE0IDdMMTQgNkwxMyA2TDEzIDVMMTUgNUwxNSA0TDEzIDRMMTMgM0wxNCAzTDE0IDJaTTIzIDVMMjMgOEwyNiA4TDI2IDVaTTEyIDZMMTIgN0wxMyA3TDEzIDZaTTE5IDZMMTkgN0wyMCA3TDIwIDZaTTI0IDZMMjQgN0wyNSA3TDI1IDZaTTMwIDZMMzAgOEwzMyA4TDMzIDZMMzIgNkwzMiA3TDMxIDdMMzEgNlpNMzcgN0wzNyA4TDM2IDhMMzYgMTFMMzUgMTFMMzUgMTBMMzQgMTBMMzQgOUwzMCA5TDMwIDEwTDM0IDEwTDM0IDExTDMyIDExTDMyIDEyTDMxIDEyTDMxIDExTDI4IDExTDI4IDEyTDI3IDEyTDI3IDEwTDI4IDEwTDI4IDlMMjcgOUwyNyAxMEwyNCAxMEwyNCAxMUwyMyAxMUwyMyAxMkwyMiAxMkwyMiAxM0wyMyAxM0wyMyAxMkwyNCAxMkwyNCAxNUwyMyAxNUwyMyAxNkwyMiAxNkwyMiAxN0wyMSAxN0wyMSAxNkwyMCAxNkwyMCAxN0wxOSAxN0wxOSAxNkwxOCAxNkwxOCAxN0wxOSAxN0wxOSAxOEwyMCAxOEwyMCAxOUwxOSAxOUwxOSAyMEwyMCAyMEwyMCAyMUwyMSAyMUwyMSAyMkwyMCAyMkwyMCAyM0wxOSAyM0wxOSAyMUwxOCAyMUwxOCAyMEwxNyAyMEwxNyAxOUwxOCAxOUwxOCAxOEwxNyAxOEwxNyAxOUwxNiAxOUwxNiAyMEwxNyAyMEwxNyAyMUwxOCAyMUwxOCAyM0wxOSAyM0wxOSAyNEwxNiAyNEwxNiAyM0wxNSAyM0wxNSAyMkwxNiAyMkwxNiAyMUwxNSAyMUwxNSAxOEwxMyAxOEwxMyAxN0wxNCAxN0wxNCAxNkwxMyAxNkwxMyAxN0wxMSAxN0wxMSAxNkwxMiAxNkwxMiAxNUwxMyAxNUwxMyAxNEwxNCAxNEwxNCAxM0wxMiAxM0wxMiAxMkwxMCAxMkwxMCAxM0wxMiAxM0wxMiAxNEwxMCAxNEwxMCAxNUwxMSAxNUwxMSAxNkwxMCAxNkwxMCAxN0w5IDE3TDkgMThMOCAxOEw4IDE5TDkgMTlMOSAyMEwxMCAyMEwxMCAyMUwxNSAyMUwxNSAyMkwxNCAyMkwxNCAyM0wxNSAyM0wxNSAyNUwxNCAyNUwxNCAyNEwxMyAyNEwxMyAyNUwxNCAyNUwxNCAyNkwxNSAyNkwxNSAyNUwxOCAyNUwxOCAyN0wxNyAyN0wxNyAyOEwxOCAyOEwxOCAyOUwxNiAyOUwxNiAyN0wxNSAyN0wxNSAyOUwxNiAyOUwxNiAzMEwxNSAzMEwxNSAzMUwxNiAzMUwxNiAzMkwxNSAzMkwxNSAzM0wxNyAzM0wxNyAzMEwxOSAzMEwxOSAzMUwxOCAzMUwxOCAzM0wxOSAzM0wxOSAzNUwyMCAzNUwyMCAzN0wxOCAzN0wxOCAzNkwxNyAzNkwxNyAzN0wxOCAzN0wxOCAzOEwxNyAzOEwxNyAzOUwxOCAzOUwxOCAzOEwxOSAzOEwxOSAzOUwyMCAzOUwyMCAzN0wyMSAzN0wyMSAzOEwyMiAzOEwyMiAzN0wyMyAzN0wyMyAzOEwyNiAzOEwyNiAzN0wyNSAzN0wyNSAzNkwyOCAzNkwyOCAzNUwyOSAzNUwyOSAzNEwzMSAzNEwzMSAzMkwzMyAzMkwzMyAzNEwzNCAzNEwzNCAzNUwzMiAzNUwzMiAzNkwzMSAzNkwzMSAzN0wzMCAzN0wzMCAzOEwzMSAzOEwzMSA0MEwzNCA0MEwzNCAzOUwzNSAzOUwzNSA0MEwzNiA0MEwzNiAzOEwzMyAzOEwzMyAzOUwzMiAzOUwzMiAzOEwzMSAzOEwzMSAzN0wzMiAzN0wzMiAzNkwzNCAzNkwzNCAzNUwzNSAzNUwzNSAzNEwzNCAzNEwzNCAzMUwzNSAzMUwzNSAzMkwzNiAzMkwzNiAzM0wzNyAzM0wzNyAzMkwzNiAzMkwzNiAzMUwzNSAzMUwzNSAzMEwzMiAzMEwzMiAyOEwzMSAyOEwzMSAyN0wzMCAyN0wzMCAyOEwzMSAyOEwzMSAyOUwzMCAyOUwzMCAzMEwyOSAzMEwyOSAzMUwyOCAzMUwyOCAzMEwyNyAzMEwyNyAzMUwyNSAzMUwyNSAzMEwyNiAzMEwyNiAyOEwyOCAyOEwyOCAyN0wyNyAyN0wyNyAyNkwyOCAyNkwyOCAyNUwyNyAyNUwyNyAyMkwyNSAyMkwyNSAyMEwyNiAyMEwyNiAyMUwyOCAyMUwyOCAyMkwyOSAyMkwyOSAyMUwzMCAyMUwzMCAyMkwzMSAyMkwzMSAyM0wzMCAyM0wzMCAyNEwzMyAyNEwzMyAyM0wzOCAyM0wzOCAyMUwzOSAyMUwzOSAyMEw0MCAyMEw0MCAxOUw0MSAxOUw0MSAxOEw0MCAxOEw0MCAxOUwzOSAxOUwzOSAxOEwzOCAxOEwzOCAxOUwzNyAxOUwzNyAyMEwzNiAyMEwzNiAxOEwzNyAxOEwzNyAxNkwzOCAxNkwzOCAxNUwzNyAxNUwzNyAxNEwzOCAxNEwzOCAxMkwzNiAxMkwzNiAxMUwzNyAxMUwzNyAxMEwzOCAxMEwzOCAxMUwzOSAxMUwzOSAxMEwzOCAxMEwzOCA3Wk0xMSA5TDExIDEwTDEyIDEwTDEyIDlaTTE0IDlMMTQgMTBMMTUgMTBMMTUgOVpNMTYgMTBMMTYgMTFMMTUgMTFMMTUgMTNMMTYgMTNMMTYgMTFMMTcgMTFMMTcgMTBaTTQyIDEwTDQyIDExTDQzIDExTDQzIDEyTDQ0IDEyTDQ0IDExTDQzIDExTDQzIDEwWk0xMyAxMUwxMyAxMkwxNCAxMkwxNCAxMVpNMjQgMTFMMjQgMTJMMjUgMTJMMjUgMTFaTTM0IDExTDM0IDEyTDM1IDEyTDM1IDExWk0wIDEyTDAgMTNMMSAxM0wxIDEyWk02IDEyTDYgMTNMOCAxM0w4IDE0TDkgMTRMOSAxM0w4IDEzTDggMTJaTTI4IDEyTDI4IDEzTDI2IDEzTDI2IDE0TDI1IDE0TDI1IDE1TDI0IDE1TDI0IDE2TDI1IDE2TDI1IDE4TDI3IDE4TDI3IDE5TDMxIDE5TDMxIDIwTDMyIDIwTDMyIDIxTDMxIDIxTDMxIDIyTDMyIDIyTDMyIDIzTDMzIDIzTDMzIDIyTDMyIDIyTDMyIDIxTDMzIDIxTDMzIDIwTDM0IDIwTDM0IDIyTDM2IDIyTDM2IDIxTDM1IDIxTDM1IDIwTDM0IDIwTDM0IDE4TDM1IDE4TDM1IDE3TDM2IDE3TDM2IDE2TDM3IDE2TDM3IDE1TDM2IDE1TDM2IDE2TDM1IDE2TDM1IDE1TDM0IDE1TDM0IDE4TDMzIDE4TDMzIDIwTDMyIDIwTDMyIDE3TDMzIDE3TDMzIDE2TDMxIDE2TDMxIDE1TDMyIDE1TDMyIDE0TDMzIDE0TDMzIDEyTDMyIDEyTDMyIDE0TDI5IDE0TDI5IDEzTDMwIDEzTDMwIDEyWk0zOSAxMkwzOSAxM0w0MSAxM0w0MSAxMlpNMzQgMTNMMzQgMTRMMzUgMTRMMzUgMTNaTTAgMTRMMCAxNUwxIDE1TDEgMTRaTTUgMTRMNSAxNUw3IDE1TDcgMTZMNiAxNkw2IDE3TDcgMTdMNyAxNkw5IDE2TDkgMTVMNyAxNUw3IDE0Wk0yMCAxNEwyMCAxNUwyMSAxNUwyMSAxNFpNMjYgMTRMMjYgMTVMMjcgMTVMMjcgMTRaTTI4IDE0TDI4IDE2TDMwIDE2TDMwIDE4TDMxIDE4TDMxIDE2TDMwIDE2TDMwIDE1TDI5IDE1TDI5IDE0Wk00NiAxNUw0NiAxNkw0OCAxNkw0OCAxNVpNMjYgMTZMMjYgMTdMMjcgMTdMMjcgMTZaTTQwIDE2TDQwIDE3TDQyIDE3TDQyIDE4TDQzIDE4TDQzIDE3TDQyIDE3TDQyIDE2Wk0yMCAxN0wyMCAxOEwyMSAxOEwyMSAxN1pNMjIgMTdMMjIgMThMMjMgMThMMjMgMTdaTTYgMThMNiAxOUw1IDE5TDUgMjBMNiAyMEw2IDE5TDcgMTlMNyAxOFpNMTEgMThMMTEgMjBMMTQgMjBMMTQgMTlMMTIgMTlMMTIgMThaTTIyIDE5TDIyIDIwTDIzIDIwTDIzIDIxTDIyIDIxTDIyIDIyTDIxIDIyTDIxIDI0TDIyIDI0TDIyIDIyTDI0IDIyTDI0IDIwTDI1IDIwTDI1IDE5TDI0IDE5TDI0IDIwTDIzIDIwTDIzIDE5Wk0xIDIwTDEgMjFMMiAyMUwyIDIwWk0yOCAyMEwyOCAyMUwyOSAyMUwyOSAyMFpNMzcgMjBMMzcgMjFMMzggMjFMMzggMjBaTTMgMjJMMyAyNEw0IDI0TDQgMjJaTTUgMjNMNSAyNkw4IDI2TDggMjNaTTIzIDIzTDIzIDI2TDI2IDI2TDI2IDIzWk0yOCAyM0wyOCAyNEwyOSAyNEwyOSAyM1pNNDEgMjNMNDEgMjZMNDQgMjZMNDQgMjNaTTYgMjRMNiAyNUw3IDI1TDcgMjRaTTE5IDI0TDE5IDI1TDIwIDI1TDIwIDI2TDIxIDI2TDIxIDI3TDIwIDI3TDIwIDI4TDE5IDI4TDE5IDI5TDIwIDI5TDIwIDMxTDE5IDMxTDE5IDMzTDIwIDMzTDIwIDM1TDIxIDM1TDIxIDM2TDIzIDM2TDIzIDM1TDIyIDM1TDIyIDM0TDI0IDM0TDI0IDMzTDI1IDMzTDI1IDM1TDI0IDM1TDI0IDM2TDI1IDM2TDI1IDM1TDI3IDM1TDI3IDM0TDI5IDM0TDI5IDMyTDMxIDMyTDMxIDMxTDMyIDMxTDMyIDMwTDMwIDMwTDMwIDMxTDI5IDMxTDI5IDMyTDI4IDMyTDI4IDMxTDI3IDMxTDI3IDMyTDI0IDMyTDI0IDMwTDIzIDMwTDIzIDI5TDI1IDI5TDI1IDI4TDI2IDI4TDI2IDI3TDI1IDI3TDI1IDI4TDI0IDI4TDI0IDI3TDIzIDI3TDIzIDI4TDIxIDI4TDIxIDI3TDIyIDI3TDIyIDI1TDIwIDI1TDIwIDI0Wk0yNCAyNEwyNCAyNUwyNSAyNUwyNSAyNFpNMzYgMjRMMzYgMjVMMzcgMjVMMzcgMjRaTTQyIDI0TDQyIDI1TDQzIDI1TDQzIDI0Wk0yOSAyNUwyOSAyNkwzMiAyNkwzMiAyNVpNMTMgMjdMMTMgMjhMMTQgMjhMMTQgMjdaTTM0IDI3TDM0IDI4TDM1IDI4TDM1IDI3Wk0zNiAyN0wzNiAyOEwzNyAyOEwzNyAyN1pNNDQgMjdMNDQgMjhMNDUgMjhMNDUgMjdaTTYgMjhMNiAyOUw3IDI5TDcgMjhaTTIwIDI4TDIwIDI5TDIxIDI5TDIxIDMwTDIyIDMwTDIyIDI5TDIxIDI5TDIxIDI4Wk0xMiAyOUwxMiAzMEwxMCAzMEwxMCAzMUw5IDMxTDkgMzBMOCAzMEw4IDMxTDcgMzFMNyAzMEw2IDMwTDYgMzFMNyAzMUw3IDMyTDggMzJMOCAzM0w3IDMzTDcgMzRMNiAzNEw2IDM1TDcgMzVMNyAzNkw4IDM2TDggMzVMOSAzNUw5IDM0TDEwIDM0TDEwIDMzTDE0IDMzTDE0IDMxTDEzIDMxTDEzIDMyTDExIDMyTDExIDMxTDEyIDMxTDEyIDMwTDE0IDMwTDE0IDI5Wk00OCAzMEw0OCAzMUw0NyAzMUw0NyAzMkw0OCAzMkw0OCAzMUw0OSAzMUw0OSAzMFpNOCAzMUw4IDMyTDkgMzJMOSAzMVpNMjEgMzFMMjEgMzJMMjAgMzJMMjAgMzNMMjEgMzNMMjEgMzRMMjIgMzRMMjIgMzNMMjQgMzNMMjQgMzJMMjIgMzJMMjIgMzFaTTggMzNMOCAzNEw3IDM0TDcgMzVMOCAzNUw4IDM0TDkgMzRMOSAzM1pNMjYgMzNMMjYgMzRMMjcgMzRMMjcgMzNaTTE3IDM0TDE3IDM1TDE4IDM1TDE4IDM0Wk0zNiAzNEwzNiAzNUwzNyAzNUwzNyAzNFpNMTMgMzVMMTMgMzZMMTQgMzZMMTQgMzVaTTEgMzZMMSAzN0wyIDM3TDIgMzZaTTMgMzdMMyAzOEw0IDM4TDQgMzdaTTEwIDM3TDEwIDM4TDExIDM4TDExIDM3Wk0xNSAzN0wxNSAzOEwxNiAzOEwxNiAzN1pNMjcgMzdMMjcgMzhMMjggMzhMMjggMzdaTTQyIDM3TDQyIDM5TDQzIDM5TDQzIDM4TDQ0IDM4TDQ0IDM3Wk00NSAzN0w0NSAzOEw0NiAzOEw0NiAzN1pNMSAzOEwxIDQwTDAgNDBMMCA0MUwzIDQxTDMgNDBMNCA0MEw0IDM5TDIgMzlMMiAzOFpNMzggMzhMMzggMzlMMzkgMzlMMzkgMzhaTTE1IDM5TDE1IDQwTDE2IDQwTDE2IDQxTDE3IDQxTDE3IDQwTDE2IDQwTDE2IDM5Wk02IDQwTDYgNDFMNyA0MUw3IDQwWk0xOCA0MEwxOCA0MUwxOSA0MUwxOSA0MFpNOSA0MUw5IDQyTDExIDQyTDExIDQ1TDEwIDQ1TDEwIDQ2TDkgNDZMOSA0OEwxMSA0OEwxMSA0N0wxMCA0N0wxMCA0NkwxMSA0NkwxMSA0NUwxMiA0NUwxMiA0MkwxMSA0MkwxMSA0MVpNMTQgNDFMMTQgNDJMMTUgNDJMMTUgNDFaTTIzIDQxTDIzIDQ0TDI2IDQ0TDI2IDQxWk0yOSA0MUwyOSA0M0wzMCA0M0wzMCA0NEwzMSA0NEwzMSA0NUwzMiA0NUwzMiA0NkwzMyA0NkwzMyA0NUwzMiA0NUwzMiA0NEwzMyA0NEwzMyA0MkwzNCA0MkwzNCA0M0wzNSA0M0wzNSA0MkwzNCA0MkwzNCA0MUwzMiA0MUwzMiA0M0wzMCA0M0wzMCA0MkwzMSA0MkwzMSA0MVpNNDEgNDFMNDEgNDRMNDQgNDRMNDQgNDFaTTE2IDQyTDE2IDQzTDE1IDQzTDE1IDQ1TDE2IDQ1TDE2IDQzTDE3IDQzTDE3IDQyWk0yNCA0MkwyNCA0M0wyNSA0M0wyNSA0MlpNNDIgNDJMNDIgNDNMNDMgNDNMNDMgNDJaTTQ2IDQzTDQ2IDQ0TDQ3IDQ0TDQ3IDQzWk0yMCA0NEwyMCA0NUwyMSA0NUwyMSA0NFpNMzYgNDVMMzYgNDZMMzcgNDZMMzcgNDVaTTE3IDQ2TDE3IDQ4TDE4IDQ4TDE4IDQ2Wk0yNCA0NkwyNCA0N0wyNSA0N0wyNSA0NlpNMTkgNDdMMTkgNDhMMjAgNDhMMjAgNDdaTTI0IDQ4TDI0IDQ5TDI1IDQ5TDI1IDQ4Wk0yNiA0OEwyNiA0OUwyNyA0OUwyNyA0OFpNMCAwTDAgN0w3IDdMNyAwWk0xIDFMMSA2TDYgNkw2IDFaTTIgMkwyIDVMNSA1TDUgMlpNNDIgMEw0MiA3TDQ5IDdMNDkgMFpNNDMgMUw0MyA2TDQ4IDZMNDggMVpNNDQgMkw0NCA1TDQ3IDVMNDcgMlpNMCA0MkwwIDQ5TDcgNDlMNyA0MlpNMSA0M0wxIDQ4TDYgNDhMNiA0M1pNMiA0NEwyIDQ3TDUgNDdMNSA0NFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9nPjwvc3ZnPgo=" alt="QR Kepala">
+                    </div>
+                                        <div class="signer-name">H. Syamsul Hadi Untung MA, M.Ls</div>
+                    <div class="signer-title">Kepala Perpustakaan</div>
+                </div>
+
+                <div class="verification-section">
+                    <div class="qr-box">
+                        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjcwIiBoZWlnaHQ9IjcwIiB2aWV3Qm94PSIwIDAgNzAgNzAiPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCIgZmlsbD0iI2ZmZmZmZiIvPjxnIHRyYW5zZm9ybT0ic2NhbGUoMi40MTQpIj48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLDApIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik05IDBMOSAxTDggMUw4IDNMOSAzTDkgNEw4IDRMOCA4TDYgOEw2IDlMNCA5TDQgOEwzIDhMMyA5TDQgOUw0IDEwTDIgMTBMMiAxMUwxIDExTDEgMTBMMCAxMEwwIDE3TDIgMTdMMiAxNkwxIDE2TDEgMTNMMiAxM0wyIDExTDQgMTFMNCAxNUwzIDE1TDMgMTZMNCAxNkw0IDE3TDMgMTdMMyAxOEw0IDE4TDQgMjBMMyAyMEwzIDE5TDIgMTlMMiAyMUw0IDIxTDQgMjBMNSAyMEw1IDIxTDcgMjFMNyAyMEw4IDIwTDggMjNMOSAyM0w5IDIwTDggMjBMOCAxOUwxMSAxOUwxMSAxN0wxMyAxN0wxMyAxNkwxNCAxNkwxNCAxOEwxNyAxOEwxNyAxOUwxNCAxOUwxNCAyMEwxMyAyMEwxMyAyMkwxMiAyMkwxMiAyM0wxMyAyM0wxMyAyNUwxNCAyNUwxNCAyNkwxNiAyNkwxNiAyN0wxNSAyN0wxNSAyOEwxNCAyOEwxNCAyN0wxMyAyN0wxMyAyNkwxMSAyNkwxMSAyNUwxMCAyNUwxMCAyNEwxMSAyNEwxMSAyMUwxMiAyMUwxMiAyMEwxMSAyMEwxMSAyMUwxMCAyMUwxMCAyNEw5IDI0TDkgMjVMOCAyNUw4IDI2TDkgMjZMOSAyN0w4IDI3TDggMjlMMTAgMjlMMTAgMjhMOSAyOEw5IDI3TDEwIDI3TDEwIDI2TDExIDI2TDExIDI4TDEyIDI4TDEyIDI3TDEzIDI3TDEzIDI4TDE0IDI4TDE0IDI5TDE1IDI5TDE1IDI4TDE2IDI4TDE2IDI5TDE3IDI5TDE3IDI4TDE5IDI4TDE5IDI5TDIyIDI5TDIyIDI2TDIzIDI2TDIzIDI4TDI0IDI4TDI0IDI5TDI1IDI5TDI1IDI4TDI2IDI4TDI2IDI2TDI1IDI2TDI1IDI1TDI2IDI1TDI2IDI0TDI3IDI0TDI3IDI2TDI4IDI2TDI4IDI3TDI3IDI3TDI3IDI5TDI4IDI5TDI4IDI3TDI5IDI3TDI5IDI2TDI4IDI2TDI4IDI0TDI5IDI0TDI5IDIzTDI4IDIzTDI4IDIyTDI5IDIyTDI5IDIxTDI3IDIxTDI3IDIwTDI5IDIwTDI5IDE3TDI4IDE3TDI4IDE1TDI5IDE1TDI5IDE0TDI3IDE0TDI3IDEzTDI5IDEzTDI5IDEyTDI4IDEyTDI4IDEwTDI5IDEwTDI5IDlMMjggOUwyOCA4TDI2IDhMMjYgOUwyNSA5TDI1IDhMMjIgOEwyMiA5TDIxIDlMMjEgOEwyMCA4TDIwIDlMMjEgOUwyMSAxMEwxOSAxMEwxOSA5TDE3IDlMMTcgMTBMMTYgMTBMMTYgMTFMMTUgMTFMMTUgOUwxNCA5TDE0IDhMMTUgOEwxNSA2TDE2IDZMMTYgOEwxOSA4TDE5IDZMMjAgNkwyMCA3TDIxIDdMMjEgNEwyMCA0TDIwIDVMMTkgNUwxOSAzTDIxIDNMMjEgMUwyMCAxTDIwIDBMMTkgMEwxOSAxTDE4IDFMMTggMkwxNyAyTDE3IDBMMTUgMEwxNSAyTDE2IDJMMTYgM0wxNSAzTDE1IDZMMTQgNkwxNCA0TDEzIDRMMTMgNkwxMiA2TDEyIDVMMTEgNUwxMSA2TDEwIDZMMTAgNUw5IDVMOSA0TDEyIDRMMTIgM0wxMyAzTDEzIDJMMTQgMkwxNCAxTDEzIDFMMTMgMEwxMiAwTDEyIDFMMTEgMUwxMSAyTDkgMkw5IDFMMTAgMUwxMCAwWk0xOSAxTDE5IDJMMjAgMkwyMCAxWk0xNyAzTDE3IDRMMTYgNEwxNiA2TDE3IDZMMTcgN0wxOCA3TDE4IDNaTTkgNkw5IDdMMTAgN0wxMCA4TDggOEw4IDEwTDcgMTBMNyA5TDYgOUw2IDEwTDUgMTBMNSAxNEw4IDE0TDggMTVMOSAxNUw5IDEzTDEyIDEzTDEyIDEyTDEzIDEyTDEzIDhMMTQgOEwxNCA2TDEzIDZMMTMgOEwxMiA4TDEyIDZMMTEgNkwxMSA3TDEwIDdMMTAgNlpNMCA4TDAgOUwyIDlMMiA4Wk0xMCA4TDEwIDEwTDggMTBMOCAxMUwxMSAxMUwxMSAxMEwxMiAxMEwxMiA5TDExIDlMMTEgOFpNMjQgOUwyNCAxMEwyMyAxMEwyMyAxMkwyNCAxMkwyNCAxNUwyMiAxNUwyMiAxNEwyMyAxNEwyMyAxM0wyMiAxM0wyMiAxMkwxOSAxMkwxOSAxMUwxNyAxMUwxNyAxMkwxOCAxMkwxOCAxM0wxNyAxM0wxNyAxNEwxNiAxNEwxNiAxM0wxNSAxM0wxNSAxNEwxNCAxNEwxNCAxM0wxMyAxM0wxMyAxNEwxNCAxNEwxNCAxNkwxNSAxNkwxNSAxN0wxNyAxN0wxNyAxOEwxOCAxOEwxOCAyMEwxNyAyMEwxNyAyMkwxNSAyMkwxNSAyM0wxNyAyM0wxNyAyNEwxOCAyNEwxOCAyMUwxOSAyMUwxOSAyM0wyMCAyM0wyMCAyMUwxOSAyMUwxOSAyMEwyMSAyMEwyMSAxOUwyMCAxOUwyMCAxN0wyMyAxN0wyMyAxOEwyMiAxOEwyMiAyMEwyNSAyMEwyNSAyM0wyNyAyM0wyNyAyMkwyNiAyMkwyNiAyMEwyNyAyMEwyNyAxOEwyOCAxOEwyOCAxN0wyNyAxN0wyNyAxNUwyNiAxNUwyNiAxM0wyNyAxM0wyNyAxMkwyNiAxMkwyNiAxM0wyNSAxM0wyNSAxMUwyNCAxMUwyNCAxMEwyNSAxMEwyNSA5Wk0yNiA5TDI2IDEwTDI4IDEwTDI4IDlaTTYgMTBMNiAxMUw3IDExTDcgMTBaTTE0IDExTDE0IDEyTDE1IDEyTDE1IDExWk02IDEyTDYgMTNMOCAxM0w4IDEyWk0xOSAxM0wxOSAxNEwxNyAxNEwxNyAxNUwxNiAxNUwxNiAxNkwxNyAxNkwxNyAxN0wxOCAxN0wxOCAxNkwxOSAxNkwxOSAxN0wyMCAxN0wyMCAxNUwxOSAxNUwxOSAxNEwyMCAxNEwyMCAxM1pNMTAgMTRMMTAgMTdMOSAxN0w5IDE4TDEwIDE4TDEwIDE3TDExIDE3TDExIDE2TDEyIDE2TDEyIDE0Wk01IDE1TDUgMTZMNyAxNkw3IDE1Wk0yMSAxNUwyMSAxNkwyMiAxNkwyMiAxNVpNMjQgMTVMMjQgMTZMMjUgMTZMMjUgMTdMMjYgMTdMMjYgMTVaTTYgMTdMNiAxOEw1IDE4TDUgMTlMNiAxOUw2IDIwTDcgMjBMNyAxOUw4IDE5TDggMTdaTTAgMThMMCAxOUwxIDE5TDEgMThaTTYgMThMNiAxOUw3IDE5TDcgMThaTTEyIDE4TDEyIDE5TDEzIDE5TDEzIDE4Wk0yMyAxOEwyMyAxOUwyNCAxOUwyNCAxOFpNMjUgMThMMjUgMTlMMjYgMTlMMjYgMThaTTAgMjBMMCAyMUwxIDIxTDEgMjBaTTE0IDIwTDE0IDIxTDE2IDIxTDE2IDIwWk0yMSAyMUwyMSAyNEwyNCAyNEwyNCAyMVpNMjIgMjJMMjIgMjNMMjMgMjNMMjMgMjJaTTE5IDI0TDE5IDI1TDE2IDI1TDE2IDI2TDE3IDI2TDE3IDI3TDE2IDI3TDE2IDI4TDE3IDI4TDE3IDI3TDE5IDI3TDE5IDI4TDIwIDI4TDIwIDI0Wk0yMyAyNUwyMyAyNkwyNCAyNkwyNCAyNVpNMCAwTDAgN0w3IDdMNyAwWk0xIDFMMSA2TDYgNkw2IDFaTTIgMkwyIDVMNSA1TDUgMlpNMjIgMEwyMiA3TDI5IDdMMjkgMFpNMjMgMUwyMyA2TDI4IDZMMjggMVpNMjQgMkwyNCA1TDI3IDVMMjcgMlpNMCAyMkwwIDI5TDcgMjlMNyAyMlpNMSAyM0wxIDI4TDYgMjhMNiAyM1pNMiAyNEwyIDI3TDUgMjdMNSAyNFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9nPjwvc3ZnPgo=" alt="QR Verification">
+                    </div>
+                    <div class="verify-url">http://127.0.0.1:8000/verify/PLAG-202512-00002</div>
+                    <div class="verify-note">Verifikasi Digital Sah Tanpa Tanda Tangan Basah</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function downloadAsPNG() {
+            const certificate = document.getElementById('certificate');
+            const actions = document.querySelector('.print-actions');
+            
+            // Hide actions during capture
+            actions.style.display = 'none';
+            
+            html2canvas(certificate, {
+                width: 794,
+                height: 1123,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                // Show actions again
+                actions.style.display = 'flex';
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = 'Sertifikat-Plagiasi-PLAG-202512-00002.png';
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+            }).catch(error => {
+                actions.style.display = 'flex';
+                console.error('Error generating PNG:', error);
+                alert('Error generating PNG. Please try again.');
+            });
+        }
+
+        // Auto-download on load (optional)
+        // window.addEventListener('load', () => {
+        //     setTimeout(downloadAsPNG, 1000);
+        // });
+    </script>
+</body>
+</html>

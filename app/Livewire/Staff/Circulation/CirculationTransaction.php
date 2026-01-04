@@ -242,14 +242,22 @@ class CirculationTransaction extends Component
             return;
         }
 
-        $item = Item::withoutGlobalScopes()->with('book')->where('barcode', $this->itemBarcode)->first();
+        $currentBranchId = auth()->user()->branch_id;
+        
+        // Cari item, prioritaskan dari branch sendiri jika ada duplikat barcode
+        $item = Item::withoutGlobalScopes()
+            ->with('book', 'location.branch', 'branch')
+            ->where('barcode', $this->itemBarcode)
+            ->when($currentBranchId, function ($q) use ($currentBranchId) {
+                $q->orderByRaw("CASE WHEN branch_id = ? THEN 0 ELSE 1 END", [$currentBranchId]);
+            })
+            ->first();
 
         if (!$item) {
             $this->alert('error', 'Item tidak ditemukan', "Barcode: {$this->itemBarcode}");
             return;
         }
 
-        $currentBranchId = auth()->user()->branch_id;
         $itemBranchId = $item->location?->branch_id ?? $item->branch_id;
         if ($currentBranchId && $itemBranchId !== $currentBranchId) {
             $itemBranch = $item->location?->branch?->name ?? $item->branch?->name ?? "ID: {$itemBranchId}";

@@ -87,7 +87,16 @@ class Circulation extends Page implements HasForms
             return;
         }
 
-        $item = Item::withoutGlobalScopes()->with('book')->where('barcode', $this->itemBarcode)->first();
+        $currentBranchId = auth('admin')->user()->getCurrentBranchId();
+        
+        // Cari item, prioritaskan dari branch sendiri jika ada duplikat barcode
+        $item = Item::withoutGlobalScopes()
+            ->with('book', 'branch')
+            ->where('barcode', $this->itemBarcode)
+            ->when($currentBranchId, function ($q) use ($currentBranchId) {
+                $q->orderByRaw("CASE WHEN branch_id = ? THEN 0 ELSE 1 END", [$currentBranchId]);
+            })
+            ->first();
 
         if (!$item) {
             Notification::make()->title('Item tidak ditemukan')->danger()->send();
@@ -95,7 +104,6 @@ class Circulation extends Page implements HasForms
         }
 
         // Branch validation
-        $currentBranchId = auth('admin')->user()->getCurrentBranchId();
         if ($currentBranchId && $item->branch_id !== $currentBranchId) {
             Notification::make()
                 ->title('Item milik cabang lain')
