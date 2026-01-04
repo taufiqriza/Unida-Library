@@ -332,7 +332,7 @@
             margin-top: auto;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-start;
             padding: 0 30px;
         }
 
@@ -341,7 +341,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            margin-top: -40px;
+            margin-top: 15px;
         }
 
         .location-date {
@@ -386,7 +386,7 @@
 
         .verification-section {
             text-align: right;
-            margin-top: -115px;
+            margin-top: 15px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
