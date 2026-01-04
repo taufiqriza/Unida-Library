@@ -460,7 +460,7 @@
                         <p class="text-xs text-gray-500 truncate">{{ $loan->item?->book?->title }}</p>
                     </div>
                     <span class="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-full">
-                        {{ $loan->due_date?->diffInDays(now()) }} hari
+                        {{ number_format($loan->due_date?->diffInDays(now()), 0) }} hari
                     </span>
                 </div>
                 @empty
