@@ -283,6 +283,7 @@ class PlagiarismController extends Controller
             return back()->with('error', 'Gagal mengambil link report.');
         }
 
-        return redirect($url);
+        // Use JS redirect to avoid nginx header size limit
+        return response()->view('opac.plagiarism.redirect', ['url' => $url]);
     }
 }
