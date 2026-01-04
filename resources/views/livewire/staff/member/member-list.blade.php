@@ -332,6 +332,10 @@
 
     {{-- Member Detail Modal - Teleported --}}
     @if($showDetailModal && $selectedMember)
+    @php
+        $isSantri = $selectedMember->memberType?->name === 'Santri';
+        $santriInfo = $isSantri && $selectedMember->notes ? explode(' | ', $selectedMember->notes) : [];
+    @endphp
     <template x-teleport="body">
         <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6);" 
             x-data 
@@ -339,36 +343,45 @@
             x-on:click.self="$wire.closeDetail()"
             @close-modal.window="document.body.classList.remove('overflow-hidden')">
             <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden" @click.stop>
-                <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 text-white flex items-center justify-between">
-                    <h3 class="text-lg font-bold">Detail Anggota</h3>
+                <div class="bg-gradient-to-r {{ $isSantri ? 'from-cyan-500 to-teal-600' : 'from-purple-600 to-pink-600' }} px-6 py-4 text-white flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Detail {{ $isSantri ? 'Santri' : 'Anggota' }}</h3>
                     <button wire:click="closeDetail" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                        <div class="w-16 h-16 bg-gradient-to-br {{ $isSantri ? 'from-cyan-400 to-teal-500' : 'from-purple-400 to-pink-500' }} rounded-xl flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                             @if($selectedMember->photo)<img src="{{ asset('storage/' . $selectedMember->photo) }}" class="w-full h-full object-cover rounded-xl">@else{{ strtoupper(substr($selectedMember->name, 0, 1)) }}@endif
                         </div>
                         <div>
                             <h4 class="text-lg font-bold text-gray-900">{{ $selectedMember->name }}</h4>
-                            <p class="text-sm text-gray-500">{{ $selectedMember->member_id }}</p>
+                            <p class="text-sm text-gray-500">{{ $isSantri ? 'Stambuk' : 'ID' }}: {{ $selectedMember->member_id }}</p>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 {{ $selectedMember->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">{{ $selectedMember->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 text-sm">
+                        @if($isSantri)
+                        <div class="bg-cyan-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Kelas</p><p class="font-medium text-gray-900">{{ $santriInfo[0] ?? '-' }}</p></div>
+                        <div class="bg-cyan-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Rayon</p><p class="font-medium text-gray-900">{{ $santriInfo[1] ?? '-' }}</p></div>
+                        <div class="bg-cyan-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Kamar</p><p class="font-medium text-gray-900">{{ isset($santriInfo[2]) ? str_replace('Kamar ', '', $santriInfo[2]) : '-' }}</p></div>
+                        <div class="bg-cyan-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tanggal Lahir</p><p class="font-medium text-gray-900">{{ $selectedMember->birth_date?->format('d M Y') ?? '-' }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Alamat</p><p class="font-medium text-gray-900 text-xs">{{ $selectedMember->address ?? '-' }}</p></div>
+                        @else
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tipe</p><p class="font-medium text-gray-900">{{ $selectedMember->memberType?->name ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Cabang</p><p class="font-medium text-gray-900">{{ $selectedMember->branch?->name ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">NIM/NIDN</p><p class="font-medium text-gray-900">{{ $selectedMember->nim_nidn ?? '-' }}</p></div>
-                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jenis Kelamin</p><p class="font-medium text-gray-900">{{ $selectedMember->gender == 'L' ? 'Laki-laki' : ($selectedMember->gender == 'P' ? 'Perempuan' : '-') }}</p></div>
+                        <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Jenis Kelamin</p><p class="font-medium text-gray-900">{{ $selectedMember->gender == 'M' ? 'Laki-laki' : ($selectedMember->gender == 'F' ? 'Perempuan' : '-') }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3 col-span-2"><p class="text-gray-500 text-xs mb-1">Email</p><p class="font-medium text-gray-900">{{ $selectedMember->email ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Fakultas</p><p class="font-medium text-gray-900">{{ $selectedMember->faculty?->name ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Prodi</p><p class="font-medium text-gray-900">{{ $selectedMember->department?->name ?? '-' }}</p></div>
+                        @endif
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Tgl Daftar</p><p class="font-medium text-gray-900">{{ $selectedMember->register_date?->format('d M Y') ?? '-' }}</p></div>
                         <div class="bg-gray-50 rounded-xl p-3"><p class="text-gray-500 text-xs mb-1">Kadaluarsa</p><p class="font-medium {{ $selectedMember->expire_date && $selectedMember->expire_date < now() ? 'text-red-600' : 'text-gray-900' }}">{{ $selectedMember->expire_date?->format('d M Y') ?? '-' }}</p></div>
                     </div>
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
                     <button wire:click="closeDetail" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
-                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
+                    <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r {{ $isSantri ? 'from-cyan-500 to-teal-600' : 'from-purple-600 to-pink-600' }} text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
                 </div>
             </div>
         </div>
