@@ -201,13 +201,22 @@
                         </div>
                         @endif
                         <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white 
-                            {{ $user->is_active ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
+                            {{ $user->isReallyOnline() ? 'bg-emerald-400 animate-pulse' : ($user->is_active ? 'bg-gray-300' : 'bg-red-400') }}"
+                            title="{{ $user->isReallyOnline() ? 'Online' : ($user->last_seen_at ? 'Terakhir: '.$user->last_seen_at->diffForHumans() : 'Belum pernah login') }}"></span>
                     </div>
                     
                     {{-- Info --}}
                     <div class="flex-1 min-w-0">
-                        <p class="font-bold text-gray-900 truncate">{{ $user->name }}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="font-bold text-gray-900 truncate">{{ $user->name }}</p>
+                            @if($user->isReallyOnline())
+                            <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-semibold">ONLINE</span>
+                            @endif
+                        </div>
                         <p class="text-sm text-gray-500 truncate">{{ $user->email }}</p>
+                        @if(!$user->isReallyOnline() && $user->last_seen_at)
+                        <p class="text-xs text-gray-400">{{ $user->last_seen_at->diffForHumans() }}</p>
+                        @endif
                         <div class="flex items-center gap-2 mt-2 flex-wrap">
                             @php
                                 $roleColors = [
