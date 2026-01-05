@@ -674,7 +674,7 @@
                             @endif
                             
                             {{-- Time & Read Status --}}
-                            <div class="flex items-center justify-end gap-1 mt-1">
+                            <div class="flex items-center gap-1 mt-1 {{ $msg['sender_id'] === auth()->id() ? 'justify-end' : 'justify-start' }}">
                                 <span class="text-[10px] text-gray-400">
                                     {{ \Carbon\Carbon::parse($msg['created_at'])->setTimezone('Asia/Jakarta')->format('H:i') }}
                                 </span>
