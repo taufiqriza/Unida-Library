@@ -1260,16 +1260,57 @@
                 setTimeout(scroll, 300);
             });
             
-            // Auto scroll on new messages during polling (only if already at bottom)
+            // Auto scroll on any update to chat messages
             let lastMessageCount = 0;
-            Livewire.hook('morph.updated', ({ el }) => {
-                if (el.id === 'chatMessages') {
+            const observer = new MutationObserver(() => {
+                const el = document.getElementById('chatMessages');
+                if (el) {
                     const messageEls = el.querySelectorAll('[data-message-id]');
                     if (messageEls.length > lastMessageCount) {
-                        // New message arrived, scroll to bottom
                         el.scrollTop = el.scrollHeight;
                     }
                     lastMessageCount = messageEls.length;
+                }
+            });
+            
+            // Start observing when chat opens
+            setInterval(() => {
+                const chatEl = document.getElementById('chatMessages');
+                if (chatEl && !chatEl.dataset.observed) {
+                    chatEl.dataset.observed = 'true';
+                    observer.observe(chatEl, { childList: true, subtree: true });
+                    chatEl.scrollTop = chatEl.scrollHeight;
+                    lastMessageCount = chatEl.querySelectorAll('[data-message-id]').length;
+                }
+            }, 500);
+            
+            // Paste image from clipboard
+            document.addEventListener('paste', (e) => {
+                const chatInput = document.getElementById('chatMessageInput');
+                if (!chatInput || document.activeElement !== chatInput) return;
+                
+                const items = e.clipboardData?.items;
+                if (!items) return;
+                
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        const file = item.getAsFile();
+                        if (file) {
+                            // Upload via Livewire
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            input.files = dt.files;
+                            
+                            @this.upload('attachment', file, 
+                                () => console.log('Image pasted successfully'),
+                                () => console.error('Failed to paste image')
+                            );
+                        }
+                        break;
+                    }
                 }
             });
             
