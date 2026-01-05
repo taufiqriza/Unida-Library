@@ -636,7 +636,7 @@
                                 <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
                             <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
-                                 class="absolute left-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                 class="absolute right-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
                                 <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
                                     <span>👍</span> <span class="text-gray-700">Suka</span>
                                 </button>
