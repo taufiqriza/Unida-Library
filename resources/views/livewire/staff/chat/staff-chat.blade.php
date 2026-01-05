@@ -459,10 +459,14 @@
                                 <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
                             <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
-                                 class="absolute right-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
-                                    <span>👍</span> <span class="text-gray-700">Suka</span>
-                                </button>
+                                 class="absolute right-0 bottom-full mb-1 w-40 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                {{-- Quick Reactions --}}
+                                <div class="flex justify-around px-2 py-1.5 border-b border-gray-100">
+                                    @foreach(['👍', '❤️', '😂', '😮', '😢', '🙏'] as $emoji)
+                                    <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '{{ $emoji }}')" @click="menuOpen = false" 
+                                            class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full text-base hover:scale-125 transition">{{ $emoji }}</button>
+                                    @endforeach
+                                </div>
                                 <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
                                     <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
@@ -678,10 +682,14 @@
                                 <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
                             <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
-                                 class="absolute right-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
-                                    <span>👍</span> <span class="text-gray-700">Suka</span>
-                                </button>
+                                 class="absolute right-0 bottom-full mb-1 w-40 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                {{-- Quick Reactions --}}
+                                <div class="flex justify-around px-2 py-1.5 border-b border-gray-100">
+                                    @foreach(['👍', '❤️', '😂', '😮', '😢', '🙏'] as $emoji)
+                                    <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '{{ $emoji }}')" @click="menuOpen = false" 
+                                            class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full text-base hover:scale-125 transition">{{ $emoji }}</button>
+                                    @endforeach
+                                </div>
                                 <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
                                     <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
