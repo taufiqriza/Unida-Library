@@ -389,11 +389,11 @@
     @endif
 
     {{-- Branch Modal --}}
-    @teleport('body')
     @if($showBranchModal)
+    @teleport('body')
     <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" wire:click.self="$set('showBranchModal', false)">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-            <div class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden" wire:click.stop>
+            <div class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between">
                 <h3 class="text-lg font-semibold">
                     @if($branchViewOnly)
                         Detail Cabang
@@ -403,6 +403,9 @@
                         Tambah Cabang Baru
                     @endif
                 </h3>
+                <button wire:click="$set('showBranchModal', false)" class="text-white/80 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
@@ -460,8 +463,8 @@
             </div>
         </div>
     </div>
-    @endif
     @endteleport
+    @endif
 
     {{-- Activity Log Tab --}}
     @if($mainTab === 'activity')
