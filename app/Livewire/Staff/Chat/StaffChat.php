@@ -281,7 +281,11 @@ class StaffChat extends Component
             ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $userId))
             ->pluck('id');
         
-        if ($unreadMessageIds->isEmpty()) return;
+        if ($unreadMessageIds->isEmpty()) {
+            // Still mark notifications as read even if no new messages
+            $this->markChatNotificationsAsRead();
+            return;
+        }
         
         $reads = $unreadMessageIds->map(fn($id) => [
             'message_id' => $id,
@@ -295,6 +299,25 @@ class StaffChat extends Component
         \App\Models\ChatMention::whereIn('message_id', $unreadMessageIds)
             ->where('user_id', $userId)
             ->update(['is_read' => true]);
+        
+        // Mark chat notifications as read
+        $this->markChatNotificationsAsRead();
+    }
+    
+    protected function markChatNotificationsAsRead()
+    {
+        // Mark all chat notifications for this room as read
+        \App\Models\StaffNotification::where('notifiable_id', auth()->id())
+            ->where('category', 'chat')
+            ->whereNull('read_at')
+            ->where(function($q) {
+                $q->where('action_url', 'like', '%chat_room=' . $this->activeRoomId . '%')
+                  ->orWhere('data->room_id', $this->activeRoomId);
+            })
+            ->update(['read_at' => now()]);
+        
+        // Dispatch event to refresh notification bell
+        $this->dispatch('refreshNotifications');
     }
 
     public function markAsRead()
