@@ -34,8 +34,8 @@ class Settings extends Component
         $this->gender = $this->member->gender ?? '';
         $this->nim = $this->member->member_id ?? '';
         
-        // Allow NIM edit if it's auto-generated (starts with M2025, M2024, etc)
-        $this->canEditNim = preg_match('/^M20\d{2}/', $this->nim);
+        // Allow NIM edit if it's auto-generated (M20xx, U20xx, T20xx, D20xx)
+        $this->canEditNim = preg_match('/^[MUTD]20\d{2}/', $this->nim);
         
         $this->branches = Branch::where('is_active', true)->orderBy('name')->get();
         $this->faculties = Faculty::orderBy('name')->get();
@@ -78,47 +78,15 @@ class Settings extends Component
             'gender' => $this->gender,
         ];
         
-        if ($this->canEditNim && $this->nim) {
-            // Check if NIM exists in another member record
-            $existingMember = \App\Models\Member::where('member_id', $this->nim)
+        if ($this->canEditNim && $this->nim && $this->nim !== $this->member->member_id) {
+            // Check if NIM exists in another member record (SIAKAD data)
+            $siakadMember = \App\Models\Member::where('member_id', $this->nim)
                 ->where('id', '!=', $this->member->id)
                 ->first();
             
-            if ($existingMember) {
-                // If has SIAKAD data (pddikti_id), merge
-                if ($existingMember->pddikti_id) {
-                    // Merge: transfer current member's data to SIAKAD member
-                    $existingMember->update([
-                        'email' => $this->member->email,
-                        'phone' => $this->phone,
-                        'gender' => $this->gender,
-                        'photo' => $this->photo 
-                            ? $this->photo->store('members', 'public') 
-                            : ($this->member->photo ?? $existingMember->photo),
-                        'profile_completed' => true,
-                    ]);
-                    
-                    // Transfer social accounts
-                    \App\Models\SocialAccount::where('member_id', $this->member->id)
-                        ->update(['member_id' => $existingMember->id]);
-                    
-                    // Delete old member record
-                    $oldMemberId = $this->member->id;
-                    
-                    // Re-login with merged account
-                    Auth::guard('member')->login($existingMember);
-                    
-                    // Delete after re-login
-                    \App\Models\Member::find($oldMemberId)?->delete();
-                    
-                    $this->dispatch('notify', type: 'success', message: 'NIM berhasil diperbarui dan data SIAKAD telah ditautkan.');
-                    
-                    return redirect()->route('member.settings');
-                } else {
-                    // NIM used by non-SIAKAD member, reject
-                    $this->addError('nim', 'NIM sudah digunakan oleh anggota lain.');
-                    return;
-                }
+            if ($siakadMember) {
+                // Merge: transfer current member's credentials to SIAKAD member
+                return $this->mergeWithSiakadMember($siakadMember);
             }
             
             // NIM not used, just update
@@ -136,9 +104,57 @@ class Settings extends Component
         $this->member->update($data);
         
         // Refresh canEditNim after save
-        $this->canEditNim = preg_match('/^M20\d{2}/', $this->nim);
+        $this->canEditNim = preg_match('/^[MUTD]20\d{2}/', $this->nim);
 
         $this->dispatch('notify', type: 'success', message: 'Profil berhasil diperbarui.');
+    }
+
+    protected function mergeWithSiakadMember(\App\Models\Member $siakadMember)
+    {
+        \DB::beginTransaction();
+        try {
+            $oldMemberId = $this->member->id;
+            
+            // Update SIAKAD member with current credentials
+            $siakadMember->update([
+                'email' => $this->member->email ?: $siakadMember->email,
+                'phone' => $this->phone ?: $siakadMember->phone,
+                'gender' => $this->gender ?: $siakadMember->gender,
+                'photo' => $this->photo 
+                    ? $this->photo->store('members', 'public') 
+                    : ($this->member->photo ?? $siakadMember->photo),
+                'profile_completed' => true,
+            ]);
+            
+            // Transfer social accounts (Google login, etc)
+            \App\Models\SocialAccount::where('member_id', $oldMemberId)
+                ->update(['member_id' => $siakadMember->id]);
+            
+            // Transfer any loans, plagiarism checks, etc
+            \DB::table('loans')->where('member_id', $oldMemberId)
+                ->update(['member_id' => $siakadMember->id]);
+            \DB::table('plagiarism_checks')->where('member_id', $oldMemberId)
+                ->update(['member_id' => $siakadMember->id]);
+            \DB::table('clearance_letters')->where('member_id', $oldMemberId)
+                ->update(['member_id' => $siakadMember->id]);
+            
+            // Re-login with merged account
+            Auth::guard('member')->login($siakadMember);
+            
+            // Delete old member record
+            \App\Models\Member::find($oldMemberId)?->forceDelete();
+            
+            \DB::commit();
+            
+            $this->dispatch('notify', type: 'success', message: 'NIM berhasil diperbarui! Data SIAKAD telah ditautkan.');
+            
+            return redirect()->route('member.settings');
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Member merge failed: ' . $e->getMessage());
+            $this->addError('nim', 'Gagal menautkan data. Silakan hubungi admin.');
+        }
     }
 
     public function render()
