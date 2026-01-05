@@ -560,7 +560,7 @@ class StaffChat extends Component
             'attachment_type' => $this->forwardingMessage->attachment_type,
             'attachment_name' => $this->forwardingMessage->attachment_name,
             'forwarded_from_id' => $this->forwardingMessage->id,
-            'type' => 'message',
+            'type' => 'text',
         ]);
         
         $this->showForwardModal = false;

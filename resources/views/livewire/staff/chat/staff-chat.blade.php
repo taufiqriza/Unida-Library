@@ -39,41 +39,79 @@
     
     {{-- Forward Modal --}}
     @if($showForwardModal && $forwardingMessage)
-    <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50">
-        <div class="bg-white rounded-2xl shadow-2xl w-96 max-w-[90vw] mx-4 overflow-hidden">
-            <div class="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
-                <h3 class="font-semibold">Teruskan Pesan</h3>
-                <button wire:click="cancelForward" class="text-white/80 hover:text-white">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="p-4">
-                {{-- Message Preview --}}
-                <div class="p-3 bg-gray-50 rounded-xl mb-4 text-sm">
-                    <p class="text-xs text-gray-500 mb-1">Dari: {{ $forwardingMessage->sender->name ?? 'Unknown' }}</p>
-                    <p class="text-gray-700">{{ Str::limit($forwardingMessage->message, 100) }}</p>
+    <div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-[420px] max-w-[95vw] mx-4 overflow-hidden" @click.away="$wire.cancelForward()">
+            {{-- Header --}}
+            <div class="px-5 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                            <i class="fas fa-share text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg">Teruskan Pesan</h3>
+                            <p class="text-xs text-white/70">Pilih tujuan pengiriman</p>
+                        </div>
+                    </div>
+                    <button wire:click="cancelForward" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                
-                {{-- Room List --}}
-                <p class="text-xs text-gray-500 mb-2">Pilih tujuan:</p>
-                <div class="max-h-60 overflow-y-auto space-y-1">
+            </div>
+            
+            {{-- Message Preview --}}
+            <div class="px-5 py-3 bg-gray-50 border-b">
+                <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Pesan yang diteruskan</p>
+                <div class="flex items-start gap-3">
+                    @if($forwardingMessage->sender && $forwardingMessage->sender->photo)
+                        <img src="{{ asset('storage/' . $forwardingMessage->sender->photo) }}" class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                    @else
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            {{ strtoupper(substr($forwardingMessage->sender->name ?? 'U', 0, 1)) }}
+                        </div>
+                    @endif
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-gray-700">{{ $forwardingMessage->sender->name ?? 'Unknown' }}</p>
+                        <p class="text-sm text-gray-600 line-clamp-2">{{ $forwardingMessage->message ?: ($forwardingMessage->attachment ? '📎 Attachment' : '') }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            {{-- Room List --}}
+            <div class="p-4">
+                <div class="relative mb-3">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" placeholder="Cari percakapan..." class="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Percakapan Terbaru</p>
+                <div class="max-h-64 overflow-y-auto space-y-1 -mx-1 px-1">
                     @foreach($this->forwardRooms as $room)
                     @php
                         $otherMember = $room->members->firstWhere('user_id', '!=', auth()->id());
-                        $roomName = $room->type === 'direct' && $otherMember ? $otherMember->user->name : $room->name;
+                        $otherUser = $otherMember?->user;
+                        $roomName = $room->type === 'direct' && $otherUser ? $otherUser->name : $room->name;
+                        $roomPhoto = $room->type === 'direct' && $otherUser ? $otherUser->photo : null;
                     @endphp
                     <button wire:click="forwardTo({{ $room->id }})" 
-                            class="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition text-left">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
-                            @if($room->type === 'direct')
-                                {{ strtoupper(substr($roomName, 0, 1)) }}
-                            @else
-                                <i class="fas fa-users text-xs"></i>
-                            @endif
-                        </div>
+                            class="w-full flex items-center gap-3 p-2.5 hover:bg-blue-50 rounded-xl transition text-left group">
+                        @if($roomPhoto)
+                            <img src="{{ asset('storage/' . $roomPhoto) }}" class="w-11 h-11 rounded-full object-cover flex-shrink-0">
+                        @else
+                            <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0
+                                {{ $room->type === 'direct' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : ($room->type === 'branch' ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : 'bg-gradient-to-br from-violet-500 to-purple-600') }}">
+                                @if($room->type === 'direct')
+                                    {{ strtoupper(substr($roomName, 0, 1)) }}
+                                @else
+                                    <i class="fas {{ $room->type === 'branch' ? 'fa-building' : 'fa-users' }} text-sm"></i>
+                                @endif
+                            </div>
+                        @endif
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900 truncate text-sm">{{ $roomName }}</p>
+                            <p class="font-medium text-gray-900 truncate">{{ $roomName }}</p>
                             <p class="text-xs text-gray-500">{{ $room->type === 'direct' ? 'Personal' : ($room->type === 'branch' ? 'Cabang' : 'Grup') }}</p>
+                        </div>
+                        <div class="opacity-0 group-hover:opacity-100 transition">
+                            <i class="fas fa-paper-plane text-blue-500"></i>
                         </div>
                     </button>
                     @endforeach
