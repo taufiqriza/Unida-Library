@@ -36,4 +36,5 @@ firebase-service-account.json
 # Shamela Content Database (22GB)
 storage/database/shamela_content.db
 docs/google-analytics.json
+docs/
 /storage

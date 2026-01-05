@@ -1,4 +1,4 @@
-<div wire:poll.30s="$refresh" class="staff-chat-widget">
+<div wire:poll.5s="refreshMessages" class="staff-chat-widget" x-data="{ sending: false }">
     {{-- Floating Button - raised on mobile to avoid bottom nav --}}
     <button wire:click="toggle" 
             class="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 z-[9998]"
@@ -234,7 +234,7 @@
         {{-- Messages Area --}}
         <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-slate-50 to-white chat-messages" id="chatMessages">
             @forelse($messages as $msg)
-                <div wire:key="msg-{{ $msg['id'] }}">
+                <div wire:key="msg-{{ $msg['id'] }}" data-message-id="{{ $msg['id'] }}">
                 @if($msg['type'] === 'system')
                     {{-- System Message --}}
                     <div class="flex justify-center">
@@ -504,6 +504,16 @@
             @endif
             
             <div id="voiceBarAnchor" class="relative"></div>
+            
+            {{-- Sending indicator --}}
+            <div wire:loading.flex wire:target="sendMessage" class="items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 text-xs rounded-lg mb-2">
+                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Mengirim pesan...</span>
+            </div>
+            
             <form wire:submit="sendMessage" class="flex items-center gap-2">
                 {{-- Emoji Picker --}}
                 <div class="relative" x-data="{ showEmoji: false }">
@@ -1226,6 +1236,19 @@
                 setTimeout(scroll, 50);
                 setTimeout(scroll, 150);
                 setTimeout(scroll, 300);
+            });
+            
+            // Auto scroll on new messages during polling (only if already at bottom)
+            let lastMessageCount = 0;
+            Livewire.hook('morph.updated', ({ el }) => {
+                if (el.id === 'chatMessages') {
+                    const messageEls = el.querySelectorAll('[data-message-id]');
+                    if (messageEls.length > lastMessageCount) {
+                        // New message arrived, scroll to bottom
+                        el.scrollTop = el.scrollHeight;
+                    }
+                    lastMessageCount = messageEls.length;
+                }
             });
             
             // Listen for new message sound

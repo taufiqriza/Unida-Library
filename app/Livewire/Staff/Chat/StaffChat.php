@@ -772,6 +772,14 @@ class StaffChat extends Component
         return preg_replace($pattern, '<a href="$1" target="_blank" class="underline hover:no-underline">$1</a>', e($message));
     }
 
+    public function refreshMessages()
+    {
+        if ($this->activeRoomId && $this->activeView === 'chat') {
+            $this->loadMessages();
+            $this->updateOnlineStatus();
+        }
+    }
+
     public function render()
     {
         return view('livewire.staff.chat.staff-chat');

@@ -1,44 +1,36 @@
-# 📚 Dokumentasi Sistem Perpustakaan UNIDA
+# 📚 Perpustakaan UNIDA - Documentation
 
-## Index Dokumentasi
+Dokumentasi teknis untuk sistem perpustakaan digital UNIDA Gontor.
 
-### Overview & Deployment
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [PROJECT_CONTEXT.md](./PROJECT_CONTEXT.md) | Overview proyek & tech stack |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Panduan deployment ke production |
-| [STAFF_PORTAL_ARCHITECTURE.md](./STAFF_PORTAL_ARCHITECTURE.md) | Arsitektur staff portal |
+## 📁 Struktur Dokumentasi
 
-### Fitur & Konfigurasi
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [member-registration.md](./member-registration.md) | Registrasi member dengan OTP verification |
-| [staff-registration.md](./staff-registration.md) | Registrasi staff dengan approval workflow |
-| [email-configuration.md](./email-configuration.md) | Setup SMTP untuk kirim email |
-| [email.md](./email.md) | Daftar trusted email domains UNIDA |
+```
+docs/
+├── README.md                      # File ini
+├── ARCHITECTURE_REFACTORING.md    # Rencana refactoring arsitektur
+├── API_MOBILE.md                  # Dokumentasi REST API untuk mobile app
+└── old/                           # Arsip dokumentasi lama
+    ├── MIGRATION/                 # Dokumentasi migrasi
+    ├── API_SPECIFICATION.md       # Spesifikasi API lama
+    ├── FIREBASE_SETUP.md          # Setup push notification
+    └── ...                        # Dokumentasi lainnya
+```
 
-### Integrasi External
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [PLAGIARISM_CHECK.md](./PLAGIARISM_CHECK.md) | Integrasi cek plagiasi |
-| [OJS_INTEGRATION.md](./OJS_INTEGRATION.md) | Integrasi Open Journal Systems |
-| [REPO_INTEGRATION.md](./REPO_INTEGRATION.md) | Integrasi Repository UNIDA |
-| [KUBUKU_API_REQUIREMENTS.md](./KUBUKU_API_REQUIREMENTS.md) | Integrasi E-Book Kubuku |
+## 🔗 Quick Links
 
-### Migration
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [MIGRATION/SLIMS_MIGRATION.md](./MIGRATION/SLIMS_MIGRATION.md) | Migrasi data dari SLiMS |
+### Dokumentasi Aktif
+- [Architecture Refactoring Plan](./ARCHITECTURE_REFACTORING.md) - Rencana peningkatan arsitektur
+- [Mobile API Documentation](./API_MOBILE.md) - REST API untuk aplikasi mobile
+
+### Arsip (Reference Only)
+- [Firebase Setup](./old/FIREBASE_SETUP.md) - Konfigurasi push notification
+- [Deployment Guide](./old/deployment-guide.md) - Panduan deployment
+- [SLIMS Migration](./old/MIGRATION/SLIMS_MIGRATION.md) - Dokumentasi migrasi dari SLiMS
+
+## ⚠️ Catatan
+
+Folder `docs/` di-exclude dari git (`.gitignore`) untuk menghindari sync ke production server. Dokumentasi ini hanya untuk development reference.
 
 ---
 
-## Quick Start
-
-### Setup Email (Wajib untuk OTP)
-1. Buka `/admin` → App Settings → Tab Email
-2. Isi konfigurasi SMTP
-3. Test dengan tombol "Kirim Test Email"
-
-### Staff Approval
-1. Staff daftar via `/register` → Tab Staff
-2. Admin approve di `/staff/control`
+*Last updated: 5 Januari 2026*
