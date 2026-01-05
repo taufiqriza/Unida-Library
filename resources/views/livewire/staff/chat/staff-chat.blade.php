@@ -854,15 +854,65 @@
                     </div>
                 </div>
                 
-                <div class="flex-1 relative" x-data="{ typingTimeout: null }">
+                <div class="flex-1 relative" 
+                     x-data="{ 
+                        typingTimeout: null,
+                        showMentions: false,
+                        mentionSearch: '',
+                        mentionStart: 0,
+                        members: @js($activeRoom ? $activeRoom->members->where('user_id', '!=', auth()->id())->map(fn($m) => ['id' => $m->user_id, 'name' => $m->user->name ?? 'Unknown'])->values() : []),
+                        get filteredMembers() {
+                            if (!this.mentionSearch) return this.members;
+                            return this.members.filter(m => m.name.toLowerCase().includes(this.mentionSearch.toLowerCase()));
+                        },
+                        checkMention(e) {
+                            const textarea = e.target;
+                            const text = textarea.value;
+                            const pos = textarea.selectionStart;
+                            const beforeCursor = text.substring(0, pos);
+                            const match = beforeCursor.match(/@(\w*)$/);
+                            if (match) {
+                                this.showMentions = true;
+                                this.mentionSearch = match[1];
+                                this.mentionStart = pos - match[0].length;
+                            } else {
+                                this.showMentions = false;
+                            }
+                        },
+                        selectMention(name) {
+                            const textarea = document.getElementById('chatMessageInput');
+                            const text = textarea.value;
+                            const before = text.substring(0, this.mentionStart);
+                            const after = text.substring(textarea.selectionStart);
+                            const newText = before + '@' + name + ' ' + after;
+                            $wire.set('message', newText);
+                            this.showMentions = false;
+                            textarea.focus();
+                        }
+                     }">
                     <textarea wire:model="message" 
                               id="chatMessageInput"
-                              placeholder="Ketik pesan..." 
+                              placeholder="Ketik pesan... (@ untuk mention)" 
                               rows="1"
                               class="w-full px-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm resize-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition"
-                              @input="clearTimeout(typingTimeout); $wire.startTyping(); typingTimeout = setTimeout(() => $wire.stopTyping(), 3000)"
-                              @blur="$wire.stopTyping()"
+                              @input="checkMention($event); clearTimeout(typingTimeout); $wire.startTyping(); typingTimeout = setTimeout(() => $wire.stopTyping(), 3000)"
+                              @blur="setTimeout(() => showMentions = false, 200); $wire.stopTyping()"
+                              @keydown.escape="showMentions = false"
                               onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); @this.stopTyping(); @this.sendMessage(); }"></textarea>
+                    
+                    {{-- Mention Dropdown --}}
+                    <div x-show="showMentions && filteredMembers.length > 0" x-transition
+                         class="absolute bottom-full left-0 mb-1 w-64 bg-white rounded-xl shadow-lg border border-gray-100 py-1 max-h-48 overflow-y-auto z-50">
+                        <p class="px-3 py-1 text-[10px] text-gray-400 uppercase">Mention seseorang</p>
+                        <template x-for="member in filteredMembers" :key="member.id">
+                            <button type="button" @click="selectMention(member.name)" 
+                                    class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50 text-left">
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold"
+                                     x-text="member.name.charAt(0).toUpperCase()"></div>
+                                <span class="text-sm text-gray-700" x-text="member.name"></span>
+                            </button>
+                        </template>
+                    </div>
                 </div>
                 
                 <div class="flex items-center gap-1 flex-shrink-0">
