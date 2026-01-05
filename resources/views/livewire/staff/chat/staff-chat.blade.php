@@ -383,7 +383,31 @@
 
         {{-- Messages Area --}}
         <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-slate-50 to-white chat-messages" id="chatMessages">
+            @php $lastDate = null; @endphp
             @forelse($messages as $msg)
+                @php
+                    $msgDate = \Carbon\Carbon::parse($msg['created_at'])->format('Y-m-d');
+                    $showDateSeparator = $lastDate !== $msgDate;
+                    $lastDate = $msgDate;
+                    
+                    $dateLabel = \Carbon\Carbon::parse($msg['created_at'])->isToday() 
+                        ? 'Hari Ini' 
+                        : (\Carbon\Carbon::parse($msg['created_at'])->isYesterday() 
+                            ? 'Kemarin' 
+                            : \Carbon\Carbon::parse($msg['created_at'])->translatedFormat('d F Y'));
+                @endphp
+                
+                {{-- Date Separator --}}
+                @if($showDateSeparator)
+                <div class="flex items-center justify-center my-4">
+                    <div class="flex-1 border-t border-gray-200"></div>
+                    <span class="px-3 py-1 bg-white border border-gray-200 text-gray-500 text-[11px] font-medium rounded-full shadow-sm">
+                        {{ $dateLabel }}
+                    </span>
+                    <div class="flex-1 border-t border-gray-200"></div>
+                </div>
+                @endif
+                
                 <div wire:key="msg-{{ $msg['id'] }}" data-message-id="{{ $msg['id'] }}">
                 @if($msg['is_deleted'] ?? false)
                     {{-- Deleted Message --}}

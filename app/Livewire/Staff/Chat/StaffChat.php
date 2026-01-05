@@ -230,11 +230,8 @@ class StaffChat extends Component
                 'forwardedFrom.sender:id,name',
             ])
             ->withCount('reads')
-            ->orderBy('created_at', 'desc')
-            ->take(50)
-            ->get()
-            ->reverse()
-            ->values();
+            ->orderBy('created_at', 'asc')
+            ->get();
         
         $roomMemberCount = ChatRoomMember::where('chat_room_id', $this->activeRoomId)->count();
         
@@ -242,7 +239,6 @@ class StaffChat extends Component
             $arr = $msg->toArray();
             $arr['reads_count'] = $msg->reads_count;
             $arr['total_recipients'] = $roomMemberCount - 1;
-            // Group reactions by emoji
             $arr['reactions_grouped'] = collect($msg->reactions)->groupBy('emoji')->map(fn($r) => [
                 'count' => $r->count(),
                 'users' => $r->pluck('user.name')->toArray(),
