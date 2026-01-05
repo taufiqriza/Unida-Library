@@ -446,14 +446,6 @@ class StaffControl extends Component
     // Branch Methods
     public function getBranchesListProperty()
     {
-        $user = auth()->user();
-        $query = Branch::withCount(['users', 'books', 'items', 'members']);
-        
-        if ($user->role !== 'super_admin' && $user->branch_id) {
-            $query->where('id', $user->branch_id);
-        }
-    public function getBranchesListProperty()
-    {
         $query = Branch::withCount(['users', 'books', 'items', 'members']);
         
         if ($this->search) {
