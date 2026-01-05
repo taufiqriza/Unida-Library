@@ -548,9 +548,13 @@
                                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-md' 
                                 : 'bg-white shadow-sm border border-gray-100 text-gray-800 rounded-bl-md' }}">
                                 @php
-                                    // Highlight @mentions
+                                    // Highlight @[Name] mentions - compact label style
                                     $formattedMsg = $this->formatMessage($msg['message']);
-                                    $formattedMsg = preg_replace('/@(\w+)/', '<span class="bg-blue-100 text-blue-700 px-1 rounded">@$1</span>', $formattedMsg);
+                                    $isOwn = $msg['sender_id'] === auth()->id();
+                                    $labelClass = $isOwn 
+                                        ? 'bg-white/20 text-white text-[11px] px-1.5 py-0.5 rounded font-medium' 
+                                        : 'bg-blue-100 text-blue-700 text-[11px] px-1.5 py-0.5 rounded font-medium';
+                                    $formattedMsg = preg_replace('/@\[([^\]]+)\]/', '<span class="' . $labelClass . '">@$1</span>', $formattedMsg);
                                 @endphp
                                 <p class="text-sm whitespace-pre-wrap break-words">{!! $formattedMsg !!}</p>
                             </div>
@@ -884,7 +888,7 @@
                             const text = textarea.value;
                             const before = text.substring(0, this.mentionStart);
                             const after = text.substring(textarea.selectionStart);
-                            const newText = before + '@' + name + ' ' + after;
+                            const newText = before + '@[' + name + '] ' + after;
                             $wire.set('message', newText);
                             this.showMentions = false;
                             textarea.focus();

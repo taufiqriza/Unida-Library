@@ -395,8 +395,8 @@ class StaffChat extends Component
     {
         if (!$message->message) return;
         
-        // Find @mentions in message
-        preg_match_all('/@(\w+)/', $message->message, $matches);
+        // Find @[Name] mentions (with brackets for full names)
+        preg_match_all('/@\[([^\]]+)\]/', $message->message, $matches);
         if (empty($matches[1])) return;
         
         // Get room members
@@ -404,13 +404,9 @@ class StaffChat extends Component
             ->where('user_id', '!=', auth()->id())
             ->pluck('user_id');
         
-        // Find mentioned users
+        // Find mentioned users by exact name
         $mentionedUsers = User::whereIn('id', $memberIds)
-            ->where(function($q) use ($matches) {
-                foreach ($matches[1] as $name) {
-                    $q->orWhere('name', 'like', $name . '%');
-                }
-            })
+            ->whereIn('name', $matches[1])
             ->pluck('id');
         
         // Create mention records
