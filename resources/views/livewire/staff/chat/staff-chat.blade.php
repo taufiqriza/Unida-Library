@@ -486,10 +486,30 @@
                             </div>
                             @endif
                             
-                            {{-- Time --}}
-                            <p class="text-[10px] text-gray-400 mt-1 {{ $msg['sender_id'] === auth()->id() ? 'text-right' : '' }}">
-                                {{ \Carbon\Carbon::parse($msg['created_at'])->setTimezone('Asia/Jakarta')->format('H:i') }}
-                            </p>
+                            {{-- Time & Read Status --}}
+                            <div class="flex items-center justify-end gap-1 mt-1">
+                                <span class="text-[10px] text-gray-400">
+                                    {{ \Carbon\Carbon::parse($msg['created_at'])->setTimezone('Asia/Jakarta')->format('H:i') }}
+                                </span>
+                                @if($msg['sender_id'] === auth()->id())
+                                    @php
+                                        $readsCount = $msg['reads_count'] ?? 0;
+                                        $totalRecipients = $msg['total_recipients'] ?? 1;
+                                        $allRead = $readsCount >= $totalRecipients && $totalRecipients > 0;
+                                    @endphp
+                                    @if($allRead)
+                                        {{-- Double check blue - all read --}}
+                                        <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M2 12l5 5L18 6M8 12l5 5L24 6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    @else
+                                        {{-- Double check gray - sent/delivered --}}
+                                        <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M2 12l5 5L18 6M8 12l5 5L24 6" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </div>
                         </div>
 
                         {{-- Reply button for others' messages --}}

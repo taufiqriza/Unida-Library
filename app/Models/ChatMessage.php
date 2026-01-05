@@ -33,6 +33,11 @@ class ChatMessage extends Model
         return $this->belongsTo(ChatMessage::class, 'reply_to_id');
     }
 
+    public function reads()
+    {
+        return $this->hasMany(ChatMessageRead::class, 'message_id');
+    }
+
     public function task()
     {
         return $this->belongsTo(Task::class);

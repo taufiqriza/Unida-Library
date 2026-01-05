@@ -208,7 +208,7 @@ class StaffChat extends Component
         if (!$this->activeRoomId) return;
 
         // Get latest 50 messages (ordered by newest first, then reverse for display)
-        $this->messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
+        $messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',
@@ -221,12 +221,49 @@ class StaffChat extends Component
                 'replyTo:id,sender_id,message,attachment_type',
                 'replyTo.sender:id,name'
             ])
+            ->withCount('reads')
             ->orderBy('created_at', 'desc')
             ->take(50)
             ->get()
             ->reverse()
-            ->values()
-            ->toArray();
+            ->values();
+        
+        // Get total members in room (excluding sender) for read status
+        $roomMemberCount = ChatRoomMember::where('chat_room_id', $this->activeRoomId)->count();
+        
+        $this->messages = $messages->map(function($msg) use ($roomMemberCount) {
+            $arr = $msg->toArray();
+            $arr['reads_count'] = $msg->reads_count;
+            $arr['total_recipients'] = $roomMemberCount - 1; // exclude sender
+            return $arr;
+        })->toArray();
+        
+        // Mark messages as read
+        $this->markMessagesAsRead();
+    }
+    
+    public function markMessagesAsRead()
+    {
+        if (!$this->activeRoomId) return;
+        
+        $userId = auth()->id();
+        
+        // Get unread message IDs (messages not sent by current user and not yet read)
+        $unreadMessageIds = ChatMessage::where('chat_room_id', $this->activeRoomId)
+            ->where('sender_id', '!=', $userId)
+            ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $userId))
+            ->pluck('id');
+        
+        if ($unreadMessageIds->isEmpty()) return;
+        
+        // Bulk insert read records
+        $reads = $unreadMessageIds->map(fn($id) => [
+            'message_id' => $id,
+            'user_id' => $userId,
+            'read_at' => now(),
+        ])->toArray();
+        
+        \App\Models\ChatMessageRead::insert($reads);
     }
 
     public function markAsRead()
