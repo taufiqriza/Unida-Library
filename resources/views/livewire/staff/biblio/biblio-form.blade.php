@@ -188,11 +188,11 @@
 
             {{-- Subjects --}}
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-tags text-gray-400 mr-1"></i> Subjek/Topik</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"><i class="fas fa-tags text-gray-400 mr-1"></i> Subjek</label>
                 <div class="relative" x-data="{ open: false }" @click.away="open = false">
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input type="text" wire:model.live.debounce.300ms="subjectSearch" @focus="open = true" class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500" placeholder="Ketik subjek/topik...">
+                            <input type="text" wire:model.live.debounce.300ms="subjectSearch" @focus="open = true" class="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500" placeholder="Cari subjek...">
                             <div wire:loading wire:target="subjectSearch" class="absolute right-3 top-1/2 -translate-y-1/2">
                                 <i class="fas fa-spinner fa-spin text-gray-400"></i>
                             </div>
