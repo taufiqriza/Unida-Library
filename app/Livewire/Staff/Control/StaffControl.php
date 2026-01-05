@@ -34,6 +34,7 @@ class StaffControl extends Component
     // Branch Form
     public $showBranchModal = false;
     public $editingBranch = null;
+    public $branchViewOnly = false;
     public $branchForm = [
         'name' => '',
         'code' => '',
@@ -458,16 +459,17 @@ class StaffControl extends Component
         return $query->orderBy('name')->get();
     }
 
-    public function openBranchModal($branchId = null)
+    public function openBranchModal($branchId = null, $viewOnly = false)
     {
         $user = auth()->user();
+        $this->branchViewOnly = $viewOnly;
         
         if ($branchId) {
             $branch = Branch::find($branchId);
             if (!$branch) return;
             
-            // Non super_admin hanya bisa edit branch sendiri
-            if ($user->role !== 'super_admin' && $user->branch_id !== $branchId) {
+            // Non super_admin hanya bisa edit branch sendiri, tapi bisa view semua
+            if (!$viewOnly && $user->role !== 'super_admin' && $user->branch_id !== $branchId) {
                 return;
             }
             

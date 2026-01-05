@@ -344,14 +344,15 @@
                     </div>
                     <div class="flex items-center gap-2">
                         @if(auth()->user()->role === 'super_admin' || auth()->user()->branch_id === $branch->id)
-                        <button wire:click="openBranchModal({{ $branch->id }})" 
+                        <button wire:click="openBranchModal({{ $branch->id }}, false)" 
                                 class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
                             <i class="fas fa-edit mr-1"></i> Edit
                         </button>
                         @else
-                        <span class="px-3 py-2 text-gray-400 text-sm">
-                            <i class="fas fa-eye mr-1"></i> Lihat saja
-                        </span>
+                        <button wire:click="openBranchModal({{ $branch->id }}, true)" 
+                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
+                            <i class="fas fa-eye mr-1"></i> Lihat
+                        </button>
                         @endif
                         @if(auth()->user()->role === 'super_admin')
                         <button wire:click="toggleBranchStatus({{ $branch->id }})" 
@@ -381,55 +382,70 @@
     <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" wire:click.self="$set('showBranchModal', false)">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
             <div class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
-                <h3 class="text-lg font-semibold">{{ $editingBranch ? 'Edit Cabang' : 'Tambah Cabang Baru' }}</h3>
+                <h3 class="text-lg font-semibold">
+                    @if($branchViewOnly)
+                        Detail Cabang
+                    @elseif($editingBranch)
+                        Edit Cabang
+                    @else
+                        Tambah Cabang Baru
+                    @endif
+                </h3>
             </div>
-            <form wire:submit="saveBranch" class="p-6 space-y-4">
+            <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Cabang *</label>
-                    <input type="text" wire:model="branchForm.name" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="Perpustakaan Pusat">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Cabang</label>
+                    <input type="text" wire:model="branchForm.name" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 {{ $branchViewOnly ? 'bg-gray-50' : '' }}" placeholder="Perpustakaan Pusat" {{ $branchViewOnly ? 'disabled' : '' }}>
                     @error('branchForm.name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
                 
-                @if(auth()->user()->role === 'super_admin')
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Kode *</label>
-                    <input type="text" wire:model="branchForm.code" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono" placeholder="PUSAT">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kode</label>
+                    <input type="text" wire:model="branchForm.code" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono {{ $branchViewOnly || auth()->user()->role !== 'super_admin' ? 'bg-gray-50' : '' }}" placeholder="PUSAT" {{ $branchViewOnly || auth()->user()->role !== 'super_admin' ? 'disabled' : '' }}>
                     @error('branchForm.code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
-                @endif
                 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-                    <textarea wire:model="branchForm.address" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="Jl. Raya..."></textarea>
+                    <textarea wire:model="branchForm.address" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 {{ $branchViewOnly ? 'bg-gray-50' : '' }}" placeholder="Jl. Raya..." {{ $branchViewOnly ? 'disabled' : '' }}></textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
-                        <input type="text" wire:model="branchForm.phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="0352-...">
+                        <input type="text" wire:model="branchForm.phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 {{ $branchViewOnly ? 'bg-gray-50' : '' }}" placeholder="0352-..." {{ $branchViewOnly ? 'disabled' : '' }}>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" wire:model="branchForm.email" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="perpus@...">
+                        <input type="email" wire:model="branchForm.email" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 {{ $branchViewOnly ? 'bg-gray-50' : '' }}" placeholder="perpus@..." {{ $branchViewOnly ? 'disabled' : '' }}>
                     </div>
                 </div>
                 
-                @if(auth()->user()->role === 'super_admin')
+                @if(!$branchViewOnly && auth()->user()->role === 'super_admin')
                 <div class="flex items-center gap-3">
                     <input type="checkbox" wire:model="branchForm.is_active" id="branchActive" class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
                     <label for="branchActive" class="text-sm text-gray-700">Cabang Aktif</label>
+                </div>
+                @elseif($branchViewOnly)
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-700">Status:</span>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full {{ $branchForm['is_active'] ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700' }}">
+                        {{ $branchForm['is_active'] ? 'Aktif' : 'Nonaktif' }}
+                    </span>
                 </div>
                 @endif
                 
                 <div class="flex justify-end gap-3 pt-4 border-t">
                     <button type="button" wire:click="$set('showBranchModal', false)" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition">
-                        Batal
+                        {{ $branchViewOnly ? 'Tutup' : 'Batal' }}
                     </button>
-                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-medium shadow-lg transition">
+                    @if(!$branchViewOnly)
+                    <button wire:click="saveBranch" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-medium shadow-lg transition">
                         {{ $editingBranch ? 'Simpan Perubahan' : 'Tambah Cabang' }}
                     </button>
+                    @endif
                 </div>
-            </form>
+            </div>
         </div>
     </div>
     @endif
