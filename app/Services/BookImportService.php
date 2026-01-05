@@ -84,13 +84,13 @@ class BookImportService
         $sheet->setTitle('📚 Data Koleksi');
 
         // Header branding
-        $sheet->mergeCells('A1:L1');
+        $sheet->mergeCells('A1:P1');
         $sheet->setCellValue('A1', 'SYSTEM ILMU - UNIDA GONTOR');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        $sheet->mergeCells('A2:L2');
-        $sheet->setCellValue('A2', 'Template Import Koleksi v2.0');
+        $sheet->mergeCells('A2:P2');
+        $sheet->setCellValue('A2', 'Template Import Koleksi v2.1');
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         // Info section
@@ -102,7 +102,7 @@ class BookImportService
         $sheet->setCellValue('E4', date('d/m/Y'));
 
         // Instructions
-        $sheet->mergeCells('A6:N6');
+        $sheet->mergeCells('A6:P6');
         $sheet->setCellValue('A6', '⚠️ PENTING: Jangan mengubah header kolom (baris 8). Mulai isi data dari baris 9. Kolom dengan tanda (*) wajib diisi.');
         $sheet->getStyle('A6')->getFont()->setItalic(true)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FF6600'));
 
@@ -115,13 +115,15 @@ class BookImportService
             'E' => 'Penerbit',
             'F' => 'Tempat Terbit',
             'G' => 'Tahun',
-            'H' => 'DDC *',
-            'I' => 'Subjek',
-            'J' => 'Bahasa',
-            'K' => 'Media',
-            'L' => 'Jml Eks *',
-            'M' => 'Lokasi Rak',
-            'N' => 'Cover File',
+            'H' => 'Edisi',
+            'I' => 'Kolasi',
+            'J' => 'DDC *',
+            'K' => 'Subjek',
+            'L' => 'Bahasa',
+            'M' => 'Media',
+            'N' => 'Jml Eks *',
+            'O' => 'Lokasi Rak',
+            'P' => 'Cover File',
         ];
 
         $row = 8;
@@ -136,30 +138,30 @@ class BookImportService
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
         ];
-        $sheet->getStyle('A8:N8')->applyFromArray($headerStyle);
+        $sheet->getStyle('A8:P8')->applyFromArray($headerStyle);
 
         for ($i = 9; $i <= 508; $i++) {
             // Row number
             $sheet->setCellValue('A' . $i, $i - 8);
             
-            // Bahasa dropdown
-            $validation = $sheet->getCell('J' . $i)->getDataValidation();
+            // Bahasa dropdown (column L)
+            $validation = $sheet->getCell('L' . $i)->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setFormula1('"Indonesia,Arab,Inggris"');
             $validation->setShowDropDown(true);
 
-            // Media dropdown
-            $mediaValidation = $sheet->getCell('K' . $i)->getDataValidation();
+            // Media dropdown (column M)
+            $mediaValidation = $sheet->getCell('M' . $i)->getDataValidation();
             $mediaValidation->setType(DataValidation::TYPE_LIST);
             $mediaValidation->setFormula1('"Buku Cetak,E-Book,CD-ROM,Reference,Skripsi,Tesis,Disertasi"');
             $mediaValidation->setShowDropDown(true);
 
-            // Jumlah eksemplar default
-            $sheet->setCellValue('L' . $i, 1);
+            // Jumlah eksemplar default (column N)
+            $sheet->setCellValue('N' . $i, 1);
         }
 
         // Column widths
-        $widths = ['A' => 5, 'B' => 35, 'C' => 25, 'D' => 18, 'E' => 18, 'F' => 15, 'G' => 8, 'H' => 10, 'I' => 18, 'J' => 12, 'K' => 12, 'L' => 8, 'M' => 12, 'N' => 18];
+        $widths = ['A' => 5, 'B' => 35, 'C' => 25, 'D' => 18, 'E' => 18, 'F' => 15, 'G' => 8, 'H' => 10, 'I' => 25, 'J' => 10, 'K' => 18, 'L' => 12, 'M' => 12, 'N' => 8, 'O' => 12, 'P' => 18];
         foreach ($widths as $col => $width) {
             $sheet->getColumnDimension($col)->setWidth($width);
         }
@@ -191,19 +193,28 @@ class BookImportService
             ['5. TAHUN', 'Tahun terbit (4 digit)'],
             ['   Contoh:', '2020'],
             ['', ''],
-            ['6. DDC (Wajib)', 'Kode klasifikasi Dewey Decimal. Lihat sheet "Daftar DDC"'],
+            ['6. EDISI', 'Edisi/cetakan buku'],
+            ['   Contoh:', 'Cet. 3, Ed. Revisi, Jilid 2'],
+            ['', ''],
+            ['7. KOLASI', 'Deskripsi fisik buku (halaman, ilustrasi, ukuran)'],
+            ['   Contoh:', 'xii, 350 hlm. : ilus. ; 24 cm'],
+            ['   Format:', '[halaman pendahuluan], [halaman isi] hlm. : [ilus./foto] ; [tinggi] cm'],
+            ['', ''],
+            ['8. DDC (Wajib)', 'Kode klasifikasi Dewey Decimal. Lihat sheet "Daftar DDC"'],
             ['   Contoh:', '297.4 untuk Fiqih Islam'],
             ['', ''],
-            ['7. KATEGORI', 'Pilih dari dropdown atau lihat sheet "Daftar Kategori"'],
+            ['9. SUBJEK', 'Pilih dari dropdown atau lihat sheet "Daftar Kategori"'],
             ['', ''],
-            ['8. BAHASA', 'Pilih: Indonesia, Arab, atau Inggris'],
+            ['10. BAHASA', 'Pilih: Indonesia, Arab, atau Inggris'],
             ['', ''],
-            ['9. JUMLAH EKSEMPLAR (Wajib)', 'Jumlah copy buku yang akan diinput'],
+            ['11. MEDIA', 'Jenis media: Buku Cetak, E-Book, CD-ROM, dll'],
             ['', ''],
-            ['10. LOKASI RAK', 'Kode lokasi rak penyimpanan'],
+            ['12. JUMLAH EKSEMPLAR (Wajib)', 'Jumlah copy buku yang akan diinput'],
+            ['', ''],
+            ['13. LOKASI RAK', 'Kode lokasi rak penyimpanan'],
             ['    Contoh:', 'A-02-15'],
             ['', ''],
-            ['11. COVER FILE', 'Nama file foto cover (jika ada)'],
+            ['14. COVER FILE', 'Nama file foto cover (jika ada)'],
             ['    Cara:', ''],
             ['    a.', 'Foto cover buku dengan HP/kamera'],
             ['    b.', 'Simpan dengan nama unik, misal: buku001.jpg'],
@@ -224,8 +235,8 @@ class BookImportService
         }
 
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getColumnDimension('A')->setWidth(30);
-        $sheet->getColumnDimension('B')->setWidth(50);
+        $sheet->getColumnDimension('A')->setWidth(35);
+        $sheet->getColumnDimension('B')->setWidth(55);
     }
 
     protected function createDdcSheet(Spreadsheet $spreadsheet): void
@@ -388,13 +399,15 @@ class BookImportService
         $publisher = trim($row['E'] ?? '');
         $publishPlace = trim($row['F'] ?? '');
         $year = trim($row['G'] ?? '');
-        $ddc = trim($row['H'] ?? '');
-        $subject = trim($row['I'] ?? '');
-        $language = trim($row['J'] ?? '');
-        $media = trim($row['K'] ?? '');
-        $quantity = (int) ($row['L'] ?? 1);
-        $location = trim($row['M'] ?? '');
-        $coverFile = trim($row['N'] ?? '');
+        $edition = trim($row['H'] ?? '');
+        $collation = trim($row['I'] ?? '');
+        $ddc = trim($row['J'] ?? '');
+        $subject = trim($row['K'] ?? '');
+        $language = trim($row['L'] ?? '');
+        $media = trim($row['M'] ?? '');
+        $quantity = (int) ($row['N'] ?? 1);
+        $location = trim($row['O'] ?? '');
+        $coverFile = trim($row['P'] ?? '');
 
         // Validations
         if (empty($title)) {
@@ -485,6 +498,8 @@ class BookImportService
                 'media' => $media,
                 'media_type_id' => $mediaTypeId,
                 'quantity' => $quantity,
+                'edition' => $edition,
+                'collation' => $collation,
                 'location' => $location,
                 'cover_file' => $coverFile,
                 'cover_found' => $coverFound,
@@ -725,6 +740,8 @@ class BookImportService
             'publisher_id' => $publisher?->id,
             'place_id' => $place?->id,
             'publish_year' => $data['year'],
+            'edition' => $data['edition'] ?? null,
+            'collation' => $data['collation'] ?? null,
             'call_number' => $data['call_number'],
             'classification' => $data['ddc'],
             'language' => $data['language'],
