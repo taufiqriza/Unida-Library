@@ -9,12 +9,15 @@ class ChatMessage extends Model
     protected $fillable = [
         'chat_room_id', 'sender_id', 'message', 'attachment', 
         'attachment_type', 'attachment_name', 'type', 'is_deleted', 'task_id', 'book_id',
-        'voice_path', 'voice_duration', 'reply_to_id'
+        'voice_path', 'voice_duration', 'reply_to_id',
+        'is_pinned', 'pinned_by', 'pinned_at', 'forwarded_from_id'
     ];
 
     protected $casts = [
         'is_deleted' => 'boolean',
+        'is_pinned' => 'boolean',
         'voice_duration' => 'integer',
+        'pinned_at' => 'datetime',
     ];
 
     // Relationships
@@ -36,6 +39,26 @@ class ChatMessage extends Model
     public function reads()
     {
         return $this->hasMany(ChatMessageRead::class, 'message_id');
+    }
+    
+    public function reactions()
+    {
+        return $this->hasMany(ChatMessageReaction::class, 'message_id');
+    }
+    
+    public function mentions()
+    {
+        return $this->hasMany(ChatMention::class, 'message_id');
+    }
+    
+    public function pinnedByUser()
+    {
+        return $this->belongsTo(User::class, 'pinned_by');
+    }
+    
+    public function forwardedFrom()
+    {
+        return $this->belongsTo(ChatMessage::class, 'forwarded_from_id');
     }
 
     public function task()

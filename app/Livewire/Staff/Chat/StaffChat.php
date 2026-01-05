@@ -30,9 +30,13 @@ class StaffChat extends Component
     public $attachment;
     public $voiceNote;
     public $messages = [];
+    public $pinnedMessages = [];
     public $searchQuery = '';
     public $typingUsers = []; // Users currently typing
     public $replyTo = null; // Message being replied to
+    public $forwardingMessage = null; // Message being forwarded
+    public $showForwardModal = false;
+    public $showReactionPicker = null; // Message ID for reaction picker
     
     // Task Picker
     public $showTaskPicker = false;
@@ -207,9 +211,9 @@ class StaffChat extends Component
     {
         if (!$this->activeRoomId) return;
 
-        // Get latest 50 messages (ordered by newest first, then reverse for display)
+        // Get latest 50 messages
         $messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
-            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'created_at'])
+            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'is_pinned', 'forwarded_from_id', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',
                 'sender.branch:id,name',
@@ -219,7 +223,11 @@ class StaffChat extends Component
                 'book:id,title,isbn,image',
                 'book.authors:id,name',
                 'replyTo:id,sender_id,message,attachment_type',
-                'replyTo.sender:id,name'
+                'replyTo.sender:id,name',
+                'reactions:id,message_id,user_id,emoji',
+                'reactions.user:id,name',
+                'forwardedFrom:id,sender_id,message',
+                'forwardedFrom.sender:id,name',
             ])
             ->withCount('reads')
             ->orderBy('created_at', 'desc')
@@ -228,18 +236,38 @@ class StaffChat extends Component
             ->reverse()
             ->values();
         
-        // Get total members in room (excluding sender) for read status
         $roomMemberCount = ChatRoomMember::where('chat_room_id', $this->activeRoomId)->count();
         
         $this->messages = $messages->map(function($msg) use ($roomMemberCount) {
             $arr = $msg->toArray();
             $arr['reads_count'] = $msg->reads_count;
-            $arr['total_recipients'] = $roomMemberCount - 1; // exclude sender
+            $arr['total_recipients'] = $roomMemberCount - 1;
+            // Group reactions by emoji
+            $arr['reactions_grouped'] = collect($msg->reactions)->groupBy('emoji')->map(fn($r) => [
+                'count' => $r->count(),
+                'users' => $r->pluck('user.name')->toArray(),
+                'user_ids' => $r->pluck('user_id')->toArray(),
+            ])->toArray();
             return $arr;
         })->toArray();
         
+        // Load pinned messages
+        $this->loadPinnedMessages();
+        
         // Mark messages as read
         $this->markMessagesAsRead();
+    }
+    
+    public function loadPinnedMessages()
+    {
+        if (!$this->activeRoomId) return;
+        
+        $this->pinnedMessages = ChatMessage::where('chat_room_id', $this->activeRoomId)
+            ->where('is_pinned', true)
+            ->with(['sender:id,name', 'pinnedByUser:id,name'])
+            ->orderBy('pinned_at', 'desc')
+            ->get()
+            ->toArray();
     }
     
     public function markMessagesAsRead()
@@ -248,7 +276,6 @@ class StaffChat extends Component
         
         $userId = auth()->id();
         
-        // Get unread message IDs (messages not sent by current user and not yet read)
         $unreadMessageIds = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->where('sender_id', '!=', $userId)
             ->whereDoesntHave('reads', fn($q) => $q->where('user_id', $userId))
@@ -256,7 +283,6 @@ class StaffChat extends Component
         
         if ($unreadMessageIds->isEmpty()) return;
         
-        // Bulk insert read records
         $reads = $unreadMessageIds->map(fn($id) => [
             'message_id' => $id,
             'user_id' => $userId,
@@ -264,6 +290,11 @@ class StaffChat extends Component
         ])->toArray();
         
         \App\Models\ChatMessageRead::insert($reads);
+        
+        // Mark mentions as read
+        \App\Models\ChatMention::whereIn('message_id', $unreadMessageIds)
+            ->where('user_id', $userId)
+            ->update(['is_read' => true]);
     }
 
     public function markAsRead()
@@ -307,6 +338,9 @@ class StaffChat extends Component
             'reply_to_id' => $this->replyTo['id'] ?? null,
             'type' => 'text',
         ]);
+        
+        // Process mentions (@username)
+        $this->processMentions($chatMessage);
 
         // Update sender's last_read_at
         ChatRoomMember::where('chat_room_id', $this->activeRoomId)
@@ -332,6 +366,38 @@ class StaffChat extends Component
         $this->selectedBookId = null;
         $this->loadMessages();
         $this->dispatch('scrollToBottom');
+    }
+    
+    protected function processMentions(ChatMessage $message)
+    {
+        if (!$message->message) return;
+        
+        // Find @mentions in message
+        preg_match_all('/@(\w+)/', $message->message, $matches);
+        if (empty($matches[1])) return;
+        
+        // Get room members
+        $memberIds = ChatRoomMember::where('chat_room_id', $message->chat_room_id)
+            ->where('user_id', '!=', auth()->id())
+            ->pluck('user_id');
+        
+        // Find mentioned users
+        $mentionedUsers = User::whereIn('id', $memberIds)
+            ->where(function($q) use ($matches) {
+                foreach ($matches[1] as $name) {
+                    $q->orWhere('name', 'like', $name . '%');
+                }
+            })
+            ->pluck('id');
+        
+        // Create mention records
+        foreach ($mentionedUsers as $userId) {
+            \App\Models\ChatMention::create([
+                'message_id' => $message->id,
+                'user_id' => $userId,
+                'created_at' => now(),
+            ]);
+        }
     }
     
     protected function notifyMember(ChatMessage $message)
@@ -431,6 +497,85 @@ class StaffChat extends Component
             $message->update(['is_deleted' => true, 'message' => null]);
             $this->loadMessages();
         }
+    }
+    
+    // Pin/Unpin Message
+    public function togglePin($messageId)
+    {
+        $message = ChatMessage::where('id', $messageId)
+            ->where('chat_room_id', $this->activeRoomId)
+            ->first();
+            
+        if (!$message) return;
+        
+        if ($message->is_pinned) {
+            $message->update(['is_pinned' => false, 'pinned_by' => null, 'pinned_at' => null]);
+        } else {
+            $message->update(['is_pinned' => true, 'pinned_by' => auth()->id(), 'pinned_at' => now()]);
+        }
+        
+        $this->loadMessages();
+    }
+    
+    // Reaction
+    public function toggleReaction($messageId, $emoji)
+    {
+        $userId = auth()->id();
+        $existing = \App\Models\ChatMessageReaction::where('message_id', $messageId)
+            ->where('user_id', $userId)
+            ->where('emoji', $emoji)
+            ->first();
+            
+        if ($existing) {
+            $existing->delete();
+        } else {
+            \App\Models\ChatMessageReaction::create([
+                'message_id' => $messageId,
+                'user_id' => $userId,
+                'emoji' => $emoji,
+                'created_at' => now(),
+            ]);
+        }
+        
+        $this->showReactionPicker = null;
+        $this->loadMessages();
+    }
+    
+    // Forward Message
+    public function openForwardModal($messageId)
+    {
+        $this->forwardingMessage = ChatMessage::with('sender:id,name')->find($messageId);
+        $this->showForwardModal = true;
+    }
+    
+    public function forwardTo($roomId)
+    {
+        if (!$this->forwardingMessage) return;
+        
+        ChatMessage::create([
+            'chat_room_id' => $roomId,
+            'sender_id' => auth()->id(),
+            'message' => $this->forwardingMessage->message,
+            'attachment' => $this->forwardingMessage->attachment,
+            'attachment_type' => $this->forwardingMessage->attachment_type,
+            'attachment_name' => $this->forwardingMessage->attachment_name,
+            'forwarded_from_id' => $this->forwardingMessage->id,
+            'type' => 'message',
+        ]);
+        
+        $this->showForwardModal = false;
+        $this->forwardingMessage = null;
+        
+        // If forwarding to current room, reload
+        if ($roomId == $this->activeRoomId) {
+            $this->loadMessages();
+        }
+    }
+    
+    public function cancelForward()
+    {
+        $this->showForwardModal = false;
+        $this->forwardingMessage = null;
     }
 
     public function removeAttachment()
