@@ -446,6 +446,13 @@ class AnalyticsDashboard extends Component
         };
     }
     
+    public function setPeriod(string $period): void
+    {
+        $this->period = $period;
+        Cache::forget("ga_full_data_{$this->period}");
+        $this->loadData();
+    }
+
     public function updatedPeriod()
     {
         Cache::forget("ga_full_data_{$this->period}");
@@ -499,6 +506,12 @@ class AnalyticsDashboard extends Component
             ->when($this->visitBranch, fn($q) => $q->where('branch_id', $this->visitBranch))
             ->with(['member:id,name,member_id', 'branch:id,name'])
             ->orderByDesc('visited_at')->limit(20)->get()->toArray();
+    }
+
+    public function setVisitPeriod(string $period): void
+    {
+        $this->visitPeriod = $period;
+        $this->loadVisitData();
     }
 
     public function updatedVisitPeriod() { $this->loadVisitData(); }

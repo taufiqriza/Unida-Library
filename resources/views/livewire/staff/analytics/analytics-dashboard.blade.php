@@ -185,7 +185,7 @@
         <div class="flex flex-wrap items-center gap-3 mb-6">
             <div class="flex bg-gray-100 rounded-xl p-1">
                 @foreach(['7d' => '7 Hari', '30d' => '30 Hari', '90d' => '90 Hari'] as $key => $label)
-                <button wire:click="$set('period', '{{ $key }}')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $period === $key ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:text-gray-900' }}">
+                <button wire:click="setPeriod('{{ $key }}')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $period === $key ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:text-gray-900' }}">
                     {{ $label }}
                 </button>
                 @endforeach
