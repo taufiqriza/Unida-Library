@@ -51,8 +51,9 @@
 
     {{-- Chat Panel --}}
     @if($isOpen)
-    <div class="fixed bottom-4 right-4 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999] animate-slideUp transition-all duration-300
-        {{ $isExpanded ? 'w-[36rem] h-[44rem]' : 'w-[420px] h-[600px]' }}">
+    <div class="fixed inset-4 sm:inset-auto sm:bottom-4 sm:right-4 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden z-[9999] animate-slideUp transition-all duration-300
+        {{ $isExpanded ? 'sm:w-[36rem] sm:h-[44rem]' : 'sm:w-[420px] sm:h-[600px]' }}"
+        style="max-height: calc(100vh - 2rem);">
         
         {{-- Header --}}
         <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
