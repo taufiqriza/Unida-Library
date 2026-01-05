@@ -536,6 +536,9 @@ class StaffChat extends Component
     public function toggleReaction($messageId, $emoji)
     {
         $userId = auth()->id();
+        $message = ChatMessage::find($messageId);
+        if (!$message) return;
+        
         $existing = \App\Models\ChatMessageReaction::where('message_id', $messageId)
             ->where('user_id', $userId)
             ->where('emoji', $emoji)
@@ -550,6 +553,10 @@ class StaffChat extends Component
                 'emoji' => $emoji,
                 'created_at' => now(),
             ]);
+            
+            // Update room to show activity
+            ChatRoom::where('id', $message->chat_room_id)->update(['updated_at' => now()]);
+            cache()->forget("chat_rooms_{$userId}");
         }
         
         $this->showReactionPicker = null;
@@ -862,11 +869,13 @@ class StaffChat extends Component
         $rooms = cache()->remember($cacheKey, 30, function () use ($userId) {
             return ChatRoom::forUser($userId)
                 ->where('type', '!=', 'support')
-                ->select(['id', 'name', 'type', 'branch_id'])
+                ->select(['id', 'name', 'type', 'branch_id', 'updated_at'])
                 ->withCount('members')
                 ->with([
                     'latestMessage:id,chat_room_id,sender_id,message,created_at',
                     'latestMessage.sender:id,name',
+                    'latestMessage.reactions' => fn($q) => $q->latest()->limit(1),
+                    'latestMessage.reactions.user:id,name',
                     'branch:id,name'
                 ])
                 ->get();

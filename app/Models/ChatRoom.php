@@ -54,6 +54,18 @@ class ChatRoom extends Model
     {
         return $this->hasOne(ChatMessage::class)->where('is_deleted', false)->latest();
     }
+    
+    public function latestReaction()
+    {
+        return $this->hasOneThrough(
+            \App\Models\ChatMessageReaction::class,
+            ChatMessage::class,
+            'chat_room_id',
+            'message_id',
+            'id',
+            'id'
+        )->latest('chat_message_reactions.created_at');
+    }
 
     // Scopes
     public function scopeForUser($query, $userId)

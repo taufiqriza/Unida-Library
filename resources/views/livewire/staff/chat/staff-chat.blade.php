@@ -1296,7 +1296,14 @@
                                 @if($room->latestMessage->sender_id === auth()->id())
                                     <span class="text-gray-400">Anda: </span>
                                 @endif
-                                {{ $room->latestMessage->attachment ? '📎 File' : Str::limit($room->latestMessage->message, 30) }}
+                                @if($room->latestMessage->reactions && $room->latestMessage->reactions->count() > 0)
+                                    @php $lastReact = $room->latestMessage->reactions->first(); @endphp
+                                    <span class="text-gray-400">{{ $lastReact->user->name ?? '' }} reacted </span>{{ $lastReact->emoji }}
+                                @elseif($room->latestMessage->attachment)
+                                    📎 File
+                                @else
+                                    {{ Str::limit($room->latestMessage->message, 30) }}
+                                @endif
                             @else
                                 <span class="italic text-gray-400">Mulai chat</span>
                             @endif
@@ -1363,12 +1370,17 @@
                     <div class="flex items-center justify-between mt-0.5">
                         <p class="text-xs text-gray-500 truncate pr-2">
                             @if($room->latestMessage)
-                                @if($room->latestMessage->sender_id === auth()->id())
-                                    <span class="text-gray-400">Anda: </span>
+                                @if($room->latestMessage->reactions && $room->latestMessage->reactions->count() > 0)
+                                    @php $lastReact = $room->latestMessage->reactions->first(); @endphp
+                                    <span class="text-gray-400">{{ Str::before($lastReact->user->name ?? '', ' ') }} reacted </span>{{ $lastReact->emoji }}
                                 @else
-                                    <span class="text-gray-400">{{ Str::before($room->latestMessage->sender->name ?? '', ' ') }}: </span>
+                                    @if($room->latestMessage->sender_id === auth()->id())
+                                        <span class="text-gray-400">Anda: </span>
+                                    @else
+                                        <span class="text-gray-400">{{ Str::before($room->latestMessage->sender->name ?? '', ' ') }}: </span>
+                                    @endif
+                                    {{ $room->latestMessage->attachment ? '📎 File' : Str::limit($room->latestMessage->message, 25) }}
                                 @endif
-                                {{ $room->latestMessage->attachment ? '📎 File' : Str::limit($room->latestMessage->message, 25) }}
                             @else
                                 <span class="italic text-gray-400">Belum ada pesan</span>
                             @endif
