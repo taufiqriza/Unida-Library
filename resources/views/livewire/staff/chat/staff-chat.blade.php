@@ -505,6 +505,26 @@
             
             <div id="voiceBarAnchor" class="relative"></div>
             
+            {{-- Typing indicator --}}
+            @if(count($typingUsers) > 0)
+            <div class="flex items-center gap-2 px-3 py-2 text-gray-500 text-xs">
+                <div class="flex gap-1">
+                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                    <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                </div>
+                <span>
+                    @if(count($typingUsers) === 1)
+                        {{ $typingUsers[0] }} sedang mengetik...
+                    @elseif(count($typingUsers) === 2)
+                        {{ $typingUsers[0] }} dan {{ $typingUsers[1] }} sedang mengetik...
+                    @else
+                        {{ count($typingUsers) }} orang sedang mengetik...
+                    @endif
+                </span>
+            </div>
+            @endif
+            
             {{-- Sending indicator --}}
             <div wire:loading.flex wire:target="sendMessage" class="items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 text-xs rounded-lg mb-2">
                 <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -545,13 +565,15 @@
                     </div>
                 </div>
                 
-                <div class="flex-1 relative">
+                <div class="flex-1 relative" x-data="{ typingTimeout: null }">
                     <textarea wire:model="message" 
                               id="chatMessageInput"
                               placeholder="Ketik pesan..." 
                               rows="1"
                               class="w-full px-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm resize-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition"
-                              onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); @this.sendMessage(); }"></textarea>
+                              @input="clearTimeout(typingTimeout); $wire.startTyping(); typingTimeout = setTimeout(() => $wire.stopTyping(), 3000)"
+                              @blur="$wire.stopTyping()"
+                              onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); @this.stopTyping(); @this.sendMessage(); }"></textarea>
                 </div>
                 
                 <div class="flex items-center gap-1 flex-shrink-0">

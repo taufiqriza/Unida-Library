@@ -31,6 +31,7 @@ class StaffChat extends Component
     public $voiceNote;
     public $messages = [];
     public $searchQuery = '';
+    public $typingUsers = []; // Users currently typing
     
     // Task Picker
     public $showTaskPicker = false;
@@ -776,8 +777,48 @@ class StaffChat extends Component
     {
         if ($this->activeRoomId && $this->activeView === 'chat') {
             $this->loadMessages();
+            $this->loadTypingUsers();
             $this->updateOnlineStatus();
         }
+    }
+
+    public function startTyping()
+    {
+        if (!$this->activeRoomId) return;
+        
+        cache()->put(
+            "typing:{$this->activeRoomId}:" . auth()->id(),
+            auth()->user()->name,
+            now()->addSeconds(5)
+        );
+    }
+
+    public function stopTyping()
+    {
+        if (!$this->activeRoomId) return;
+        cache()->forget("typing:{$this->activeRoomId}:" . auth()->id());
+    }
+
+    protected function loadTypingUsers()
+    {
+        if (!$this->activeRoomId) {
+            $this->typingUsers = [];
+            return;
+        }
+
+        $typing = [];
+        $members = ChatRoomMember::where('chat_room_id', $this->activeRoomId)
+            ->where('user_id', '!=', auth()->id())
+            ->pluck('user_id');
+
+        foreach ($members as $userId) {
+            $name = cache()->get("typing:{$this->activeRoomId}:{$userId}");
+            if ($name) {
+                $typing[] = $name;
+            }
+        }
+
+        $this->typingUsers = $typing;
     }
 
     public function render()
