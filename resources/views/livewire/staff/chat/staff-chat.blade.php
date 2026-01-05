@@ -261,7 +261,7 @@
                         $isGroupChat = $activeRoom->isGroup();
                         $showSenderInfo = ($isGroupChat || $isSupportChat) && !$isOwnMessage && !$isMemberMessage;
                     @endphp
-                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} gap-2">
+                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} gap-2 group">
                         {{-- Sender Avatar (for groups/support, not own message) --}}
                         @if($showSenderInfo)
                         <div class="flex-shrink-0 mt-4">
@@ -289,7 +289,22 @@
                         </div>
                         @endif
 
+                        {{-- Reply button (appears on hover, before message for own, after for others) --}}
+                        @if($isOwnMessage)
+                        <button wire:click="replyToMessage({{ $msg['id'] }})" class="self-center opacity-0 group-hover:opacity-100 transition p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
+                            <i class="fas fa-reply text-gray-400 text-xs"></i>
+                        </button>
+                        @endif
+
                         <div class="max-w-[75%]">
+                            {{-- Reply reference --}}
+                            @if(isset($msg['reply_to']) && $msg['reply_to'])
+                            <div class="mb-1 px-2 py-1 bg-gray-100 border-l-2 border-blue-400 rounded text-xs text-gray-600 cursor-pointer hover:bg-gray-200" onclick="document.querySelector('[data-message-id=\'{{ $msg['reply_to']['id'] }}\']')?.scrollIntoView({behavior:'smooth',block:'center'})">
+                                <span class="font-semibold text-blue-600">{{ $msg['reply_to']['sender']['name'] ?? 'Unknown' }}</span>
+                                <p class="truncate">{{ $msg['reply_to']['attachment_type'] ? '📎 Attachment' : Str::limit($msg['reply_to']['message'], 50) }}</p>
+                            </div>
+                            @endif
+                            
                             {{-- Sender Name (for groups/support) --}}
                             @if($showSenderInfo)
                                 <p class="text-[10px] mb-1 ml-1 flex items-center gap-1.5">
@@ -419,6 +434,13 @@
                                 {{ \Carbon\Carbon::parse($msg['created_at'])->setTimezone('Asia/Jakarta')->format('H:i') }}
                             </p>
                         </div>
+
+                        {{-- Reply button for others' messages --}}
+                        @if(!$isOwnMessage)
+                        <button wire:click="replyToMessage({{ $msg['id'] }})" class="self-center opacity-0 group-hover:opacity-100 transition p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
+                            <i class="fas fa-reply text-gray-400 text-xs"></i>
+                        </button>
+                        @endif
                     </div>
                 @endif
                 </div>
@@ -500,6 +522,23 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
+            </div>
+            @endif
+
+            {{-- Reply Preview --}}
+            @if($replyTo)
+            <div class="mb-2 p-2 bg-blue-50 rounded-lg border-l-4 border-blue-500 flex items-center justify-between">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs text-blue-600 font-medium">
+                        <i class="fas fa-reply mr-1"></i> Membalas {{ $replyTo['sender']['name'] ?? 'Unknown' }}
+                    </p>
+                    <p class="text-xs text-gray-600 truncate">
+                        {{ $replyTo['attachment_type'] ? '📎 Attachment' : Str::limit($replyTo['message'], 60) }}
+                    </p>
+                </div>
+                <button wire:click="cancelReply" class="text-gray-400 hover:text-gray-600 p-1">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             @endif
             
@@ -1317,6 +1356,13 @@
             // Listen for new message sound
             Livewire.on('playNewMessageSound', () => {
                 playNotificationSound();
+            });
+
+            // Focus input when replying
+            Livewire.on('focusInput', () => {
+                setTimeout(() => {
+                    document.getElementById('chatMessageInput')?.focus();
+                }, 100);
             });
 
             // Check for open_chat query param (from notification click)

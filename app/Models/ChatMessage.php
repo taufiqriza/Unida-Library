@@ -9,7 +9,7 @@ class ChatMessage extends Model
     protected $fillable = [
         'chat_room_id', 'sender_id', 'message', 'attachment', 
         'attachment_type', 'attachment_name', 'type', 'is_deleted', 'task_id', 'book_id',
-        'voice_path', 'voice_duration'
+        'voice_path', 'voice_duration', 'reply_to_id'
     ];
 
     protected $casts = [
@@ -26,6 +26,11 @@ class ChatMessage extends Model
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function replyTo()
+    {
+        return $this->belongsTo(ChatMessage::class, 'reply_to_id');
     }
 
     public function task()

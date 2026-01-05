@@ -32,6 +32,7 @@ class StaffChat extends Component
     public $messages = [];
     public $searchQuery = '';
     public $typingUsers = []; // Users currently typing
+    public $replyTo = null; // Message being replied to
     
     // Task Picker
     public $showTaskPicker = false;
@@ -209,7 +210,7 @@ class StaffChat extends Component
         // Get latest 50 messages (ordered by newest first, then reverse for display)
         $this->messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->where('is_deleted', false)
-            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'type', 'voice_path', 'voice_duration', 'created_at'])
+            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',
                 'sender.branch:id,name',
@@ -217,7 +218,9 @@ class StaffChat extends Component
                 'task.assignee:id,name',
                 'task.status:id,name,color',
                 'book:id,title,isbn,image',
-                'book.authors:id,name'
+                'book.authors:id,name',
+                'replyTo:id,sender_id,message,attachment_type',
+                'replyTo.sender:id,name'
             ])
             ->orderBy('created_at', 'desc')
             ->take(50)
@@ -255,7 +258,7 @@ class StaffChat extends Component
             $attachmentName = $this->attachment->getClientOriginalName();
         }
 
-        // Create message with optional task/book
+        // Create message with optional task/book/reply
         $chatMessage = ChatMessage::create([
             'chat_room_id' => $this->activeRoomId,
             'sender_id' => auth()->id(),
@@ -265,6 +268,7 @@ class StaffChat extends Component
             'attachment_name' => $attachmentName,
             'task_id' => $this->selectedTaskId,
             'book_id' => $this->selectedBookId,
+            'reply_to_id' => $this->replyTo['id'] ?? null,
             'type' => 'text',
         ]);
 
@@ -287,6 +291,7 @@ class StaffChat extends Component
 
         $this->message = '';
         $this->attachment = null;
+        $this->replyTo = null;
         $this->selectedTaskId = null;
         $this->selectedBookId = null;
         $this->loadMessages();
@@ -363,6 +368,20 @@ class StaffChat extends Component
                 } catch (\Exception $e) {}
             }
         }
+    }
+
+    public function replyToMessage($messageId)
+    {
+        $msg = collect($this->messages)->firstWhere('id', $messageId);
+        if ($msg) {
+            $this->replyTo = $msg;
+            $this->dispatch('focusInput');
+        }
+    }
+
+    public function cancelReply()
+    {
+        $this->replyTo = null;
     }
 
     public function removeAttachment()
