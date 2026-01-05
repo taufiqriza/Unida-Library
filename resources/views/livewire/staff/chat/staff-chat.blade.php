@@ -57,21 +57,23 @@
                 {{-- Room List --}}
                 <p class="text-xs text-gray-500 mb-2">Pilih tujuan:</p>
                 <div class="max-h-60 overflow-y-auto space-y-1">
-                    @foreach($this->chatRooms as $room)
+                    @foreach($this->forwardRooms as $room)
+                    @php
+                        $otherMember = $room->members->firstWhere('user_id', '!=', auth()->id());
+                        $roomName = $room->type === 'direct' && $otherMember ? $otherMember->user->name : $room->name;
+                    @endphp
                     <button wire:click="forwardTo({{ $room->id }})" 
                             class="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition text-left">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
-                            @if($room->isDirect())
-                                {{ strtoupper(substr($room->getOtherMember(auth()->id())->name ?? 'U', 0, 1)) }}
+                            @if($room->type === 'direct')
+                                {{ strtoupper(substr($roomName, 0, 1)) }}
                             @else
                                 <i class="fas fa-users text-xs"></i>
                             @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-900 truncate text-sm">
-                                {{ $room->isDirect() ? ($room->getOtherMember(auth()->id())->name ?? 'Unknown') : $room->name }}
-                            </p>
-                            <p class="text-xs text-gray-500">{{ $room->isDirect() ? 'Personal' : 'Grup' }}</p>
+                            <p class="font-medium text-gray-900 truncate text-sm">{{ $roomName }}</p>
+                            <p class="text-xs text-gray-500">{{ $room->type === 'direct' ? 'Personal' : ($room->type === 'branch' ? 'Cabang' : 'Grup') }}</p>
                         </div>
                     </button>
                     @endforeach
@@ -412,22 +414,32 @@
                         </div>
                         @endif
 
-                        {{-- Action buttons for own message --}}
+                        {{-- Action buttons for own message (3-dot menu) --}}
                         @if($isOwnMessage)
-                        <div class="flex items-center gap-0.5" x-show="showActions" x-transition.opacity x-cloak>
-                            <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full text-xs" title="Like">👍</button>
-                            <button wire:click.stop="togglePin({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-amber-50 rounded-full" title="{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}">
-                                <i class="fas fa-thumbtack text-xs {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }}"></i>
+                        <div class="relative" x-show="showActions" x-transition.opacity x-cloak x-data="{ menuOpen: false }">
+                            <button @click.stop="menuOpen = !menuOpen" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full">
+                                <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
-                            <button wire:click.stop="openForwardModal({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Forward">
-                                <i class="fas fa-share text-gray-400 text-xs"></i>
-                            </button>
-                            <button wire:click.stop="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
-                                <i class="fas fa-reply text-gray-400 text-xs"></i>
-                            </button>
-                            <button @click.stop="$dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-6 h-6 flex items-center justify-center hover:bg-red-50 rounded-full" title="Hapus">
-                                <i class="fas fa-trash text-gray-400 text-xs"></i>
-                            </button>
+                            <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
+                                 class="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <span>👍</span> <span class="text-gray-700">Suka</span>
+                                </button>
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-reply text-gray-400 w-4"></i> <span class="text-gray-700">Balas</span>
+                                </button>
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-share text-gray-400 w-4"></i> <span class="text-gray-700">Teruskan</span>
+                                </button>
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-4"></i> 
+                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}</span>
+                                </button>
+                                <hr class="my-1">
+                                <button @click.stop="menuOpen = false; $dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-full px-3 py-2 text-left text-sm hover:bg-red-50 flex items-center gap-2 text-red-600">
+                                    <i class="fas fa-trash w-4"></i> <span>Hapus</span>
+                                </button>
+                            </div>
                         </div>
                         @endif
 
@@ -617,19 +629,28 @@
                             </div>
                         </div>
 
-                        {{-- Action buttons for others' messages --}}
+                        {{-- Action buttons for others' messages (3-dot menu) --}}
                         @if(!$isOwnMessage)
-                        <div class="flex items-center gap-0.5" x-show="showActions" x-transition.opacity x-cloak>
-                            <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full text-xs" title="Like">👍</button>
-                            <button wire:click.stop="togglePin({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-amber-50 rounded-full" title="{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}">
-                                <i class="fas fa-thumbtack text-xs {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }}"></i>
+                        <div class="relative" x-show="showActions" x-transition.opacity x-cloak x-data="{ menuOpen: false }">
+                            <button @click.stop="menuOpen = !menuOpen" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full">
+                                <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
-                            <button wire:click.stop="openForwardModal({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Forward">
-                                <i class="fas fa-share text-gray-400 text-xs"></i>
-                            </button>
-                            <button wire:click.stop="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
-                                <i class="fas fa-reply text-gray-400 text-xs"></i>
-                            </button>
+                            <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
+                                 class="absolute left-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <span>👍</span> <span class="text-gray-700">Suka</span>
+                                </button>
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-reply text-gray-400 w-4"></i> <span class="text-gray-700">Balas</span>
+                                </button>
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-share text-gray-400 w-4"></i> <span class="text-gray-700">Teruskan</span>
+                                </button>
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-4"></i> 
+                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}</span>
+                                </button>
+                            </div>
                         </div>
                         @endif
                     </div>

@@ -916,6 +916,16 @@ class StaffChat extends Component
         ];
     }
     
+    public function getForwardRoomsProperty()
+    {
+        // Get all rooms for forward modal (simpler query)
+        return ChatRoom::whereHas('members', fn($q) => $q->where('user_id', auth()->id()))
+            ->whereIn('type', ['direct', 'group', 'branch'])
+            ->with(['members.user:id,name'])
+            ->orderBy('name')
+            ->get();
+    }
+    
     public function getUnreadCountProperty()
     {
         $rooms = $this->rooms;
