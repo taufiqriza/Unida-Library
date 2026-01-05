@@ -7,7 +7,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Pengaturan</h1>
-                <p class="text-sm text-gray-500">Kelola staff dan persetujuan akun</p>
+                <p class="text-sm text-gray-500">Kelola staff, cabang, dan persetujuan akun</p>
             </div>
         </div>
         
@@ -17,26 +17,41 @@
             <i class="fas fa-plus"></i>
             <span>Tambah User</span>
         </button>
+        @elseif($mainTab === 'branches' && auth()->user()->role === 'super_admin')
+        <button wire:click="openBranchModal" 
+                class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/25 transition flex items-center gap-2">
+            <i class="fas fa-plus"></i>
+            <span>Tambah Cabang</span>
+        </button>
         @endif
     </div>
 
     {{-- Main Tabs --}}
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-1.5">
-        <div class="flex gap-1">
+        <div class="flex gap-1 flex-wrap">
             <button wire:click="setMainTab('staff')" 
-                    class="flex-1 px-5 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
                     {{ $mainTab === 'staff' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-users"></i>
-                <span>Manajemen Staff</span>
+                <span class="hidden sm:inline">Manajemen Staff</span>
+                <span class="sm:hidden">Staff</span>
                 <span class="px-2 py-0.5 {{ $mainTab === 'staff' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">
                     {{ $stats['staff']['total'] }}
                 </span>
             </button>
+            <button wire:click="setMainTab('branches')" 
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    {{ $mainTab === 'branches' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-building"></i>
+                <span class="hidden sm:inline">Cabang</span>
+                <span class="sm:hidden">Cabang</span>
+            </button>
             <button wire:click="setMainTab('approval')" 
-                    class="flex-1 px-5 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
                     {{ $mainTab === 'approval' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-check"></i>
-                <span>Persetujuan</span>
+                <span class="hidden sm:inline">Persetujuan</span>
+                <span class="sm:hidden">Approval</span>
                 @if($stats['approval']['pending'] > 0)
                 <span class="px-2.5 py-0.5 bg-red-500 text-white rounded-full text-xs animate-pulse">
                     {{ $stats['approval']['pending'] }}
@@ -44,10 +59,11 @@
                 @endif
             </button>
             <button wire:click="setMainTab('activity')" 
-                    class="flex-1 px-5 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
                     {{ $mainTab === 'activity' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-history"></i>
-                <span>Log Aktivitas</span>
+                <span class="hidden sm:inline">Log Aktivitas</span>
+                <span class="sm:hidden">Log</span>
             </button>
         </div>
     </div>
@@ -285,6 +301,131 @@
             <p class="text-sm text-gray-400 mt-1">Belum ada user yang sesuai filter</p>
         </div>
         @endif
+    </div>
+    @endif
+
+    {{-- Branches Tab --}}
+    @if($mainTab === 'branches')
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {{-- Search --}}
+        <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-slate-50">
+            <div class="relative max-w-md">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari cabang..." 
+                       class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+        </div>
+
+        {{-- Branch List --}}
+        <div class="divide-y divide-gray-100">
+            @forelse($this->branchesList as $branch)
+            <div class="p-4 hover:bg-gray-50 transition">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br {{ $branch->is_active ? 'from-emerald-500 to-teal-600' : 'from-gray-400 to-gray-500' }} flex items-center justify-center text-white shadow-lg">
+                            <i class="fas fa-building text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-semibold text-gray-900">{{ $branch->name }}</h3>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-mono">{{ $branch->code }}</span>
+                                @if(!$branch->is_active)
+                                <span class="px-2 py-0.5 bg-red-100 text-red-600 rounded text-xs">Nonaktif</span>
+                                @endif
+                            </div>
+                            <p class="text-sm text-gray-500 mt-0.5">{{ $branch->address ?: 'Alamat belum diisi' }}</p>
+                            <div class="flex items-center gap-4 mt-2 text-xs text-gray-400">
+                                <span><i class="fas fa-users mr-1"></i> {{ $branch->users_count }} staff</span>
+                                <span><i class="fas fa-book mr-1"></i> {{ number_format($branch->books_count) }} judul</span>
+                                <span><i class="fas fa-copy mr-1"></i> {{ number_format($branch->items_count) }} eksemplar</span>
+                                <span><i class="fas fa-id-card mr-1"></i> {{ number_format($branch->members_count) }} anggota</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        @if(auth()->user()->role === 'super_admin' || auth()->user()->branch_id === $branch->id)
+                        <button wire:click="openBranchModal({{ $branch->id }})" 
+                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </button>
+                        @endif
+                        @if(auth()->user()->role === 'super_admin')
+                        <button wire:click="toggleBranchStatus({{ $branch->id }})" 
+                                class="px-3 py-2 {{ $branch->is_active ? 'bg-red-50 hover:bg-red-100 text-red-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' }} rounded-lg text-sm font-medium transition">
+                            <i class="fas {{ $branch->is_active ? 'fa-ban' : 'fa-check' }} mr-1"></i>
+                            {{ $branch->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                        </button>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="p-12 text-center">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-building text-2xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-500 font-medium">Tidak ada cabang</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+    @endif
+
+    {{-- Branch Modal --}}
+    @if($showBranchModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" wire:click.self="$set('showBranchModal', false)">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+            <div class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
+                <h3 class="text-lg font-semibold">{{ $editingBranch ? 'Edit Cabang' : 'Tambah Cabang Baru' }}</h3>
+            </div>
+            <form wire:submit="saveBranch" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Cabang *</label>
+                    <input type="text" wire:model="branchForm.name" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="Perpustakaan Pusat">
+                    @error('branchForm.name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+                
+                @if(auth()->user()->role === 'super_admin')
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kode *</label>
+                    <input type="text" wire:model="branchForm.code" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 font-mono" placeholder="PUSAT">
+                    @error('branchForm.code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+                @endif
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                    <textarea wire:model="branchForm.address" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="Jl. Raya..."></textarea>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
+                        <input type="text" wire:model="branchForm.phone" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="0352-...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" wire:model="branchForm.email" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500" placeholder="perpus@...">
+                    </div>
+                </div>
+                
+                @if(auth()->user()->role === 'super_admin')
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" wire:model="branchForm.is_active" id="branchActive" class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                    <label for="branchActive" class="text-sm text-gray-700">Cabang Aktif</label>
+                </div>
+                @endif
+                
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" wire:click="$set('showBranchModal', false)" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-medium shadow-lg transition">
+                        {{ $editingBranch ? 'Simpan Perubahan' : 'Tambah Cabang' }}
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
     @endif
 

@@ -13,7 +13,7 @@ class StaffControl extends Component
 {
     use WithPagination;
 
-    public $mainTab = 'staff'; // 'staff', 'approval', or 'activity'
+    public $mainTab = 'staff'; // 'staff', 'approval', 'activity', 'branches'
     public $activeTab = 'all'; // for staff: all, super_admin, admin, librarian, staff
     public $search = '';
     public $selectedUser = null;
@@ -28,6 +28,18 @@ class StaffControl extends Component
         'password' => '',
         'branch_id' => '',
         'role' => 'staff',
+        'is_active' => true,
+    ];
+
+    // Branch Form
+    public $showBranchModal = false;
+    public $editingBranch = null;
+    public $branchForm = [
+        'name' => '',
+        'code' => '',
+        'address' => '',
+        'phone' => '',
+        'email' => '',
         'is_active' => true,
     ];
 
@@ -429,6 +441,123 @@ class StaffControl extends Component
         $this->activityDateStart = now()->subDays(7)->format('Y-m-d');
         $this->activityDateEnd = now()->format('Y-m-d');
         $this->search = '';
+    }
+
+    // Branch Methods
+    public function getBranchesListProperty()
+    {
+        $user = auth()->user();
+        $query = Branch::withCount(['users', 'books', 'items', 'members']);
+        
+        if ($user->role !== 'super_admin' && $user->branch_id) {
+            $query->where('id', $user->branch_id);
+        }
+        
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('name', 'like', "%{$this->search}%")
+                  ->orWhere('code', 'like', "%{$this->search}%");
+            });
+        }
+        
+        return $query->orderBy('name')->get();
+    }
+
+    public function openBranchModal($branchId = null)
+    {
+        $user = auth()->user();
+        
+        if ($branchId) {
+            $branch = Branch::find($branchId);
+            if (!$branch) return;
+            
+            // Admin cabang hanya bisa edit branch sendiri
+            if ($user->role !== 'super_admin' && $user->branch_id !== $branchId) {
+                return;
+            }
+            
+            $this->editingBranch = $branch;
+            $this->branchForm = [
+                'name' => $branch->name,
+                'code' => $branch->code,
+                'address' => $branch->address ?? '',
+                'phone' => $branch->phone ?? '',
+                'email' => $branch->email ?? '',
+                'is_active' => $branch->is_active,
+            ];
+        } else {
+            // Hanya super_admin yang bisa tambah branch baru
+            if ($user->role !== 'super_admin') return;
+            
+            $this->editingBranch = null;
+            $this->branchForm = [
+                'name' => '',
+                'code' => '',
+                'address' => '',
+                'phone' => '',
+                'email' => '',
+                'is_active' => true,
+            ];
+        }
+        
+        $this->showBranchModal = true;
+    }
+
+    public function saveBranch()
+    {
+        $user = auth()->user();
+        
+        $rules = [
+            'branchForm.name' => 'required|string|max:255',
+            'branchForm.address' => 'nullable|string',
+            'branchForm.phone' => 'nullable|string|max:50',
+            'branchForm.email' => 'nullable|email',
+        ];
+        
+        // Code hanya bisa diubah super_admin
+        if ($user->role === 'super_admin') {
+            $rules['branchForm.code'] = 'required|string|max:50|unique:branches,code,' . ($this->editingBranch?->id ?? 'NULL');
+        }
+        
+        $this->validate($rules);
+        
+        $data = [
+            'name' => $this->branchForm['name'],
+            'address' => $this->branchForm['address'] ?: null,
+            'phone' => $this->branchForm['phone'] ?: null,
+            'email' => $this->branchForm['email'] ?: null,
+        ];
+        
+        // Hanya super_admin yang bisa ubah code dan is_active
+        if ($user->role === 'super_admin') {
+            $data['code'] = $this->branchForm['code'];
+            $data['is_active'] = $this->branchForm['is_active'];
+        }
+        
+        if ($this->editingBranch) {
+            // Validasi akses edit
+            if ($user->role !== 'super_admin' && $user->branch_id !== $this->editingBranch->id) {
+                return;
+            }
+            $this->editingBranch->update($data);
+            session()->flash('success', 'Branch berhasil diupdate');
+        } else {
+            if ($user->role !== 'super_admin') return;
+            Branch::create($data);
+            session()->flash('success', 'Branch berhasil ditambahkan');
+        }
+        
+        $this->showBranchModal = false;
+    }
+
+    public function toggleBranchStatus($branchId)
+    {
+        if (auth()->user()->role !== 'super_admin') return;
+        
+        $branch = Branch::find($branchId);
+        if ($branch) {
+            $branch->update(['is_active' => !$branch->is_active]);
+        }
     }
 }
 
