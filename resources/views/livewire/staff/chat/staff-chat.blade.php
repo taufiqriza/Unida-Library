@@ -307,12 +307,16 @@
                         $isGroupChat = $activeRoom->isGroup();
                         $showSenderInfo = ($isGroupChat || $isSupportChat) && !$isOwnMessage && !$isMemberMessage;
                     @endphp
-                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} items-end gap-1 group"
-                         x-data="{ showActions: false }" @mouseenter="showActions = true" @mouseleave="showActions = false">
+                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} items-center gap-1"
+                         x-data="{ showActions: false }" 
+                         @mouseenter="showActions = true" 
+                         @mouseleave="showActions = false"
+                         @click="showActions = !showActions"
+                         @click.away="showActions = false">
                         
                         {{-- Sender Avatar (for groups/support, not own message) --}}
                         @if($showSenderInfo)
-                        <div class="flex-shrink-0 mb-1">
+                        <div class="flex-shrink-0 self-end mb-5">
                             @if(isset($msg['sender']['photo']) && $msg['sender']['photo'])
                                 <img src="{{ asset('storage/' . $msg['sender']['photo']) }}" 
                                      class="w-7 h-7 rounded-full object-cover" 
@@ -339,12 +343,12 @@
 
                         {{-- Action buttons for own message --}}
                         @if($isOwnMessage)
-                        <div class="flex items-center mb-1" x-show="showActions" x-transition.opacity>
-                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
-                                <i class="fas fa-reply text-gray-400 text-[10px]"></i>
+                        <div class="flex items-center" x-show="showActions" x-transition.opacity x-cloak>
+                            <button wire:click.stop="replyToMessage({{ $msg['id'] }})" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
+                                <i class="fas fa-reply text-gray-400 text-xs"></i>
                             </button>
-                            <button @click="$dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-6 h-6 flex items-center justify-center hover:bg-red-50 rounded-full" title="Hapus">
-                                <i class="fas fa-trash text-gray-400 text-[10px]"></i>
+                            <button @click.stop="$dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-7 h-7 flex items-center justify-center hover:bg-red-50 rounded-full" title="Hapus">
+                                <i class="fas fa-trash text-gray-400 text-xs"></i>
                             </button>
                         </div>
                         @endif
@@ -490,9 +494,9 @@
 
                         {{-- Reply button for others' messages --}}
                         @if(!$isOwnMessage)
-                        <div class="flex items-center mb-1" x-show="showActions" x-transition.opacity>
-                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
-                                <i class="fas fa-reply text-gray-400 text-[10px]"></i>
+                        <div class="flex items-center" x-show="showActions" x-transition.opacity x-cloak>
+                            <button wire:click.stop="replyToMessage({{ $msg['id'] }})" class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
+                                <i class="fas fa-reply text-gray-400 text-xs"></i>
                             </button>
                         </div>
                         @endif
