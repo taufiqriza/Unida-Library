@@ -296,14 +296,14 @@
                         </div>
                         @endif
 
-                        {{-- Action buttons (appears on hover, before message for own) --}}
+                        {{-- Action buttons for own message (left side) --}}
                         @if($isOwnMessage)
-                        <div class="self-center opacity-0 group-hover:opacity-100 transition flex items-center gap-0.5">
-                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
-                                <i class="fas fa-reply text-gray-400 text-xs"></i>
+                        <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition">
+                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1 hover:bg-gray-100 rounded" title="Reply">
+                                <i class="fas fa-reply text-gray-400 text-[10px]"></i>
                             </button>
-                            <button wire:click="deleteMessage({{ $msg['id'] }})" wire:confirm="Hapus pesan ini?" class="p-1.5 hover:bg-red-50 rounded-full" title="Hapus">
-                                <i class="fas fa-trash text-gray-400 hover:text-red-500 text-xs"></i>
+                            <button wire:click="deleteMessage({{ $msg['id'] }})" wire:confirm="Hapus pesan ini?" class="p-1 hover:bg-red-50 rounded" title="Hapus">
+                                <i class="fas fa-trash text-gray-400 hover:text-red-500 text-[10px]"></i>
                             </button>
                         </div>
                         @endif
@@ -449,9 +449,11 @@
 
                         {{-- Reply button for others' messages --}}
                         @if(!$isOwnMessage)
-                        <button wire:click="replyToMessage({{ $msg['id'] }})" class="self-center opacity-0 group-hover:opacity-100 transition p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
-                            <i class="fas fa-reply text-gray-400 text-xs"></i>
-                        </button>
+                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition">
+                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1 hover:bg-gray-100 rounded" title="Reply">
+                                <i class="fas fa-reply text-gray-400 text-[10px]"></i>
+                            </button>
+                        </div>
                         @endif
                     </div>
                 @endif
@@ -1311,29 +1313,36 @@
                 setTimeout(scroll, 300);
             });
             
-            // Auto scroll on any update to chat messages
-            let lastMessageCount = 0;
-            const observer = new MutationObserver(() => {
-                const el = document.getElementById('chatMessages');
-                if (el) {
+            // Track message count for new message detection
+            let lastMessageId = 0;
+            
+            // Only scroll to bottom when NEW message arrives (not on every poll)
+            Livewire.hook('morph.updated', ({ el }) => {
+                if (el.id === 'chatMessages') {
                     const messageEls = el.querySelectorAll('[data-message-id]');
-                    if (messageEls.length > lastMessageCount) {
-                        el.scrollTop = el.scrollHeight;
+                    if (messageEls.length > 0) {
+                        const newestId = parseInt(messageEls[messageEls.length - 1].dataset.messageId);
+                        if (newestId > lastMessageId) {
+                            // New message arrived, scroll to bottom
+                            el.scrollTop = el.scrollHeight;
+                            lastMessageId = newestId;
+                        }
                     }
-                    lastMessageCount = messageEls.length;
                 }
             });
             
-            // Start observing when chat opens
+            // Initialize lastMessageId when chat opens
             setInterval(() => {
                 const chatEl = document.getElementById('chatMessages');
-                if (chatEl && !chatEl.dataset.observed) {
-                    chatEl.dataset.observed = 'true';
-                    observer.observe(chatEl, { childList: true, subtree: true });
+                if (chatEl && !chatEl.dataset.initialized) {
+                    chatEl.dataset.initialized = 'true';
+                    const messageEls = chatEl.querySelectorAll('[data-message-id]');
+                    if (messageEls.length > 0) {
+                        lastMessageId = parseInt(messageEls[messageEls.length - 1].dataset.messageId);
+                    }
                     chatEl.scrollTop = chatEl.scrollHeight;
-                    lastMessageCount = chatEl.querySelectorAll('[data-message-id]').length;
                 }
-            }, 500);
+            }, 300);
             
             // Paste image from clipboard
             document.addEventListener('paste', (e) => {
