@@ -235,7 +235,14 @@
         <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-slate-50 to-white chat-messages" id="chatMessages">
             @forelse($messages as $msg)
                 <div wire:key="msg-{{ $msg['id'] }}" data-message-id="{{ $msg['id'] }}">
-                @if($msg['type'] === 'system')
+                @if($msg['is_deleted'] ?? false)
+                    {{-- Deleted Message --}}
+                    <div class="flex {{ ($msg['sender_id'] === auth()->id()) ? 'justify-end' : 'justify-start' }}">
+                        <div class="px-4 py-2 bg-gray-100 rounded-2xl border border-dashed border-gray-300">
+                            <p class="text-sm text-gray-400 italic"><i class="fas fa-ban mr-1"></i> Pesan telah dihapus</p>
+                        </div>
+                    </div>
+                @elseif($msg['type'] === 'system')
                     {{-- System Message --}}
                     <div class="flex justify-center">
                         <span class="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
@@ -289,11 +296,16 @@
                         </div>
                         @endif
 
-                        {{-- Reply button (appears on hover, before message for own, after for others) --}}
+                        {{-- Action buttons (appears on hover, before message for own) --}}
                         @if($isOwnMessage)
-                        <button wire:click="replyToMessage({{ $msg['id'] }})" class="self-center opacity-0 group-hover:opacity-100 transition p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
-                            <i class="fas fa-reply text-gray-400 text-xs"></i>
-                        </button>
+                        <div class="self-center opacity-0 group-hover:opacity-100 transition flex items-center gap-0.5">
+                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1.5 hover:bg-gray-100 rounded-full" title="Reply">
+                                <i class="fas fa-reply text-gray-400 text-xs"></i>
+                            </button>
+                            <button wire:click="deleteMessage({{ $msg['id'] }})" wire:confirm="Hapus pesan ini?" class="p-1.5 hover:bg-red-50 rounded-full" title="Hapus">
+                                <i class="fas fa-trash text-gray-400 hover:text-red-500 text-xs"></i>
+                            </button>
+                        </div>
                         @endif
 
                         <div class="max-w-[75%]">

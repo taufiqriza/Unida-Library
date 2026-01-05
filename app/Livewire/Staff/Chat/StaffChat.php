@@ -209,8 +209,7 @@ class StaffChat extends Component
 
         // Get latest 50 messages (ordered by newest first, then reverse for display)
         $this->messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
-            ->where('is_deleted', false)
-            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'created_at'])
+            ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',
                 'sender.branch:id,name',
@@ -382,6 +381,19 @@ class StaffChat extends Component
     public function cancelReply()
     {
         $this->replyTo = null;
+    }
+
+    public function deleteMessage($messageId)
+    {
+        $message = ChatMessage::where('id', $messageId)
+            ->where('chat_room_id', $this->activeRoomId)
+            ->where('sender_id', auth()->id())
+            ->first();
+
+        if ($message) {
+            $message->update(['is_deleted' => true, 'message' => null]);
+            $this->loadMessages();
+        }
     }
 
     public function removeAttachment()
@@ -795,9 +807,18 @@ class StaffChat extends Component
     public function refreshMessages()
     {
         if ($this->activeRoomId && $this->activeView === 'chat') {
+            $oldCount = count($this->messages);
             $this->loadMessages();
             $this->loadTypingUsers();
             $this->updateOnlineStatus();
+            
+            // Play sound if new message from others
+            if (count($this->messages) > $oldCount && $this->soundEnabled) {
+                $lastMsg = end($this->messages);
+                if ($lastMsg && ($lastMsg['sender_id'] ?? null) !== auth()->id()) {
+                    $this->dispatch('playNewMessageSound');
+                }
+            }
         }
     }
 
