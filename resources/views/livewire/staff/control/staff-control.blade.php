@@ -45,6 +45,9 @@
                 <i class="fas fa-building"></i>
                 <span class="hidden sm:inline">Cabang</span>
                 <span class="sm:hidden">Cabang</span>
+                <span class="px-2 py-0.5 {{ $mainTab === 'branches' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">
+                    {{ $this->branchesCount }}
+                </span>
             </button>
             <button wire:click="setMainTab('approval')" 
                     class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
@@ -343,23 +346,32 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        @if(auth()->user()->role === 'super_admin' || auth()->user()->branch_id === $branch->id)
-                        <button wire:click="openBranchModal({{ $branch->id }}, false)" 
-                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
-                            <i class="fas fa-edit mr-1"></i> Edit
-                        </button>
-                        @else
-                        <button wire:click="openBranchModal({{ $branch->id }}, true)" 
-                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
-                            <i class="fas fa-eye mr-1"></i> Lihat
-                        </button>
-                        @endif
                         @if(auth()->user()->role === 'super_admin')
-                        <button wire:click="toggleBranchStatus({{ $branch->id }})" 
-                                class="px-3 py-2 {{ $branch->is_active ? 'bg-red-50 hover:bg-red-100 text-red-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' }} rounded-lg text-sm font-medium transition">
-                            <i class="fas {{ $branch->is_active ? 'fa-ban' : 'fa-check' }} mr-1"></i>
-                            {{ $branch->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                        </button>
+                            {{-- Super Admin: bisa edit semua --}}
+                            <button wire:click="openBranchModal({{ $branch->id }}, false)" 
+                                    class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                            <button wire:click="toggleBranchStatus({{ $branch->id }})" 
+                                    class="px-3 py-2 {{ $branch->is_active ? 'bg-red-50 hover:bg-red-100 text-red-600' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' }} rounded-lg text-sm font-medium transition">
+                                <i class="fas {{ $branch->is_active ? 'fa-ban' : 'fa-check' }} mr-1"></i>
+                                {{ $branch->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                            </button>
+                        @elseif(auth()->user()->branch_id === $branch->id)
+                            {{-- Admin cabang: hanya bisa edit branch sendiri --}}
+                            <button wire:click="openBranchModal({{ $branch->id }}, false)" 
+                                    class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                            <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-medium">
+                                <i class="fas fa-check-circle mr-1"></i> Cabang Anda
+                            </span>
+                        @else
+                            {{-- Admin cabang lain: hanya bisa view --}}
+                            <button wire:click="openBranchModal({{ $branch->id }}, true)" 
+                                    class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
+                                <i class="fas fa-eye mr-1"></i> Lihat
+                            </button>
                         @endif
                     </div>
                 </div>

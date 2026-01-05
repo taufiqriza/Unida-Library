@@ -447,6 +447,7 @@ class StaffControl extends Component
     // Branch Methods
     public function getBranchesListProperty()
     {
+        $user = auth()->user();
         $query = Branch::withCount(['users', 'books', 'items', 'members']);
         
         if ($this->search) {
@@ -456,7 +457,17 @@ class StaffControl extends Component
             });
         }
         
+        // Non super_admin: branch sendiri di atas
+        if ($user->role !== 'super_admin' && $user->branch_id) {
+            $query->orderByRaw('CASE WHEN id = ? THEN 0 ELSE 1 END', [$user->branch_id]);
+        }
+        
         return $query->orderBy('name')->get();
+    }
+    
+    public function getBranchesCountProperty()
+    {
+        return Branch::count();
     }
 
     public function openBranchModal($branchId = null, $viewOnly = false)
