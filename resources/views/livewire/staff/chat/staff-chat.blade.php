@@ -892,7 +892,7 @@
                      }">
                     <textarea wire:model="message" 
                               id="chatMessageInput"
-                              placeholder="Ketik pesan... (@ untuk mention)" 
+                              placeholder="Ketik pesan..." 
                               rows="1"
                               class="w-full px-4 py-2.5 bg-gray-100 border-0 rounded-xl text-sm resize-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition"
                               @input="checkMention($event); clearTimeout(typingTimeout); $wire.startTyping(); typingTimeout = setTimeout(() => $wire.stopTyping(), 3000)"
