@@ -421,23 +421,23 @@
                                 <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
                             <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
-                                 class="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                 class="absolute right-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
                                     <span>👍</span> <span class="text-gray-700">Suka</span>
                                 </button>
-                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-reply text-gray-400 w-4"></i> <span class="text-gray-700">Balas</span>
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
-                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-share text-gray-400 w-4"></i> <span class="text-gray-700">Teruskan</span>
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-share text-gray-400 w-3"></i> <span class="text-gray-700">Teruskan</span>
                                 </button>
-                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-4"></i> 
-                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}</span>
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-3"></i> 
+                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas' : 'Pin' }}</span>
                                 </button>
                                 <hr class="my-1">
-                                <button @click.stop="menuOpen = false; $dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-full px-3 py-2 text-left text-sm hover:bg-red-50 flex items-center gap-2 text-red-600">
-                                    <i class="fas fa-trash w-4"></i> <span>Hapus</span>
+                                <button @click.stop="menuOpen = false; $dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-full px-3 py-1.5 text-left text-xs hover:bg-red-50 flex items-center gap-2 text-red-600">
+                                    <i class="fas fa-trash w-3"></i> <span>Hapus</span>
                                 </button>
                             </div>
                         </div>
@@ -636,19 +636,19 @@
                                 <i class="fas fa-ellipsis-v text-gray-400 text-xs"></i>
                             </button>
                             <div x-show="menuOpen" @click.away="menuOpen = false" x-transition
-                                 class="absolute left-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
-                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
+                                 class="absolute left-0 bottom-full mb-1 w-32 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+                                <button wire:click.stop="toggleReaction({{ $msg['id'] }}, '👍')" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
                                     <span>👍</span> <span class="text-gray-700">Suka</span>
                                 </button>
-                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-reply text-gray-400 w-4"></i> <span class="text-gray-700">Balas</span>
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
-                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-share text-gray-400 w-4"></i> <span class="text-gray-700">Teruskan</span>
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-share text-gray-400 w-3"></i> <span class="text-gray-700">Teruskan</span>
                                 </button>
-                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2">
-                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-4"></i> 
-                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas Pin' : 'Pin' }}</span>
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-3"></i> 
+                                    <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas' : 'Pin' }}</span>
                                 </button>
                             </div>
                         </div>
