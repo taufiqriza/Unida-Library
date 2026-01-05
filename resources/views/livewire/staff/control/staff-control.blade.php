@@ -348,6 +348,10 @@
                                 class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition">
                             <i class="fas fa-edit mr-1"></i> Edit
                         </button>
+                        @else
+                        <span class="px-3 py-2 text-gray-400 text-sm">
+                            <i class="fas fa-eye mr-1"></i> Lihat saja
+                        </span>
                         @endif
                         @if(auth()->user()->role === 'super_admin')
                         <button wire:click="toggleBranchStatus({{ $branch->id }})" 
@@ -372,8 +376,9 @@
     @endif
 
     {{-- Branch Modal --}}
+    @teleport('body')
     @if($showBranchModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" wire:click.self="$set('showBranchModal', false)">
+    <div class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50" wire:click.self="$set('showBranchModal', false)">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
             <div class="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
                 <h3 class="text-lg font-semibold">{{ $editingBranch ? 'Edit Cabang' : 'Tambah Cabang Baru' }}</h3>
@@ -428,6 +433,7 @@
         </div>
     </div>
     @endif
+    @endteleport
 
     {{-- Activity Log Tab --}}
     @if($mainTab === 'activity')

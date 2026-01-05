@@ -452,6 +452,9 @@ class StaffControl extends Component
         if ($user->role !== 'super_admin' && $user->branch_id) {
             $query->where('id', $user->branch_id);
         }
+    public function getBranchesListProperty()
+    {
+        $query = Branch::withCount(['users', 'books', 'items', 'members']);
         
         if ($this->search) {
             $query->where(function($q) {
@@ -471,7 +474,7 @@ class StaffControl extends Component
             $branch = Branch::find($branchId);
             if (!$branch) return;
             
-            // Admin cabang hanya bisa edit branch sendiri
+            // Non super_admin hanya bisa edit branch sendiri
             if ($user->role !== 'super_admin' && $user->branch_id !== $branchId) {
                 return;
             }
