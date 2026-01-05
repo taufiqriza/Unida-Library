@@ -97,9 +97,36 @@
                                             @endif
                                         </label>
                                         @if($canEditNim)
-                                            <input type="text" wire:model="nim" class="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm font-medium focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-50 transition disabled:opacity-60 disabled:cursor-not-allowed" :disabled="!editMode" :class="editMode ? 'bg-white border-primary-300' : ''" placeholder="Masukkan NIM yang benar">
+                                            <input type="text" wire:model.live.debounce.500ms="nim" class="w-full px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm font-medium focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-50 transition disabled:opacity-60 disabled:cursor-not-allowed" :disabled="!editMode" :class="editMode ? 'bg-white border-primary-300' : ''" placeholder="Masukkan NIM yang benar">
                                             @error('nim') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                                            <p class="text-[10px] text-amber-600 mt-1"><i class="fas fa-info-circle mr-1"></i> NIM Anda masih otomatis ({{ $nim }}). Masukkan NIM sesuai data SIAKAD untuk menautkan data akademik Anda.</p>
+                                            
+                                            {{-- Auto-detect info --}}
+                                            @if($showDetectedInfo && $detectedMember)
+                                                <div class="mt-2 p-3 bg-green-50 border border-green-200 rounded-xl">
+                                                    <div class="flex items-start gap-2">
+                                                        <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
+                                                        <div class="flex-1">
+                                                            <p class="text-sm font-semibold text-green-800">Data SIAKAD Ditemukan!</p>
+                                                            <div class="mt-1 text-xs text-green-700 space-y-0.5">
+                                                                <p><span class="font-medium">Nama:</span> {{ $detectedMember['name'] }}</p>
+                                                                <p><span class="font-medium">NIM:</span> {{ $detectedMember['nim'] }}</p>
+                                                                @if($detectedMember['faculty'])
+                                                                    <p><span class="font-medium">Fakultas:</span> {{ $detectedMember['faculty'] }}</p>
+                                                                @endif
+                                                                @if($detectedMember['department'])
+                                                                    <p><span class="font-medium">Prodi:</span> {{ $detectedMember['department'] }}</p>
+                                                                @endif
+                                                            </div>
+                                                            <p class="mt-2 text-[10px] text-green-600">
+                                                                <i class="fas fa-info-circle mr-1"></i>
+                                                                Klik "Simpan" untuk menautkan akun Anda dengan data SIAKAD ini.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <p class="text-[10px] text-amber-600 mt-1"><i class="fas fa-info-circle mr-1"></i> NIM Anda masih otomatis. Masukkan NIM sesuai data SIAKAD untuk menautkan data akademik Anda.</p>
+                                            @endif
                                         @else
                                             <input type="text" value="{{ $nim }}" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-500 cursor-not-allowed" disabled>
                                             <p class="text-[10px] text-gray-400 mt-1"><i class="fas fa-check-circle mr-1 text-green-500"></i> NIM sudah sesuai dan tidak dapat diubah.</p>

@@ -4,6 +4,7 @@ namespace App\Livewire\Opac\Member;
 
 use App\Models\Branch;
 use App\Models\Faculty;
+use App\Models\Member;
 use App\Models\MemberType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +22,10 @@ class Settings extends Component
     public string $nim = '';
     public bool $canEditNim = false;
     public $photo;
+    
+    // Auto-detect SIAKAD
+    public ?array $detectedMember = null;
+    public bool $showDetectedInfo = false;
     
     public $branches;
     public $faculties;
@@ -40,6 +45,36 @@ class Settings extends Component
         $this->branches = Branch::where('is_active', true)->orderBy('name')->get();
         $this->faculties = Faculty::orderBy('name')->get();
         $this->memberTypes = MemberType::orderBy('name')->distinct()->get(['id', 'name']);
+    }
+
+    public function updatedNim($value)
+    {
+        $this->detectSiakadMember($value);
+    }
+
+    protected function detectSiakadMember(string $nim): void
+    {
+        $this->detectedMember = null;
+        $this->showDetectedInfo = false;
+        
+        if (strlen($nim) < 5) return;
+        
+        // Find existing member with this NIM
+        $existing = Member::where('member_id', $nim)
+            ->where('id', '!=', $this->member->id)
+            ->first();
+        
+        if ($existing) {
+            $this->detectedMember = [
+                'id' => $existing->id,
+                'name' => $existing->name,
+                'nim' => $existing->member_id,
+                'faculty' => $existing->faculty?->name,
+                'department' => $existing->department?->name,
+                'type' => $existing->memberType?->name,
+            ];
+            $this->showDetectedInfo = true;
+        }
     }
 
     protected function rules()
