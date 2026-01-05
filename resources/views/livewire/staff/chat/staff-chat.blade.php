@@ -1,4 +1,42 @@
-<div wire:poll.5s="refreshMessages" class="staff-chat-widget" x-data="{ sending: false }">
+<div wire:poll.5s="refreshMessages" class="staff-chat-widget" 
+     x-data="{ 
+        sending: false, 
+        deleteId: null,
+        showDeleteModal: false 
+     }"
+     @confirm-delete.window="deleteId = $event.detail.id; showDeleteModal = true">
+    
+    {{-- Delete Confirmation Modal --}}
+    <div x-show="showDeleteModal" x-cloak
+         class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-80 mx-4" @click.away="showDeleteModal = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+            <div class="text-center">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-trash text-red-500 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Hapus Pesan?</h3>
+                <p class="text-sm text-gray-500 mb-6">Pesan yang dihapus tidak dapat dikembalikan.</p>
+                <div class="flex gap-3">
+                    <button @click="showDeleteModal = false" class="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition">
+                        Batal
+                    </button>
+                    <button @click="$wire.deleteMessage(deleteId); showDeleteModal = false" class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Floating Button - raised on mobile to avoid bottom nav --}}
     <button wire:click="toggle" 
             class="fixed bottom-24 lg:bottom-6 right-4 lg:right-6 w-14 h-14 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 z-[9998]"
@@ -268,13 +306,15 @@
                         $isGroupChat = $activeRoom->isGroup();
                         $showSenderInfo = ($isGroupChat || $isSupportChat) && !$isOwnMessage && !$isMemberMessage;
                     @endphp
-                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} gap-2 group">
+                    <div class="flex {{ ($isOwnMessage || ($isSupportChat && !$isMemberMessage)) ? 'justify-end' : 'justify-start' }} items-end gap-1 group"
+                         x-data="{ showActions: false }" @mouseenter="showActions = true" @mouseleave="showActions = false">
+                        
                         {{-- Sender Avatar (for groups/support, not own message) --}}
                         @if($showSenderInfo)
-                        <div class="flex-shrink-0 mt-4">
+                        <div class="flex-shrink-0 mb-1">
                             @if(isset($msg['sender']['photo']) && $msg['sender']['photo'])
                                 <img src="{{ asset('storage/' . $msg['sender']['photo']) }}" 
-                                     class="w-8 h-8 rounded-full object-cover" 
+                                     class="w-7 h-7 rounded-full object-cover" 
                                      alt="{{ $msg['sender']['name'] ?? '' }}">
                             @else
                                 @php
@@ -288,7 +328,7 @@
                                     $colorIndex = ($msg['sender']['id'] ?? 0) % count($colors);
                                     $bgColor = $colors[$colorIndex];
                                 @endphp
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" 
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" 
                                      style="background: linear-gradient(135deg, #{{ $bgColor }} 0%, #{{ $bgColor }}cc 100%);">
                                     {{ $initials }}
                                 </div>
@@ -296,19 +336,19 @@
                         </div>
                         @endif
 
-                        {{-- Action buttons for own message (left side) --}}
+                        {{-- Action buttons for own message --}}
                         @if($isOwnMessage)
-                        <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition">
-                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1 hover:bg-gray-100 rounded" title="Reply">
+                        <div class="flex items-center mb-1" x-show="showActions" x-transition.opacity>
+                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
                                 <i class="fas fa-reply text-gray-400 text-[10px]"></i>
                             </button>
-                            <button wire:click="deleteMessage({{ $msg['id'] }})" wire:confirm="Hapus pesan ini?" class="p-1 hover:bg-red-50 rounded" title="Hapus">
-                                <i class="fas fa-trash text-gray-400 hover:text-red-500 text-[10px]"></i>
+                            <button @click="$dispatch('confirm-delete', { id: {{ $msg['id'] }} })" class="w-6 h-6 flex items-center justify-center hover:bg-red-50 rounded-full" title="Hapus">
+                                <i class="fas fa-trash text-gray-400 text-[10px]"></i>
                             </button>
                         </div>
                         @endif
 
-                        <div class="max-w-[75%]">
+                        <div class="max-w-[70%]">
                             {{-- Reply reference --}}
                             @if(isset($msg['reply_to']) && $msg['reply_to'])
                             <div class="mb-1 px-2 py-1 bg-gray-100 border-l-2 border-blue-400 rounded text-xs text-gray-600 cursor-pointer hover:bg-gray-200" onclick="document.querySelector('[data-message-id=\'{{ $msg['reply_to']['id'] }}\']')?.scrollIntoView({behavior:'smooth',block:'center'})">
@@ -449,8 +489,8 @@
 
                         {{-- Reply button for others' messages --}}
                         @if(!$isOwnMessage)
-                        <div class="flex items-center opacity-0 group-hover:opacity-100 transition">
-                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="p-1 hover:bg-gray-100 rounded" title="Reply">
+                        <div class="flex items-center mb-1" x-show="showActions" x-transition.opacity>
+                            <button wire:click="replyToMessage({{ $msg['id'] }})" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full" title="Reply">
                                 <i class="fas fa-reply text-gray-400 text-[10px]"></i>
                             </button>
                         </div>
@@ -1302,47 +1342,51 @@
         }
         
         document.addEventListener('livewire:initialized', () => {
+            // Track for new message detection
+            let lastMessageId = 0;
+            let isInitialized = false;
+            
             Livewire.on('scrollToBottom', () => {
-                // Scroll with multiple attempts to ensure it works after DOM render
-                const scroll = () => {
+                setTimeout(() => {
                     const el = document.getElementById('chatMessages');
                     if (el) el.scrollTop = el.scrollHeight;
-                };
-                setTimeout(scroll, 50);
-                setTimeout(scroll, 150);
-                setTimeout(scroll, 300);
+                }, 100);
             });
             
-            // Track message count for new message detection
-            let lastMessageId = 0;
-            
-            // Only scroll to bottom when NEW message arrives (not on every poll)
-            Livewire.hook('morph.updated', ({ el }) => {
-                if (el.id === 'chatMessages') {
-                    const messageEls = el.querySelectorAll('[data-message-id]');
-                    if (messageEls.length > 0) {
-                        const newestId = parseInt(messageEls[messageEls.length - 1].dataset.messageId);
-                        if (newestId > lastMessageId) {
-                            // New message arrived, scroll to bottom
-                            el.scrollTop = el.scrollHeight;
-                            lastMessageId = newestId;
-                        }
-                    }
-                }
-            });
-            
-            // Initialize lastMessageId when chat opens
-            setInterval(() => {
+            // Initialize when chat opens - scroll to bottom once
+            const initChat = () => {
                 const chatEl = document.getElementById('chatMessages');
-                if (chatEl && !chatEl.dataset.initialized) {
-                    chatEl.dataset.initialized = 'true';
+                if (chatEl && !isInitialized) {
+                    isInitialized = true;
                     const messageEls = chatEl.querySelectorAll('[data-message-id]');
                     if (messageEls.length > 0) {
-                        lastMessageId = parseInt(messageEls[messageEls.length - 1].dataset.messageId);
+                        lastMessageId = parseInt(messageEls[messageEls.length - 1].dataset.messageId) || 0;
                     }
                     chatEl.scrollTop = chatEl.scrollHeight;
                 }
-            }, 300);
+                if (!chatEl) {
+                    isInitialized = false; // Reset when chat closes
+                }
+            };
+            
+            setInterval(initChat, 300);
+            
+            // Only scroll on NEW messages (higher ID than before)
+            Livewire.hook('message.processed', () => {
+                setTimeout(() => {
+                    const chatEl = document.getElementById('chatMessages');
+                    if (!chatEl) return;
+                    
+                    const messageEls = chatEl.querySelectorAll('[data-message-id]');
+                    if (messageEls.length > 0) {
+                        const newestId = parseInt(messageEls[messageEls.length - 1].dataset.messageId) || 0;
+                        if (newestId > lastMessageId && lastMessageId > 0) {
+                            chatEl.scrollTop = chatEl.scrollHeight;
+                        }
+                        lastMessageId = newestId;
+                    }
+                }, 100);
+            });
             
             // Paste image from clipboard
             document.addEventListener('paste', (e) => {
