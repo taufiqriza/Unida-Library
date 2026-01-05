@@ -284,23 +284,14 @@ class PlagiarismCheck extends Model
     public static function generateCertificateNumber(): string
     {
         $prefix = 'PLAG';
-        $year = date('Y');
-        $month = date('m');
+        $yearMonth = date('Ym');
         
-        // Get last number this month
-        $lastCheck = static::whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
-            ->whereNotNull('certificate_number')
-            ->orderByDesc('id')
-            ->first();
+        // Get highest certificate number this month
+        $lastNumber = static::where('certificate_number', 'like', "PLAG-{$yearMonth}-%")
+            ->selectRaw('MAX(CAST(SUBSTRING(certificate_number, -5) AS UNSIGNED)) as max_num')
+            ->value('max_num') ?? 0;
 
-        if ($lastCheck && preg_match('/(\d{5})$/', $lastCheck->certificate_number, $matches)) {
-            $nextNumber = (int)$matches[1] + 1;
-        } else {
-            $nextNumber = 1;
-        }
-
-        return sprintf('%s-%s%s-%05d', $prefix, $year, $month, $nextNumber);
+        return sprintf('%s-%s-%05d', $prefix, $yearMonth, $lastNumber + 1);
     }
 
     // ========== File Helpers ==========
