@@ -77,7 +77,7 @@ class ElearningDashboard extends Component
         }
         
         // Staff sees their branch courses only (read-only)
-        return Course::where('branch_id', $user->branch_id)->pluck('id');
+        return Course::where(fn($q) => $q->where('branch_id', $user->branch_id)->orWhereNull('branch_id'))->pluck('id');
     }
 
     public function isSuperAdmin(): bool

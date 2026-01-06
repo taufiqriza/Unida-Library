@@ -201,9 +201,14 @@
             
             {{-- Content --}}
             <div class="p-4">
-                @if($course->category)
-                <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{{ $course->category->name }}</span>
-                @endif
+                <div class="flex items-center gap-2 flex-wrap">
+                    @if($course->category)
+                    <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{{ $course->category->name }}</span>
+                    @endif
+                    <span class="text-xs font-medium {{ $course->branch_id ? 'text-blue-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-2 py-0.5 rounded">
+                        {{ $course->branch?->name ?? 'Global' }}
+                    </span>
+                </div>
                 <h3 class="font-bold text-gray-900 mt-2 line-clamp-2 group-hover:text-violet-600 transition">{{ $course->title }}</h3>
                 <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $course->description }}</p>
                 
@@ -225,7 +230,7 @@
                 
                 {{-- Instructor --}}
                 <div class="flex items-center gap-2 mt-3">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=24&background=random" class="w-6 h-6 rounded-full">
+                    <img src="{{ $course->instructor->getAvatarUrl(24) }}" class="w-6 h-6 rounded-full object-cover">
                     <span class="text-xs text-gray-600">{{ $course->instructor->name }}</span>
                 </div>
             </div>
