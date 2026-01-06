@@ -215,67 +215,73 @@
                         </div>
                     </div>
 
-                    {{-- CTA Buttons Grid - 3 columns --}}
-                    <div class="grid grid-cols-3 gap-2 lg:gap-3">
-                        {{-- Cek Plagiasi CTA --}}
-                        @if($member->canAccessPlagiarism())
-                        <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
-                            <div class="flex items-center gap-2">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-search-plus"></i>
-                                </div>
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-xs">Cek Plagiasi</h3>
-                                    <p class="text-teal-200 text-[9px]">Kuota 5x</p>
-                                </div>
-                            </div>
-                        </a>
-                        @else
-                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl p-3 text-white shadow-md relative">
-                            <div class="absolute top-1 right-1 px-1 py-0.5 bg-amber-500 text-[7px] font-bold rounded">TERBATAS</div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-xs">Cek Plagiasi</h3>
-                                    <p class="text-gray-200 text-[9px]">Civitas</p>
-                                </div>
-                            </div>
+                    {{-- Premium CTA Card --}}
+                    <div class="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur rounded-2xl p-4 border border-white/10 shadow-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-bolt text-amber-400 text-xs"></i>
+                            <span class="text-white/80 text-xs font-medium">Layanan Utama</span>
                         </div>
-                        @endif
-
-                        {{-- Upload TA CTA --}}
-                        <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
-                            <div class="flex items-center gap-2">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-upload"></i>
+                        <div class="grid grid-cols-3 gap-2">
+                            {{-- Cek Plagiasi CTA --}}
+                            @if($member->canAccessPlagiarism())
+                            <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-search-plus text-sm"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Cek Plagiasi</h3>
+                                        <p class="text-teal-200 text-[9px]">Kuota 5x</p>
+                                    </div>
                                 </div>
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-xs">Upload TA</h3>
-                                    <p class="text-violet-200 text-[9px]">Skripsi/Tesis</p>
+                            </a>
+                            @else
+                            <div class="block bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl p-2.5 text-white shadow-md relative">
+                                <div class="absolute top-1 right-1 px-1 py-0.5 bg-amber-500 text-[7px] font-bold rounded">TERBATAS</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-lock text-sm"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Cek Plagiasi</h3>
+                                        <p class="text-gray-300 text-[9px]">Civitas</p>
+                                    </div>
                                 </div>
                             </div>
-                        </a>
-
-                        {{-- Kelas Saya CTA --}}
-                        @php
-                            $myCoursesCount = \App\Models\CourseEnrollment::where('member_id', $member->id)->whereIn('status', ['approved', 'completed'])->count();
-                        @endphp
-                        <a href="{{ route('opac.member.courses') }}" class="block bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all relative">
-                            @if($myCoursesCount > 0)
-                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-white text-blue-600 text-[8px] font-bold rounded">{{ $myCoursesCount }}</div>
                             @endif
-                            <div class="flex items-center gap-2">
-                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-graduation-cap"></i>
+
+                            {{-- Upload TA CTA --}}
+                            <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-upload text-sm"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Upload TA</h3>
+                                        <p class="text-violet-200 text-[9px]">Skripsi/Tesis</p>
+                                    </div>
                                 </div>
-                                <div class="min-w-0">
-                                    <h3 class="font-bold text-xs">Kelas Saya</h3>
-                                    <p class="text-blue-200 text-[9px]">E-Learning</p>
+                            </a>
+
+                            {{-- Kelas Saya CTA --}}
+                            @php
+                                $myCoursesCount = \App\Models\CourseEnrollment::where('member_id', $member->id)->whereIn('status', ['approved', 'completed'])->count();
+                            @endphp
+                            <a href="{{ route('opac.member.courses') }}" class="block bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all relative">
+                                @if($myCoursesCount > 0)
+                                <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-white text-blue-600 text-[8px] font-bold rounded">{{ $myCoursesCount }}</div>
+                                @endif
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-graduation-cap text-sm"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Kelas Saya</h3>
+                                        <p class="text-blue-200 text-[9px]">E-Learning</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                     
                     {{-- External Plagiarism Banner - Highlighted --}}
