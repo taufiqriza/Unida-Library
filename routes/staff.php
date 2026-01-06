@@ -115,6 +115,20 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             ->middleware('can:manage-staff')
             ->name('email.index');
         
+        Route::get('/email/preview/{template}', function ($template) {
+            $data = match($template) {
+                'service-promotion' => ['recipientName' => 'Bapak/Ibu Pimpinan', 'appUrl' => config('app.url'), 'websiteUrl' => config('app.url')],
+                'welcome' => ['user' => (object)['name' => 'Ahmad Fauzi']],
+                'publication-approved' => ['publication' => (object)['title' => 'Contoh Judul Karya Ilmiah', 'type' => 'Skripsi'], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                'plagiarism-result' => ['submission' => (object)['title' => 'Contoh Judul Dokumen', 'similarity_score' => 15], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                'certificate-updated' => ['publication' => (object)['title' => 'Contoh Judul Karya'], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                'loan-reminder' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->addDays(3)], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                'loan-overdue' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->subDays(5), 'fine' => 5000], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                default => []
+            };
+            return view("emails.{$template}", $data);
+        })->middleware('can:manage-staff')->name('email.preview');
+        
         // Logout - secure with signed URL (no CSRF needed, expires in 5 min)
         Route::get('/logout/{signature}', function ($signature) {
             // Verify signature manually
