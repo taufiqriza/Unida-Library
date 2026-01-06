@@ -200,16 +200,18 @@
                 {{-- Left Column: Peminjaman Aktif + Submissions --}}
                 <div class="lg:col-span-2 space-y-4">
 
-                    {{-- Turnitin Active Banner --}}
-                    <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-check text-white text-sm"></i>
+                    {{-- Turnitin Active Banner - Dismissible --}}
+                    <div x-data="{ show: !localStorage.getItem('hideTurnitinBanner_{{ $member->id }}') }" x-show="show" x-cloak class="p-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-white text-xs"></i>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-emerald-800 text-xs font-semibold">Integrasi Turnitin/iThenticate Aktif</p>
-                                <p class="text-emerald-600 text-[10px]">Layanan cek plagiasi telah normal kembali. Kuota 5x per member.</p>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-emerald-800 text-[10px] font-semibold">Turnitin/iThenticate Aktif • Kuota 5x</p>
                             </div>
+                            <button @click="localStorage.setItem('hideTurnitinBanner_{{ $member->id }}', '1'); show = false" class="w-6 h-6 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-100 rounded-full flex items-center justify-center transition">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -218,11 +220,11 @@
                         {{-- Cek Plagiasi CTA --}}
                         @if($member->canAccessPlagiarism())
                         <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
-                            <div class="flex flex-col items-center text-center gap-2">
-                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-search-plus text-lg"></i>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-search-plus"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-xs">Cek Plagiasi</h3>
                                     <p class="text-teal-200 text-[9px]">Kuota 5x</p>
                                 </div>
@@ -231,13 +233,13 @@
                         @else
                         <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl p-3 text-white shadow-md relative">
                             <div class="absolute top-1 right-1 px-1 py-0.5 bg-amber-500 text-[7px] font-bold rounded">TERBATAS</div>
-                            <div class="flex flex-col items-center text-center gap-2">
-                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-lock text-lg"></i>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-lock"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-xs">Cek Plagiasi</h3>
-                                    <p class="text-gray-200 text-[9px]">Civitas UNIDA</p>
+                                    <p class="text-gray-200 text-[9px]">Civitas</p>
                                 </div>
                             </div>
                         </div>
@@ -245,11 +247,11 @@
 
                         {{-- Upload TA CTA --}}
                         <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
-                            <div class="flex flex-col items-center text-center gap-2">
-                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-upload text-lg"></i>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-upload"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-xs">Upload TA</h3>
                                     <p class="text-violet-200 text-[9px]">Skripsi/Tesis</p>
                                 </div>
@@ -264,11 +266,11 @@
                             @if($myCoursesCount > 0)
                             <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-white text-blue-600 text-[8px] font-bold rounded">{{ $myCoursesCount }}</div>
                             @endif
-                            <div class="flex flex-col items-center text-center gap-2">
-                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                    <i class="fas fa-graduation-cap text-lg"></i>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-graduation-cap"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <h3 class="font-bold text-xs">Kelas Saya</h3>
                                     <p class="text-blue-200 text-[9px]">E-Learning</p>
                                 </div>
