@@ -71,7 +71,7 @@
 
                 <div class="text-center pt-4 border-t mt-6">
                     <p class="text-sm text-gray-500">
-                        <a href="{{ route('register') }}" class="text-indigo-600 hover:underline"><i class="fas fa-arrow-left mr-1"></i> Kembali ke pilihan pendaftaran</a>
+                        <a href="{{ route('opac.register') }}" class="text-indigo-600 hover:underline"><i class="fas fa-arrow-left mr-1"></i> Kembali ke pilihan pendaftaran</a>
                     </p>
                     <p class="text-sm text-gray-500 mt-2">Sudah punya akun? <a href="{{ route('login') }}" class="text-indigo-600 font-semibold hover:underline">Masuk di sini</a></p>
                 </div>
