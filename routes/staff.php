@@ -110,6 +110,14 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{survey}/analytics', \App\Livewire\Staff\Survey\SurveyAnalytics::class)->name('analytics');
         });
 
+        // E-Learning Module
+        Route::prefix('elearning')->name('elearning.')->group(function () {
+            Route::get('/', \App\Livewire\Staff\Elearning\ElearningDashboard::class)->name('index');
+            Route::get('/create', \App\Livewire\Staff\Elearning\CourseForm::class)->name('create');
+            Route::get('/{id}', \App\Livewire\Staff\Elearning\CourseShow::class)->name('show');
+            Route::get('/{id}/edit', \App\Livewire\Staff\Elearning\CourseForm::class)->name('edit');
+        });
+
         // Email Management
         Route::get('/email', \App\Livewire\Staff\Email\EmailManagement::class)
             ->middleware('can:manage-staff')
