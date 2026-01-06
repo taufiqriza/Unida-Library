@@ -375,9 +375,12 @@
                 <h3 class="text-lg font-bold text-gray-900">Preview: {{ $templates[$previewTemplate]['name'] ?? '' }}</h3>
                 <button @click="show = false" class="p-2 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
             </div>
-            <div class="flex-1 overflow-auto p-1 bg-gray-100">
+            <div class="flex-1 overflow-auto bg-gray-100 p-4">
                 @if($previewTemplate)
-                <iframe srcdoc="{{ $previewHtml }}" class="w-full h-full min-h-[500px] bg-white rounded-lg border-0"></iframe>
+                    @php $previewData = $this->getPreviewData($previewTemplate); @endphp
+                    <div class="bg-white rounded-lg shadow">
+                        @include("emails.{$previewTemplate}", $previewData)
+                    </div>
                 @endif
             </div>
         </div>

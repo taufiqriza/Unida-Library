@@ -33,12 +33,11 @@ class EmailManagement extends Component
     
     public $showPreviewModal = false;
     public $previewTemplate = '';
-    public $previewHtml = '';
 
     // Daftar template email yang tersedia
     public array $templates = [
         'service-promotion' => ['name' => 'Promosi Layanan', 'desc' => 'Informasi layanan terbaru perpustakaan', 'icon' => 'fa-bullhorn', 'color' => 'violet'],
-        'welcome' => ['name' => 'Selamat Datang', 'desc' => 'Email sambutan member baru', 'icon' => 'fa-hand-wave', 'color' => 'green'],
+        'welcome' => ['name' => 'Selamat Datang', 'desc' => 'Email sambutan member baru', 'icon' => 'fa-door-open', 'color' => 'green'],
         'publication-approved' => ['name' => 'Publikasi Disetujui', 'desc' => 'Notifikasi karya ilmiah dipublikasikan', 'icon' => 'fa-check-circle', 'color' => 'emerald'],
         'plagiarism-result' => ['name' => 'Hasil Plagiasi', 'desc' => 'Hasil pengecekan similarity', 'icon' => 'fa-search', 'color' => 'blue'],
         'certificate-updated' => ['name' => 'Update Sertifikat', 'desc' => 'Pembaruan format sertifikat', 'icon' => 'fa-certificate', 'color' => 'amber'],
@@ -149,14 +148,13 @@ class EmailManagement extends Component
     public function previewTemplate($template)
     {
         $this->previewTemplate = $template;
-        $this->previewHtml = $this->renderTemplatePreview($template);
         $this->showPreviewModal = true;
     }
 
-    private function renderTemplatePreview($template): string
+    public function getPreviewData($template): array
     {
-        $data = match($template) {
-            'service-promotion' => ['recipientName' => 'Bapak/Ibu Pimpinan', 'appUrl' => config('app.url')],
+        return match($template) {
+            'service-promotion' => ['recipientName' => 'Bapak/Ibu Pimpinan', 'appUrl' => config('app.url'), 'websiteUrl' => config('app.url')],
             'welcome' => ['user' => (object)['name' => 'Ahmad Fauzi']],
             'publication-approved' => ['publication' => (object)['title' => 'Contoh Judul Karya Ilmiah', 'type' => 'Skripsi'], 'user' => (object)['name' => 'Ahmad Fauzi']],
             'plagiarism-result' => ['submission' => (object)['title' => 'Contoh Judul Dokumen', 'similarity_score' => 15], 'user' => (object)['name' => 'Ahmad Fauzi']],
@@ -165,12 +163,6 @@ class EmailManagement extends Component
             'loan-overdue' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->subDays(5), 'fine' => 5000], 'user' => (object)['name' => 'Ahmad Fauzi']],
             default => []
         };
-        
-        try {
-            return view("emails.{$template}", $data)->render();
-        } catch (\Exception $e) {
-            return '<div style="padding:40px;text-align:center;color:#666;">Template tidak tersedia atau error: ' . e($e->getMessage()) . '</div>';
-        }
     }
 
     public function createCampaign()
