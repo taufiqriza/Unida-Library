@@ -44,7 +44,10 @@
 
             <div class="p-3">
                 @foreach($course->modules as $moduleIndex => $module)
-                <div x-data="{ open: {{ $currentMaterial && $currentMaterial->module_id === $module->id ? 'true' : 'false' }} }" class="mb-2">
+                @php $moduleHasCurrentMaterial = $currentMaterial && $currentMaterial->module_id === $module->id; @endphp
+                <div x-data="{ open: {{ $moduleHasCurrentMaterial ? 'true' : 'false' }} }" 
+                     x-init="$watch('$wire.currentMaterialId', () => { if ({{ json_encode($module->materials->pluck('id')->toArray()) }}.includes($wire.currentMaterialId)) open = true })"
+                     class="mb-2">
                     <button @click="open = !open" class="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl text-left transition group">
                         <div class="flex items-center gap-3">
                             <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg flex items-center justify-center text-sm font-bold shadow-sm">
