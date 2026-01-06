@@ -21,7 +21,7 @@
     </div>
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-6 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-gray-500 text-xs font-medium">Request Diblokir</span>
