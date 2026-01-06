@@ -214,21 +214,10 @@ class StaffChat extends Component
 
     public function deletePersonalChat($roomId)
     {
-        $room = ChatRoom::where('id', $roomId)
-            ->where('type', 'direct')
-            ->whereHas('members', fn($q) => $q->where('user_id', auth()->id()))
-            ->first();
-
-        if (!$room) return;
-
-        // Delete all messages in the room
-        $room->messages()->delete();
-        
-        // Delete room members
-        $room->members()->delete();
-        
-        // Delete the room
-        $room->delete();
+        // Soft delete - hanya clear chat untuk user ini (seperti WhatsApp)
+        ChatRoomMember::where('chat_room_id', $roomId)
+            ->where('user_id', auth()->id())
+            ->update(['cleared_at' => now()]);
 
         // Clear cache
         cache()->forget("chat_rooms_" . auth()->id());
@@ -263,8 +252,15 @@ class StaffChat extends Component
     {
         if (!$this->activeRoomId) return;
 
-        // Get latest 50 messages
+        // Get user's cleared_at timestamp
+        $membership = ChatRoomMember::where('chat_room_id', $this->activeRoomId)
+            ->where('user_id', auth()->id())
+            ->first();
+        $clearedAt = $membership?->cleared_at;
+
+        // Get messages (filter by cleared_at if set)
         $messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
+            ->when($clearedAt, fn($q) => $q->where('created_at', '>', $clearedAt))
             ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'is_pinned', 'forwarded_from_id', 'created_at'])
             ->with([
                 'sender:id,name,photo,branch_id',

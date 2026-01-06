@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class ChatRoomMember extends Model
 {
     protected $fillable = [
-        'chat_room_id', 'user_id', 'role', 'is_muted', 'joined_at', 'last_read_at'
+        'chat_room_id', 'user_id', 'role', 'is_muted', 'joined_at', 'last_read_at', 'cleared_at'
     ];
 
     protected $casts = [
         'is_muted' => 'boolean',
         'joined_at' => 'datetime',
         'last_read_at' => 'datetime',
+        'cleared_at' => 'datetime',
     ];
 
     // Relationships
