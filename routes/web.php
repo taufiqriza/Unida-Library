@@ -68,7 +68,7 @@ Route::get('/verify-email', \App\Livewire\Opac\Auth\VerifyEmail::class)
 Route::get('/forgot-password', \App\Livewire\Opac\Auth\ForgotPassword::class)
     ->middleware('throttle:10,1')
     ->name('opac.forgot-password');
-Route::post('/register/staff', [App\Http\Controllers\Auth\StaffRegisterController::class, 'register'])
+Route::get('/register/staff', \App\Livewire\Opac\Auth\RegisterStaff::class)
     ->middleware('throttle:login')
     ->name('opac.register.staff');
 Route::get('/logout', [MemberAuthController::class, 'logout'])->name('opac.logout');

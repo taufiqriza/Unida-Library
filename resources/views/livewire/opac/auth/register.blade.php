@@ -67,39 +67,47 @@
                     </div>
                     @endif
 
-                    {{-- User Type Cards --}}
-                    <div class="grid grid-cols-2 gap-3">
-                        <button wire:click="selectUserType('mahasiswa')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-primary-500 hover:bg-primary-50 {{ $detectedType === 'mahasiswa' ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }}">
-                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-primary-200 transition">
+                    {{-- User Type Cards - Horizontal Layout --}}
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        <button wire:click="selectUserType('mahasiswa')" class="group flex-1 min-w-[140px] p-4 rounded-xl border-2 transition-all text-center hover:border-primary-500 hover:bg-primary-50 {{ $detectedType === 'mahasiswa' ? 'border-primary-500 bg-primary-50' : 'border-gray-200' }}">
+                            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-primary-200 transition">
                                 <i class="fas fa-graduation-cap text-xl text-primary-600"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900">Mahasiswa UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Mahasiswa aktif UNIDA Gontor</p>
+                            <h3 class="font-semibold text-gray-900 text-sm">Mahasiswa</h3>
+                            <p class="text-xs text-gray-500 mt-1">UNIDA Gontor</p>
                         </button>
 
-                        <button wire:click="selectUserType('dosen')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-blue-500 hover:bg-blue-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'dosen' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
-                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-200 transition">
+                        <button wire:click="selectUserType('dosen')" class="group flex-1 min-w-[140px] p-4 rounded-xl border-2 transition-all text-center hover:border-blue-500 hover:bg-blue-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'dosen' ? 'border-blue-500 bg-blue-50' : 'border-gray-200' }}">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-blue-200 transition">
                                 <i class="fas fa-chalkboard-teacher text-xl text-blue-600"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900">Dosen UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Dosen tetap/tidak tetap</p>
+                            <h3 class="font-semibold text-gray-900 text-sm">Dosen</h3>
+                            <p class="text-xs text-gray-500 mt-1">UNIDA Gontor</p>
                         </button>
 
-                        <button wire:click="selectUserType('tendik')" class="group p-4 rounded-xl border-2 transition-all text-left hover:border-emerald-500 hover:bg-emerald-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'tendik' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200' }}">
-                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition">
+                        <button wire:click="selectUserType('tendik')" class="group flex-1 min-w-[140px] p-4 rounded-xl border-2 transition-all text-center hover:border-emerald-500 hover:bg-emerald-50 {{ $detectedType === 'dosen_tendik' && $detectedEmployee?->type === 'tendik' ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200' }}">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-emerald-200 transition">
                                 <i class="fas fa-user-tie text-xl text-emerald-600"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900">Tendik UNIDA</h3>
-                            <p class="text-xs text-gray-500 mt-1">Tenaga kependidikan</p>
+                            <h3 class="font-semibold text-gray-900 text-sm">Tendik</h3>
+                            <p class="text-xs text-gray-500 mt-1">UNIDA Gontor</p>
                         </button>
 
-                        <button wire:click="selectUserType('umum')" class="group p-4 rounded-xl border-2 border-gray-200 transition-all text-left hover:border-gray-400 hover:bg-gray-50">
-                            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-gray-200 transition">
+                        <button wire:click="selectUserType('umum')" class="group flex-1 min-w-[140px] p-4 rounded-xl border-2 border-gray-200 transition-all text-center hover:border-gray-400 hover:bg-gray-50">
+                            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-gray-200 transition">
                                 <i class="fas fa-users text-xl text-gray-600"></i>
                             </div>
-                            <h3 class="font-semibold text-gray-900">Pengunjung Umum</h3>
-                            <p class="text-xs text-gray-500 mt-1">Bukan civitas UNIDA</p>
+                            <h3 class="font-semibold text-gray-900 text-sm">Umum</h3>
+                            <p class="text-xs text-gray-500 mt-1">Non-civitas</p>
                         </button>
+
+                        <a href="{{ route('opac.register.staff') }}" class="group flex-1 min-w-[140px] p-4 rounded-xl border-2 border-gray-200 transition-all text-center hover:border-indigo-500 hover:bg-indigo-50">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:bg-indigo-200 transition">
+                                <i class="fas fa-id-badge text-xl text-indigo-600"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-sm">Staff</h3>
+                            <p class="text-xs text-gray-500 mt-1">Perpustakaan</p>
+                        </a>
                     </div>
 
                     <div class="text-center pt-4 border-t mt-6">
