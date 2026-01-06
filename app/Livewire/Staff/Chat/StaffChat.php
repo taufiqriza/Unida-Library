@@ -207,6 +207,35 @@ class StaffChat extends Component
         $this->attachment = null;
     }
 
+    public function deletePersonalChat($roomId)
+    {
+        $room = ChatRoom::where('id', $roomId)
+            ->where('type', 'direct')
+            ->whereHas('members', fn($q) => $q->where('user_id', auth()->id()))
+            ->first();
+
+        if (!$room) return;
+
+        // Delete all messages in the room
+        $room->messages()->delete();
+        
+        // Delete room members
+        $room->members()->delete();
+        
+        // Delete the room
+        $room->delete();
+
+        // Clear cache
+        cache()->forget("chat_rooms_" . auth()->id());
+
+        // If currently viewing this room, close it
+        if ($this->activeRoomId == $roomId) {
+            $this->closeChat();
+        }
+
+        $this->dispatch('notify', type: 'success', message: 'Chat berhasil dihapus');
+    }
+
     public function loadMessages()
     {
         if (!$this->activeRoomId) return;

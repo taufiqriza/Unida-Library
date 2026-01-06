@@ -1268,71 +1268,79 @@
             @forelse($this->rooms['directs'] as $room)
             @php $otherUser = $room->other_user; @endphp
             @if($otherUser)
-            <button wire:click="openRoom({{ $room->id }})" 
-                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50">
-                <div class="relative flex-shrink-0">
-                    @if($otherUser->photo)
-                        <img src="{{ $otherUser->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
-                    @else
-                        <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold" 
-                             style="background: linear-gradient(135deg, #{{ $otherUser->getAvatarColor() }} 0%, #{{ $otherUser->getAvatarColor() }}dd 100%);">
-                            {{ $otherUser->getInitials() }}
-                        </div>
-                    @endif
-                    <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $otherUser->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
-                </div>
-                <div class="flex-1 min-w-0 text-left">
-                    <div class="flex items-center justify-between">
-                        <p class="font-semibold text-gray-900 text-sm truncate">{{ $otherUser->name }}</p>
-                        @if($room->latestMessage)
-                        <span class="text-[10px] text-gray-400">
-                            {{ $room->latestMessage->created_at->diffForHumans(short: true) }}
-                        </span>
+            <div class="relative group">
+                <button wire:click="openRoom({{ $room->id }})" 
+                        class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50">
+                    <div class="relative flex-shrink-0">
+                        @if($otherUser->photo)
+                            <img src="{{ $otherUser->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
+                        @else
+                            <div class="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold" 
+                                 style="background: linear-gradient(135deg, #{{ $otherUser->getAvatarColor() }} 0%, #{{ $otherUser->getAvatarColor() }}dd 100%);">
+                                {{ $otherUser->getInitials() }}
+                            </div>
                         @endif
+                        <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white {{ $otherUser->isReallyOnline() ? 'bg-emerald-400' : 'bg-gray-300' }}"></span>
                     </div>
-                    <div class="flex items-center justify-between mt-0.5">
-                        <p class="text-xs text-gray-500 truncate pr-2">
+                    <div class="flex-1 min-w-0 text-left">
+                        <div class="flex items-center justify-between">
+                            <p class="font-semibold text-gray-900 text-sm truncate">{{ $otherUser->name }}</p>
                             @if($room->latestMessage)
-                                @if($room->latestMessage->sender_id === auth()->id())
-                                    <span class="text-gray-400">Anda: </span>
-                                @endif
-                                @if($room->latestMessage->reactions && $room->latestMessage->reactions->count() > 0)
-                                    @php $lastReact = $room->latestMessage->reactions->first(); @endphp
-                                    <span class="text-gray-400">{{ $lastReact->user->name ?? '' }} reacted </span>{{ $lastReact->emoji }}
-                                @elseif($room->latestMessage->attachment)
-                                    📎 File
+                            <span class="text-[10px] text-gray-400">
+                                {{ $room->latestMessage->created_at->diffForHumans(short: true) }}
+                            </span>
+                            @endif
+                        </div>
+                        <div class="flex items-center justify-between mt-0.5">
+                            <p class="text-xs text-gray-500 truncate pr-2">
+                                @if($room->latestMessage)
+                                    @if($room->latestMessage->sender_id === auth()->id())
+                                        <span class="text-gray-400">Anda: </span>
+                                    @endif
+                                    @if($room->latestMessage->reactions && $room->latestMessage->reactions->count() > 0)
+                                        @php $lastReact = $room->latestMessage->reactions->first(); @endphp
+                                        <span class="text-gray-400">{{ $lastReact->user->name ?? '' }} reacted </span>{{ $lastReact->emoji }}
+                                    @elseif($room->latestMessage->attachment)
+                                        📎 File
+                                    @else
+                                        {{ Str::limit($room->latestMessage->message, 30) }}
+                                    @endif
                                 @else
-                                    {{ Str::limit($room->latestMessage->message, 30) }}
+                                    <span class="italic text-gray-400">Mulai chat</span>
                                 @endif
+                            </p>
+                            @if($room->unread_count > 0)
+                            <span class="w-5 h-5 bg-green-600 rounded-full text-[10px] text-white font-bold flex items-center justify-center flex-shrink-0">
+                                {{ $room->unread_count }}
+                            </span>
+                            @endif
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-2">
+                            @php
+                                $roleLabels = [
+                                    'super_admin' => ['label' => 'Super Admin', 'color' => 'bg-purple-100 text-purple-700'],
+                                    'admin' => ['label' => 'Admin', 'color' => 'bg-blue-100 text-blue-700'],
+                                    'librarian' => ['label' => 'Pustakawan', 'color' => 'bg-amber-100 text-amber-700'],
+                                    'staff' => ['label' => 'Staff', 'color' => 'bg-gray-100 text-gray-700'],
+                                ];
+                                $roleInfo = $roleLabels[$otherUser->role] ?? ['label' => ucfirst($otherUser->role ?? 'Staff'), 'color' => 'bg-gray-100 text-gray-700'];
+                            @endphp
+                            <span class="px-1.5 py-0.5 rounded {{ $roleInfo['color'] }} text-[9px] font-medium">{{ $roleInfo['label'] }}</span>
+                            @if($otherUser->branch)
+                            <span><i class="fas fa-building mr-0.5"></i>{{ $otherUser->branch->name }}</span>
                             @else
-                                <span class="italic text-gray-400">Mulai chat</span>
+                            <span><i class="fas fa-globe mr-0.5"></i>Pusat</span>
                             @endif
                         </p>
-                        @if($room->unread_count > 0)
-                        <span class="w-5 h-5 bg-green-600 rounded-full text-[10px] text-white font-bold flex items-center justify-center flex-shrink-0">
-                            {{ $room->unread_count }}
-                        </span>
-                        @endif
                     </div>
-                    <p class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-2">
-                        @php
-                            $roleLabels = [
-                                'super_admin' => ['label' => 'Super Admin', 'color' => 'bg-purple-100 text-purple-700'],
-                                'admin' => ['label' => 'Admin', 'color' => 'bg-blue-100 text-blue-700'],
-                                'librarian' => ['label' => 'Pustakawan', 'color' => 'bg-amber-100 text-amber-700'],
-                                'staff' => ['label' => 'Staff', 'color' => 'bg-gray-100 text-gray-700'],
-                            ];
-                            $roleInfo = $roleLabels[$otherUser->role] ?? ['label' => ucfirst($otherUser->role ?? 'Staff'), 'color' => 'bg-gray-100 text-gray-700'];
-                        @endphp
-                        <span class="px-1.5 py-0.5 rounded {{ $roleInfo['color'] }} text-[9px] font-medium">{{ $roleInfo['label'] }}</span>
-                        @if($otherUser->branch)
-                        <span><i class="fas fa-building mr-0.5"></i>{{ $otherUser->branch->name }}</span>
-                        @else
-                        <span><i class="fas fa-globe mr-0.5"></i>Pusat</span>
-                        @endif
-                    </p>
-                </div>
-            </button>
+                </button>
+                {{-- Delete Button --}}
+                <button wire:click="deletePersonalChat({{ $room->id }})" 
+                        wire:confirm="Hapus chat dengan {{ $otherUser->name }}? Semua pesan akan dihapus permanen."
+                        class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg items-center justify-center opacity-0 group-hover:opacity-100 transition hidden group-hover:flex">
+                    <i class="fas fa-trash text-xs"></i>
+                </button>
+            </div>
             @endif
             @empty
             <div class="flex flex-col items-center justify-center py-12 text-gray-400">
