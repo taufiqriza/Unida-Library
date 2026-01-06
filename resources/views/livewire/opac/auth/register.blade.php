@@ -1,5 +1,5 @@
 <div class="min-h-[80vh] flex items-center justify-center py-8 px-4">
-    <div class="w-full max-w-2xl">
+    <div class="w-full max-w-4xl">
         <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 overflow-hidden">
             
             {{-- Header --}}
