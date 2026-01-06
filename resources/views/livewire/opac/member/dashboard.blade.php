@@ -283,70 +283,53 @@
                             </a>
                         </div>
                     </div>
-                    
-                    {{-- External Plagiarism Banner - Highlighted --}}
-                    <a href="{{ route('opac.member.plagiarism.external') }}" class="block p-3 bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-teal-300 rounded-xl hover:border-teal-400 hover:shadow-md transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow">
-                                <i class="fas fa-file-upload text-white text-sm"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-teal-800 text-xs">Upload Hasil Cek Plagiasi Eksternal</h4>
-                                <p class="text-teal-600 text-[10px]">Submit hasil Turnitin/iThenticate untuk mendapatkan sertifikat bebas plagiasi</p>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <span class="px-2 py-0.5 bg-teal-500 text-white text-[8px] font-bold rounded mb-1">TERSEDIA</span>
-                                <i class="fas fa-chevron-right text-teal-400 text-xs"></i>
-                            </div>
+
+                    {{-- Premium Digital Resources Card --}}
+                    <div class="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur rounded-2xl p-4 border border-white/10 shadow-xl">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-crown text-amber-400 text-xs"></i>
+                            <span class="text-white/80 text-xs font-medium">Akses Premium Anggota</span>
                         </div>
-                    </a>
-
-                    {{-- Shamela, Database & Repository Cards Grid --}}
-                    <div class="grid grid-cols-3 gap-2 lg:gap-3">
-                        {{-- Maktabah Shamela Card --}}
-                        <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
-                            <div class="relative flex items-center gap-2 lg:gap-3">
-                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-book-quran text-sm lg:text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-1.5 mb-0.5">
-                                        <h3 class="font-bold text-xs lg:text-sm">Shamela</h3>
+                        <div class="grid grid-cols-3 gap-2">
+                            {{-- Maktabah Shamela Card --}}
+                            <a href="{{ route('opac.shamela.index') }}" class="block bg-gradient-to-br from-emerald-600 to-teal-700 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-book-quran text-sm"></i>
                                     </div>
-                                    <p class="text-emerald-200 text-[9px] lg:text-xs truncate">8.4K Kitab</p>
-                                </div>
-                            </div>
-                        </a>
-
-                        {{-- Repository EPrints Card --}}
-                        <a href="{{ route('opac.repository') }}" class="block bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
-                            <div class="relative flex items-center gap-2 lg:gap-3">
-                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-archive text-sm lg:text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-1.5 mb-0.5">
-                                        <h3 class="font-bold text-xs lg:text-sm">Repository</h3>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Shamela</h3>
+                                        <p class="text-emerald-200 text-[9px]">8.4K Kitab</p>
                                     </div>
-                                    <p class="text-orange-200 text-[9px] lg:text-xs truncate">EPrints</p>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
 
-                        {{-- FPPTI Database Access Card --}}
-                        <a href="{{ route('opac.database-access') }}" class="block bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-2.5 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group relative overflow-hidden">
-                            <div class="relative flex items-center gap-2 lg:gap-3">
-                                <div class="w-9 h-9 lg:w-11 lg:h-11 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-database text-sm lg:text-lg"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center gap-1.5 mb-0.5">
-                                        <h3 class="font-bold text-xs lg:text-sm">Database</h3>
+                            {{-- Repository EPrints Card --}}
+                            <a href="{{ route('opac.repository') }}" class="block bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-archive text-sm"></i>
                                     </div>
-                                    <p class="text-indigo-200 text-[9px] lg:text-xs truncate">FPPTI</p>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Repository</h3>
+                                        <p class="text-orange-200 text-[9px]">EPrints</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+
+                            {{-- FPPTI Database Access Card --}}
+                            <a href="{{ route('opac.database-access') }}" class="block bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-2.5 text-white shadow-md hover:shadow-lg hover:scale-[1.02] transition-all">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-database text-sm"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-xs">Database</h3>
+                                        <p class="text-indigo-200 text-[9px]">FPPTI</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
 
                     {{-- Peminjaman Aktif --}}
@@ -751,6 +734,20 @@
                         @endif
                     </div>
                     @endif
+
+                    {{-- External Plagiarism Upload - Compact --}}
+                    <a href="{{ route('opac.member.plagiarism.external') }}" class="block p-2.5 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-200 rounded-xl hover:border-teal-300 transition">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-file-upload text-white text-xs"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-teal-800 font-semibold text-[10px]">Upload Hasil Plagiasi Eksternal</p>
+                                <p class="text-teal-600 text-[9px]">Dapatkan sertifikat bebas plagiasi</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-teal-400 text-[10px]"></i>
+                        </div>
+                    </a>
 
                     {{-- Quick Links --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
