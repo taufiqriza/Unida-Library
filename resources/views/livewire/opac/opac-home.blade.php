@@ -196,6 +196,18 @@
                         <i class="fas fa-chevron-right text-blue-200 group-hover:translate-x-1 transition"></i>
                     </div>
                 </a>
+                <a href="{{ route('opac.page', 'e-learning') }}" class="block bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl p-4 text-white hover:shadow-lg hover:shadow-amber-200 transition group">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-graduation-cap text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm">E-Learning</h4>
+                            <p class="text-amber-200 text-xs">Kelas & workshop literasi</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-amber-200 group-hover:translate-x-1 transition"></i>
+                    </div>
+                </a>
             </div>
         </div>
     </section>

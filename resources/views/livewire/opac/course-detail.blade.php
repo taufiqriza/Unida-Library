@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gray-50">
     {{-- Hero Section --}}
-    <div class="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 overflow-hidden">
+    <div class="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 overflow-hidden">
         <div class="absolute inset-0 opacity-10">
             <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 translate-x-1/2"></div>
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-white rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -31,7 +31,7 @@
                     {{-- Meta Info --}}
                     <div class="flex flex-wrap items-center gap-4 text-white/90 text-sm">
                         <div class="flex items-center gap-2">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=32&background=ffffff&color=7c3aed" class="w-8 h-8 rounded-full">
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=32&background=ffffff&color=2563eb" class="w-8 h-8 rounded-full">
                             <span>{{ $course->instructor->name }}</span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -245,7 +245,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h3 class="font-bold text-gray-900 mb-4">Instruktur</h3>
                     <div class="flex items-center gap-4">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=64&background=7c3aed&color=ffffff" class="w-16 h-16 rounded-xl">
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=64&background=2563eb&color=ffffff" class="w-16 h-16 rounded-xl">
                         <div>
                             <p class="font-semibold text-gray-900">{{ $course->instructor->name }}</p>
                             <p class="text-sm text-gray-500">{{ $course->instructor->email }}</p>
