@@ -806,6 +806,16 @@
                                 <span class="text-xs text-gray-700">Riwayat Plagiasi</span>
                             </a>
                             @endif
+                            <a href="{{ route('opac.page', 'e-learning') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
+                                <div class="w-7 h-7 bg-violet-50 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-violet-500 text-[10px]"></i>
+                                </div>
+                                <span class="text-xs text-gray-700">E-Learning</span>
+                                @php $myEnrollments = \App\Models\CourseEnrollment::where('member_id', $member->id)->whereIn('status', ['approved', 'completed'])->count(); @endphp
+                                @if($myEnrollments > 0)
+                                <span class="ml-auto px-1.5 py-0.5 bg-violet-100 text-violet-700 text-[8px] font-bold rounded">{{ $myEnrollments }}</span>
+                                @endif
+                            </a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <a href="{{ route('opac.database-access') }}" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition">
                                 <div class="w-7 h-7 bg-indigo-50 rounded-lg flex items-center justify-center">
@@ -828,6 +838,53 @@
                             </a>
                         </div>
                     </div>
+
+                    {{-- Kelas E-Learning Saya --}}
+                    @php
+                        $myEnrollmentsData = \App\Models\CourseEnrollment::with(['course.category', 'course.instructor'])
+                            ->where('member_id', $member->id)
+                            ->whereIn('status', ['approved', 'completed'])
+                            ->latest()
+                            ->take(3)
+                            ->get();
+                    @endphp
+                    @if($myEnrollmentsData->count() > 0)
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-3 border-b border-gray-100 flex items-center justify-between">
+                            <h2 class="font-bold text-gray-900 text-xs flex items-center gap-2">
+                                <div class="w-6 h-6 bg-violet-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-violet-500 text-[10px]"></i>
+                                </div>
+                                Kelas Saya
+                            </h2>
+                            <a href="{{ route('opac.page', 'e-learning') }}" class="text-[10px] text-violet-600 hover:underline">Lihat Semua</a>
+                        </div>
+                        <div class="divide-y divide-gray-50">
+                            @foreach($myEnrollmentsData as $enrollment)
+                            <div class="p-3">
+                                <div class="flex items-start gap-2">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-book-open text-white text-xs"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-medium text-gray-900 line-clamp-1">{{ $enrollment->course->title }}</p>
+                                        <p class="text-[10px] text-gray-500">{{ $enrollment->course->instructor->name }}</p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-violet-500 rounded-full" style="width: {{ $enrollment->progress_percent }}%"></div>
+                                            </div>
+                                            <span class="text-[9px] text-gray-500">{{ $enrollment->progress_percent }}%</span>
+                                        </div>
+                                    </div>
+                                    @if($enrollment->status === 'completed')
+                                    <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-600 text-[8px] font-bold rounded">LULUS</span>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
                     {{-- History Pinjaman --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
