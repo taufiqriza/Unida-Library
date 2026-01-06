@@ -62,7 +62,9 @@ Route::get('/classroom/{slug}', \App\Livewire\Opac\Classroom::class)->middleware
 
 // E-Learning Certificate
 Route::get('/certificate/{number}', function($number) {
-    $cert = \App\Models\CourseCertificate::where('certificate_number', $number)->with(['enrollment.course', 'enrollment.member'])->firstOrFail();
+    $cert = \App\Models\CourseCertificate::where('certificate_number', $number)
+        ->with(['enrollment.course.instructor', 'enrollment.member'])
+        ->firstOrFail();
     return view('opac.elearning.certificate', compact('cert'));
 })->name('opac.elearning.certificate');
 

@@ -1,97 +1,106 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertifikat - {{ $cert->certificate_number }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
-        @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .no-print { display: none !important; }
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen py-8">
-    {{-- Print Button --}}
-    <div class="no-print max-w-4xl mx-auto mb-4 px-4 flex gap-3">
-        <button onclick="window.print()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-            <i class="fas fa-print"></i> Cetak Sertifikat
-        </button>
-        <a href="{{ url()->previous() }}" class="px-6 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-    </div>
+@extends('components.opac.layout')
 
-    {{-- Certificate --}}
-    <div class="max-w-4xl mx-auto bg-white shadow-2xl" style="aspect-ratio: 1.414;">
-        <div class="relative w-full h-full p-8 overflow-hidden">
-            {{-- Border Design --}}
-            <div class="absolute inset-4 border-4 border-blue-600 rounded-lg"></div>
-            <div class="absolute inset-6 border-2 border-blue-300 rounded-lg"></div>
-            
-            {{-- Corner Decorations --}}
-            <div class="absolute top-8 left-8 w-16 h-16 border-t-4 border-l-4 border-amber-500 rounded-tl-lg"></div>
-            <div class="absolute top-8 right-8 w-16 h-16 border-t-4 border-r-4 border-amber-500 rounded-tr-lg"></div>
-            <div class="absolute bottom-8 left-8 w-16 h-16 border-b-4 border-l-4 border-amber-500 rounded-bl-lg"></div>
-            <div class="absolute bottom-8 right-8 w-16 h-16 border-b-4 border-r-4 border-amber-500 rounded-br-lg"></div>
-
-            {{-- Content --}}
-            <div class="relative h-full flex flex-col items-center justify-center text-center px-12">
-                {{-- Logo --}}
-                <div class="mb-4">
-                    <img src="{{ asset('storage/logo-portal.png') }}" alt="Logo" class="h-16 mx-auto">
-                </div>
-
-                {{-- Title --}}
-                <h1 class="text-3xl font-bold text-blue-800 tracking-wider mb-1" style="font-family: 'Playfair Display', serif;">
-                    SERTIFIKAT
-                </h1>
-                <p class="text-gray-500 text-sm tracking-widest mb-6">CERTIFICATE OF COMPLETION</p>
-
-                {{-- Recipient --}}
-                <p class="text-gray-600 mb-2">Diberikan kepada:</p>
-                <h2 class="text-4xl font-bold text-gray-900 mb-6" style="font-family: 'Playfair Display', serif;">
-                    {{ $cert->member_name }}
-                </h2>
-
-                {{-- Description --}}
-                <p class="text-gray-600 max-w-lg mb-2">
-                    Telah berhasil menyelesaikan kelas:
-                </p>
-                <h3 class="text-xl font-bold text-blue-700 mb-6 max-w-lg">
-                    "{{ $cert->course_title }}"
-                </h3>
-
-                {{-- Date --}}
-                <p class="text-gray-500 text-sm mb-8">
-                    Diterbitkan pada {{ $cert->issued_at->translatedFormat('d F Y') }}
-                </p>
-
-                {{-- Signature Area --}}
-                <div class="flex items-end justify-center gap-24 mt-auto">
-                    <div class="text-center">
-                        <div class="w-32 border-b-2 border-gray-400 mb-2"></div>
-                        <p class="text-sm font-semibold text-gray-700">{{ $cert->enrollment->course->instructor->name ?? 'Instruktur' }}</p>
-                        <p class="text-xs text-gray-500">Instruktur</p>
-                    </div>
-                </div>
-
-                {{-- Certificate Number --}}
-                <div class="absolute bottom-10 left-1/2 -translate-x-1/2">
-                    <p class="text-xs text-gray-400">No: {{ $cert->certificate_number }}</p>
-                </div>
-
-                {{-- QR Placeholder --}}
-                <div class="absolute bottom-10 right-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center">
-                        <i class="fas fa-qrcode text-gray-300 text-2xl"></i>
-                    </div>
+@section('content')
+<div class="min-h-screen bg-gray-50">
+    {{-- Header --}}
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <div class="max-w-3xl mx-auto px-4 py-6">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('opac.classroom', $cert->enrollment->course->slug) }}" class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center hover:bg-white/30 transition">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-xl font-bold">Sertifikat E-Learning</h1>
+                    <p class="text-blue-200 text-sm">{{ $cert->certificate_number }}</p>
                 </div>
             </div>
         </div>
     </div>
-</body>
-</html>
+
+    <div class="max-w-3xl mx-auto px-4 py-6">
+        {{-- Certificate Preview Card --}}
+        <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
+            {{-- Header --}}
+            <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-center">
+                <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-award text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Sertifikat Kelulusan</h2>
+                <p class="text-blue-100 text-sm mt-2">Perpustakaan Universitas Darussalam Gontor</p>
+            </div>
+
+            {{-- Content --}}
+            <div class="p-6 space-y-6">
+                {{-- Certificate Info --}}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-gray-500 block">Nomor Sertifikat</label>
+                        <p class="font-bold text-gray-900">{{ $cert->certificate_number }}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block">Tanggal Terbit</label>
+                        <p class="font-medium text-gray-900">{{ $cert->issued_at->translatedFormat('d F Y') }}</p>
+                    </div>
+                </div>
+
+                {{-- Course Info --}}
+                <div>
+                    <label class="text-xs text-gray-500 block">Nama Kelas</label>
+                    <p class="font-semibold text-gray-900 text-lg">{{ $cert->enrollment->course->title }}</p>
+                </div>
+
+                {{-- Member Info --}}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-gray-500 block">Nama Peserta</label>
+                        <p class="font-medium text-gray-900">{{ $cert->enrollment->member->name }}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block">No. Anggota</label>
+                        <p class="font-medium text-gray-900">{{ $cert->enrollment->member->member_id }}</p>
+                    </div>
+                </div>
+
+                {{-- Completion Badge --}}
+                <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl text-center border border-emerald-200">
+                    <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-check text-white text-2xl"></i>
+                    </div>
+                    <p class="text-emerald-700 font-bold text-lg">LULUS</p>
+                    <p class="text-emerald-600 text-sm">Telah menyelesaikan seluruh materi kelas</p>
+                </div>
+
+                {{-- Instructor Info --}}
+                <div class="text-center text-sm text-gray-500">
+                    <p>Instruktur: <strong class="text-gray-700">{{ $cert->enrollment->course->instructor->name }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Actions --}}
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button onclick="window.print()" class="flex-1 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                <i class="fas fa-print"></i>
+                Cetak Sertifikat
+            </button>
+            <a href="{{ route('opac.classroom', $cert->enrollment->course->slug) }}" class="flex-1 py-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-left"></i>
+                Kembali ke Kelas
+            </a>
+        </div>
+
+        {{-- Verification Note --}}
+        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-600 text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-blue-800 font-medium text-sm">Verifikasi Sertifikat</p>
+                    <p class="text-blue-600 text-xs mt-1">Sertifikat ini dapat diverifikasi dengan nomor: <strong>{{ $cert->certificate_number }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

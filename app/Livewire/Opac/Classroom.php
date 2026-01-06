@@ -121,15 +121,13 @@ class Classroom extends Component
         $existing = \App\Models\CourseCertificate::where('enrollment_id', $this->enrollment->id)->first();
         if ($existing) return $existing;
 
-        $member = auth('member')->user();
         $certNumber = 'CERT-' . strtoupper(substr(md5($this->enrollment->id . time()), 0, 8));
         
         return \App\Models\CourseCertificate::create([
             'enrollment_id' => $this->enrollment->id,
             'certificate_number' => $certNumber,
-            'member_name' => $member->name,
-            'course_title' => $this->course->title,
             'issued_at' => now(),
+            'issued_by' => $this->course->instructor_id,
         ]);
     }
 
