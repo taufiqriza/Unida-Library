@@ -60,13 +60,19 @@ class EmailManagement extends Component
     {
         if (EmailRecipient::count() === 0) {
             $defaults = [
+                // Rektorat & Unit Pusat
+                ['name' => 'Rektorat UNIDA Gontor', 'email' => 'rektorat@unida.gontor.ac.id', 'category' => 'bureau', 'phone' => '+62 81 3337 31713'],
+                ['name' => 'Operator PDDIKTI', 'email' => 'operatorpt@unida.gontor.ac.id', 'category' => 'bureau'],
+                ['name' => 'CIOS (Center for Islamization of Science)', 'email' => 'cios@unida.gontor.ac.id', 'category' => 'bureau', 'phone' => '+62 822 2839 5277'],
                 ['name' => 'BAAK UNIDA Gontor', 'email' => 'baak@unida.gontor.ac.id', 'category' => 'bureau'],
-                ['name' => 'Fakultas Ushuluddin', 'email' => 'ushuluddin@unida.gontor.ac.id', 'category' => 'faculty'],
+                
+                // Fakultas
+                ['name' => 'Fakultas Ushuluddin', 'email' => 'ushuluddin@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 81 3337 31713'],
                 ['name' => 'Fakultas Tarbiyah', 'email' => 'tarbiyah@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 813-3568-0607'],
                 ['name' => 'Fakultas Syariah', 'email' => 'syariah@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 838-4567-4075'],
                 ['name' => 'Fakultas Ekonomi & Manajemen', 'email' => 'fem@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 81235797925'],
                 ['name' => 'Fakultas Humaniora', 'email' => 'humaniora@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 813 3415 7523'],
-                ['name' => 'Fakultas Sains & Teknologi', 'email' => 'saintek@unida.gontor.ac.id', 'category' => 'faculty'],
+                ['name' => 'Fakultas Sains & Teknologi', 'email' => 'saintek@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 81 3337 31713'],
                 ['name' => 'Fakultas Kedokteran', 'email' => 'fk@unida.gontor.ac.id', 'category' => 'faculty'],
                 ['name' => 'Pascasarjana', 'email' => 'pascasarjana@unida.gontor.ac.id', 'category' => 'faculty', 'phone' => '+62 812-3285-7600'],
             ];
@@ -125,6 +131,15 @@ class EmailManagement extends Component
             session()->flash('error', 'Pilih minimal 1 penerima');
             return;
         }
+        $this->campaignName = 'Campaign ' . now()->format('d M Y H:i');
+        $this->selectedTemplate = 'service-promotion';
+        $this->showCampaignModal = true;
+    }
+
+    public function openNewCampaignModal()
+    {
+        // Auto-select semua penerima aktif
+        $this->selectedRecipients = EmailRecipient::where('is_active', true)->pluck('id')->toArray();
         $this->campaignName = 'Campaign ' . now()->format('d M Y H:i');
         $this->selectedTemplate = 'service-promotion';
         $this->showCampaignModal = true;

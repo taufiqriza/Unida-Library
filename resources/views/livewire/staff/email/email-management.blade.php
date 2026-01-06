@@ -185,6 +185,11 @@
             {{-- Tab: Campaigns --}}
             @if($activeTab === 'campaigns')
             <div class="space-y-4">
+                <div class="flex justify-end">
+                    <button wire:click="openNewCampaignModal" class="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl text-sm font-semibold hover:shadow-lg transition">
+                        <i class="fas fa-plus mr-1"></i> Buat Campaign
+                    </button>
+                </div>
                 @forelse($campaigns as $c)
                 <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
