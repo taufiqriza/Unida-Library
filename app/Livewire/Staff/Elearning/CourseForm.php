@@ -85,11 +85,25 @@ class CourseForm extends Component
             }
             
             $this->editMode = true;
-            $this->fill($this->course->toArray());
-            $this->schedule_days = $this->course->schedule_days_array;
-            $this->existing_thumbnail = $this->course->thumbnail;
+            $this->title = $this->course->title;
+            $this->description = $this->course->description ?? '';
+            $this->category_id = $this->course->category_id;
+            $this->branch_id = $this->course->branch_id;
+            $this->level = $this->course->level ?? 'beginner';
+            $this->duration_hours = $this->course->duration_hours;
+            $this->max_participants = $this->course->max_participants;
             $this->start_date = $this->course->start_date?->format('Y-m-d');
             $this->end_date = $this->course->end_date?->format('Y-m-d');
+            $this->schedule_time = $this->course->schedule_time;
+            $this->schedule_days = $this->course->schedule_days_array;
+            $this->location = $this->course->location;
+            $this->is_online = $this->course->is_online ?? false;
+            $this->meeting_link = $this->course->meeting_link;
+            $this->status = $this->course->status ?? 'draft';
+            $this->requires_approval = $this->course->requires_approval ?? false;
+            $this->has_certificate = $this->course->has_certificate ?? true;
+            $this->passing_score = $this->course->passing_score ?? 70;
+            $this->existing_thumbnail = $this->course->thumbnail;
         }
     }
 
