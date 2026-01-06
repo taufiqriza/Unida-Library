@@ -157,13 +157,12 @@
                         <div class="flex-1 min-w-0">
                             <h3 class="font-semibold text-gray-900">{{ $tpl['name'] }}</h3>
                             <p class="text-sm text-gray-500 mt-1">{{ $tpl['desc'] }}</p>
-                            <p class="text-xs text-gray-400 mt-2 font-mono">{{ $key }}.blade.php</p>
                         </div>
                     </div>
                     <div class="mt-4 pt-4 border-t border-gray-200 flex gap-2">
-                        <a href="/staff/email/preview/{{ $key }}" target="_blank" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-center text-gray-600 hover:bg-gray-50 transition">
+                        <button wire:click="previewTemplate('{{ $key }}')" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-center text-gray-600 hover:bg-gray-50 transition">
                             <i class="fas fa-eye mr-1"></i> Preview
-                        </a>
+                        </button>
                         @if($key === 'service-promotion')
                         <button wire:click="$set('activeTab', 'recipients')" class="flex-1 px-3 py-2 bg-violet-600 text-white rounded-lg text-sm text-center hover:bg-violet-700 transition">
                             <i class="fas fa-paper-plane mr-1"></i> Kirim
@@ -363,6 +362,23 @@
                         <span wire:loading wire:target="sendCampaign"><i class="fas fa-spinner fa-spin mr-1"></i>Mengirim...</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endteleport
+
+    {{-- Modal: Template Preview --}}
+    @teleport('body')
+    <div x-data="{ show: @entangle('showPreviewModal') }" x-show="show" x-cloak class="fixed inset-0 z-[99999] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.5)">
+        <div @click.outside="show = false" class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col" x-show="show" x-transition>
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
+                <h3 class="text-lg font-bold text-gray-900">Preview: {{ $templates[$previewTemplate]['name'] ?? '' }}</h3>
+                <button @click="show = false" class="p-2 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="flex-1 overflow-auto p-1 bg-gray-100">
+                @if($previewTemplate)
+                <iframe srcdoc="{{ $previewHtml }}" class="w-full h-full min-h-[500px] bg-white rounded-lg border-0"></iframe>
+                @endif
             </div>
         </div>
     </div>

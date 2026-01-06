@@ -33,6 +33,7 @@ class EmailManagement extends Component
     
     public $showPreviewModal = false;
     public $previewTemplate = '';
+    public $previewHtml = '';
 
     // Daftar template email yang tersedia
     public array $templates = [
@@ -148,7 +149,28 @@ class EmailManagement extends Component
     public function previewTemplate($template)
     {
         $this->previewTemplate = $template;
+        $this->previewHtml = $this->renderTemplatePreview($template);
         $this->showPreviewModal = true;
+    }
+
+    private function renderTemplatePreview($template): string
+    {
+        $data = match($template) {
+            'service-promotion' => ['recipientName' => 'Bapak/Ibu Pimpinan', 'appUrl' => config('app.url')],
+            'welcome' => ['user' => (object)['name' => 'Ahmad Fauzi']],
+            'publication-approved' => ['publication' => (object)['title' => 'Contoh Judul Karya Ilmiah', 'type' => 'Skripsi'], 'user' => (object)['name' => 'Ahmad Fauzi']],
+            'plagiarism-result' => ['submission' => (object)['title' => 'Contoh Judul Dokumen', 'similarity_score' => 15], 'user' => (object)['name' => 'Ahmad Fauzi']],
+            'certificate-updated' => ['publication' => (object)['title' => 'Contoh Judul Karya'], 'user' => (object)['name' => 'Ahmad Fauzi']],
+            'loan-reminder' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->addDays(3)], 'user' => (object)['name' => 'Ahmad Fauzi']],
+            'loan-overdue' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->subDays(5), 'fine' => 5000], 'user' => (object)['name' => 'Ahmad Fauzi']],
+            default => []
+        };
+        
+        try {
+            return view("emails.{$template}", $data)->render();
+        } catch (\Exception $e) {
+            return '<div style="padding:40px;text-align:center;color:#666;">Template tidak tersedia atau error: ' . e($e->getMessage()) . '</div>';
+        }
     }
 
     public function createCampaign()
