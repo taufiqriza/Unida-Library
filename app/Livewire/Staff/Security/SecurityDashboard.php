@@ -12,6 +12,7 @@ class SecurityDashboard extends Component
     public array $stats = [];
     public array $recentLogs = [];
     public array $blockedIps = [];
+    public array $failedLogins = [];
     public string $scanResult = '';
     public bool $isScanning = false;
 
@@ -19,15 +20,13 @@ class SecurityDashboard extends Component
     {
         $this->loadStats();
         $this->loadRecentLogs();
+        $this->loadFailedLogins();
     }
 
     public function loadStats()
     {
         $logPath = storage_path('logs/laravel.log');
         $logContent = File::exists($logPath) ? File::get($logPath) : '';
-        
-        // Count security events from today
-        $today = now()->format('Y-m-d');
         
         $this->stats = [
             'blocked_requests' => substr_count($logContent, 'Blocked suspicious content'),
@@ -42,6 +41,47 @@ class SecurityDashboard extends Component
     protected function countFailedLogins(): int
     {
         return Cache::get('failed_login_count_' . now()->format('Y-m-d'), 0);
+    }
+
+    public function loadFailedLogins()
+    {
+        $logPath = storage_path('logs/laravel.log');
+        if (!File::exists($logPath)) {
+            $this->failedLogins = [];
+            return;
+        }
+        
+        $content = File::get($logPath);
+        $lines = array_filter(explode("\n", $content));
+        
+        $failed = [];
+        foreach ($lines as $line) {
+            if (strpos($line, 'Failed login attempt') !== false) {
+                if (preg_match('/\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\].*Failed login attempt \{(.+)\}/', $line, $matches)) {
+                    $data = json_decode('{' . $matches[2] . '}', true);
+                    if ($data) {
+                        $failed[] = [
+                            'time' => $matches[1],
+                            'ip' => $data['ip'] ?? '-',
+                            'identifier' => $data['identifier'] ?? '-',
+                            'user_agent' => $this->parseUserAgent($data['user_agent'] ?? ''),
+                        ];
+                    }
+                }
+            }
+        }
+        
+        $this->failedLogins = array_slice(array_reverse($failed), 0, 50);
+    }
+
+    protected function parseUserAgent(?string $ua): string
+    {
+        if (!$ua) return '-';
+        if (strpos($ua, 'Chrome') !== false) return 'Chrome';
+        if (strpos($ua, 'Firefox') !== false) return 'Firefox';
+        if (strpos($ua, 'Safari') !== false) return 'Safari';
+        if (strpos($ua, 'Edge') !== false) return 'Edge';
+        return 'Other';
     }
 
     protected function getLastScanTime(): ?string

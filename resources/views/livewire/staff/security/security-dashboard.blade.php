@@ -189,4 +189,43 @@
             </a>
         </div>
     </div>
+
+    {{-- Failed Logins Detail --}}
+    @if(count($failedLogins) > 0)
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-user-times text-rose-500"></i> Percobaan Login Gagal
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">{{ count($failedLogins) }}</span>
+            </h3>
+            <button wire:click="loadFailedLogins" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Waktu</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">IP Address</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email/ID</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Browser</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach($failedLogins as $login)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm text-gray-500">{{ $login['time'] }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-mono rounded">{{ $login['ip'] }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ Str::limit($login['identifier'], 30) }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-500">{{ $login['user_agent'] }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
 </div>
