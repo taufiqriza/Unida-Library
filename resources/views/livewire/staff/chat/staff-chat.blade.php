@@ -1335,8 +1335,7 @@
                     </div>
                 </button>
                 {{-- Delete Button --}}
-                <button wire:click="deletePersonalChat({{ $room->id }})" 
-                        wire:confirm="Hapus chat dengan {{ $otherUser->name }}? Semua pesan akan dihapus permanen."
+                <button wire:click="confirmDeleteChat({{ $room->id }}, '{{ addslashes($otherUser->name) }}')"
                         class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg items-center justify-center opacity-0 group-hover:opacity-100 transition hidden group-hover:flex">
                     <i class="fas fa-trash text-xs"></i>
                 </button>
@@ -1837,6 +1836,29 @@
                 </a>
                 <button wire:click="closeTaskModal" class="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm font-medium transition">
                     Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Delete Chat Confirmation Modal --}}
+    @if($showDeleteChatModal)
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden" @click.outside="$wire.cancelDeleteChat()">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">Hapus Chat?</h3>
+                <p class="text-gray-500 text-sm">Hapus semua percakapan dengan <strong class="text-gray-700">{{ $deletingChatName }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="px-6 pb-6 flex gap-3">
+                <button wire:click="cancelDeleteChat" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition">
+                    Batal
+                </button>
+                <button wire:click="deletePersonalChat({{ $deletingChatId }})" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition">
+                    Hapus
                 </button>
             </div>
         </div>

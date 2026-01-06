@@ -63,6 +63,11 @@ class StaffChat extends Component
     // Branch Search
     public $branchSearch = '';
 
+    // Delete Chat Confirmation
+    public $showDeleteChatModal = false;
+    public $deletingChatId = null;
+    public $deletingChatName = '';
+
     protected ChatService $chatService;
 
     public function boot(ChatService $chatService)
@@ -233,7 +238,25 @@ class StaffChat extends Component
             $this->closeChat();
         }
 
+        $this->showDeleteChatModal = false;
+        $this->deletingChatId = null;
+        $this->deletingChatName = '';
+
         $this->dispatch('notify', type: 'success', message: 'Chat berhasil dihapus');
+    }
+
+    public function confirmDeleteChat($roomId, $name)
+    {
+        $this->deletingChatId = $roomId;
+        $this->deletingChatName = $name;
+        $this->showDeleteChatModal = true;
+    }
+
+    public function cancelDeleteChat()
+    {
+        $this->showDeleteChatModal = false;
+        $this->deletingChatId = null;
+        $this->deletingChatName = '';
     }
 
     public function loadMessages()
