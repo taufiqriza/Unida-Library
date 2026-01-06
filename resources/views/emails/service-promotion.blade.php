@@ -56,8 +56,8 @@
                     <td style="padding: 16px;">
                         <p style="margin: 0 0 8px; font-size: 12px; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">🔍 SISTEM CEK PLAGIASI TERINTEGRASI</p>
                         <ul style="margin: 0; padding-left: 16px; color: #475569; font-size: 13px; line-height: 1.6;">
-                            <li>Powered by Turnitin - standar internasional</li>
-                            <li>Database 190+ juta publikasi ilmiah</li>
+                            <li>Powered by <strong>Turnitin iThenticate</strong> - standar internasional</li>
+                            <li>Database 190+ juta publikasi ilmiah & 97% top jurnal dunia</li>
                             <li>Deteksi AI Writing (ChatGPT, dll)</li>
                             <li>Hasil similarity report dalam hitungan menit</li>
                         </ul>
