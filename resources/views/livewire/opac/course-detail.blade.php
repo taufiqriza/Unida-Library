@@ -31,7 +31,7 @@
                     {{-- Meta Info --}}
                     <div class="flex flex-wrap items-center gap-4 text-white/90 text-sm">
                         <div class="flex items-center gap-2">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=32&background=ffffff&color=2563eb" class="w-8 h-8 rounded-full">
+                            <img src="{{ $course->instructor->getAvatarUrl(32) }}" class="w-8 h-8 rounded-full object-cover">
                             <span>{{ $course->instructor->name }}</span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -53,35 +53,35 @@
 
                 {{-- Enrollment Card --}}
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="bg-white rounded-2xl shadow-xl p-4">
                         {{-- Thumbnail --}}
-                        <div class="relative h-40 bg-gradient-to-br from-violet-100 to-purple-100 rounded-xl overflow-hidden mb-4">
+                        <div class="relative h-32 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl overflow-hidden mb-3">
                             @if($course->thumbnail)
                             <img src="{{ Storage::url($course->thumbnail) }}" class="w-full h-full object-cover">
                             @else
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <i class="fas fa-graduation-cap text-violet-300 text-5xl"></i>
+                                <i class="fas fa-graduation-cap text-blue-300 text-4xl"></i>
                             </div>
                             @endif
                         </div>
 
                         {{-- Schedule Info --}}
                         @if($course->start_date)
-                        <div class="bg-violet-50 rounded-xl p-4 mb-4">
-                            <h4 class="font-semibold text-violet-900 text-sm mb-2">Jadwal Kelas</h4>
-                            <div class="space-y-2 text-sm">
+                        <div class="bg-blue-50 rounded-xl p-3 mb-3">
+                            <h4 class="font-semibold text-blue-900 text-sm mb-1.5">Jadwal Kelas</h4>
+                            <div class="space-y-1.5 text-sm">
                                 <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-calendar-alt text-violet-500 w-5"></i>
+                                    <i class="fas fa-calendar-alt text-blue-500 w-4"></i>
                                     <span>{{ $course->start_date->format('d M Y') }}@if($course->end_date && $course->end_date != $course->start_date) - {{ $course->end_date->format('d M Y') }}@endif</span>
                                 </div>
                                 @if($course->schedule_time)
                                 <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-clock text-violet-500 w-5"></i>
+                                    <i class="fas fa-clock text-blue-500 w-4"></i>
                                     <span>{{ \Carbon\Carbon::parse($course->schedule_time)->format('H:i') }} WIB</span>
                                 </div>
                                 @endif
                                 <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas {{ $course->is_online ? 'fa-video' : 'fa-map-marker-alt' }} text-violet-500 w-5"></i>
+                                    <i class="fas {{ $course->is_online ? 'fa-video' : 'fa-map-marker-alt' }} text-blue-500 w-4"></i>
                                     <span>{{ $course->is_online ? 'Online' : $course->location }}</span>
                                 </div>
                             </div>
@@ -91,43 +91,43 @@
                         {{-- Enrollment Status --}}
                         @if($myEnrollment)
                             @if($myEnrollment->status === 'pending')
-                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">
                                 <div class="flex items-center gap-2 text-amber-700">
                                     <i class="fas fa-hourglass-half"></i>
-                                    <span class="font-semibold">Menunggu Persetujuan</span>
+                                    <span class="font-semibold text-sm">Menunggu Persetujuan</span>
                                 </div>
-                                <p class="text-amber-600 text-sm mt-1">Pendaftaran Anda sedang direview oleh admin.</p>
+                                <p class="text-amber-600 text-xs mt-1">Pendaftaran sedang direview admin.</p>
                             </div>
                             @elseif($myEnrollment->status === 'approved')
-                            <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                            <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
                                 <div class="flex items-center gap-2 text-green-700">
                                     <i class="fas fa-check-circle"></i>
-                                    <span class="font-semibold">Anda Terdaftar</span>
+                                    <span class="font-semibold text-sm">Anda Terdaftar</span>
                                 </div>
-                                <p class="text-green-600 text-sm mt-1">Progress: {{ $myEnrollment->progress_percent }}%</p>
-                                <div class="w-full h-2 bg-green-200 rounded-full mt-2 overflow-hidden">
+                                <p class="text-green-600 text-xs mt-1">Progress: {{ $myEnrollment->progress_percent }}%</p>
+                                <div class="w-full h-1.5 bg-green-200 rounded-full mt-1.5 overflow-hidden">
                                     <div class="h-full bg-green-500 rounded-full" style="width: {{ $myEnrollment->progress_percent }}%"></div>
                                 </div>
                             </div>
                             @elseif($myEnrollment->status === 'completed')
-                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3">
                                 <div class="flex items-center gap-2 text-emerald-700">
                                     <i class="fas fa-award"></i>
-                                    <span class="font-semibold">Selesai!</span>
+                                    <span class="font-semibold text-sm">Selesai!</span>
                                 </div>
-                                <p class="text-emerald-600 text-sm mt-1">Nilai: {{ $myEnrollment->final_score ?? '-' }}</p>
+                                <p class="text-emerald-600 text-xs mt-1">Nilai: {{ $myEnrollment->final_score ?? '-' }}</p>
                             </div>
                             @endif
                         @else
                             @auth('member')
-                            <button wire:click="$set('showEnrollModal', true)" class="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold rounded-xl hover:from-violet-700 hover:to-purple-700 transition shadow-lg shadow-violet-500/25">
+                            <button wire:click="$set('showEnrollModal', true)" class="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/25 text-sm">
                                 <i class="fas fa-user-plus mr-2"></i>Daftar Kelas
                             </button>
                             @if($course->requires_approval)
-                            <p class="text-xs text-gray-500 text-center mt-2"><i class="fas fa-info-circle mr-1"></i>Pendaftaran memerlukan persetujuan</p>
+                            <p class="text-xs text-gray-500 text-center mt-1.5"><i class="fas fa-info-circle mr-1"></i>Memerlukan persetujuan</p>
                             @endif
                             @else
-                            <a href="{{ route('login') }}" class="block w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-xl text-center hover:bg-gray-200 transition">
+                            <a href="{{ route('login') }}" class="block w-full py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl text-center hover:bg-gray-200 transition text-sm">
                                 <i class="fas fa-sign-in-alt mr-2"></i>Login untuk Daftar
                             </a>
                             @endauth
@@ -245,7 +245,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h3 class="font-bold text-gray-900 mb-4">Instruktur</h3>
                     <div class="flex items-center gap-4">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=64&background=2563eb&color=ffffff" class="w-16 h-16 rounded-xl">
+                        <img src="{{ $course->instructor->getAvatarUrl(64) }}" class="w-16 h-16 rounded-xl object-cover">
                         <div>
                             <p class="font-semibold text-gray-900">{{ $course->instructor->name }}</p>
                             <p class="text-sm text-gray-500">{{ $course->instructor->email }}</p>
