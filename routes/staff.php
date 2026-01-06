@@ -118,12 +118,18 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         Route::get('/email/preview/{template}', function ($template) {
             $data = match($template) {
                 'service-promotion' => ['recipientName' => 'Bapak/Ibu Pimpinan', 'appUrl' => config('app.url'), 'websiteUrl' => config('app.url')],
-                'welcome' => ['user' => (object)['name' => 'Ahmad Fauzi']],
-                'publication-approved' => ['publication' => (object)['title' => 'Contoh Judul Karya Ilmiah', 'type' => 'Skripsi'], 'user' => (object)['name' => 'Ahmad Fauzi']],
-                'plagiarism-result' => ['submission' => (object)['title' => 'Contoh Judul Dokumen', 'similarity_score' => 15], 'user' => (object)['name' => 'Ahmad Fauzi']],
-                'certificate-updated' => ['publication' => (object)['title' => 'Contoh Judul Karya'], 'user' => (object)['name' => 'Ahmad Fauzi']],
-                'loan-reminder' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->addDays(3)], 'user' => (object)['name' => 'Ahmad Fauzi']],
-                'loan-overdue' => ['loan' => (object)['book' => (object)['title' => 'Contoh Judul Buku'], 'due_date' => now()->subDays(5), 'fine' => 5000], 'user' => (object)['name' => 'Ahmad Fauzi']],
+                'welcome' => ['name' => 'Ahmad Fauzi', 'loginUrl' => config('app.url') . '/login'],
+                'publication-approved' => ['title' => 'Contoh Judul Karya Ilmiah', 'type' => 'Skripsi', 'author' => 'Ahmad Fauzi', 'year' => date('Y'), 'nim' => '2021001234', 'portalUrl' => config('app.url')],
+                'plagiarism-result' => ['title' => 'Contoh Judul Dokumen', 'similarityScore' => 15, 'name' => 'Ahmad Fauzi', 'status' => 'completed', 'viewUrl' => config('app.url')],
+                'certificate-updated' => ['title' => 'Contoh Judul Karya', 'name' => 'Ahmad Fauzi', 'downloadUrl' => config('app.url')],
+                'loan-reminder' => ['name' => 'Ahmad Fauzi', 'bookTitle' => 'Contoh Judul Buku', 'dueDate' => now()->addDays(3)->format('d M Y'), 'daysLeft' => 3],
+                'loan-overdue' => ['name' => 'Ahmad Fauzi', 'bookTitle' => 'Contoh Judul Buku', 'dueDate' => now()->subDays(5)->format('d M Y'), 'daysOverdue' => 5, 'fine' => 5000],
+                'event-invitation' => ['name' => 'Bapak/Ibu', 'eventTitle' => 'Workshop Penulisan Karya Ilmiah', 'eventDate' => now()->addDays(7)->format('d M Y'), 'eventTime' => '09:00 WIB', 'eventLocation' => 'Aula Perpustakaan Lt. 2', 'eventDescription' => 'Workshop ini akan membahas teknik penulisan karya ilmiah yang baik dan benar.', 'registerUrl' => config('app.url')],
+                'announcement' => ['title' => 'Jadwal Libur Akhir Tahun', 'content' => 'Perpustakaan UNIDA akan tutup pada tanggal 25 Desember - 1 Januari dalam rangka libur akhir tahun.', 'recipientName' => 'Civitas Akademika'],
+                'new-collection' => ['name' => 'Ahmad Fauzi', 'collections' => [['title' => 'Artificial Intelligence: A Modern Approach', 'author' => 'Stuart Russell', 'type' => 'Buku'], ['title' => 'Deep Learning', 'author' => 'Ian Goodfellow', 'type' => 'Buku']], 'viewUrl' => config('app.url')],
+                'loan-extended' => ['name' => 'Ahmad Fauzi', 'bookTitle' => 'Contoh Judul Buku', 'oldDueDate' => now()->format('d M Y'), 'newDueDate' => now()->addDays(7)->format('d M Y')],
+                'reservation-ready' => ['name' => 'Ahmad Fauzi', 'bookTitle' => 'Contoh Judul Buku', 'pickupDeadline' => now()->addDays(3)->format('d M Y'), 'pickupLocation' => 'Meja Sirkulasi Lt. 1'],
+                'newsletter' => ['month' => 'Januari 2026', 'totalVisitors' => 1250, 'totalLoans' => 450, 'topBooks' => [['title' => 'Buku Populer 1', 'loans' => 25], ['title' => 'Buku Populer 2', 'loans' => 20]], 'upcomingEvents' => [['title' => 'Workshop Menulis', 'date' => '15 Jan 2026']]],
                 default => []
             };
             return view("emails.{$template}", $data);

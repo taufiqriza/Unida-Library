@@ -34,15 +34,20 @@ class EmailManagement extends Component
     public $showPreviewModal = false;
     public $previewTemplate = '';
 
-    // Daftar template email yang tersedia
     public array $templates = [
-        'service-promotion' => ['name' => 'Promosi Layanan', 'desc' => 'Informasi layanan terbaru perpustakaan', 'icon' => 'fa-bullhorn', 'color' => 'violet'],
-        'welcome' => ['name' => 'Selamat Datang', 'desc' => 'Email sambutan member baru', 'icon' => 'fa-door-open', 'color' => 'green'],
-        'publication-approved' => ['name' => 'Publikasi Disetujui', 'desc' => 'Notifikasi karya ilmiah dipublikasikan', 'icon' => 'fa-check-circle', 'color' => 'emerald'],
-        'plagiarism-result' => ['name' => 'Hasil Plagiasi', 'desc' => 'Hasil pengecekan similarity', 'icon' => 'fa-search', 'color' => 'blue'],
-        'certificate-updated' => ['name' => 'Update Sertifikat', 'desc' => 'Pembaruan format sertifikat', 'icon' => 'fa-certificate', 'color' => 'amber'],
-        'loan-reminder' => ['name' => 'Pengingat Peminjaman', 'desc' => 'Reminder batas waktu pengembalian', 'icon' => 'fa-clock', 'color' => 'orange'],
-        'loan-overdue' => ['name' => 'Keterlambatan', 'desc' => 'Notifikasi buku terlambat dikembalikan', 'icon' => 'fa-exclamation-triangle', 'color' => 'red'],
+        'service-promotion' => ['name' => 'Promosi Layanan', 'desc' => 'Informasi layanan terbaru perpustakaan', 'icon' => 'fa-bullhorn', 'color' => 'violet', 'manual' => true],
+        'event-invitation' => ['name' => 'Undangan Event', 'desc' => 'Undangan seminar, workshop, pelatihan', 'icon' => 'fa-calendar-check', 'color' => 'blue', 'manual' => true],
+        'announcement' => ['name' => 'Pengumuman', 'desc' => 'Info penting (jadwal tutup, maintenance)', 'icon' => 'fa-bullhorn', 'color' => 'amber', 'manual' => true],
+        'new-collection' => ['name' => 'Koleksi Baru', 'desc' => 'Notifikasi buku/jurnal baru', 'icon' => 'fa-book-open', 'color' => 'emerald', 'manual' => true],
+        'newsletter' => ['name' => 'Newsletter', 'desc' => 'Ringkasan aktivitas bulanan', 'icon' => 'fa-newspaper', 'color' => 'indigo', 'manual' => true],
+        'welcome' => ['name' => 'Selamat Datang', 'desc' => 'Email sambutan member baru', 'icon' => 'fa-door-open', 'color' => 'green', 'manual' => false],
+        'publication-approved' => ['name' => 'Publikasi Disetujui', 'desc' => 'Notifikasi karya ilmiah dipublikasikan', 'icon' => 'fa-check-circle', 'color' => 'emerald', 'manual' => false],
+        'plagiarism-result' => ['name' => 'Hasil Plagiasi', 'desc' => 'Hasil pengecekan similarity', 'icon' => 'fa-search', 'color' => 'blue', 'manual' => false],
+        'certificate-updated' => ['name' => 'Update Sertifikat', 'desc' => 'Pembaruan format sertifikat', 'icon' => 'fa-certificate', 'color' => 'amber', 'manual' => false],
+        'loan-reminder' => ['name' => 'Pengingat Peminjaman', 'desc' => 'Reminder batas waktu pengembalian', 'icon' => 'fa-clock', 'color' => 'orange', 'manual' => false],
+        'loan-overdue' => ['name' => 'Keterlambatan', 'desc' => 'Notifikasi buku terlambat dikembalikan', 'icon' => 'fa-exclamation-triangle', 'color' => 'red', 'manual' => false],
+        'loan-extended' => ['name' => 'Perpanjangan Berhasil', 'desc' => 'Konfirmasi perpanjangan pinjaman', 'icon' => 'fa-redo', 'color' => 'green', 'manual' => false],
+        'reservation-ready' => ['name' => 'Reservasi Siap', 'desc' => 'Buku yang direservasi sudah tersedia', 'icon' => 'fa-bookmark', 'color' => 'blue', 'manual' => false],
     ];
 
     protected $rules = [

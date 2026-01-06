@@ -147,7 +147,7 @@
 
             {{-- Tab: Templates --}}
             @if($activeTab === 'templates')
-            <div x-data="{ previewOpen: false, previewKey: '' }" class="space-y-4">
+            <div class="space-y-4">
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach($templates as $key => $tpl)
                     <div class="bg-gray-50 rounded-xl p-5 border border-gray-100 hover:border-violet-200 hover:shadow-md transition group">
@@ -156,15 +156,20 @@
                                 <i class="fas {{ $tpl['icon'] }} text-{{ $tpl['color'] }}-600 text-lg"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-semibold text-gray-900">{{ $tpl['name'] }}</h3>
-                                <p class="text-sm text-gray-500 mt-1">{{ $tpl['desc'] }}</p>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-gray-900">{{ $tpl['name'] }}</h3>
+                                    <span class="px-1.5 py-0.5 text-[10px] font-medium rounded {{ $tpl['manual'] ? 'bg-violet-100 text-violet-700' : 'bg-gray-200 text-gray-600' }}">
+                                        {{ $tpl['manual'] ? 'Manual' : 'Auto' }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-500">{{ $tpl['desc'] }}</p>
                             </div>
                         </div>
                         <div class="mt-4 pt-4 border-t border-gray-200 flex gap-2">
                             <a href="{{ route('staff.email.preview', $key) }}" target="_blank" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-center text-gray-600 hover:bg-gray-50 transition">
                                 <i class="fas fa-eye mr-1"></i> Preview
                             </a>
-                            @if($key === 'service-promotion')
+                            @if($tpl['manual'])
                             <button wire:click="$set('activeTab', 'recipients')" class="flex-1 px-3 py-2 bg-violet-600 text-white rounded-lg text-sm text-center hover:bg-violet-700 transition">
                                 <i class="fas fa-paper-plane mr-1"></i> Kirim
                             </button>
@@ -178,7 +183,7 @@
                     @endforeach
                 </div>
                 <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <p class="text-sm text-blue-700"><i class="fas fa-info-circle mr-2"></i><strong>Info:</strong> Template selain "Promosi Layanan" dikirim otomatis oleh sistem saat event terjadi (publikasi disetujui, hasil plagiasi, dll).</p>
+                    <p class="text-sm text-blue-700"><i class="fas fa-info-circle mr-2"></i><strong>Manual:</strong> Bisa dikirim massal via Campaign. <strong>Auto:</strong> Dikirim otomatis oleh sistem saat event terjadi.</p>
                 </div>
             </div>
             @endif
