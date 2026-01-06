@@ -1,6 +1,6 @@
 @section('title', $editMode ? 'Edit Kelas' : 'Buat Kelas Baru')
 
-<div class="max-w-4xl mx-auto space-y-6">
+<div class="space-y-6">
     {{-- Header --}}
     <div class="flex items-center gap-4">
         <a href="{{ route('staff.elearning.index') }}" wire:navigate class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-200 transition">

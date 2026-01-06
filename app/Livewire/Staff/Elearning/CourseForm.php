@@ -79,9 +79,14 @@ class CourseForm extends Component
         if ($id) {
             $this->course = Course::findOrFail($id);
             
-            // Check edit permission
-            if ($user->role !== 'super_admin' && $this->course->branch_id !== $user->branch_id && $this->course->instructor_id !== $user->id) {
-                abort(403);
+            // Check edit permission - super_admin can edit all, others can edit their branch or own courses
+            if ($user->role !== 'super_admin') {
+                $canEdit = $this->course->branch_id === $user->branch_id 
+                    || $this->course->branch_id === null 
+                    || $this->course->instructor_id === $user->id;
+                if (!$canEdit) {
+                    abort(403);
+                }
             }
             
             $this->editMode = true;
