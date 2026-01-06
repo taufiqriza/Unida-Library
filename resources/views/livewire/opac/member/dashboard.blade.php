@@ -240,37 +240,23 @@
                     </div>
                     @endif
 
-                    {{-- Sertifikat Bebas Plagiasi (jika ada) --}}
+                    {{-- Sertifikat Bebas Plagiasi (jika ada) - Compact --}}
                     @if(isset($plagiarismCertificates) && $plagiarismCertificates->count() > 0)
-                    <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl shadow-sm border border-violet-200/50 overflow-hidden">
-                        <div class="p-4 border-b border-violet-200/50">
-                            <h2 class="font-bold text-violet-800 text-sm flex items-center gap-2">
-                                <div class="w-7 h-7 bg-violet-500 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-award text-white text-xs"></i>
-                                </div>
-                                Sertifikat Bebas Plagiasi
-                            </h2>
-                        </div>
-                        <div class="p-3 space-y-2">
-                            @foreach($plagiarismCertificates as $cert)
-                            <div class="p-3 bg-white rounded-xl border border-violet-100">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-900">{{ $cert->certificate_number }}</p>
-                                        <p class="text-xs text-gray-500">{{ $cert->certificate_generated_at?->format('d M Y') }} • {{ $cert->similarity_score }}% similarity</p>
-                                    </div>
-                                    <a href="{{ route('opac.member.plagiarism.certificate', $cert) }}" target="_blank" class="px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition flex items-center gap-1">
-                                        <i class="fas fa-download"></i> Unduh
-                                    </a>
-                                </div>
-                                <div class="bg-violet-50 rounded-lg p-2">
-                                    <p class="text-xs text-violet-700 font-medium line-clamp-1">{{ $cert->document_title }}</p>
-                                    <p class="text-[10px] text-violet-600">{{ ucfirst($cert->external_platform ?? $cert->provider) }}</p>
-                                </div>
+                    <a href="{{ route('opac.member.plagiarism.certificate', $plagiarismCertificates->first()) }}" class="block p-3 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl hover:border-violet-300 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-violet-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-award text-white"></i>
                             </div>
-                            @endforeach
+                            <div class="flex-1 min-w-0">
+                                <p class="text-violet-800 font-semibold text-xs">Sertifikat Bebas Plagiasi</p>
+                                <p class="text-violet-600 text-[10px] truncate">{{ $plagiarismCertificates->first()->certificate_number }}</p>
+                            </div>
+                            @if($plagiarismCertificates->count() > 1)
+                            <span class="px-2 py-0.5 bg-violet-200 text-violet-700 text-[9px] font-bold rounded">+{{ $plagiarismCertificates->count() - 1 }}</span>
+                            @endif
+                            <i class="fas fa-chevron-right text-violet-400 text-xs"></i>
                         </div>
-                    </div>
+                    </a>
                     @endif
 
                     {{-- Turnitin Active Banner --}}

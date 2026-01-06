@@ -1,6 +1,4 @@
-@extends('components.opac.layout')
-
-@section('content')
+<x-opac.layout>
 <div class="min-h-screen bg-gray-50">
     {{-- Header --}}
     <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
@@ -30,8 +28,7 @@
             </div>
 
             {{-- Content --}}
-            <div class="p-6 space-y-6">
-                {{-- Certificate Info --}}
+            <div class="p-6 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs text-gray-500 block">Nomor Sertifikat</label>
@@ -43,13 +40,11 @@
                     </div>
                 </div>
 
-                {{-- Course Info --}}
                 <div>
                     <label class="text-xs text-gray-500 block">Nama Kelas</label>
-                    <p class="font-semibold text-gray-900 text-lg">{{ $cert->enrollment->course->title }}</p>
+                    <p class="font-semibold text-gray-900">{{ $cert->enrollment->course->title }}</p>
                 </div>
 
-                {{-- Member Info --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs text-gray-500 block">Nama Peserta</label>
@@ -63,14 +58,13 @@
 
                 {{-- Completion Badge --}}
                 <div class="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl text-center border border-emerald-200">
-                    <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-check text-white text-2xl"></i>
+                    <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <i class="fas fa-check text-white text-lg"></i>
                     </div>
-                    <p class="text-emerald-700 font-bold text-lg">LULUS</p>
-                    <p class="text-emerald-600 text-sm">Telah menyelesaikan seluruh materi kelas</p>
+                    <p class="text-emerald-700 font-bold">LULUS</p>
+                    <p class="text-emerald-600 text-xs">Telah menyelesaikan seluruh materi</p>
                 </div>
 
-                {{-- Instructor Info --}}
                 <div class="text-center text-sm text-gray-500">
                     <p>Instruktur: <strong class="text-gray-700">{{ $cert->enrollment->course->instructor->name }}</strong></p>
                 </div>
@@ -78,29 +72,14 @@
         </div>
 
         {{-- Actions --}}
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-            <button onclick="window.print()" class="flex-1 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
-                <i class="fas fa-print"></i>
-                Cetak Sertifikat
+        <div class="mt-4 flex gap-3">
+            <button onclick="window.print()" class="flex-1 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition flex items-center justify-center gap-2">
+                <i class="fas fa-print"></i> Cetak
             </button>
-            <a href="{{ route('opac.classroom', $cert->enrollment->course->slug) }}" class="flex-1 py-4 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2">
-                <i class="fas fa-arrow-left"></i>
-                Kembali ke Kelas
+            <a href="{{ route('opac.classroom', $cert->enrollment->course->slug) }}" class="flex-1 py-3 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-left"></i> Kembali
             </a>
-        </div>
-
-        {{-- Verification Note --}}
-        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-            <div class="flex items-start gap-3">
-                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-info-circle text-blue-600 text-sm"></i>
-                </div>
-                <div>
-                    <p class="text-blue-800 font-medium text-sm">Verifikasi Sertifikat</p>
-                    <p class="text-blue-600 text-xs mt-1">Sertifikat ini dapat diverifikasi dengan nomor: <strong>{{ $cert->certificate_number }}</strong></p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
-@endsection
+</x-opac.layout>
