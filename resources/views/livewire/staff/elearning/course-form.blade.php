@@ -44,12 +44,16 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Cabang</label>
+                        @if($this->isSuperAdmin())
                         <select wire:model="branch_id" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
-                            <option value="">Semua Cabang</option>
+                            <option value="">Semua Cabang (Global)</option>
                             @foreach($branches as $branch)
                             <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                             @endforeach
                         </select>
+                        @else
+                        <input type="text" value="{{ $branches->firstWhere('id', $branch_id)?->name ?? 'Cabang Anda' }}" disabled class="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-600">
+                        @endif
                     </div>
                 </div>
 

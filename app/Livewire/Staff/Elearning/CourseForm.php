@@ -64,8 +64,26 @@ class CourseForm extends Component
 
     public function mount($id = null)
     {
+        $user = auth()->user();
+        
+        // Check permission - only admin/librarian can create/edit
+        if (!in_array($user->role, ['super_admin', 'admin', 'librarian'])) {
+            abort(403);
+        }
+
+        // Set default branch for non-super_admin
+        if ($user->role !== 'super_admin') {
+            $this->branch_id = $user->branch_id;
+        }
+
         if ($id) {
             $this->course = Course::findOrFail($id);
+            
+            // Check edit permission
+            if ($user->role !== 'super_admin' && $this->course->branch_id !== $user->branch_id && $this->course->instructor_id !== $user->id) {
+                abort(403);
+            }
+            
             $this->editMode = true;
             $this->fill($this->course->toArray());
             $this->schedule_days = $this->course->schedule_days_array;
@@ -73,6 +91,11 @@ class CourseForm extends Component
             $this->start_date = $this->course->start_date?->format('Y-m-d');
             $this->end_date = $this->course->end_date?->format('Y-m-d');
         }
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return auth()->user()->role === 'super_admin';
     }
 
     public function save()

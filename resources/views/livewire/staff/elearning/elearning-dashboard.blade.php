@@ -12,11 +12,13 @@
                 <p class="text-sm text-gray-500">Kelola kelas, materi, dan peserta pelatihan</p>
             </div>
         </div>
+        @if($canCreate)
         <a href="{{ route('staff.elearning.create') }}" wire:navigate
            class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition">
             <i class="fas fa-plus"></i>
             <span>Buat Kelas Baru</span>
         </a>
+        @endif
     </div>
 
     {{-- Stats Cards --}}
