@@ -57,7 +57,7 @@ class Classroom extends Component
     public function selectMaterial($materialId)
     {
         $this->currentMaterialId = $materialId;
-        $this->currentMaterial = CourseMaterial::find($materialId);
+        $this->currentMaterial = CourseMaterial::with('module')->find($materialId);
     }
 
     public function markComplete()
@@ -109,6 +109,38 @@ class Classroom extends Component
         ]);
 
         $this->enrollment->refresh();
+        
+        // Generate certificate if completed
+        if ($progress >= 100 && $this->course->has_certificate) {
+            $this->generateCertificate();
+        }
+    }
+
+    public function generateCertificate()
+    {
+        $existing = \App\Models\CourseCertificate::where('enrollment_id', $this->enrollment->id)->first();
+        if ($existing) return $existing;
+
+        $member = auth('member')->user();
+        $certNumber = 'CERT-' . strtoupper(substr(md5($this->enrollment->id . time()), 0, 8));
+        
+        return \App\Models\CourseCertificate::create([
+            'enrollment_id' => $this->enrollment->id,
+            'certificate_number' => $certNumber,
+            'member_name' => $member->name,
+            'course_title' => $this->course->title,
+            'issued_at' => now(),
+        ]);
+    }
+
+    public function downloadCertificate()
+    {
+        $cert = \App\Models\CourseCertificate::where('enrollment_id', $this->enrollment->id)->first();
+        if (!$cert) {
+            $cert = $this->generateCertificate();
+        }
+        
+        return redirect()->route('opac.elearning.certificate', $cert->certificate_number);
     }
 
     public function isMaterialCompleted($materialId): bool

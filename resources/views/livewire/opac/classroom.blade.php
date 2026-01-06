@@ -181,9 +181,9 @@
                     <h3 class="text-2xl font-bold text-gray-900 mb-2">Selamat! 🎉</h3>
                     <p class="text-gray-600 mb-6">Anda telah menyelesaikan semua materi kelas ini.</p>
                     @if($course->has_certificate)
-                    <a href="#" class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold transition shadow-lg">
-                        <i class="fas fa-certificate"></i> Unduh Sertifikat
-                    </a>
+                    <button wire:click="downloadCertificate" class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold transition shadow-lg">
+                        <i class="fas fa-certificate"></i> Lihat Sertifikat
+                    </button>
                     @endif
                 </div>
                 @endif

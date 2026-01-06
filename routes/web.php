@@ -60,6 +60,12 @@ Route::get('/elearning/{slug}', \App\Livewire\Opac\CourseDetail::class)->name('o
 // E-Learning Classroom (requires member auth)
 Route::get('/classroom/{slug}', \App\Livewire\Opac\Classroom::class)->middleware('auth:member')->name('opac.classroom');
 
+// E-Learning Certificate
+Route::get('/certificate/{number}', function($number) {
+    $cert = \App\Models\CourseCertificate::where('certificate_number', $number)->with(['enrollment.course', 'enrollment.member'])->firstOrFail();
+    return view('opac.elearning.certificate', compact('cert'));
+})->name('opac.elearning.certificate');
+
 // Auth Routes (Livewire) - with rate limiting
 Route::get('/login', \App\Livewire\Opac\Auth\Login::class)
     ->middleware('throttle:login')
