@@ -200,42 +200,26 @@
                 {{-- Left Column: Peminjaman Aktif + Submissions --}}
                 <div class="lg:col-span-2 space-y-4">
                     
-                    {{-- Surat Bebas Pustaka (jika ada) --}}
+                    {{-- Surat Bebas Pustaka (jika ada) - Compact --}}
                     @if(isset($clearanceLetters) && $clearanceLetters->where('status', 'approved')->count() > 0)
-                    <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl shadow-sm border border-emerald-200/50 overflow-hidden">
-                        <div class="p-4 border-b border-emerald-200/50">
-                            <h2 class="font-bold text-emerald-800 text-sm flex items-center gap-2">
-                                <div class="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-certificate text-white text-xs"></i>
-                                </div>
-                                Surat Bebas Pustaka
-                            </h2>
-                        </div>
-                        <div class="p-3 space-y-2">
-                            @foreach($clearanceLetters->where('status', 'approved') as $letter)
-                            <div class="p-3 bg-white rounded-xl border border-emerald-100">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-900">{{ $letter->letter_number }}</p>
-                                        <p class="text-xs text-gray-500">Diterbitkan {{ $letter->approved_at?->format('d M Y') }}</p>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <a href="{{ route('opac.member.clearance-letter.download', $letter) }}" class="px-2 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-1">
-                                            <i class="fas fa-download"></i> PDF
-                                        </a>
-                                        <a href="{{ route('opac.member.clearance-letter', $letter) }}" target="_blank" class="px-2 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded-lg hover:bg-emerald-700 transition flex items-center gap-1">
-                                            <i class="fas fa-print"></i> Cetak
-                                        </a>
-                                    </div>
-                                </div>
-                                @if($letter->thesisSubmission)
-                                <div class="bg-emerald-50 rounded-lg p-2 border-l-3 border-emerald-400">
-                                    <p class="text-xs text-emerald-700 font-medium line-clamp-1">{{ $letter->thesisSubmission->title }}</p>
-                                    <p class="text-[10px] text-emerald-600">{{ ucfirst($letter->thesisSubmission->type) }} • {{ $letter->thesisSubmission->year }}</p>
-                                </div>
-                                @endif
+                    @php $latestClearance = $clearanceLetters->where('status', 'approved')->first(); @endphp
+                    <div class="p-3 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-certificate text-white"></i>
                             </div>
-                            @endforeach
+                            <div class="flex-1 min-w-0">
+                                <p class="text-emerald-800 font-semibold text-xs">Surat Bebas Pustaka</p>
+                                <p class="text-emerald-600 text-[10px] truncate">{{ $latestClearance->letter_number }}</p>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <a href="{{ route('opac.member.clearance-letter.download', $latestClearance) }}" class="px-2 py-1.5 bg-emerald-600 text-white text-[10px] font-medium rounded-lg hover:bg-emerald-700 transition">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="{{ route('opac.member.clearance-letter', $latestClearance) }}" target="_blank" class="px-2 py-1.5 bg-blue-600 text-white text-[10px] font-medium rounded-lg hover:bg-blue-700 transition">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                     @endif
