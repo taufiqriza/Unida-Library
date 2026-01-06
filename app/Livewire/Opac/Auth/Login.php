@@ -64,10 +64,7 @@ class Login extends Component
 
         // No valid account found
         if (!$staff && !$member) {
-            Log::channel('daily')->warning('Login failed', [
-                'identifier' => $this->identifier,
-                'ip' => request()->ip(),
-            ]);
+            $this->trackFailedLogin();
             $this->addError('identifier', 'Email/No. Anggota atau password salah');
             return;
         }
@@ -181,6 +178,20 @@ class Login extends Component
     {
         $this->showPortalChoice = false;
         $this->availablePortals = null;
+    }
+
+    protected function trackFailedLogin(): void
+    {
+        $ip = request()->ip();
+        $today = now()->format('Y-m-d');
+        
+        \Cache::increment("failed_login_count_{$today}");
+        
+        Log::warning('Failed login attempt', [
+            'ip' => $ip,
+            'identifier' => $this->identifier,
+            'user_agent' => request()->userAgent(),
+        ]);
     }
 
     public function render()
