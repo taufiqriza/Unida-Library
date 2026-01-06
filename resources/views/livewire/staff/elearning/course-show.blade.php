@@ -97,57 +97,61 @@
 
     @include('livewire.staff.elearning.partials.course-' . $tab)
 
-    {{-- Module Modal --}}
-    @if($showModuleModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" wire:click.self="$set('showModuleModal', false)">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg">
-            <div class="p-6 border-b border-gray-100">
-                <h3 class="text-lg font-bold text-gray-900">{{ $editingModuleId ? 'Edit Modul' : 'Tambah Modul' }}</h3>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul Modul</label>
-                    <input type="text" wire:model="moduleTitle" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
-                    @error('moduleTitle') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+    {{-- Module Modal - Teleported --}}
+    <template x-teleport="body">
+        <div x-data x-show="$wire.showModuleModal" x-cloak
+             class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style="z-index: 99999;"
+             @click.self="$wire.set('showModuleModal', false)">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg" @click.stop>
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900">{{ $editingModuleId ? 'Edit Modul' : 'Tambah Modul' }}</h3>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
-                    <textarea wire:model="moduleDescription" rows="3" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500"></textarea>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Judul Modul</label>
+                        <input type="text" wire:model="moduleTitle" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
+                        @error('moduleTitle') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <textarea wire:model="moduleDescription" rows="3" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500"></textarea>
+                    </div>
                 </div>
-            </div>
-            <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
-                <button wire:click="$set('showModuleModal', false)" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200">Batal</button>
-                <button wire:click="saveModule" class="px-4 py-2 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700">Simpan</button>
+                <div class="p-6 border-t border-gray-100 flex justify-end gap-3">
+                    <button wire:click="$set('showModuleModal', false)" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200">Batal</button>
+                    <button wire:click="saveModule" class="px-4 py-2 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700">Simpan</button>
+                </div>
             </div>
         </div>
-    </div>
-    @endif
+    </template>
 
-    {{-- Material Modal --}}
-    @if($showMaterialModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" wire:click.self="$set('showMaterialModal', false)">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-gray-100">
-                <h3 class="text-lg font-bold text-gray-900">{{ $editingMaterialId ? 'Edit Materi' : 'Tambah Materi' }}</h3>
-            </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul Materi</label>
-                    <input type="text" wire:model="materialTitle" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
+    {{-- Material Modal - Teleported --}}
+    <template x-teleport="body">
+        <div x-data x-show="$wire.showMaterialModal" x-cloak
+             class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style="z-index: 99999;"
+             @click.self="$wire.set('showMaterialModal', false)">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" @click.stop>
+                <div class="p-6 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-900">{{ $editingMaterialId ? 'Edit Materi' : 'Tambah Materi' }}</h3>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
-                    <select wire:model.live="materialType" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
-                        <option value="text">Teks/Artikel</option>
-                        <option value="video">Video</option>
-                        <option value="document">Dokumen</option>
-                        <option value="link">Link Eksternal</option>
-                        <option value="quiz">Quiz</option>
-                    </select>
-                </div>
-                @if($materialType === 'text')
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Konten</label>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Judul Materi</label>
+                        <input type="text" wire:model="materialTitle" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipe</label>
+                        <select wire:model.live="materialType" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500">
+                            <option value="text">Teks/Artikel</option>
+                            <option value="video">Video</option>
+                            <option value="document">Dokumen</option>
+                            <option value="link">Link Eksternal</option>
+                            <option value="quiz">Quiz</option>
+                        </select>
+                    </div>
+                    @if($materialType === 'text')
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Konten</label>
                     <textarea wire:model="materialContent" rows="6" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500"></textarea>
                 </div>
                 @elseif($materialType === 'video')
@@ -178,5 +182,5 @@
             </div>
         </div>
     </div>
-    @endif
+    </template>
 </div>
