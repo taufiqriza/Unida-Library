@@ -221,12 +221,10 @@ class EmailManagement extends Component
         
         foreach ($recipients as $recipient) {
             try {
-                // Untuk saat ini hanya service-promotion yang bisa dikirim massal
-                if ($campaign->template === 'service-promotion') {
-                    Mail::to($recipient->email)->send(
-                        new ServicePromotionMail($recipient->name, config('app.url'))
-                    );
-                }
+                $data = $this->getTemplateData($campaign->template, $recipient);
+                Mail::to($recipient->email)->send(
+                    new \App\Mail\GenericCampaignMail($campaign->template, $data, $campaign->subject)
+                );
                 
                 EmailLog::create([
                     'campaign_id' => $campaign->id,
@@ -255,6 +253,19 @@ class EmailManagement extends Component
         $this->showSendModal = false;
         $this->sendingCampaign = null;
         session()->flash('success', "Terkirim: {$sent}, Gagal: {$failed}");
+    }
+
+    private function getTemplateData(string $template, EmailRecipient $recipient): array
+    {
+        $appUrl = config('app.url');
+        return match($template) {
+            'service-promotion' => ['recipientName' => $recipient->name, 'appUrl' => $appUrl, 'websiteUrl' => $appUrl],
+            'event-invitation' => ['name' => $recipient->name, 'eventTitle' => 'Workshop Perpustakaan', 'eventDate' => now()->addDays(7)->format('d M Y'), 'eventTime' => '09:00 WIB', 'eventLocation' => 'Aula Perpustakaan', 'eventDescription' => '', 'registerUrl' => $appUrl],
+            'announcement' => ['recipientName' => $recipient->name, 'title' => 'Pengumuman', 'content' => ''],
+            'new-collection' => ['name' => $recipient->name, 'collections' => [], 'viewUrl' => $appUrl],
+            'newsletter' => ['month' => now()->format('F Y'), 'totalVisitors' => 0, 'totalLoans' => 0, 'topBooks' => [], 'upcomingEvents' => []],
+            default => ['name' => $recipient->name]
+        };
     }
 
     public function deleteCampaign($id)
