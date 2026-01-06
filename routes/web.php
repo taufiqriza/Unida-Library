@@ -57,6 +57,9 @@ Route::get('/panduan/member', fn() => view('opac.pages.panduan-member'))->name('
 // E-Learning Course Detail
 Route::get('/elearning/{slug}', \App\Livewire\Opac\CourseDetail::class)->name('opac.elearning.show');
 
+// E-Learning Classroom (requires member auth)
+Route::get('/classroom/{slug}', \App\Livewire\Opac\Classroom::class)->middleware('auth:member')->name('opac.classroom');
+
 // Auth Routes (Livewire) - with rate limiting
 Route::get('/login', \App\Livewire\Opac\Auth\Login::class)
     ->middleware('throttle:login')

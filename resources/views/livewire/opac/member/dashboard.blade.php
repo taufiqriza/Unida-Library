@@ -861,7 +861,7 @@
                         @if($myEnrollmentsData->count() > 0)
                         <div class="divide-y divide-gray-50">
                             @foreach($myEnrollmentsData as $enrollment)
-                            <a href="{{ route('opac.elearning.show', $enrollment->course->slug) }}" class="block p-3 hover:bg-gray-50 transition">
+                            <a href="{{ route('opac.classroom', $enrollment->course->slug) }}" class="block p-3 hover:bg-gray-50 transition">
                                 <div class="flex items-start gap-2">
                                     <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                         @if($enrollment->course->thumbnail)

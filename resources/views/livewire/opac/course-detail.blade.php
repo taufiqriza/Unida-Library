@@ -98,25 +98,20 @@
                                 </div>
                                 <p class="text-amber-600 text-xs mt-1">Pendaftaran sedang direview admin.</p>
                             </div>
-                            @elseif($myEnrollment->status === 'approved')
+                            @elseif($myEnrollment->status === 'approved' || $myEnrollment->status === 'completed')
                             <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
                                 <div class="flex items-center gap-2 text-green-700">
                                     <i class="fas fa-check-circle"></i>
-                                    <span class="font-semibold text-sm">Anda Terdaftar</span>
+                                    <span class="font-semibold text-sm">{{ $myEnrollment->status === 'completed' ? 'Selesai!' : 'Anda Terdaftar' }}</span>
                                 </div>
                                 <p class="text-green-600 text-xs mt-1">Progress: {{ $myEnrollment->progress_percent }}%</p>
                                 <div class="w-full h-1.5 bg-green-200 rounded-full mt-1.5 overflow-hidden">
                                     <div class="h-full bg-green-500 rounded-full" style="width: {{ $myEnrollment->progress_percent }}%"></div>
                                 </div>
                             </div>
-                            @elseif($myEnrollment->status === 'completed')
-                            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 mb-3">
-                                <div class="flex items-center gap-2 text-emerald-700">
-                                    <i class="fas fa-award"></i>
-                                    <span class="font-semibold text-sm">Selesai!</span>
-                                </div>
-                                <p class="text-emerald-600 text-xs mt-1">Nilai: {{ $myEnrollment->final_score ?? '-' }}</p>
-                            </div>
+                            <a href="{{ route('opac.classroom', $course->slug) }}" class="block w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl text-center hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/25 text-sm">
+                                <i class="fas fa-play mr-2"></i>{{ $myEnrollment->progress_percent > 0 ? 'Lanjutkan Belajar' : 'Mulai Belajar' }}
+                            </a>
                             @endif
                         @else
                             @auth('member')
