@@ -323,20 +323,22 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Template Email</label>
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                         @foreach($templates as $key => $tpl)
-                        @if($key === 'service-promotion')
+                        @if($tpl['manual'] ?? false)
                         <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition {{ $selectedTemplate === $key ? 'border-violet-500 bg-violet-50' : 'border-gray-200 hover:border-gray-300' }}">
                             <input type="radio" wire:model="selectedTemplate" value="{{ $key }}" class="text-violet-600">
-                            <div>
+                            <div class="w-8 h-8 bg-{{ $tpl['color'] }}-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas {{ $tpl['icon'] }} text-{{ $tpl['color'] }}-600 text-sm"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
                                 <p class="font-medium text-sm text-gray-900">{{ $tpl['name'] }}</p>
-                                <p class="text-xs text-gray-500">{{ $tpl['desc'] }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ $tpl['desc'] }}</p>
                             </div>
                         </label>
                         @endif
                         @endforeach
                     </div>
-                    <p class="text-xs text-gray-400 mt-2"><i class="fas fa-info-circle mr-1"></i>Saat ini hanya template Promosi Layanan yang bisa dikirim massal</p>
                 </div>
                 <div class="bg-violet-50 rounded-xl p-4">
                     <p class="text-sm text-violet-700"><i class="fas fa-users mr-2"></i><strong>{{ count($selectedRecipients) }}</strong> penerima terpilih</p>
