@@ -184,8 +184,11 @@ class Login extends Component
     {
         $ip = request()->ip();
         $today = now()->format('Y-m-d');
+        $key = "failed_login_count_{$today}";
         
-        \Cache::increment("failed_login_count_{$today}");
+        // Database cache driver needs key to exist first
+        $current = \Cache::get($key, 0);
+        \Cache::put($key, $current + 1, now()->endOfDay());
         
         Log::warning('Failed login attempt', [
             'ip' => $ip,
