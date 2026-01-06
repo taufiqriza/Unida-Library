@@ -109,6 +109,11 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/{survey}/responses', \App\Livewire\Staff\Survey\SurveyResponses::class)->name('responses');
             Route::get('/{survey}/analytics', \App\Livewire\Staff\Survey\SurveyAnalytics::class)->name('analytics');
         });
+
+        // Email Management
+        Route::get('/email', \App\Livewire\Staff\Email\EmailManagement::class)
+            ->middleware('can:manage-staff')
+            ->name('email.index');
         
         // Logout - secure with signed URL (no CSRF needed, expires in 5 min)
         Route::get('/logout/{signature}', function ($signature) {
