@@ -124,12 +124,14 @@ class MemberList extends Component
         }])->orderBy('name')->get();
 
         // Visibility rules:
-        // - Dosen/Tendik: visible to ALL branches (data SDM pusat)
+        // - Dosen/Tendik: visible to ALL branches (data SDM pusat) EXCEPT OPPM
         // - Santri: only visible to OPPM branch or super admin
-        // - Mahasiswa/Umum: filtered by branch
-        $canSeeSantri = $isSuperAdmin || ($user->branch && str_contains(strtolower($user->branch->name), 'oppm'));
-        $canSeeDosen = true; // All branches can see dosen
-        $canSeeTendik = true; // All branches can see tendik
+        // - Mahasiswa/Umum: filtered by branch, Mahasiswa hidden for OPPM
+        $isOppmBranch = $user->branch && str_contains(strtolower($user->branch->name), 'oppm');
+        $canSeeSantri = $isSuperAdmin || $isOppmBranch;
+        $canSeeMahasiswa = !$isOppmBranch || $isSuperAdmin;
+        $canSeeDosen = !$isOppmBranch || $isSuperAdmin;
+        $canSeeTendik = !$isOppmBranch || $isSuperAdmin;
 
         // Stats - dosen/tendik always show full count
         $statsQuery = Member::query()->when($effectiveBranchId, fn($q) => $q->where('branch_id', $effectiveBranchId));
@@ -175,6 +177,9 @@ class MemberList extends Component
                 'branches' => $isSuperAdmin ? Branch::orderBy('name')->get() : collect(),
                 'isSuperAdmin' => $isSuperAdmin,
                 'canSeeSantri' => $canSeeSantri,
+                'canSeeMahasiswa' => $canSeeMahasiswa,
+                'canSeeDosen' => $canSeeDosen,
+                'canSeeTendik' => $canSeeTendik,
                 'sdmFaculties' => $sdmFaculties,
                 'showEmployees' => true,
             ])->extends('staff.layouts.app')->section('content');
@@ -215,6 +220,9 @@ class MemberList extends Component
             'branches' => $isSuperAdmin ? Branch::orderBy('name')->get() : collect(),
             'isSuperAdmin' => $isSuperAdmin,
             'canSeeSantri' => $canSeeSantri,
+            'canSeeMahasiswa' => $canSeeMahasiswa,
+            'canSeeDosen' => $canSeeDosen,
+            'canSeeTendik' => $canSeeTendik,
             'sdmFaculties' => collect(),
             'showEmployees' => false,
         ])->extends('staff.layouts.app')->section('content');

@@ -38,31 +38,45 @@
     @endif
 
     {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    <div class="grid grid-cols-2 lg:grid-cols-{{ ($canSeeMahasiswa && $canSeeDosen && $canSeeTendik) ? '5' : '3' }} gap-3">
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center"><i class="fas fa-users text-white text-lg"></i></div>
-                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total'] + $stats['dosen'] + $stats['tendik']) }}</p><p class="text-xs text-gray-500">Total Civitas</p></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total'] + ($canSeeDosen ? $stats['dosen'] : 0) + ($canSeeTendik ? $stats['tendik'] : 0)) }}</p><p class="text-xs text-gray-500">Total Anggota</p></div>
             </div>
         </div>
+        @if($canSeeMahasiswa)
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"><i class="fas fa-user-graduate text-white text-lg"></i></div>
                 <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['mahasiswa']) }}</p><p class="text-xs text-gray-500">Mahasiswa</p></div>
             </div>
         </div>
+        @endif
+        @if($canSeeDosen)
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center"><i class="fas fa-chalkboard-teacher text-white text-lg"></i></div>
                 <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['dosen']) }}</p><p class="text-xs text-gray-500">Dosen</p></div>
             </div>
         </div>
+        @endif
+        @if($canSeeTendik)
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-tie text-white text-lg"></i></div>
                 <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['tendik']) }}</p><p class="text-xs text-gray-500">Tendik</p></div>
             </div>
         </div>
+        @endif
+        @if($canSeeSantri)
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-lg flex items-center justify-center"><i class="fas fa-mosque text-white text-lg"></i></div>
+                <div><p class="text-2xl font-bold text-gray-900">{{ number_format($stats['santri']) }}</p><p class="text-xs text-gray-500">Santri</p></div>
+            </div>
+        </div>
+        @endif
         <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-rose-500 rounded-lg flex items-center justify-center"><i class="fas fa-user-clock text-white text-lg"></i></div>
@@ -78,18 +92,24 @@
                 <i class="fas fa-users"></i><span>Semua</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'all' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['total']) }}</span>
             </button>
+            @if($canSeeMahasiswa)
             <button wire:click="setTab('mahasiswa')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'mahasiswa' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-graduate"></i><span>Mahasiswa</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'mahasiswa' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['mahasiswa']) }}</span>
             </button>
+            @endif
+            @if($canSeeDosen)
             <button wire:click="setTab('dosen')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'dosen' ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-chalkboard-teacher"></i><span>Dosen</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'dosen' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['dosen']) }}</span>
             </button>
+            @endif
+            @if($canSeeTendik)
             <button wire:click="setTab('tendik')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'tendik' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-user-tie"></i><span>Tendik</span>
                 <span class="px-2 py-0.5 {{ $activeTab === 'tendik' ? 'bg-white/20' : 'bg-gray-200' }} rounded-full text-xs">{{ number_format($stats['tendik']) }}</span>
             </button>
+            @endif
             @if($canSeeSantri)
             <button wire:click="setTab('santri')" class="flex-1 min-w-max px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 {{ $activeTab === 'santri' ? 'bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-mosque"></i><span>Santri</span>
