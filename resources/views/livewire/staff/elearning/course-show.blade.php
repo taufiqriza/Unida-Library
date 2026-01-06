@@ -21,9 +21,11 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
+            @if($this->canEdit())
             <a href="{{ route('staff.elearning.edit', $course->id) }}" wire:navigate class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition">
                 <i class="fas fa-edit mr-1"></i> Edit
             </a>
+            @endif
         </div>
     </div>
 

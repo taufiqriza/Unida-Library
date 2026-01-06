@@ -47,6 +47,13 @@ class CourseShow extends Component
         $this->course = Course::with(['category', 'instructor', 'branch', 'modules.materials'])->findOrFail($id);
     }
 
+    public function canEdit(): bool
+    {
+        $user = auth()->user();
+        if ($user->role === 'super_admin') return true;
+        return $this->course->instructor_id === $user->id;
+    }
+
     // Module Methods
     public function openModuleModal($moduleId = null)
     {
