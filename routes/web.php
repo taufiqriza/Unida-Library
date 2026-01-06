@@ -54,6 +54,8 @@ Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->na
 Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');
 Route::get('/panduan/member', fn() => view('opac.pages.panduan-member'))->name('opac.panduan.member');
 
+// E-Learning Course Detail
+Route::get('/elearning/{slug}', \App\Livewire\Opac\CourseDetail::class)->name('opac.elearning.show');
 
 // Auth Routes (Livewire) - with rate limiting
 Route::get('/login', \App\Livewire\Opac\Auth\Login::class)

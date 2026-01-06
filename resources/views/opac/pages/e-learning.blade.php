@@ -125,15 +125,9 @@
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=24&background=random" class="w-6 h-6 rounded-full">
                             <span class="text-xs text-gray-600">{{ $course->instructor->name }}</span>
                         </div>
-                        @auth('member')
-                        <a href="{{ route('opac.elearning.enroll', $course->slug) }}" class="px-3 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 transition">
-                            Daftar
+                        <a href="{{ route('opac.elearning.show', $course->slug) }}" class="px-3 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 transition">
+                            Lihat Detail
                         </a>
-                        @else
-                        <a href="{{ route('login') }}" class="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-lg hover:bg-gray-200 transition">
-                            Login untuk Daftar
-                        </a>
-                        @endauth
                     </div>
                 </div>
             </div>
