@@ -260,7 +260,7 @@
                         @php
                             $myCoursesCount = \App\Models\CourseEnrollment::where('member_id', $member->id)->whereIn('status', ['approved', 'completed'])->count();
                         @endphp
-                        <a href="{{ $myCoursesCount > 0 ? route('opac.member.dashboard') . '#kelas-saya' : route('opac.page', 'e-learning') }}" class="block bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all relative">
+                        <a href="{{ route('opac.member.courses') }}" class="block bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all relative">
                             @if($myCoursesCount > 0)
                             <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-white text-blue-600 text-[8px] font-bold rounded">{{ $myCoursesCount }}</div>
                             @endif
