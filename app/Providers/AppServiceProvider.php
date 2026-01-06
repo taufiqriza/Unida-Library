@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use Illuminate\Auth\Events\Failed;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
@@ -57,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Observers
         \App\Models\Task::observe(\App\Observers\TaskObserver::class);
+
+        // Register Event Listeners
+        Event::listen(Failed::class, \App\Listeners\LogFailedLogin::class);
 
         // Load mail config from database
         $this->configureMailFromDatabase();
