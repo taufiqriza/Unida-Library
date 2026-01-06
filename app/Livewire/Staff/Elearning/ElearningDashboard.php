@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Staff\Elearning;
 
+use App\Models\Branch;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\CourseEnrollment;
@@ -16,10 +17,11 @@ class ElearningDashboard extends Component
     public string $statusFilter = '';
     public string $categoryFilter = '';
     public string $tab = 'courses';
+    public ?int $selectedBranchId = null;
     
     public array $stats = [];
 
-    protected $queryString = ['search', 'statusFilter', 'categoryFilter', 'tab'];
+    protected $queryString = ['search', 'statusFilter', 'categoryFilter', 'tab', 'selectedBranchId'];
 
     public function mount()
     {
@@ -61,8 +63,11 @@ class ElearningDashboard extends Component
     {
         $user = auth()->user();
         
-        // Super admin sees all
+        // Super admin with branch filter
         if ($user->role === 'super_admin') {
+            if ($this->selectedBranchId) {
+                return Course::where('branch_id', $this->selectedBranchId)->pluck('id');
+            }
             return Course::pluck('id');
         }
         
@@ -73,6 +78,17 @@ class ElearningDashboard extends Component
         
         // Staff sees their branch courses only (read-only)
         return Course::where('branch_id', $user->branch_id)->pluck('id');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return auth()->user()->role === 'super_admin';
+    }
+
+    public function updatedSelectedBranchId()
+    {
+        $this->resetPage();
+        $this->loadStats();
     }
 
     public function approveEnrollment($id)
@@ -124,6 +140,8 @@ class ElearningDashboard extends Component
             'categories' => $categories,
             'pendingEnrollments' => $pendingEnrollments,
             'canCreate' => $this->canCreate(),
+            'branches' => Branch::where('is_active', true)->orderBy('name')->get(),
+            'isSuperAdmin' => $this->isSuperAdmin(),
         ])->extends('staff.layouts.app')->section('content');
     }
 }

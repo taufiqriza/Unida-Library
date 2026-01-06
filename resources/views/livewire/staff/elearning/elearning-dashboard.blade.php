@@ -12,13 +12,50 @@
                 <p class="text-sm text-gray-500">Kelola kelas, materi, dan peserta pelatihan</p>
             </div>
         </div>
-        @if($canCreate)
-        <a href="{{ route('staff.elearning.create') }}" wire:navigate
-           class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition">
-            <i class="fas fa-plus"></i>
-            <span>Buat Kelas Baru</span>
-        </a>
-        @endif
+        <div class="flex items-center gap-3">
+            {{-- Branch Switcher for Super Admin --}}
+            @if($isSuperAdmin)
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition shadow-sm">
+                    <i class="fas fa-building text-violet-500"></i>
+                    <span class="max-w-[150px] truncate">{{ $selectedBranchId ? $branches->firstWhere('id', $selectedBranchId)?->name : 'Semua Cabang' }}</span>
+                    <i class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform" :class="{ 'rotate-180': open }"></i>
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition
+                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-80 overflow-y-auto">
+                    <div class="px-3 py-2 border-b border-gray-100">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Pilih Cabang</p>
+                    </div>
+                    <button wire:click="$set('selectedBranchId', null)" @click="open = false"
+                            class="w-full px-3 py-2.5 text-left text-sm hover:bg-violet-50 transition flex items-center gap-3 {{ !$selectedBranchId ? 'bg-violet-50 text-violet-700' : 'text-gray-700' }}">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ !$selectedBranchId ? 'bg-violet-100' : 'bg-gray-100' }}">
+                            <i class="fas fa-globe text-xs {{ !$selectedBranchId ? 'text-violet-600' : 'text-gray-500' }}"></i>
+                        </div>
+                        <span class="flex-1">Semua Cabang</span>
+                        @if(!$selectedBranchId)<i class="fas fa-check text-violet-600 text-xs"></i>@endif
+                    </button>
+                    @foreach($branches as $branch)
+                    <button wire:click="$set('selectedBranchId', {{ $branch->id }})" @click="open = false"
+                            class="w-full px-3 py-2.5 text-left text-sm hover:bg-violet-50 transition flex items-center gap-3 {{ $selectedBranchId == $branch->id ? 'bg-violet-50 text-violet-700' : 'text-gray-700' }}">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center {{ $selectedBranchId == $branch->id ? 'bg-violet-100' : 'bg-gray-100' }}">
+                            <i class="fas fa-building text-xs {{ $selectedBranchId == $branch->id ? 'text-violet-600' : 'text-gray-500' }}"></i>
+                        </div>
+                        <span class="flex-1 truncate">{{ $branch->name }}</span>
+                        @if($selectedBranchId == $branch->id)<i class="fas fa-check text-violet-600 text-xs"></i>@endif
+                    </button>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            @if($canCreate)
+            <a href="{{ route('staff.elearning.create') }}" wire:navigate
+               class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition">
+                <i class="fas fa-plus"></i>
+                <span>Buat Kelas Baru</span>
+            </a>
+            @endif
+        </div>
     </div>
 
     {{-- Stats Cards --}}
