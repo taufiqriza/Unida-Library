@@ -199,49 +199,6 @@
                 
                 {{-- Left Column: Peminjaman Aktif + Submissions --}}
                 <div class="lg:col-span-2 space-y-4">
-                    
-                    {{-- Surat Bebas Pustaka (jika ada) - Compact --}}
-                    @if(isset($clearanceLetters) && $clearanceLetters->where('status', 'approved')->count() > 0)
-                    @php $latestClearance = $clearanceLetters->where('status', 'approved')->first(); @endphp
-                    <div class="p-3 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-certificate text-white"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-emerald-800 font-semibold text-xs">Surat Bebas Pustaka</p>
-                                <p class="text-emerald-600 text-[10px] truncate">{{ $latestClearance->letter_number }}</p>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <a href="{{ route('opac.member.clearance-letter.download', $latestClearance) }}" class="px-2 py-1.5 bg-emerald-600 text-white text-[10px] font-medium rounded-lg hover:bg-emerald-700 transition">
-                                    <i class="fas fa-download"></i>
-                                </a>
-                                <a href="{{ route('opac.member.clearance-letter', $latestClearance) }}" target="_blank" class="px-2 py-1.5 bg-blue-600 text-white text-[10px] font-medium rounded-lg hover:bg-blue-700 transition">
-                                    <i class="fas fa-print"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
-
-                    {{-- Sertifikat Bebas Plagiasi (jika ada) - Compact --}}
-                    @if(isset($plagiarismCertificates) && $plagiarismCertificates->count() > 0)
-                    <a href="{{ route('opac.member.plagiarism.certificate', $plagiarismCertificates->first()) }}" class="block p-3 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl hover:border-violet-300 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-violet-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-award text-white"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-violet-800 font-semibold text-xs">Sertifikat Bebas Plagiasi</p>
-                                <p class="text-violet-600 text-[10px] truncate">{{ $plagiarismCertificates->first()->certificate_number }}</p>
-                            </div>
-                            @if($plagiarismCertificates->count() > 1)
-                            <span class="px-2 py-0.5 bg-violet-200 text-violet-700 text-[9px] font-bold rounded">+{{ $plagiarismCertificates->count() - 1 }}</span>
-                            @endif
-                            <i class="fas fa-chevron-right text-violet-400 text-xs"></i>
-                        </div>
-                    </a>
-                    @endif
 
                     {{-- Turnitin Active Banner --}}
                     <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl">
@@ -256,48 +213,64 @@
                         </div>
                     </div>
 
-                    {{-- CTA Buttons Grid --}}
-                    <div class="grid grid-cols-2 gap-2 lg:gap-3">
-                        {{-- Cek Plagiasi CTA (Left) --}}
+                    {{-- CTA Buttons Grid - 3 columns --}}
+                    <div class="grid grid-cols-3 gap-2 lg:gap-3">
+                        {{-- Cek Plagiasi CTA --}}
                         @if($member->canAccessPlagiarism())
-                        <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
-                            <div class="flex items-center gap-2 lg:gap-3">
-                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-search-plus text-base lg:text-xl"></i>
+                        <a href="{{ route('opac.member.plagiarism.create') }}" class="block bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
+                            <div class="flex flex-col items-center text-center gap-2">
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-search-plus text-lg"></i>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
-                                    <p class="text-teal-200 text-[10px] lg:text-xs">iThenticate/Turnitin</p>
-                                    <p class="text-teal-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-bolt mr-0.5"></i>Kuota 5x cek</p>
+                                <div>
+                                    <h3 class="font-bold text-xs">Cek Plagiasi</h3>
+                                    <p class="text-teal-200 text-[9px]">Kuota 5x</p>
                                 </div>
                             </div>
                         </a>
                         @else
-                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md relative overflow-hidden">
-                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-amber-500 text-[8px] font-bold rounded">TERBATAS</div>
-                            <div class="flex items-center gap-2 lg:gap-3">
-                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-lock text-base lg:text-xl"></i>
+                        <div class="block bg-gradient-to-br from-gray-400 to-gray-500 rounded-xl p-3 text-white shadow-md relative">
+                            <div class="absolute top-1 right-1 px-1 py-0.5 bg-amber-500 text-[7px] font-bold rounded">TERBATAS</div>
+                            <div class="flex flex-col items-center text-center gap-2">
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-lock text-lg"></i>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold text-xs lg:text-sm">Cek Plagiasi</h3>
-                                    <p class="text-gray-200 text-[10px] lg:text-xs">Khusus civitas UNIDA</p>
-                                    <p class="text-gray-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-info-circle mr-0.5"></i>Hubungkan data SIAKAD</p>
+                                <div>
+                                    <h3 class="font-bold text-xs">Cek Plagiasi</h3>
+                                    <p class="text-gray-200 text-[9px]">Civitas UNIDA</p>
                                 </div>
                             </div>
                         </div>
                         @endif
 
-                        {{-- Unggah Tugas Akhir CTA (Right) --}}
-                        <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl lg:rounded-2xl p-3 lg:p-4 text-white shadow-md hover:shadow-lg transition-all group">
-                            <div class="flex items-center gap-2 lg:gap-3">
-                                <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white/20 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-upload text-base lg:text-xl"></i>
+                        {{-- Upload TA CTA --}}
+                        <a href="{{ route('opac.member.submissions') }}" class="block bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all">
+                            <div class="flex flex-col items-center text-center gap-2">
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-upload text-lg"></i>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold text-xs lg:text-sm">Upload TA</h3>
-                                    <p class="text-violet-200 text-[10px] lg:text-xs truncate">Skripsi/Tesis</p>
-                                    <p class="text-violet-100/70 text-[8px] lg:text-[10px] mt-0.5"><i class="fas fa-file-signature mr-0.5"></i>Surat bebas pustaka</p>
+                                <div>
+                                    <h3 class="font-bold text-xs">Upload TA</h3>
+                                    <p class="text-violet-200 text-[9px]">Skripsi/Tesis</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        {{-- Kelas Saya CTA --}}
+                        @php
+                            $myCoursesCount = \App\Models\CourseEnrollment::where('member_id', $member->id)->whereIn('status', ['approved', 'completed'])->count();
+                        @endphp
+                        <a href="{{ $myCoursesCount > 0 ? route('opac.member.dashboard') . '#kelas-saya' : route('opac.page', 'e-learning') }}" class="block bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 text-white shadow-md hover:shadow-lg transition-all relative">
+                            @if($myCoursesCount > 0)
+                            <div class="absolute top-1 right-1 px-1.5 py-0.5 bg-white text-blue-600 text-[8px] font-bold rounded">{{ $myCoursesCount }}</div>
+                            @endif
+                            <div class="flex flex-col items-center text-center gap-2">
+                                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-graduation-cap text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-xs">Kelas Saya</h3>
+                                    <p class="text-blue-200 text-[9px]">E-Learning</p>
                                 </div>
                             </div>
                         </a>
@@ -727,6 +700,47 @@
                             <p class="text-[10px] text-red-600 text-center">+{{ $fines->count() - 3 }} denda lainnya</p>
                             @endif
                         </div>
+                    </div>
+                    @endif
+
+                    {{-- Surat Bebas Pustaka & Sertifikat Plagiasi - Compact Cards --}}
+                    @if((isset($clearanceLetters) && $clearanceLetters->where('status', 'approved')->count() > 0) || (isset($plagiarismCertificates) && $plagiarismCertificates->count() > 0))
+                    <div class="space-y-2">
+                        @if(isset($clearanceLetters) && $clearanceLetters->where('status', 'approved')->count() > 0)
+                        @php $latestClearance = $clearanceLetters->where('status', 'approved')->first(); @endphp
+                        <div class="p-2.5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-certificate text-white text-xs"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-emerald-800 font-semibold text-[10px]">Surat Bebas Pustaka</p>
+                                    <p class="text-emerald-600 text-[9px] truncate">{{ $latestClearance->letter_number }}</p>
+                                </div>
+                                <a href="{{ route('opac.member.clearance-letter.download', $latestClearance) }}" class="w-7 h-7 bg-emerald-600 text-white rounded-lg flex items-center justify-center hover:bg-emerald-700 transition">
+                                    <i class="fas fa-download text-[10px]"></i>
+                                </a>
+                            </div>
+                        </div>
+                        @endif
+                        
+                        @if(isset($plagiarismCertificates) && $plagiarismCertificates->count() > 0)
+                        <a href="{{ route('opac.member.plagiarism.certificate', $plagiarismCertificates->first()) }}" class="block p-2.5 bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl hover:border-violet-300 transition">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-award text-white text-xs"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-violet-800 font-semibold text-[10px]">Sertifikat Bebas Plagiasi</p>
+                                    <p class="text-violet-600 text-[9px] truncate">{{ $plagiarismCertificates->first()->certificate_number }}</p>
+                                </div>
+                                @if($plagiarismCertificates->count() > 1)
+                                <span class="px-1.5 py-0.5 bg-violet-200 text-violet-700 text-[8px] font-bold rounded">+{{ $plagiarismCertificates->count() - 1 }}</span>
+                                @endif
+                                <i class="fas fa-chevron-right text-violet-400 text-[10px]"></i>
+                            </div>
+                        </a>
+                        @endif
                     </div>
                     @endif
 
