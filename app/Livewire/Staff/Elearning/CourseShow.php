@@ -248,6 +248,6 @@ class CourseShow extends Component
                 'pending_enrollments' => $this->course->enrollments()->where('status', 'pending')->count(),
                 'completed_enrollments' => $this->course->enrollments()->where('status', 'completed')->count(),
             ],
-        ])->layout('staff.layouts.app', ['title' => $this->course->title]);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }

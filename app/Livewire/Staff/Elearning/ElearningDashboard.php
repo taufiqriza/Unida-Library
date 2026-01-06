@@ -64,7 +64,7 @@ class ElearningDashboard extends Component
         $isSuperAdmin = $user->role === 'super_admin';
 
         $coursesQuery = Course::with(['category', 'instructor', 'branch'])
-            ->withCount(['enrollments', 'modules', 'materials']);
+            ->withCount(['enrollments', 'modules']);
 
         if (!$isSuperAdmin && $branchId) {
             $coursesQuery->where(fn($q) => $q->where('branch_id', $branchId)->orWhereNull('branch_id'));
@@ -99,6 +99,6 @@ class ElearningDashboard extends Component
             'courses' => $courses,
             'categories' => $categories,
             'pendingEnrollments' => $pendingEnrollments,
-        ])->layout('staff.layouts.app', ['title' => 'E-Learning']);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }

@@ -125,6 +125,6 @@ class CourseForm extends Component
         return view('livewire.staff.elearning.course-form', [
             'categories' => CourseCategory::where('is_active', true)->orderBy('name')->get(),
             'branches' => Branch::where('is_active', true)->orderBy('name')->get(),
-        ])->layout('staff.layouts.app', ['title' => $this->editMode ? 'Edit Kelas' : 'Buat Kelas Baru']);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }
