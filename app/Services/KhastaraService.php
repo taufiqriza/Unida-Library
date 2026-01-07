@@ -197,7 +197,7 @@ class KhastaraService
                                 'deskripsi_fisik' => $manuscript['deskripsi_fisik'] ?? '',
                                 'call_number' => $manuscript['call_number'] ?? '',
                                 'ddc' => $manuscript['ddc'] ?? '',
-                                'aksara' => is_array($manuscript['aksara'] ?? []) ? implode(', ', $manuscript['aksara']) : ($manuscript['aksara'] ?? ''),
+                                'aksara' => isset($manuscript['aksara']) ? (is_array($manuscript['aksara']) ? implode(', ', $manuscript['aksara']) : $manuscript['aksara']) : '',
                                 'condition' => 'Baik',
                                 'location' => isset($manuscript['list_lokasi']) ? implode(', ', $manuscript['list_lokasi']) : 'Perpustakaan Nasional RI',
                                 'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail/?catId=' . $id,
