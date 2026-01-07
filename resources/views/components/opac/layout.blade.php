@@ -439,16 +439,28 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <!-- CTA Full Width -->
-                                        <div class="col-span-4 mt-2">
-                                            <a href="{{ route('opac.page', 'e-resources') }}" class="w-full group relative bg-gradient-to-r from-primary-600 to-indigo-600 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-4 py-4 px-6">
-                                                <div class="flex items-center gap-4">
-                                                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
-                                                        <i class="fas fa-th-large text-white text-xl"></i>
+                                        <!-- CTA Cards -->
+                                        <div class="col-span-4 mt-2 grid grid-cols-2 gap-3">
+                                            <a href="{{ route('opac.page', 'e-resources') }}" class="group relative bg-gradient-to-r from-primary-600 to-indigo-600 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-3 py-4 px-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                                                        <i class="fas fa-th-large text-white text-lg"></i>
                                                     </div>
                                                     <div class="text-left">
-                                                        <p class="text-white font-semibold text-sm">Lihat Semua E-Resources</p>
-                                                        <p class="text-white/70 text-xs">Akses lengkap koleksi digital perpustakaan</p>
+                                                        <p class="text-white font-semibold text-sm">Lihat Semua Koleksi</p>
+                                                        <p class="text-white/70 text-xs">E-Resources digital</p>
+                                                    </div>
+                                                </div>
+                                                <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-1 transition"></i>
+                                            </a>
+                                            <a href="{{ route('opac.khastara.browse') }}" class="group relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-3 py-4 px-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                                                        <i class="fas fa-scroll text-white text-lg"></i>
+                                                    </div>
+                                                    <div class="text-left">
+                                                        <p class="text-white font-semibold text-sm">Naskah Nusantara</p>
+                                                        <p class="text-white/70 text-xs">Khastara Perpusnas</p>
                                                     </div>
                                                 </div>
                                                 <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-1 transition"></i>
@@ -510,13 +522,6 @@
                                                 <h3 class="font-bold text-gray-900 text-sm">{{ __('opac.discover_menu.explore') }}</h3>
                                             </div>
                                             <div class="space-y-1">
-                                                <a href="{{ route('opac.khastara.browse') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
-                                                    <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition"><i class="fas fa-scroll text-orange-600"></i></div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">Naskah Nusantara</p>
-                                                        <p class="text-xs text-gray-500">Khastara Perpusnas</p>
-                                                    </div>
-                                                </a>
                                                 <a href="{{ route('opac.page', 'prosa-kreatif') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
                                                     <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center group-hover:bg-rose-100 transition"><i class="fas fa-pen-fancy text-rose-600"></i></div>
                                                     <div class="flex-1 min-w-0">
@@ -540,20 +545,20 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <!-- Naskah Nusantara CTA -->
+                                        <!-- Book Recommendation CTA -->
                                         <div class="col-span-2 mt-2">
-                                            <a href="{{ route('opac.khastara.browse') }}" class="w-full group relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-4 py-4 px-6">
+                                            <a href="{{ route('opac.search') }}?type=book&sort=latest" class="w-full group relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-4 py-4 px-6">
                                                 <div class="flex items-center gap-4">
                                                     <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
-                                                        <i class="fas fa-scroll text-white text-xl"></i>
+                                                        <i class="fas fa-book text-white text-xl"></i>
                                                     </div>
                                                     <div class="text-left">
-                                                        <p class="text-white font-semibold text-sm">Naskah Nusantara</p>
-                                                        <p class="text-white/70 text-xs">Warisan dokumenter Indonesia</p>
+                                                        <p class="text-white font-semibold text-sm">{{ __('opac.discover_menu.latest_collection') }}</p>
+                                                        <p class="text-white/70 text-xs">{{ __('opac.discover_menu.view_new_books') }}</p>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center gap-2">
-                                                    <span class="px-2 py-1 bg-white/20 text-white text-xs font-bold rounded-lg">KHASTARA</span>
+                                                    <span class="px-2 py-1 bg-white/20 text-white text-xs font-bold rounded-lg">{{ __('opac.new') }}</span>
                                                     <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-1 transition"></i>
                                                 </div>
                                             </a>

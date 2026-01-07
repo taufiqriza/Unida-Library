@@ -12,6 +12,49 @@ class KhastaraService
     
     public function getCollectionList($filters = [], $page = 1, $perPage = 10)
     {
+        // Temporary: Return mock data since API endpoint is not confirmed
+        return [
+            'data' => [
+                [
+                    'catalog_id' => 'mock-1',
+                    'title' => 'Serat Centhini',
+                    'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg',
+                    'create_date' => '2024-01-01',
+                    'worksheet_name' => 'Naskah Kuno',
+                    'language_name' => 'Jawa'
+                ],
+                [
+                    'catalog_id' => 'mock-2', 
+                    'title' => 'Hikayat Raja-Raja Pasai',
+                    'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg',
+                    'create_date' => '2024-01-02',
+                    'worksheet_name' => 'Hikayat',
+                    'language_name' => 'Melayu'
+                ],
+                [
+                    'catalog_id' => 'mock-3',
+                    'title' => 'Babad Tanah Jawi',
+                    'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 
+                    'create_date' => '2024-01-03',
+                    'worksheet_name' => 'Babad',
+                    'language_name' => 'Jawa'
+                ],
+                [
+                    'catalog_id' => 'mock-4',
+                    'title' => 'Kitab Undang-Undang Melaka',
+                    'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg',
+                    'create_date' => '2024-01-04', 
+                    'worksheet_name' => 'Undang-Undang',
+                    'language_name' => 'Melayu'
+                ]
+            ],
+            'meta' => [
+                'total' => 4,
+                'per_page' => $perPage,
+                'current_page' => $page
+            ]
+        ];
+        
         $cacheKey = 'khastara_collections_' . md5(serialize($filters) . $page . $perPage);
         
         return Cache::remember($cacheKey, 3600, function () use ($filters, $page, $perPage) {
