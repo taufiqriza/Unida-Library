@@ -153,7 +153,7 @@ class FacultyDirectory extends Component
     public function render()
     {
         return view('livewire.opac.faculty-directory')
-            ->layout('layouts.opac', [
+            ->layout('components.opac.layout', [
                 'title' => 'Direktori Akademisi UNIDA Gontor',
                 'description' => 'Direktori lengkap dosen dan akademisi Universitas Darussalam Gontor'
             ]);
