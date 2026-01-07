@@ -171,6 +171,13 @@ class Login extends Component
         
         Auth::guard('member')->login($member, $this->remember);
         session()->regenerate();
+        
+        // Check for redirect parameter (e.g., from e-learning course detail)
+        $redirect = request()->query('redirect');
+        if ($redirect && str_starts_with($redirect, url('/'))) {
+            return redirect($redirect);
+        }
+        
         return redirect()->route('opac.member.dashboard');
     }
 

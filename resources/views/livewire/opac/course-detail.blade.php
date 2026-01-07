@@ -122,7 +122,7 @@
                             <p class="text-xs text-gray-500 text-center mt-1.5"><i class="fas fa-info-circle mr-1"></i>Memerlukan persetujuan</p>
                             @endif
                             @else
-                            <a href="{{ route('login') }}" class="block w-full py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl text-center hover:bg-gray-200 transition text-sm">
+                            <a href="{{ route('login') }}?redirect={{ urlencode(request()->url()) }}" class="block w-full py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl text-center hover:bg-gray-200 transition text-sm">
                                 <i class="fas fa-sign-in-alt mr-2"></i>Login untuk Daftar
                             </a>
                             @endauth
