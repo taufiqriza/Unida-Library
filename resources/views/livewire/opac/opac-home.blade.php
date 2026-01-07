@@ -317,6 +317,9 @@
                 <button @click="activeTab = 'ebooks'" :class="activeTab === 'ebooks' ? 'bg-white shadow text-orange-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
                     <i class="fas fa-file-pdf mr-1.5"></i>{{ __('opac.homepage.ebook') }}
                 </button>
+                <button @click="activeTab = 'manuscripts'" :class="activeTab === 'manuscripts' ? 'bg-white shadow text-amber-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+                    <i class="fas fa-scroll mr-1.5"></i>Naskah Nusantara
+                </button>
                 <button @click="activeTab = 'journals'" :class="activeTab === 'journals' ? 'bg-white shadow text-emerald-600' : 'text-gray-600 hover:text-gray-900'" class="px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
                     <i class="fas fa-newspaper mr-1.5"></i>{{ __('opac.homepage.journals') }}
                 </button>
@@ -452,6 +455,50 @@
             <div class="text-center py-12 text-gray-400">
                 <i class="fas fa-newspaper text-4xl mb-3"></i>
                 <p>{{ __('opac.homepage.no_journals') }}</p>
+            </div>
+            @endif
+        </div>
+
+        <!-- Manuscripts Tab -->
+        <div x-show="activeTab === 'manuscripts'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0">
+            @if($featuredManuscripts->count() > 0)
+            <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2 lg:gap-3">
+                @foreach($featuredManuscripts->take(8) as $manuscript)
+                <a href="{{ $manuscript['url'] }}" target="_blank" class="group">
+                    <div class="aspect-[2/3] rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 relative bg-gradient-to-br from-amber-100 to-orange-100">
+                        <img 
+                            src="{{ $manuscript['cover'] }}" 
+                            alt="{{ $manuscript['title'] }}"
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgdmlld0JveD0iMCAwIDIwMCAyNjciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjY3IiBmaWxsPSIjRkVGM0UyIi8+CjxwYXRoIGQ9Ik0xMDAgMTMzLjVDMTE4LjIyNSAxMzMuNSAxMzMgMTE4LjcyNSAxMzMgMTAwLjVDMTMzIDgyLjI3NDYgMTE4LjIyNSA2Ny41IDEwMCA2Ny41QzgxLjc3NDYgNjcuNSA2NyA4Mi4yNzQ2IDY3IDEwMC41QzY3IDExOC43MjUgODEuNzc0NiAxMzMuNSAxMDAgMTMzLjVaIiBmaWxsPSIjRjU5RTBCIi8+CjxwYXRoIGQ9Ik0xNjcgMjAwLjVDMTY3IDE2My4zNTUgMTM3LjE0NSAxMzMuNSAxMDAgMTMzLjVDNjIuODU1IDEzMy41IDMzIDE2My4zNTUgMzMgMjAwLjVIMTY3WiIgZmlsbD0iI0Y1OUUwQiIvPgo8L3N2Zz4K'"
+                        >
+                        <!-- Type Badge -->
+                        @if($manuscript['type'])
+                            <div class="absolute top-1.5 left-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[7px] px-1.5 py-0.5 rounded-full font-semibold uppercase tracking-wide shadow">
+                                <i class="fas fa-scroll text-[6px] mr-0.5"></i>{{ $manuscript['type'] }}
+                            </div>
+                        @endif
+                        <!-- External Link -->
+                        <div class="absolute top-1.5 right-1.5 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-external-link-alt text-white text-[8px]"></i>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
+                            <h3 class="text-white text-[10px] lg:text-xs font-medium line-clamp-2 leading-tight">{{ $manuscript['title'] }}</h3>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            <div class="text-center mt-6">
+                <a href="{{ route('opac.khastara.browse') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-sm font-medium transition">
+                    Jelajahi Naskah Nusantara <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            @else
+            <div class="text-center py-12 text-gray-400">
+                <i class="fas fa-scroll text-4xl mb-3"></i>
+                <p>Koleksi naskah sedang dimuat...</p>
             </div>
             @endif
         </div>

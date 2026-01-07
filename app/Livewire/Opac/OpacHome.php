@@ -9,6 +9,7 @@ use App\Models\Ethesis;
 use App\Models\Item;
 use App\Models\JournalArticle;
 use App\Models\News;
+use App\Services\KhastaraService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
@@ -21,6 +22,7 @@ class OpacHome extends Component
     public $latestEbooks;
     public $latestJournals;
     public $latestEtheses;
+    public $featuredManuscripts;
     public $news;
     public $branches;
 
@@ -73,6 +75,10 @@ class OpacHome extends Component
         $this->latestEbooks = Ebook::latest()->take(4)->get();
         $this->latestJournals = JournalArticle::latest()->take(4)->get();
         $this->latestEtheses = Ethesis::latest()->take(4)->get();
+
+        // Load featured manuscripts from Khastara
+        $khastaraService = new KhastaraService();
+        $this->featuredManuscripts = $khastaraService->getFeaturedManuscripts(8);
 
         $this->news = News::published()
             ->with('category')

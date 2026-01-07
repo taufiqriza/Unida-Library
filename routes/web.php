@@ -52,6 +52,9 @@ Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page']
 // Faculty Directory - Premium Feature
 Route::get('/direktori-akademisi', \App\Livewire\Opac\FacultyDirectory::class)->name('opac.faculty-directory');
 
+// Khastara Naskah Nusantara
+Route::get('/naskah-nusantara', \App\Livewire\Opac\KhastaraBrowse::class)->name('opac.khastara.browse');
+
 // Panduan Pages
 Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');
 Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');

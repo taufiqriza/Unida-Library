@@ -367,6 +367,15 @@
                                                         </div>
                                                     </div>
                                                 </a>
+                                                <a href="{{ route('opac.khastara.browse') }}" class="block p-3 rounded-xl bg-orange-50 border border-orange-100 hover:shadow-md hover:border-orange-200 transition group">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-scroll text-white text-sm"></i></div>
+                                                        <div>
+                                                            <p class="text-sm font-semibold text-gray-900 group-hover:text-orange-700">Naskah Nusantara</p>
+                                                            <p class="text-xs text-gray-500">Khastara Perpusnas</p>
+                                                        </div>
+                                                    </div>
+                                                </a>
                                                 <a href="{{ route('opac.page', 'digilib-apps') }}" class="block p-3 rounded-xl bg-teal-50 border border-teal-100 hover:shadow-md hover:border-teal-200 transition group">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-9 h-9 bg-teal-500 rounded-lg flex items-center justify-center"><i class="fas fa-mobile-alt text-white text-sm"></i></div>
