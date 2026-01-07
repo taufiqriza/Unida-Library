@@ -19,42 +19,51 @@
             ->get();
     @endphp
 
-    <section class="max-w-6xl mx-auto px-4 py-6 lg:py-10">
-        {{-- Intro --}}
-        <div class="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-5 lg:p-6 border border-violet-100 mb-8">
-            <p class="text-gray-700 text-sm lg:text-base leading-relaxed">
-                {{ __('opac.pages.e_learning.intro') }}
-            </p>
+    <section class="max-w-6xl mx-auto px-4 py-6 lg:py-10" x-data="{ showIntro: !localStorage.getItem('hideElearningIntro') }">
+        {{-- Intro Banner --}}
+        <div x-show="showIntro" x-transition class="relative bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-4 lg:p-5 mb-6 text-white overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            <div class="relative flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-graduation-cap text-lg"></i>
+                    </div>
+                    <p class="text-sm lg:text-base text-white/90">{{ __('opac.pages.e_learning.intro') }}</p>
+                </div>
+                <button @click="showIntro = false; localStorage.setItem('hideElearningIntro', '1')" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center flex-shrink-0 transition">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
         </div>
 
         {{-- Categories --}}
         @if($categories->count() > 0)
-        <h3 class="font-bold text-gray-900 mb-4 text-base lg:text-lg">Kategori Pembelajaran</h3>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
             @foreach($categories as $cat)
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:border-violet-200 hover:shadow-md transition text-center">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2" style="background-color: {{ $cat->color ?? '#8B5CF6' }}20">
-                    <i class="fas {{ $cat->icon ?? 'fa-folder' }}" style="color: {{ $cat->color ?? '#8B5CF6' }}"></i>
-                </div>
-                <p class="font-semibold text-gray-900 text-sm">{{ $cat->name }}</p>
-                <p class="text-xs text-gray-500">{{ $cat->courses_count }} kelas</p>
+            <div class="flex items-center gap-2 px-3 py-2 bg-white rounded-full shadow-sm border border-gray-100 hover:border-violet-200 hover:shadow transition flex-shrink-0 cursor-pointer">
+                <i class="fas {{ $cat->icon ?? 'fa-folder' }} text-xs" style="color: {{ $cat->color ?? '#8B5CF6' }}"></i>
+                <span class="text-xs font-medium text-gray-700">{{ $cat->name }}</span>
+                <span class="text-[10px] text-gray-400">({{ $cat->courses_count }})</span>
             </div>
             @endforeach
         </div>
         @endif
 
         {{-- Active Courses --}}
-        <h3 class="font-bold text-gray-900 mb-4 text-base lg:text-lg flex items-center gap-2">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            Kelas Aktif
-        </h3>
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-900 text-base lg:text-lg flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Kelas Aktif
+            </h3>
+            <span class="text-sm text-gray-500">{{ $activeCourses->count() }} kelas</span>
+        </div>
 
         @if($activeCourses->count() > 0)
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
             @foreach($activeCourses as $course)
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-violet-200 transition-all group">
+            <a href="{{ route('opac.elearning.show', $course->slug) }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-violet-200 transition-all group block">
                 {{-- Thumbnail --}}
-                <div class="relative h-40 bg-gradient-to-br from-violet-500 to-purple-600 overflow-hidden">
+                <div class="relative h-36 bg-gradient-to-br from-violet-500 to-purple-600 overflow-hidden">
                     @if($course->thumbnail)
                     <img src="{{ Storage::url($course->thumbnail) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     @else
@@ -62,15 +71,13 @@
                         <i class="fas fa-graduation-cap text-white/30 text-5xl"></i>
                     </div>
                     @endif
-                    {{-- Level Badge --}}
-                    <div class="absolute top-3 right-3">
-                        <span class="px-2.5 py-1 bg-white/90 backdrop-blur text-gray-700 text-xs font-semibold rounded-lg capitalize">{{ $course->level }}</span>
+                    <div class="absolute top-2 right-2">
+                        <span class="px-2 py-0.5 bg-white/90 backdrop-blur text-gray-700 text-[10px] font-semibold rounded capitalize">{{ $course->level }}</span>
                     </div>
-                    {{-- Branch Badge --}}
                     @if($course->branch)
-                    <div class="absolute bottom-3 left-3">
-                        <span class="px-2.5 py-1 bg-black/50 backdrop-blur text-white text-xs font-medium rounded-lg">
-                            <i class="fas fa-building mr-1"></i>{{ $course->branch->name }}
+                    <div class="absolute bottom-2 left-2">
+                        <span class="px-2 py-0.5 bg-black/50 backdrop-blur text-white text-[10px] font-medium rounded">
+                            {{ $course->branch->name }}
                         </span>
                     </div>
                     @endif
@@ -78,82 +85,61 @@
                 
                 {{-- Content --}}
                 <div class="p-4">
-                    @if($course->category)
-                    <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{{ $course->category->name }}</span>
-                    @endif
-                    <h4 class="font-bold text-gray-900 mt-2 line-clamp-2 group-hover:text-violet-600 transition">{{ $course->title }}</h4>
-                    <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $course->description }}</p>
+                    <h4 class="font-bold text-gray-900 text-sm line-clamp-2 h-10 group-hover:text-violet-600 transition">{{ $course->title }}</h4>
+                    <p class="text-xs text-gray-500 mt-1 line-clamp-2 h-8">{{ $course->description ?: '-' }}</p>
+                    
+                    {{-- Labels --}}
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        @if($course->category)
+                        <span class="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">{{ $course->category->name }}</span>
+                        @endif
+                        @if($course->has_certificate)
+                        <span class="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded"><i class="fas fa-award mr-0.5"></i>Sertifikat</span>
+                        @endif
+                    </div>
                     
                     {{-- Meta --}}
-                    <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                        <span class="flex items-center gap-1">
-                            <i class="fas fa-layer-group text-violet-400"></i>
-                            {{ $course->modules_count }} Modul
-                        </span>
-                        <span class="flex items-center gap-1">
-                            <i class="fas fa-users text-green-400"></i>
-                            {{ $course->enrollments_count }} Peserta
-                        </span>
+                    <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100 text-[10px] text-gray-500">
+                        <span class="flex items-center gap-1"><i class="fas fa-layer-group text-violet-400"></i>{{ $course->modules_count }}</span>
+                        <span class="flex items-center gap-1"><i class="fas fa-users text-green-400"></i>{{ $course->enrollments_count }}</span>
                         @if($course->duration_hours)
-                        <span class="flex items-center gap-1">
-                            <i class="fas fa-clock text-blue-400"></i>
-                            {{ $course->duration_hours }} Jam
-                        </span>
+                        <span class="flex items-center gap-1"><i class="fas fa-clock text-blue-400"></i>{{ $course->duration_hours }}j</span>
                         @endif
-                    </div>
-                    
-                    {{-- Schedule --}}
-                    @if($course->start_date)
-                    <div class="mt-3 p-2 bg-gray-50 rounded-lg">
-                        <p class="text-xs text-gray-600">
-                            <i class="fas fa-calendar-alt text-gray-400 mr-1"></i>
-                            {{ $course->start_date->format('d M Y') }}
-                            @if($course->end_date) - {{ $course->end_date->format('d M Y') }} @endif
-                            @if($course->schedule_time) • {{ $course->schedule_time }} @endif
-                        </p>
                         @if($course->is_online)
-                        <p class="text-xs text-blue-600 mt-1"><i class="fas fa-video mr-1"></i>Online</p>
-                        @elseif($course->location)
-                        <p class="text-xs text-gray-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>{{ $course->location }}</p>
+                        <span class="flex items-center gap-1"><i class="fas fa-video text-cyan-400"></i></span>
                         @endif
                     </div>
-                    @endif
                     
-                    {{-- Instructor & Action --}}
-                    <div class="flex items-center justify-between mt-4">
-                        <div class="flex items-center gap-2">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($course->instructor->name) }}&size=24&background=random" class="w-6 h-6 rounded-full">
-                            <span class="text-xs text-gray-600">{{ $course->instructor->name }}</span>
-                        </div>
-                        <a href="{{ route('opac.elearning.show', $course->slug) }}" class="px-3 py-1.5 bg-violet-600 text-white text-xs font-semibold rounded-lg hover:bg-violet-700 transition">
-                            Lihat Detail
-                        </a>
+                    {{-- Instructor --}}
+                    <div class="flex items-center gap-2 mt-3">
+                        <img src="{{ $course->instructor->getAvatarUrl(20) }}" class="w-5 h-5 rounded-full object-cover">
+                        <span class="text-[10px] text-gray-600 truncate">{{ $course->instructor->name }}</span>
                     </div>
                 </div>
-            </div>
+            </a>
             @endforeach
         </div>
         @else
-        {{-- No Active Courses --}}
-        <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 text-center border border-gray-200 mb-8">
-            <div class="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-graduation-cap text-gray-400 text-2xl"></i>
+        <div class="bg-gray-50 rounded-xl p-8 text-center border border-gray-200 mb-8">
+            <div class="w-14 h-14 bg-gray-200 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-graduation-cap text-gray-400 text-xl"></i>
             </div>
-            <h3 class="font-bold text-gray-900 mb-2">Belum Ada Kelas Aktif</h3>
-            <p class="text-gray-500 text-sm mb-4">Kelas-kelas baru akan segera tersedia. Pantau terus halaman ini!</p>
+            <h3 class="font-bold text-gray-900 mb-1 text-sm">Belum Ada Kelas Aktif</h3>
+            <p class="text-gray-500 text-xs">Kelas baru akan segera tersedia</p>
         </div>
         @endif
 
         {{-- Contact --}}
-        <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
-            <div class="flex items-center gap-2 mb-2">
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200/50 flex items-center gap-4">
+            <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-lightbulb text-amber-600"></i>
-                <span class="font-bold text-gray-900 text-sm">{{ __('opac.pages.e_learning.need_training') }}</span>
             </div>
-            <p class="text-sm text-gray-600 mb-3">{{ __('opac.pages.e_learning.training_desc') }}</p>
-            <a href="mailto:library@unida.gontor.ac.id" class="inline-flex items-center gap-1 text-amber-700 hover:text-amber-800 text-sm font-medium">
-                <i class="fas fa-envelope"></i> library@unida.gontor.ac.id
-            </a>
+            <div class="flex-1 min-w-0">
+                <p class="font-semibold text-gray-900 text-sm">{{ __('opac.pages.e_learning.need_training') }}</p>
+                <a href="mailto:library@unida.gontor.ac.id" class="text-xs text-amber-700 hover:text-amber-800">
+                    <i class="fas fa-envelope mr-1"></i>library@unida.gontor.ac.id
+                </a>
+            </div>
         </div>
     </section>
 </x-opac.layout>
