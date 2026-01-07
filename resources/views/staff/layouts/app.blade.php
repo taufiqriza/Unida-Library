@@ -482,13 +482,11 @@
                         :class="darkMode ? 'border-slate-600 text-slate-400 hover:text-slate-200 hover:border-slate-500' : 'border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-400'">
                     <i class="fas" :class="sidebarCollapsed ? 'fa-angles-right' : 'fa-angles-left'"></i>
                 </button>
-                @if(!View::hasSection('hide_title'))
                 <div class="h-8 w-px" :class="darkMode ? 'bg-slate-600' : 'bg-slate-200'"></div>
                 <div>
                     <h2 class="text-lg font-semibold leading-tight" :class="darkMode ? 'text-slate-100' : 'text-slate-900'">@yield('title', 'Dashboard')</h2>
                     <p class="text-xs" :class="darkMode ? 'text-slate-400' : 'text-slate-500'">{{ $currentDate }}</p>
                 </div>
-                @endif
             </div>
             <div class="flex items-center gap-4">
                 @include('staff.components.portal-switcher')

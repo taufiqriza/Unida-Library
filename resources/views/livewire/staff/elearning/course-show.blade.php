@@ -1,5 +1,4 @@
-@section('title', '')
-@section('hide_title', true)
+@section('title', 'E-Learning')
 
 <div class="space-y-6">
     {{-- Success Alert --}}
