@@ -278,8 +278,11 @@ class StaffChat extends Component
                 'forwardedFrom.sender:id,name',
             ])
             ->withCount('reads')
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->take(50)
+            ->get()
+            ->reverse()
+            ->values();
         
         $roomMemberCount = ChatRoomMember::where('chat_room_id', $this->activeRoomId)->count();
         
@@ -914,6 +917,12 @@ class StaffChat extends Component
         // Cache rooms for 30 seconds to reduce queries
         $cacheKey = "chat_rooms_{$userId}";
         
+        // Get cleared rooms for this user
+        $clearedRooms = ChatRoomMember::where('user_id', $userId)
+            ->whereNotNull('cleared_at')
+            ->pluck('cleared_at', 'chat_room_id')
+            ->toArray();
+        
         $rooms = cache()->remember($cacheKey, 30, function () use ($userId) {
             return ChatRoom::forUser($userId)
                 ->where('type', '!=', 'support')
@@ -927,6 +936,13 @@ class StaffChat extends Component
                     'branch:id,name'
                 ])
                 ->get();
+        });
+
+        // Filter cleared rooms - hide if no new messages after cleared_at
+        $rooms = $rooms->filter(function ($room) use ($clearedRooms) {
+            if (!isset($clearedRooms[$room->id])) return true;
+            $clearedAt = $clearedRooms[$room->id];
+            return $room->latestMessage && $room->latestMessage->created_at > $clearedAt;
         });
 
         // Calculate unread and sort (not cached - dynamic)
