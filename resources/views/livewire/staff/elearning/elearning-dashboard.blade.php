@@ -173,65 +173,70 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         @foreach($courses as $course)
         <a href="{{ route('staff.elearning.show', $course->id) }}" wire:navigate
-           class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-violet-200 transition-all">
+           class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-violet-200 transition-all flex flex-col">
             {{-- Thumbnail --}}
-            <div class="relative h-40 bg-gradient-to-br from-violet-500 to-purple-600 overflow-hidden">
+            <div class="relative h-36 bg-gradient-to-br from-violet-500 to-purple-600 overflow-hidden flex-shrink-0">
                 @if($course->thumbnail)
                 <img src="{{ Storage::url($course->thumbnail) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 @else
                 <div class="absolute inset-0 flex items-center justify-center">
-                    <i class="fas fa-graduation-cap text-white/30 text-6xl"></i>
+                    <i class="fas fa-graduation-cap text-white/30 text-5xl"></i>
                 </div>
                 @endif
                 {{-- Status Badge --}}
-                <div class="absolute top-3 left-3">
+                <div class="absolute top-2 left-2">
                     @if($course->status === 'published')
-                    <span class="px-2.5 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg">Aktif</span>
+                    <span class="px-2 py-0.5 bg-green-500 text-white text-[10px] font-semibold rounded">Aktif</span>
                     @elseif($course->status === 'draft')
-                    <span class="px-2.5 py-1 bg-gray-500 text-white text-xs font-semibold rounded-lg">Draft</span>
+                    <span class="px-2 py-0.5 bg-gray-500 text-white text-[10px] font-semibold rounded">Draft</span>
                     @else
-                    <span class="px-2.5 py-1 bg-red-500 text-white text-xs font-semibold rounded-lg">Arsip</span>
+                    <span class="px-2 py-0.5 bg-red-500 text-white text-[10px] font-semibold rounded">Arsip</span>
                     @endif
                 </div>
                 {{-- Level Badge --}}
-                <div class="absolute top-3 right-3">
-                    <span class="px-2.5 py-1 bg-white/90 backdrop-blur text-gray-700 text-xs font-semibold rounded-lg capitalize">{{ $course->level }}</span>
+                <div class="absolute top-2 right-2">
+                    <span class="px-2 py-0.5 bg-white/90 backdrop-blur text-gray-700 text-[10px] font-semibold rounded capitalize">{{ $course->level }}</span>
                 </div>
             </div>
             
             {{-- Content --}}
-            <div class="p-4">
-                <div class="flex items-center gap-2 flex-wrap">
+            <div class="p-4 flex flex-col flex-1">
+                {{-- Labels --}}
+                <div class="flex items-center gap-1.5 mb-2 h-5 overflow-hidden">
                     @if($course->category)
-                    <span class="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{{ $course->category->name }}</span>
+                    <span class="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded truncate max-w-[80px]" title="{{ $course->category->name }}">{{ $course->category->name }}</span>
                     @endif
-                    <span class="text-xs font-medium {{ $course->branch_id ? 'text-blue-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-2 py-0.5 rounded">
+                    <span class="text-[10px] font-medium {{ $course->branch_id ? 'text-blue-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-1.5 py-0.5 rounded truncate max-w-[80px]" title="{{ $course->branch?->name ?? 'Global' }}">
                         {{ $course->branch?->name ?? 'Global' }}
                     </span>
                 </div>
-                <h3 class="font-bold text-gray-900 mt-2 line-clamp-2 group-hover:text-violet-600 transition">{{ $course->title }}</h3>
-                <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ $course->description }}</p>
+                
+                {{-- Title --}}
+                <h3 class="font-bold text-gray-900 text-sm line-clamp-2 h-10 group-hover:text-violet-600 transition">{{ $course->title }}</h3>
+                
+                {{-- Description --}}
+                <p class="text-xs text-gray-500 mt-1 line-clamp-2 h-8">{{ $course->description ?: '-' }}</p>
                 
                 {{-- Meta --}}
-                <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                <div class="flex items-center gap-3 mt-auto pt-3 border-t border-gray-100 text-[10px] text-gray-500">
                     <span class="flex items-center gap-1">
                         <i class="fas fa-layer-group text-violet-400"></i>
-                        {{ $course->modules_count }} Modul
+                        {{ $course->modules_count }}
                     </span>
                     <span class="flex items-center gap-1">
                         <i class="fas fa-file-alt text-blue-400"></i>
-                        {{ $course->materials_count }} Materi
+                        {{ $course->materials_count }}
                     </span>
                     <span class="flex items-center gap-1">
                         <i class="fas fa-users text-green-400"></i>
-                        {{ $course->enrollments_count }} Peserta
+                        {{ $course->enrollments_count }}
                     </span>
                 </div>
                 
                 {{-- Instructor --}}
-                <div class="flex items-center gap-2 mt-3">
-                    <img src="{{ $course->instructor->getAvatarUrl(24) }}" class="w-6 h-6 rounded-full object-cover">
-                    <span class="text-xs text-gray-600">{{ $course->instructor->name }}</span>
+                <div class="flex items-center gap-2 mt-2">
+                    <img src="{{ $course->instructor->getAvatarUrl(20) }}" class="w-5 h-5 rounded-full object-cover">
+                    <span class="text-[10px] text-gray-600 truncate">{{ $course->instructor->name }}</span>
                 </div>
             </div>
         </a>
