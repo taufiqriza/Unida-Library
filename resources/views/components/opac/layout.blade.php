@@ -367,15 +367,6 @@
                                                         </div>
                                                     </div>
                                                 </a>
-                                                <a href="{{ route('opac.khastara.browse') }}" class="block p-3 rounded-xl bg-orange-50 border border-orange-100 hover:shadow-md hover:border-orange-200 transition group">
-                                                    <div class="flex items-center gap-3">
-                                                        <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center"><i class="fas fa-scroll text-white text-sm"></i></div>
-                                                        <div>
-                                                            <p class="text-sm font-semibold text-gray-900 group-hover:text-orange-700">Naskah Nusantara</p>
-                                                            <p class="text-xs text-gray-500">Khastara Perpusnas</p>
-                                                        </div>
-                                                    </div>
-                                                </a>
                                                 <a href="{{ route('opac.page', 'digilib-apps') }}" class="block p-3 rounded-xl bg-teal-50 border border-teal-100 hover:shadow-md hover:border-teal-200 transition group">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-9 h-9 bg-teal-500 rounded-lg flex items-center justify-center"><i class="fas fa-mobile-alt text-white text-sm"></i></div>
@@ -519,6 +510,13 @@
                                                 <h3 class="font-bold text-gray-900 text-sm">{{ __('opac.discover_menu.explore') }}</h3>
                                             </div>
                                             <div class="space-y-1">
+                                                <a href="{{ route('opac.khastara.browse') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
+                                                    <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition"><i class="fas fa-scroll text-orange-600"></i></div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">Naskah Nusantara</p>
+                                                        <p class="text-xs text-gray-500">Khastara Perpusnas</p>
+                                                    </div>
+                                                </a>
                                                 <a href="{{ route('opac.page', 'prosa-kreatif') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
                                                     <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center group-hover:bg-rose-100 transition"><i class="fas fa-pen-fancy text-rose-600"></i></div>
                                                     <div class="flex-1 min-w-0">
@@ -542,20 +540,20 @@
                                                 </a>
                                             </div>
                                         </div>
-                                        <!-- Book Recommendation CTA -->
+                                        <!-- Naskah Nusantara CTA -->
                                         <div class="col-span-2 mt-2">
-                                            <a href="{{ route('opac.search') }}?type=book&sort=latest" class="w-full group relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-4 py-4 px-6">
+                                            <a href="{{ route('opac.khastara.browse') }}" class="w-full group relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-between gap-4 py-4 px-6">
                                                 <div class="flex items-center gap-4">
                                                     <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition">
-                                                        <i class="fas fa-book text-white text-xl"></i>
+                                                        <i class="fas fa-scroll text-white text-xl"></i>
                                                     </div>
                                                     <div class="text-left">
-                                                        <p class="text-white font-semibold text-sm">{{ __('opac.discover_menu.latest_collection') }}</p>
-                                                        <p class="text-white/70 text-xs">{{ __('opac.discover_menu.view_new_books') }}</p>
+                                                        <p class="text-white font-semibold text-sm">Naskah Nusantara</p>
+                                                        <p class="text-white/70 text-xs">Warisan dokumenter Indonesia</p>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center gap-2">
-                                                    <span class="px-2 py-1 bg-white/20 text-white text-xs font-bold rounded-lg">{{ __('opac.new') }}</span>
+                                                    <span class="px-2 py-1 bg-white/20 text-white text-xs font-bold rounded-lg">KHASTARA</span>
                                                     <i class="fas fa-arrow-right text-white/70 group-hover:translate-x-1 transition"></i>
                                                 </div>
                                             </a>
