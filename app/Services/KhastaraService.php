@@ -8,90 +8,87 @@ use Illuminate\Support\Facades\Log;
 
 class KhastaraService
 {
-    private $baseUrl = 'https://khastara.perpusnas.go.id/api';
+    private $baseUrl = 'https://khastara-api.perpusnas.go.id';
     
     public function getCollectionList($filters = [], $page = 1, $perPage = 10)
     {
-        // Mock data dengan lebih banyak koleksi
-        $mockData = [
-            // Naskah Kuno
-            ['catalog_id' => 'nk-001', 'title' => 'Serat Centhini', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-01', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Jawa'],
-            ['catalog_id' => 'nk-002', 'title' => 'Babad Tanah Jawi', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-02', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Jawa'],
-            ['catalog_id' => 'nk-003', 'title' => 'Serat Wedhatama', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-03', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Jawa'],
-            ['catalog_id' => 'nk-004', 'title' => 'Kitab Undang-Undang Melaka', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-04', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Melayu'],
-            ['catalog_id' => 'nk-005', 'title' => 'Hikayat Raja-Raja Pasai', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-05', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Melayu'],
-            ['catalog_id' => 'nk-006', 'title' => 'Serat Yusuf', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-06', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Jawa'],
-            ['catalog_id' => 'nk-007', 'title' => 'Hikayat Hang Tuah', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-07', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Melayu'],
-            ['catalog_id' => 'nk-008', 'title' => 'Serat Kalimasada', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-01-08', 'worksheet_name' => 'Naskah Kuno', 'language_name' => 'Jawa'],
-            
-            // Buku Langka
-            ['catalog_id' => 'bl-001', 'title' => 'Sejarah Melayu', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-01', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Melayu'],
-            ['catalog_id' => 'bl-002', 'title' => 'Pustaka Raja Purwa', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-02', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Jawa'],
-            ['catalog_id' => 'bl-003', 'title' => 'Kitab Kuning Pesantren', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-03', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Arab'],
-            ['catalog_id' => 'bl-004', 'title' => 'Lontar Bali Kuno', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-04', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Bali'],
-            ['catalog_id' => 'bl-005', 'title' => 'Naskah Bugis Makassar', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-05', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Bugis'],
-            ['catalog_id' => 'bl-006', 'title' => 'Tambo Minangkabau', 'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg', 'create_date' => '2024-02-06', 'worksheet_name' => 'Buku Langka', 'language_name' => 'Minang'],
-        ];
-        
-        // Filter data
-        $filteredData = collect($mockData);
-        
-        if (!empty($filters)) {
-            foreach ($filters as $key => $value) {
-                if ($value) {
-                    $filteredData = $filteredData->filter(function ($item) use ($key, $value) {
-                        return stripos($item[$key] ?? '', $value) !== false;
-                    });
-                }
-            }
-        }
-        
-        $total = $filteredData->count();
-        $paginatedData = $filteredData->skip(($page - 1) * $perPage)->take($perPage)->values();
-        
-        return [
-            'data' => $paginatedData->toArray(),
-            'meta' => [
-                'total' => $total,
-                'per_page' => $perPage,
-                'current_page' => $page
-            ]
-        ];
-        
         $cacheKey = 'khastara_collections_' . md5(serialize($filters) . $page . $perPage);
         
-        return Cache::remember($cacheKey, 3600, function () use ($filters, $page, $perPage) {
+        return Cache::remember($cacheKey, 1800, function () use ($filters, $page, $perPage) {
             try {
-                $response = Http::timeout(10)->post($this->baseUrl . '/collections', [
-                    'filter' => $filters,
-                    'pages' => $page,
+                $params = [
+                    'page' => $page,
                     'per_page' => $perPage
-                ]);
+                ];
+                
+                if (isset($filters['worksheet_name'])) {
+                    $params['worksheet_name'] = $filters['worksheet_name'];
+                }
+                
+                $response = Http::timeout(15)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+                    ])
+                    ->get($this->baseUrl . '/inlis/collection-list', $params);
                 
                 if ($response->successful()) {
-                    return $response->json();
+                    $data = $response->json();
+                    
+                    if (isset($data['data'])) {
+                        $transformedData = collect($data['data'])->map(function ($item) {
+                            return [
+                                'catalog_id' => $item['catalog_id'] ?? '',
+                                'title' => $item['title'] ?? 'Tanpa Judul',
+                                'cover_utama' => $item['cover_utama'] ?? '/assets/images/placeholder/manuscript.jpg',
+                                'create_date' => $item['create_date'] ?? '',
+                                'worksheet_name' => $item['worksheet_name'] ?? '',
+                                'language_name' => $this->extractLanguage($item['aksara'] ?? []),
+                                'subject' => $item['subject'] ?? '',
+                                'publisher' => $item['publisher'] ?? '',
+                                'publish_year' => $item['publish_year'] ?? '',
+                                'deskripsi_fisik' => $item['deskripsi_fisik'] ?? '',
+                                'view_count' => $item['view_count'] ?? 0,
+                                'konten_digital_count' => $item['konten_digital_count'] ?? 0
+                            ];
+                        });
+                        
+                        return [
+                            'data' => $transformedData->toArray(),
+                            'meta' => [
+                                'total' => $data['meta']['total'] ?? 0,
+                                'per_page' => $data['meta']['per_page'] ?? $perPage,
+                                'current_page' => $data['meta']['current_page'] ?? $page
+                            ]
+                        ];
+                    }
                 }
                 
                 Log::warning('Khastara API error: ' . $response->status());
-                return null;
+                return $this->getFallbackData($filters, $page, $perPage);
                 
             } catch (\Exception $e) {
                 Log::error('Khastara API exception: ' . $e->getMessage());
-                return null;
+                return $this->getFallbackData($filters, $page, $perPage);
             }
         });
     }
     
-    public function getDigitalCollection($page = 1, $perPage = 20)
+    public function getCollectionTypes($page = 1, $limit = 20)
     {
-        $cacheKey = 'khastara_digital_' . $page . '_' . $perPage;
+        $cacheKey = 'khastara_collection_types_' . $page . '_' . $limit;
         
-        return Cache::remember($cacheKey, 3600, function () use ($page, $perPage) {
+        return Cache::remember($cacheKey, 3600, function () use ($page, $limit) {
             try {
-                $response = Http::timeout(10)->get($this->baseUrl . '/digital-collections', [
-                    'page' => $page,
-                    'per_page' => $perPage
-                ]);
+                $response = Http::timeout(10)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'User-Agent' => 'Mozilla/5.0'
+                    ])
+                    ->get($this->baseUrl . '/collection-type-list', [
+                        'page' => $page,
+                        'limit' => $limit
+                    ]);
                 
                 if ($response->successful()) {
                     return $response->json();
@@ -100,7 +97,7 @@ class KhastaraService
                 return null;
                 
             } catch (\Exception $e) {
-                Log::error('Khastara Digital API exception: ' . $e->getMessage());
+                Log::error('Khastara Collection Types API exception: ' . $e->getMessage());
                 return null;
             }
         });
@@ -110,7 +107,12 @@ class KhastaraService
     {
         return Cache::remember('khastara_statistics', 7200, function () {
             try {
-                $response = Http::timeout(10)->get($this->baseUrl . '/statistics');
+                $response = Http::timeout(10)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'User-Agent' => 'Mozilla/5.0'
+                    ])
+                    ->get($this->baseUrl . '/inlis/collection-statistic');
                 
                 if ($response->successful()) {
                     return $response->json();
@@ -157,46 +159,68 @@ class KhastaraService
     
     public function getManuscriptDetail($id)
     {
-        // Mock detail data
+        // For now, use fallback data for detail since we need specific detail endpoint
         $mockData = [
-            'nk-001' => [
-                'catalog_id' => 'nk-001',
-                'title' => 'Serat Centhini',
-                'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg',
-                'create_date' => '2024-01-01',
-                'worksheet_name' => 'Naskah Kuno',
-                'language_name' => 'Jawa',
-                'description' => 'Serat Centhini adalah karya sastra Jawa klasik yang berisi ajaran-ajaran kehidupan, filosofi, dan budaya Jawa. Naskah ini merupakan salah satu karya terpenting dalam khazanah sastra Jawa.',
-                'author' => 'Pakubuwono V',
-                'year' => '1814',
-                'pages' => '2.774 halaman',
-                'size' => '21 x 33 cm',
-                'material' => 'Kertas Eropa',
-                'script' => 'Aksara Jawa',
+            '50513' => [
+                'catalog_id' => '50513',
+                'title' => 'Syarh \'Aja\'ib al-Qalb',
+                'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50513.JPG',
+                'create_date' => '11/21/2007 11:38:13 AM',
+                'worksheet_name' => 'Manuskrip',
+                'language_name' => 'Arab',
+                'description' => 'Naskah tentang tasawuf dalam bahasa Arab yang membahas keajaiban hati dalam perspektif spiritual Islam.',
+                'subject' => 'Tasawuf -- Manuskrip Arab -- Kesusastraan Arab',
+                'publisher' => '[produsen tidak teridentifikasi]',
+                'publish_year' => '[tahun produksi tidak teridentifikasi]',
+                'deskripsi_fisik' => '318 halaman',
+                'call_number' => 'A 109; A 109',
+                'ddc' => '892.7 [23]',
+                'aksara' => 'Aksara Arab',
                 'condition' => 'Baik',
-                'location' => 'Perpustakaan Nasional RI',
-                'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail?catId=nk-001'
-            ],
-            'bl-001' => [
-                'catalog_id' => 'bl-001',
-                'title' => 'Sejarah Melayu',
-                'cover_utama' => 'https://khastara.perpusnas.go.id/assets/images/placeholder/manuscript.jpg',
-                'create_date' => '2024-02-01',
-                'worksheet_name' => 'Buku Langka',
-                'language_name' => 'Melayu',
-                'description' => 'Sejarah Melayu adalah karya historiografi Melayu klasik yang menceritakan sejarah kerajaan-kerajaan Melayu, khususnya Kesultanan Melaka.',
-                'author' => 'Tun Sri Lanang',
-                'year' => '1612',
-                'pages' => '156 halaman',
-                'size' => '19 x 25 cm',
-                'material' => 'Kertas Cina',
-                'script' => 'Aksara Jawi',
-                'condition' => 'Baik',
-                'location' => 'Perpustakaan Nasional RI',
-                'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail?catId=bl-001'
+                'location' => 'Transformasi Digital',
+                'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail/?catId=50513',
+                'view_count' => 3407,
+                'konten_digital_count' => 13
             ]
         ];
         
         return $mockData[$id] ?? null;
+    }
+    
+    private function extractLanguage($aksara)
+    {
+        if (empty($aksara)) return 'Indonesia';
+        
+        $firstAksara = is_array($aksara) ? $aksara[0] : $aksara;
+        
+        $languageMap = [
+            'Aksara Arab' => 'Arab',
+            'Aksara Jawa' => 'Jawa',
+            'Aksara Latin' => 'Indonesia',
+            'Aksara Bali' => 'Bali',
+            'Aksara Bugis' => 'Bugis',
+            'Aksara Jawi' => 'Melayu',
+            'Aksara Batak' => 'Batak'
+        ];
+        
+        return $languageMap[$firstAksara] ?? 'Indonesia';
+    }
+    
+    private function getFallbackData($filters, $page, $perPage)
+    {
+        // Minimal fallback data
+        $mockData = [
+            ['catalog_id' => '50513', 'title' => 'Syarh Aja\'ib al-Qalb', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50513.JPG', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab'],
+            ['catalog_id' => '50516', 'title' => 'Fath al-Muluk', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50516.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab']
+        ];
+        
+        return [
+            'data' => $mockData,
+            'meta' => [
+                'total' => count($mockData),
+                'per_page' => $perPage,
+                'current_page' => $page
+            ]
+        ];
     }
 }
