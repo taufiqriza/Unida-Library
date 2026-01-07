@@ -40,8 +40,31 @@
                     <p class="text-slate-500 mt-1">Atau daftar sebagai tamu</p>
                 </div>
 
-                <div class="max-w-lg mx-auto">
-                    <input type="text" wire:model.live.debounce.500ms="nim" wire:keydown.enter="searchMember"
+                <div class="max-w-lg mx-auto" x-data="{ 
+                    lastKeyTime: 0,
+                    inputBuffer: '',
+                    handleInput(e) {
+                        const now = Date.now();
+                        // Scanner types very fast (< 50ms between keys)
+                        if (now - this.lastKeyTime < 50) {
+                            // Likely scanner input
+                            this.inputBuffer += e.data || '';
+                        } else {
+                            this.inputBuffer = e.data || '';
+                        }
+                        this.lastKeyTime = now;
+                    },
+                    handleKeydown(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            // Small delay to ensure model is updated
+                            setTimeout(() => $wire.searchMember(), 50);
+                        }
+                    }
+                }">
+                    <input type="text" wire:model="nim" 
+                        @input="handleInput($event)"
+                        @keydown="handleKeydown($event)"
                         class="w-full px-8 py-6 text-3xl text-center border-3 border-slate-200 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition font-mono tracking-widest"
                         placeholder="Ketik NIM..." autofocus>
 
