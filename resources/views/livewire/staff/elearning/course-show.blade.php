@@ -1,4 +1,5 @@
-@section('title', $course->title)
+@section('title', '')
+@section('hide_title', true)
 
 <div class="space-y-6">
     {{-- Success Alert --}}

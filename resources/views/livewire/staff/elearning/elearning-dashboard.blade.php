@@ -201,36 +201,52 @@
             
             {{-- Content --}}
             <div class="p-4 flex flex-col flex-1">
-                {{-- Labels --}}
-                <div class="flex items-center gap-1.5 mb-2 h-5 overflow-hidden">
-                    @if($course->category)
-                    <span class="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded truncate max-w-[80px]" title="{{ $course->category->name }}">{{ $course->category->name }}</span>
-                    @endif
-                    <span class="text-[10px] font-medium {{ $course->branch_id ? 'text-blue-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-1.5 py-0.5 rounded truncate max-w-[80px]" title="{{ $course->branch?->name ?? 'Global' }}">
-                        {{ $course->branch?->name ?? 'Global' }}
-                    </span>
-                </div>
-                
                 {{-- Title --}}
                 <h3 class="font-bold text-gray-900 text-sm line-clamp-2 h-10 group-hover:text-violet-600 transition">{{ $course->title }}</h3>
                 
                 {{-- Description --}}
                 <p class="text-xs text-gray-500 mt-1 line-clamp-2 h-8">{{ $course->description ?: '-' }}</p>
                 
+                {{-- Labels --}}
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                    @if($course->category)
+                    <span class="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">{{ $course->category->name }}</span>
+                    @endif
+                    <span class="text-[10px] font-medium {{ $course->branch_id ? 'text-blue-600 bg-blue-50' : 'text-emerald-600 bg-emerald-50' }} px-1.5 py-0.5 rounded">
+                        {{ $course->branch?->name ?? 'Global' }}
+                    </span>
+                </div>
+                
                 {{-- Meta --}}
-                <div class="flex items-center gap-3 mt-auto pt-3 border-t border-gray-100 text-[10px] text-gray-500">
-                    <span class="flex items-center gap-1">
+                <div class="flex items-center flex-wrap gap-x-3 gap-y-1 mt-auto pt-3 border-t border-gray-100 text-[10px] text-gray-500">
+                    <span class="flex items-center gap-1" title="Modul">
                         <i class="fas fa-layer-group text-violet-400"></i>
                         {{ $course->modules_count }}
                     </span>
-                    <span class="flex items-center gap-1">
+                    <span class="flex items-center gap-1" title="Materi">
                         <i class="fas fa-file-alt text-blue-400"></i>
                         {{ $course->materials_count }}
                     </span>
-                    <span class="flex items-center gap-1">
+                    <span class="flex items-center gap-1" title="Peserta">
                         <i class="fas fa-users text-green-400"></i>
                         {{ $course->enrollments_count }}
                     </span>
+                    @if($course->duration_hours)
+                    <span class="flex items-center gap-1" title="Durasi">
+                        <i class="fas fa-clock text-amber-400"></i>
+                        {{ $course->duration_hours }}j
+                    </span>
+                    @endif
+                    @if($course->has_certificate)
+                    <span class="flex items-center gap-1" title="Sertifikat">
+                        <i class="fas fa-award text-rose-400"></i>
+                    </span>
+                    @endif
+                    @if($course->is_online)
+                    <span class="flex items-center gap-1" title="Online">
+                        <i class="fas fa-video text-cyan-400"></i>
+                    </span>
+                    @endif
                 </div>
                 
                 {{-- Instructor --}}
