@@ -131,9 +131,27 @@
             </div>
 
             <!-- Pagination -->
-            <div class="mt-8">
-                {{ $this->manuscripts['data']->links() }}
+            @if($this->manuscripts['total'] > 12)
+            <div class="mt-8 flex justify-center">
+                <div class="flex items-center gap-2">
+                    @if($this->getPage() > 1)
+                        <button wire:click="previousPage" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                            <i class="fas fa-chevron-left mr-1"></i>Sebelumnya
+                        </button>
+                    @endif
+                    
+                    <span class="px-4 py-2 text-sm text-gray-600">
+                        Halaman {{ $this->getPage() }} dari {{ ceil($this->manuscripts['total'] / 12) }}
+                    </span>
+                    
+                    @if($this->getPage() < ceil($this->manuscripts['total'] / 12))
+                        <button wire:click="nextPage" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                            Selanjutnya<i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    @endif
+                </div>
             </div>
+            @endif
         @else
             <!-- Empty State -->
             <div class="text-center py-16">

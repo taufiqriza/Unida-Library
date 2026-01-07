@@ -95,8 +95,8 @@
             <!-- Results Count -->
             <div class="flex items-center justify-between mb-6">
                 <p class="text-gray-600">
-                    Menampilkan <span class="font-semibold text-indigo-600">{{ $this->filteredData->count() }}</span> 
-                    dari <span class="font-semibold">{{ count($facultyData) }}</span> akademisi
+                    Menampilkan <span class="font-semibold text-indigo-600">{{ $this->filteredData['data']->count() }}</span> 
+                    dari <span class="font-semibold">{{ number_format($this->filteredData['total']) }}</span> akademisi
                 </p>
             </div>
         </div>
@@ -104,11 +104,11 @@
 
     <!-- Faculty Grid/List -->
     <section class="max-w-7xl mx-auto px-4 py-8">
-        @if($this->filteredData->count() > 0)
+        @if($this->filteredData['data']->count() > 0)
             @if($viewMode === 'grid')
                 <!-- Grid View -->
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
-                    @foreach($this->filteredData as $faculty)
+                    @foreach($this->filteredData['data'] as $faculty)
                         <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1">
                             <!-- Photo -->
                             <div class="aspect-[3/4] bg-gradient-to-br from-indigo-100 to-purple-100 relative overflow-hidden">
@@ -141,7 +141,7 @@
             @else
                 <!-- List View -->
                 <div class="space-y-4">
-                    @foreach($this->filteredData as $faculty)
+                    @foreach($this->filteredData['data'] as $faculty)
                         <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden">
                             <div class="flex items-center p-6">
                                 <!-- Photo -->
@@ -184,6 +184,29 @@
                         </div>
                     @endforeach
                 </div>
+            @endif
+            
+            <!-- Pagination -->
+            @if($this->filteredData['last_page'] > 1)
+            <div class="mt-8 flex justify-center">
+                <div class="flex items-center gap-2">
+                    @if($this->filteredData['current_page'] > 1)
+                        <button wire:click="previousPage" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                            <i class="fas fa-chevron-left mr-1"></i>Sebelumnya
+                        </button>
+                    @endif
+                    
+                    <span class="px-4 py-2 text-sm text-gray-600">
+                        Halaman {{ $this->filteredData['current_page'] }} dari {{ $this->filteredData['last_page'] }}
+                    </span>
+                    
+                    @if($this->filteredData['current_page'] < $this->filteredData['last_page'])
+                        <button wire:click="nextPage" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                            Selanjutnya<i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    @endif
+                </div>
+            </div>
             @endif
         @else
             <!-- Empty State -->

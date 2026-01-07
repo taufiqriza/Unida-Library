@@ -64,6 +64,16 @@ class KhastaraBrowse extends Component
         $this->resetPage();
     }
     
+    public function nextPage()
+    {
+        $this->setPage($this->getPage() + 1);
+    }
+    
+    public function previousPage()
+    {
+        $this->setPage($this->getPage() - 1);
+    }
+    
     public function getManuscriptsProperty()
     {
         $khastaraService = new KhastaraService();

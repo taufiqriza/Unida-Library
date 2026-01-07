@@ -3,10 +3,13 @@
 namespace App\Livewire\Opac;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
 
 class FacultyDirectory extends Component
 {
+    use WithPagination;
+    
     public $search = '';
     public $selectedRank = '';
     public $selectedFaculty = '';
@@ -17,6 +20,13 @@ class FacultyDirectory extends Component
     public $ranks = [];
     public $faculties = [];
     public $departments = [];
+    
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'selectedRank' => ['except' => ''],
+        'selectedFaculty' => ['except' => ''],
+        'selectedDepartment' => ['except' => '']
+    ];
     
     public function mount()
     {
@@ -139,7 +149,43 @@ class FacultyDirectory extends Component
             $data = $data->filter(fn($item) => $item['department'] === $this->selectedDepartment);
         }
         
-        return $data->sortBy('name')->values();
+        // Pagination
+        $perPage = 24;
+        $currentPage = $this->getPage();
+        $total = $data->count();
+        
+        $paginatedData = $data->sortBy('name')
+            ->skip(($currentPage - 1) * $perPage)
+            ->take($perPage)
+            ->values();
+            
+        return [
+            'data' => $paginatedData,
+            'total' => $total,
+            'per_page' => $perPage,
+            'current_page' => $currentPage,
+            'last_page' => ceil($total / $perPage)
+        ];
+    }
+    
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+    
+    public function updatedSelectedRank()
+    {
+        $this->resetPage();
+    }
+    
+    public function updatedSelectedFaculty()
+    {
+        $this->resetPage();
+    }
+    
+    public function updatedSelectedDepartment()
+    {
+        $this->resetPage();
     }
     
     public function clearFilters()
@@ -148,6 +194,8 @@ class FacultyDirectory extends Component
         $this->selectedRank = '';
         $this->selectedFaculty = '';
         $this->selectedDepartment = '';
+        $this->resetPage();
+    }
     }
     
     public function render()
