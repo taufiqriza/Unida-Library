@@ -1,4 +1,4 @@
-<div wire:poll.5s="refreshMessages" class="staff-chat-widget" 
+<div wire:poll.15s="refreshMessages" class="staff-chat-widget" 
      x-data="{ 
         sending: false, 
         deleteId: null,

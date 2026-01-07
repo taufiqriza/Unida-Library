@@ -258,47 +258,22 @@ class StaffChat extends Component
             ->first();
         $clearedAt = $membership?->cleared_at;
 
-        // Get messages (filter by cleared_at if set)
+        // Optimized query - only essential fields and relations
         $messages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->when($clearedAt, fn($q) => $q->where('created_at', '>', $clearedAt))
             ->select(['id', 'chat_room_id', 'sender_id', 'message', 'attachment', 'attachment_type', 'attachment_name', 'task_id', 'book_id', 'reply_to_id', 'type', 'voice_path', 'voice_duration', 'is_deleted', 'is_pinned', 'forwarded_from_id', 'created_at'])
             ->with([
-                'sender:id,name,photo,branch_id',
-                'sender.branch:id,name',
-                'task:id,title,status_id,assigned_to,due_date',
-                'task.assignee:id,name',
-                'task.status:id,name,color',
-                'book:id,title,isbn,image',
-                'book.authors:id,name',
+                'sender:id,name,photo',
                 'replyTo:id,sender_id,message,attachment_type',
                 'replyTo.sender:id,name',
-                'reactions:id,message_id,user_id,emoji',
-                'reactions.user:id,name',
-                'forwardedFrom:id,sender_id,message',
-                'forwardedFrom.sender:id,name',
             ])
-            ->withCount('reads')
             ->orderBy('created_at', 'asc')
+            ->limit(100)
             ->get();
         
-        $roomMemberCount = ChatRoomMember::where('chat_room_id', $this->activeRoomId)->count();
+        $this->messages = $messages->map(fn($msg) => $msg->toArray())->toArray();
         
-        $this->messages = $messages->map(function($msg) use ($roomMemberCount) {
-            $arr = $msg->toArray();
-            $arr['reads_count'] = $msg->reads_count;
-            $arr['total_recipients'] = $roomMemberCount - 1;
-            $arr['reactions_grouped'] = collect($msg->reactions)->groupBy('emoji')->map(fn($r) => [
-                'count' => $r->count(),
-                'users' => $r->pluck('user.name')->toArray(),
-                'user_ids' => $r->pluck('user_id')->toArray(),
-            ])->toArray();
-            return $arr;
-        })->toArray();
-        
-        // Load pinned messages
-        $this->loadPinnedMessages();
-        
-        // Mark messages as read
+        // Mark messages as read (simplified)
         $this->markMessagesAsRead();
     }
     
@@ -308,8 +283,9 @@ class StaffChat extends Component
         
         $this->pinnedMessages = ChatMessage::where('chat_room_id', $this->activeRoomId)
             ->where('is_pinned', true)
-            ->with(['sender:id,name', 'pinnedByUser:id,name'])
-            ->orderBy('pinned_at', 'desc')
+            ->select(['id', 'sender_id', 'message', 'pinned_at'])
+            ->with(['sender:id,name'])
+            ->limit(5)
             ->get()
             ->toArray();
     }
@@ -392,7 +368,7 @@ class StaffChat extends Component
             $attachmentName = $this->attachment->getClientOriginalName();
         }
 
-        // Create message with optional task/book/reply
+        // Create message
         $chatMessage = ChatMessage::create([
             'chat_room_id' => $this->activeRoomId,
             'sender_id' => auth()->id(),
@@ -405,34 +381,29 @@ class StaffChat extends Component
             'reply_to_id' => $this->replyTo['id'] ?? null,
             'type' => 'text',
         ]);
-        
-        // Process mentions (@username)
-        $this->processMentions($chatMessage);
 
         // Update sender's last_read_at
         ChatRoomMember::where('chat_room_id', $this->activeRoomId)
             ->where('user_id', auth()->id())
             ->update(['last_read_at' => now()]);
-            
-        // Update last_staff_id for support chat and notify member
-        if ($this->activeRoom && $this->activeRoom->type === 'support') {
-            $this->activeRoom->update(['last_staff_id' => auth()->id(), 'status' => 'open']);
-            $this->notifyMember($chatMessage);
-        }
 
-        // Send notification to other room members
-        $this->sendChatNotifications($chatMessage);
-
-        // Clear room cache to show updated latest message
+        // Clear cache
         cache()->forget("chat_rooms_" . auth()->id());
 
+        // Reset form
         $this->message = '';
         $this->attachment = null;
         $this->replyTo = null;
         $this->selectedTaskId = null;
         $this->selectedBookId = null;
+        
         $this->loadMessages();
         $this->dispatch('scrollToBottom');
+        
+        // Send notifications async (background)
+        dispatch(function () use ($chatMessage) {
+            $this->sendChatNotifications($chatMessage);
+        })->afterResponse();
     }
     
     protected function processMentions(ChatMessage $message)
@@ -877,31 +848,9 @@ class StaffChat extends Component
 
     public function refreshData()
     {
-        // Only update online status every minute to reduce DB writes
-        static $lastOnlineUpdate = null;
-        if (!$lastOnlineUpdate || now()->diffInSeconds($lastOnlineUpdate) >= 60) {
-            $this->updateOnlineStatus();
-            $lastOnlineUpdate = now();
-        }
-        
         // Only reload messages if we're in chat view
         if ($this->activeRoomId && $this->activeView === 'chat') {
-            $oldCount = count($this->messages);
             $this->loadMessages();
-            $newCount = count($this->messages);
-            
-            // Play sound if new messages arrived and sound is enabled
-            if ($newCount > $oldCount && $this->soundEnabled) {
-                // Check if the new message is not from current user
-                if (!empty($this->messages)) {
-                    $lastMsg = end($this->messages);
-                    if ($lastMsg['sender_id'] !== auth()->id()) {
-                        $this->dispatch('playNewMessageSound');
-                    }
-                }
-            }
-            
-            $this->markAsRead();
         }
     }
 
@@ -910,26 +859,35 @@ class StaffChat extends Component
     public function getRoomsProperty()
     {
         $userId = auth()->id();
-        
-        // Cache rooms for 30 seconds to reduce queries
         $cacheKey = "chat_rooms_{$userId}";
+        
+        // Get user's cleared rooms
+        $clearedRooms = ChatRoomMember::where('user_id', $userId)
+            ->whereNotNull('cleared_at')
+            ->pluck('cleared_at', 'chat_room_id')
+            ->toArray();
         
         $rooms = cache()->remember($cacheKey, 30, function () use ($userId) {
             return ChatRoom::forUser($userId)
                 ->where('type', '!=', 'support')
                 ->select(['id', 'name', 'type', 'branch_id', 'updated_at'])
-                ->withCount('members')
                 ->with([
                     'latestMessage:id,chat_room_id,sender_id,message,created_at',
                     'latestMessage.sender:id,name',
-                    'latestMessage.reactions' => fn($q) => $q->latest()->limit(1),
-                    'latestMessage.reactions.user:id,name',
-                    'branch:id,name'
                 ])
                 ->get();
         });
 
-        // Calculate unread and sort (not cached - dynamic)
+        // Filter out cleared rooms (no messages after cleared_at)
+        $rooms = $rooms->filter(function ($room) use ($clearedRooms, $userId) {
+            if (!isset($clearedRooms[$room->id])) return true;
+            
+            // Check if there are messages after cleared_at
+            $clearedAt = $clearedRooms[$room->id];
+            return $room->latestMessage && $room->latestMessage->created_at > $clearedAt;
+        });
+
+        // Calculate unread and sort
         $rooms = $rooms->map(function ($room) use ($userId) {
             $room->unread_count = $room->getUnreadCountFor($userId);
             $room->display_name = $room->getDisplayNameFor($userId);
@@ -939,47 +897,25 @@ class StaffChat extends Component
 
         // Filter by search
         if ($this->searchQuery) {
-            $rooms = $rooms->filter(function ($room) {
-                return str_contains(strtolower($room->display_name), strtolower($this->searchQuery));
-            });
+            $rooms = $rooms->filter(fn($room) => 
+                str_contains(strtolower($room->display_name), strtolower($this->searchQuery))
+            );
         }
 
         // Separate groups and direct
         $groups = $rooms->filter(fn($r) => $r->isGroup())->sortByDesc('latestMessage.created_at');
         $directs = $rooms->filter(fn($r) => $r->isDirect())->sortByDesc('latestMessage.created_at');
         
-        // Support rooms - show all, but prioritize connected ones
-        $support = ChatRoom::where('type', 'support')
-            ->with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'member.branch:id,name', 'latestMessage:id,chat_room_id,sender_id,message,type,created_at'])
-            ->orderByDesc('connected_to_staff')
-            ->orderByDesc('updated_at')
-            ->get();
-        
-        $support = $support
-            ->map(function ($room) use ($userId) {
-                $staffMember = ChatRoomMember::where('chat_room_id', $room->id)
-                    ->where('user_id', $userId)
-                    ->first();
-                
-                // Only count unread if connected to staff
-                if ($room->connected_to_staff) {
-                    if ($staffMember && $staffMember->last_read_at) {
-                        $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
-                            ->whereNull('sender_id')
-                            ->where('type', 'text')
-                            ->where('created_at', '>', $staffMember->last_read_at)
-                            ->count();
-                    } else {
-                        $room->unread_count = ChatMessage::where('chat_room_id', $room->id)
-                            ->whereNull('sender_id')
-                            ->where('type', 'text')
-                            ->count();
-                    }
-                } else {
-                    $room->unread_count = 0;
-                }
-                return $room;
-            });
+        // Support rooms - only for admin/librarian, simplified query
+        $support = collect();
+        if ($this->canAccessSupportChat()) {
+            $support = ChatRoom::where('type', 'support')
+                ->select(['id', 'topic', 'member_id', 'status', 'connected_to_staff', 'updated_at'])
+                ->with(['member:id,name,member_id', 'latestMessage:id,chat_room_id,message,created_at'])
+                ->orderByDesc('updated_at')
+                ->limit(20)
+                ->get();
+        }
 
         return [
             'groups' => $groups->values(),
@@ -1071,18 +1007,7 @@ class StaffChat extends Component
     public function refreshMessages()
     {
         if ($this->activeRoomId && $this->activeView === 'chat') {
-            $oldCount = count($this->messages);
             $this->loadMessages();
-            $this->loadTypingUsers();
-            $this->updateOnlineStatus();
-            
-            // Play sound if new message from others
-            if (count($this->messages) > $oldCount && $this->soundEnabled) {
-                $lastMsg = end($this->messages);
-                if ($lastMsg && ($lastMsg['sender_id'] ?? null) !== auth()->id()) {
-                    $this->dispatch('playNewMessageSound');
-                }
-            }
         }
     }
 
