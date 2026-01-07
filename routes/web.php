@@ -54,6 +54,7 @@ Route::get('/direktori-akademisi', \App\Livewire\Opac\FacultyDirectory::class)->
 
 // Khastara Naskah Nusantara
 Route::get('/naskah-nusantara', \App\Livewire\Opac\KhastaraBrowse::class)->name('opac.khastara.browse');
+Route::get('/naskah-nusantara/{id}', \App\Livewire\Opac\KhastaraDetail::class)->name('opac.khastara.detail');
 
 // Panduan Pages
 Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');

@@ -92,7 +92,7 @@
         @if($this->manuscripts['data']->count() > 0)
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-6">
                 @foreach($this->manuscripts['data'] as $manuscript)
-                    <a href="{{ $manuscript['url'] }}" target="_blank" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1">
+                    <a href="{{ route('opac.khastara.detail', $manuscript['id']) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1">
                         <!-- Cover -->
                         <div class="aspect-[3/4] bg-gradient-to-br from-amber-100 to-orange-100 relative overflow-hidden">
                             <img 
@@ -110,7 +110,7 @@
                             @endif
                             <!-- External Link Icon -->
                             <div class="absolute top-2 right-2 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-external-link-alt text-white text-xs"></i>
+                                <i class="fas fa-eye text-white text-xs"></i>
                             </div>
                         </div>
                         
