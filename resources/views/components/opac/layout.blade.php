@@ -269,7 +269,7 @@
                                             </div>
                                         </div>
                                         <!-- Video Button -->
-                                        <div class="col-span-2 mt-2">
+                                        <div class="col-span-1 mt-2">
                                             <button @click="$dispatch('open-youtube-modal')" class="w-full group relative bg-gradient-to-r from-red-600 to-red-700 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-center gap-3 py-4 px-6">
                                                 <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition">
                                                     <i class="fas fa-play text-white ml-0.5"></i>
@@ -280,6 +280,23 @@
                                                 </div>
                                                 <i class="fab fa-youtube text-white/30 text-3xl ml-auto"></i>
                                             </button>
+                                        </div>
+                                        <!-- Faculty Directory Button -->
+                                        <div class="col-span-1 mt-2">
+                                            <a href="{{ route('opac.faculty-directory') }}" class="w-full group relative bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-center gap-3 py-4 px-6">
+                                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition">
+                                                    <i class="fas fa-users text-white"></i>
+                                                </div>
+                                                <div class="text-left">
+                                                    <p class="text-white font-semibold text-sm">Direktori Akademisi</p>
+                                                    <p class="text-white/70 text-xs">Profil dosen & pimpinan UNIDA</p>
+                                                </div>
+                                                <div class="ml-auto">
+                                                    <div class="px-2 py-1 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">
+                                                        <i class="fas fa-crown"></i> PREMIUM
+                                                    </div>
+                                                </div>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

@@ -49,6 +49,9 @@ Route::get('/survey', \App\Livewire\Opac\SurveyList::class)->name('opac.survey.i
 Route::get('/survey/{slug}', \App\Livewire\Opac\SurveyRespond::class)->name('opac.survey.show');
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
+// Faculty Directory - Premium Feature
+Route::get('/direktori-akademisi', \App\Livewire\Opac\FacultyDirectory::class)->name('opac.faculty-directory');
+
 // Panduan Pages
 Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');
 Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');
