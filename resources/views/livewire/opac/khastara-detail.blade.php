@@ -40,7 +40,7 @@
                             src="{{ $manuscript['cover_utama'] }}" 
                             alt="{{ $manuscript['title'] }}"
                             class="w-full h-full object-cover"
-                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2NyIgdmlld0JveD0iMCAwIDIwMCAyNjciIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjY3IiBmaWxsPSIjRkVGM0UyIi8+CjxwYXRoIGQ9Ik0xMDAgMTMzLjVDMTE4LjIyNSAxMzMuNSAxMzMgMTE4LjcyNSAxMzMgMTAwLjVDMTMzIDgyLjI3NDYgMTE4LjIyNSA2Ny41IDEwMCA2Ny41QzgxLjc3NDYgNjcuNSA2NyA4Mi4yNzQ2IDY3IDEwMC41QzY3IDExOC43MjUgODEuNzc0NiAxMzMuNSAxMDAgMTMzLjVaIiBmaWxsPSIjRjU5RTBCIi8+CjxwYXRoIGQ9Ik0xNjcgMjAwLjVDMTY3IDE2My4zNTUgMTM3LjE0NSAxMzMuNSAxMDAgMTMzLjVDNjIuODU1IDEzMy41IDMzIDE2My4zNTUgMzMgMjAwLjVIMTY3WiIgZmlsbD0iI0Y1OUUwQiIvPgo8L3N2Zz4K'"
+                            onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder/manuscript.svg') }}'"
                         >
                     </div>
                     

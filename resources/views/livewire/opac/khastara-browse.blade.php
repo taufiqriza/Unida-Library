@@ -100,7 +100,7 @@
                                 alt="{{ $manuscript['title'] }}"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 loading="lazy"
-                                onerror="this.src='/assets/images/placeholder/manuscript.jpg'"
+                                onerror="this.onerror=null; this.src='{{ asset('assets/images/placeholder/manuscript.svg') }}'"
                             >
                             <!-- Type Badge -->
                             @if($manuscript['type'])

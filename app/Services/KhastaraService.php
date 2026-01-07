@@ -159,32 +159,84 @@ class KhastaraService
     
     public function getManuscriptDetail($id)
     {
-        // For now, use fallback data for detail since we need specific detail endpoint
-        $mockData = [
-            '50513' => [
-                'catalog_id' => '50513',
-                'title' => 'Syarh \'Aja\'ib al-Qalb',
-                'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50513.JPG',
-                'create_date' => '11/21/2007 11:38:13 AM',
-                'worksheet_name' => 'Manuskrip',
-                'language_name' => 'Arab',
-                'description' => 'Naskah tentang tasawuf dalam bahasa Arab yang membahas keajaiban hati dalam perspektif spiritual Islam.',
-                'subject' => 'Tasawuf -- Manuskrip Arab -- Kesusastraan Arab',
-                'publisher' => '[produsen tidak teridentifikasi]',
-                'publish_year' => '[tahun produksi tidak teridentifikasi]',
-                'deskripsi_fisik' => '318 halaman',
-                'call_number' => 'A 109; A 109',
-                'ddc' => '892.7 [23]',
-                'aksara' => 'Aksara Arab',
-                'condition' => 'Baik',
-                'location' => 'Transformasi Digital',
-                'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail/?catId=50513',
-                'view_count' => 3407,
-                'konten_digital_count' => 13
-            ]
-        ];
+        $cacheKey = 'khastara_detail_' . $id;
         
-        return $mockData[$id] ?? null;
+        return Cache::remember($cacheKey, 1800, function () use ($id) {
+            try {
+                // Search for specific manuscript by ID in the collection list
+                $response = Http::timeout(15)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'User-Agent' => 'Mozilla/5.0'
+                    ])
+                    ->get($this->baseUrl . '/inlis/collection-list', [
+                        'per_page' => 100,
+                        'page' => 1
+                    ]);
+                
+                if ($response->successful()) {
+                    $data = $response->json();
+                    
+                    if (isset($data['data'])) {
+                        // Find the specific manuscript by catalog_id
+                        $manuscript = collect($data['data'])->firstWhere('catalog_id', $id);
+                        
+                        if ($manuscript) {
+                            return [
+                                'catalog_id' => $manuscript['catalog_id'] ?? $id,
+                                'title' => $manuscript['title'] ?? 'Tanpa Judul',
+                                'cover_utama' => $manuscript['cover_utama'] ?? '/assets/images/placeholder/manuscript.svg',
+                                'create_date' => $manuscript['create_date'] ?? '',
+                                'worksheet_name' => $manuscript['worksheet_name'] ?? '',
+                                'language_name' => $this->extractLanguage($manuscript['aksara'] ?? []),
+                                'description' => isset($manuscript['list_abstraksi']) ? $manuscript['list_abstraksi'][0] : 'Deskripsi tidak tersedia',
+                                'subject' => $manuscript['subject'] ?? '',
+                                'author' => $manuscript['author'] ?? '',
+                                'publisher' => $manuscript['publisher'] ?? '',
+                                'publish_year' => $manuscript['publish_year'] ?? '',
+                                'deskripsi_fisik' => $manuscript['deskripsi_fisik'] ?? '',
+                                'call_number' => $manuscript['call_number'] ?? '',
+                                'ddc' => $manuscript['ddc'] ?? '',
+                                'aksara' => is_array($manuscript['aksara'] ?? []) ? implode(', ', $manuscript['aksara']) : ($manuscript['aksara'] ?? ''),
+                                'condition' => 'Baik',
+                                'location' => isset($manuscript['list_lokasi']) ? implode(', ', $manuscript['list_lokasi']) : 'Perpustakaan Nasional RI',
+                                'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail/?catId=' . $id,
+                                'view_count' => $manuscript['view_count'] ?? 0,
+                                'konten_digital_count' => $manuscript['konten_digital_count'] ?? 0
+                            ];
+                        }
+                    }
+                }
+                
+                // If not found in first page, return basic info
+                return [
+                    'catalog_id' => $id,
+                    'title' => 'Naskah ID: ' . $id,
+                    'cover_utama' => '/assets/images/placeholder/manuscript.svg',
+                    'create_date' => '',
+                    'worksheet_name' => 'Manuskrip',
+                    'language_name' => 'Indonesia',
+                    'description' => 'Detail naskah sedang dimuat dari Khastara Perpustakaan Nasional.',
+                    'subject' => '',
+                    'author' => '',
+                    'publisher' => '',
+                    'publish_year' => '',
+                    'deskripsi_fisik' => '',
+                    'call_number' => '',
+                    'ddc' => '',
+                    'aksara' => '',
+                    'condition' => 'Baik',
+                    'location' => 'Perpustakaan Nasional RI',
+                    'external_url' => 'https://khastara.perpusnas.go.id/koleksi-digital/detail/?catId=' . $id,
+                    'view_count' => 0,
+                    'konten_digital_count' => 0
+                ];
+                
+            } catch (\Exception $e) {
+                Log::error('Khastara Detail API exception: ' . $e->getMessage());
+                return null;
+            }
+        });
     }
     
     private function extractLanguage($aksara)
