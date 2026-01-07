@@ -116,45 +116,50 @@ class CourseForm extends Component
     {
         $this->validate();
 
-        $data = [
-            'title' => $this->title,
-            'slug' => Str::slug($this->title) . '-' . Str::random(6),
-            'description' => $this->description,
-            'category_id' => $this->category_id,
-            'branch_id' => $this->branch_id,
-            'level' => $this->level,
-            'duration_hours' => $this->duration_hours,
-            'max_participants' => $this->max_participants,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'schedule_time' => $this->schedule_time,
-            'schedule_days' => json_encode($this->schedule_days),
-            'location' => $this->location,
-            'is_online' => $this->is_online,
-            'meeting_link' => $this->meeting_link,
-            'status' => $this->status,
-            'requires_approval' => $this->requires_approval,
-            'has_certificate' => $this->has_certificate,
-            'passing_score' => $this->passing_score,
-        ];
+        try {
+            $data = [
+                'title' => $this->title,
+                'slug' => Str::slug($this->title) . '-' . Str::random(6),
+                'description' => $this->description,
+                'category_id' => $this->category_id,
+                'branch_id' => $this->branch_id,
+                'level' => $this->level,
+                'duration_hours' => $this->duration_hours,
+                'max_participants' => $this->max_participants,
+                'start_date' => $this->start_date,
+                'end_date' => $this->end_date,
+                'schedule_time' => $this->schedule_time,
+                'schedule_days' => json_encode($this->schedule_days),
+                'location' => $this->location,
+                'is_online' => $this->is_online,
+                'meeting_link' => $this->meeting_link,
+                'status' => $this->status,
+                'requires_approval' => $this->requires_approval,
+                'has_certificate' => $this->has_certificate,
+                'passing_score' => $this->passing_score,
+            ];
 
-        if ($this->thumbnail) {
-            $data['thumbnail'] = $this->thumbnail->store('courses/thumbnails', 'public');
+            if ($this->thumbnail) {
+                $data['thumbnail'] = $this->thumbnail->store('courses/thumbnails', 'public');
+            }
+
+            if ($this->editMode) {
+                unset($data['slug']);
+                $this->course->update($data);
+                $course = $this->course;
+                $message = 'Kelas berhasil diperbarui';
+            } else {
+                $data['instructor_id'] = auth()->id();
+                $course = Course::create($data);
+                $message = 'Kelas berhasil dibuat';
+            }
+
+            session()->flash('success', $message);
+            return $this->redirect(route('staff.elearning.show', $course->id), navigate: true);
+        } catch (\Exception $e) {
+            \Log::error('Course save failed: ' . $e->getMessage());
+            $this->dispatch('notify', type: 'error', message: 'Gagal menyimpan: ' . $e->getMessage());
         }
-
-        if ($this->editMode) {
-            unset($data['slug']);
-            $this->course->update($data);
-            $course = $this->course;
-            $message = 'Kelas berhasil diperbarui';
-        } else {
-            $data['instructor_id'] = auth()->id();
-            $course = Course::create($data);
-            $message = 'Kelas berhasil dibuat';
-        }
-
-        $this->dispatch('notify', type: 'success', message: $message);
-        return redirect()->route('staff.elearning.show', $course->id);
     }
 
     public function render()
