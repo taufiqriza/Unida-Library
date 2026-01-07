@@ -20,8 +20,17 @@ class FacultyDirectory extends Component
     
     public function mount()
     {
-        $this->loadFacultyData();
-        $this->extractFilters();
+        try {
+            $this->loadFacultyData();
+            $this->extractFilters();
+        } catch (\Exception $e) {
+            // Log error but don't break the page
+            \Log::error('Faculty Directory Error: ' . $e->getMessage());
+            $this->facultyData = [];
+            $this->ranks = [];
+            $this->faculties = [];
+            $this->departments = [];
+        }
     }
     
     private function loadFacultyData()
@@ -33,24 +42,35 @@ class FacultyDirectory extends Component
             return;
         }
         
-        $csv = array_map('str_getcsv', file($csvPath));
-        $headers = array_shift($csv);
-        
-        foreach ($csv as $row) {
-            if (count($row) >= 6) {
-                $fileName = $row[0];
-                $this->facultyData[] = [
-                    'name' => $this->extractName($fileName),
-                    'rank' => $this->extractRank($fileName),
-                    'faculty' => $this->extractFaculty($row[5]),
-                    'department' => $this->extractDepartment($row[5]),
-                    'file_id' => $row[1],
-                    'direct_url' => $row[2],
-                    'thumbnail_url' => $row[3],
-                    'folder_path' => $row[5],
-                    'original_filename' => $fileName
-                ];
+        try {
+            $csvContent = file($csvPath);
+            if (!$csvContent) {
+                $this->facultyData = [];
+                return;
             }
+            
+            $csv = array_map('str_getcsv', $csvContent);
+            $headers = array_shift($csv);
+            
+            foreach ($csv as $row) {
+                if (count($row) >= 6 && !empty($row[0])) {
+                    $fileName = $row[0];
+                    $this->facultyData[] = [
+                        'name' => $this->extractName($fileName),
+                        'rank' => $this->extractRank($fileName),
+                        'faculty' => $this->extractFaculty($row[5] ?? ''),
+                        'department' => $this->extractDepartment($row[5] ?? ''),
+                        'file_id' => $row[1] ?? '',
+                        'direct_url' => $row[2] ?? '',
+                        'thumbnail_url' => $row[3] ?? '',
+                        'folder_path' => $row[5] ?? '',
+                        'original_filename' => $fileName
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('CSV parsing error: ' . $e->getMessage());
+            $this->facultyData = [];
         }
     }
     
@@ -85,9 +105,16 @@ class FacultyDirectory extends Component
     
     private function extractFilters()
     {
-        $this->ranks = collect($this->facultyData)->pluck('rank')->unique()->sort()->values()->toArray();
-        $this->faculties = collect($this->facultyData)->pluck('faculty')->unique()->sort()->values()->toArray();
-        $this->departments = collect($this->facultyData)->pluck('department')->unique()->sort()->values()->toArray();
+        if (empty($this->facultyData)) {
+            $this->ranks = [];
+            $this->faculties = [];
+            $this->departments = [];
+            return;
+        }
+        
+        $this->ranks = collect($this->facultyData)->pluck('rank')->unique()->filter()->sort()->values()->toArray();
+        $this->faculties = collect($this->facultyData)->pluck('faculty')->unique()->filter()->sort()->values()->toArray();
+        $this->departments = collect($this->facultyData)->pluck('department')->unique()->filter()->sort()->values()->toArray();
     }
     
     public function getFilteredDataProperty()

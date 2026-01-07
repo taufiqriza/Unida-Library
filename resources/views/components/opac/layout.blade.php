@@ -283,16 +283,16 @@
                                         </div>
                                         <!-- Faculty Directory Button -->
                                         <div class="col-span-1 mt-2">
-                                            <a href="{{ route('opac.faculty-directory') }}" class="w-full group relative bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-center gap-3 py-4 px-6">
-                                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition">
+                                            <a href="{{ route('opac.faculty-directory') }}" class="w-full group relative bg-gradient-to-r from-indigo-600 to-purple-700 rounded-xl overflow-hidden hover:shadow-lg transition flex items-center justify-center gap-2 py-4 px-4">
+                                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition flex-shrink-0">
                                                     <i class="fas fa-users text-white"></i>
                                                 </div>
-                                                <div class="text-left">
-                                                    <p class="text-white font-semibold text-sm">Direktori Akademisi</p>
-                                                    <p class="text-white/70 text-xs">Profil dosen & pimpinan UNIDA</p>
+                                                <div class="text-left min-w-0 flex-1">
+                                                    <p class="text-white font-semibold text-sm whitespace-nowrap">Direktori Akademisi</p>
+                                                    <p class="text-white/70 text-xs whitespace-nowrap">Profil dosen UNIDA</p>
                                                 </div>
-                                                <div class="ml-auto">
-                                                    <div class="px-2 py-1 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full">
+                                                <div class="flex-shrink-0">
+                                                    <div class="px-2 py-1 bg-amber-400 text-amber-900 text-[10px] font-bold rounded-full whitespace-nowrap">
                                                         <i class="fas fa-crown"></i> PREMIUM
                                                     </div>
                                                 </div>
