@@ -196,7 +196,6 @@ class FacultyDirectory extends Component
         $this->selectedDepartment = '';
         $this->resetPage();
     }
-    }
     
     public function render()
     {
