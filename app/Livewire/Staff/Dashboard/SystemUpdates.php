@@ -14,13 +14,10 @@ class SystemUpdates extends Component
     {
         $this->loadUpdates();
         
-        // Only show modal on first login (not on refresh)
-        if ($this->updates->isNotEmpty() && !session()->has('updates_shown_this_session')) {
+        // Always show modal on mount (first load after login)
+        if ($this->updates->isNotEmpty()) {
             $this->showSplashModal = true;
-            session()->put('updates_shown_this_session', true);
-            logger('SystemUpdates: showing splash modal for first login');
-        } else {
-            logger('SystemUpdates: modal already shown this session or no updates');
+            logger('SystemUpdates: showing splash modal on mount');
         }
     }
 
