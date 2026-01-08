@@ -15,14 +15,16 @@
                                 <i class="fas fa-cog text-2xl text-amber-100"></i>
                             </div>
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h2 class="text-xl font-bold">Pembaruan Sistem</h2>
-                                    <span class="px-2 py-1 bg-white/20 text-amber-100 text-xs font-bold rounded-lg border border-white/30">
-                                        v2.5
-                                    </span>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <h2 class="text-xl font-bold">Pembaruan Sistem</h2>
+                                        <span class="px-2 py-1 bg-white/20 text-amber-100 text-xs font-bold rounded-lg border border-white/30">
+                                            v2.5
+                                        </span>
+                                    </div>
+                                    <p class="text-amber-100 text-sm">{{ $updates->count() }} fitur dan perbaikan terbaru</p>
                                 </div>
-                                <p class="text-amber-100 text-sm mb-1">{{ $updates->count() }} fitur dan perbaikan terbaru</p>
-                                <div class="flex items-center gap-1">
+                                <div class="flex items-center gap-1 mt-2">
                                     <i class="fas fa-gem text-xs text-yellow-200"></i>
                                     <span class="text-xs text-yellow-200 font-medium">SISTEM ILMU</span>
                                     <span class="text-xs text-amber-200">- Integrated Library Management UNIDA v.2.0</span>

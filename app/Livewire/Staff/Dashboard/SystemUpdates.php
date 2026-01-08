@@ -14,15 +14,13 @@ class SystemUpdates extends Component
     {
         $this->loadUpdates();
         
-        // Debug logging
-        logger('SystemUpdates: mount called, updates count: ' . $this->updates->count());
-        
-        // Show splash modal if there are new updates
-        if ($this->updates->isNotEmpty()) {
+        // Only show modal on first login (not on refresh)
+        if ($this->updates->isNotEmpty() && !session()->has('updates_shown_this_session')) {
             $this->showSplashModal = true;
-            logger('SystemUpdates: showing splash modal');
+            session()->put('updates_shown_this_session', true);
+            logger('SystemUpdates: showing splash modal for first login');
         } else {
-            logger('SystemUpdates: no updates to show');
+            logger('SystemUpdates: modal already shown this session or no updates');
         }
     }
 
