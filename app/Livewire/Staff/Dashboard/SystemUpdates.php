@@ -14,9 +14,15 @@ class SystemUpdates extends Component
     {
         $this->loadUpdates();
         
+        // Debug logging
+        logger('SystemUpdates: mount called, updates count: ' . $this->updates->count());
+        
         // Show splash modal if there are new updates
         if ($this->updates->isNotEmpty()) {
             $this->showSplashModal = true;
+            logger('SystemUpdates: showing splash modal');
+        } else {
+            logger('SystemUpdates: no updates to show');
         }
     }
 

@@ -56,6 +56,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(SocialAccount::class);
     }
 
+    public function dismissedUpdates()
+    {
+        return $this->belongsToMany(SystemUpdate::class, 'user_dismissed_updates');
+    }
+
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
