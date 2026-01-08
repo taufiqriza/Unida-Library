@@ -51,30 +51,20 @@ class MemberLinking extends Component
         $isNumeric = preg_match('/^\d{4,}$/', $search);
         $searchUpper = strtoupper($search);
 
-        // === Search Mahasiswa (SIAKAD) ===
+        // === Search Mahasiswa (SIAKAD) - Same as CompleteProfile ===
         if ($isNumeric && strlen($search) >= 10) {
-            // NIM/Member ID search
-            $mahasiswa = Member::where(function($q) use ($search) {
-                    $q->where('member_id', $search)
-                      ->orWhere('nim_nidn', $search);
-                })
-                ->where(function($q) {
-                    $q->whereNull('email')->orWhere('email', '');
-                })
-                ->with(['department', 'faculty', 'memberType'])
-                ->limit(5)
-                ->get();
-            
+            // NIM search
+            $mahasiswa = Member::with(['department', 'faculty', 'memberType'])
+                ->where(fn($q) => $q->where('member_id', $search)->orWhere('nim_nidn', $search))
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                ->limit(5)->get();
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
             // Name search
-            $mahasiswa = Member::where('name', 'like', "%{$search}%")
-                ->where(function($q) {
-                    $q->whereNull('email')->orWhere('email', '');
-                })
-                ->with(['department', 'faculty', 'memberType'])
-                ->limit(10)
-                ->get();
+            $mahasiswa = Member::with(['department', 'faculty', 'memberType'])
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                ->where('name', 'like', "%{$search}%")
+                ->limit(10)->get();
             
             $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
@@ -87,27 +77,19 @@ class MemberLinking extends Component
             });
         }
 
-        // === Search Dosen/Tendik (Employee) ===
+        // === Search Dosen/Tendik (Employee) - Same as CompleteProfile ===
         $employees = collect();
         try {
             if (class_exists('\App\Models\Employee')) {
                 if ($isNumeric) {
                     // NIY/NIDN search
-                    $employees = \App\Models\Employee::where(function($q) use ($search) {
-                        $q->where('niy', $search)->orWhere('nidn', $search);
-                    })
-                    ->limit(5)
-                    ->get();
-                    
+                    $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
+                        ->limit(5)->get();
                     $employees->each(fn($e) => $e->_matchScore = 100);
                 } else {
                     // Name search
-                    $employees = \App\Models\Employee::where(function($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%")
-                          ->orWhere('full_name', 'like', "%{$search}%");
-                    })
-                    ->limit(10)
-                    ->get();
+                    $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
+                        ->limit(10)->get();
                     
                     $employees->each(function($e) use ($searchUpper) {
                         $nameUpper = strtoupper($e->full_name ?? $e->name);
@@ -124,7 +106,7 @@ class MemberLinking extends Component
             // Employee table might not exist
         }
 
-        // Filter and combine results
+        // Filter and combine results - Same as CompleteProfile
         $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
         $filteredEmployees = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
 

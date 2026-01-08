@@ -51,6 +51,9 @@
                     </span>
                     @endif
                 </div>
+                
+                {{-- Member Linking Component --}}
+                @livewire('staff.profile.member-linking')
             </div>
             
             {{-- Stats --}}
@@ -244,7 +247,6 @@
             </div>
 
             {{-- Member Linking --}}
-            @livewire('staff.profile.member-linking')
 
             {{-- Account Info --}}
             <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
