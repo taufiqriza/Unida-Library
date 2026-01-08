@@ -32,6 +32,12 @@ class MemberLinking extends Component
         $this->linkedMember = Member::where('email', $this->user->email)->first();
     }
 
+    public function testMethod()
+    {
+        logger('MemberLinking: testMethod called');
+        session()->flash('success', 'Test method berhasil dipanggil!');
+    }
+
     public function searchPddikti()
     {
         logger('MemberLinking: searchPddikti called');

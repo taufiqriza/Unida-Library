@@ -78,11 +78,11 @@
                                    placeholder="Masukkan NIM, NIDN, atau Nama (min. 2 karakter)..."
                                    class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
                             <button type="button" 
-                                    wire:click="searchPddikti" 
+                                    wire:click="testMethod" 
                                     wire:loading.attr="disabled"
                                     class="px-5 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition disabled:opacity-50">
-                                <span wire:loading.remove wire:target="searchPddikti"><i class="fas fa-search"></i></span>
-                                <span wire:loading wire:target="searchPddikti"><i class="fas fa-spinner fa-spin"></i></span>
+                                <span wire:loading.remove wire:target="testMethod"><i class="fas fa-search"></i></span>
+                                <span wire:loading wire:target="testMethod"><i class="fas fa-spinner fa-spin"></i></span>
                             </button>
                         </div>
                     </div>
