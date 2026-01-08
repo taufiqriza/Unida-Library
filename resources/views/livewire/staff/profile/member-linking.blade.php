@@ -5,11 +5,18 @@
         <p class="text-xs text-emerald-200 font-medium">
             <i class="fas fa-link mr-1"></i>{{ $linkedMember->memberType->name ?? 'Member' }}
         </p>
-        <a href="{{ route('auth.switch-portal', 'member') }}" 
-           class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 text-xs font-medium rounded transition">
-            <i class="fas fa-exchange-alt"></i>
-            <span>Portal</span>
-        </a>
+        <div class="flex gap-1">
+            <a href="{{ route('auth.switch-portal', 'member') }}" 
+               class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 text-xs font-medium rounded transition">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Portal</span>
+            </a>
+            <button @click="showLinkingModal = true" 
+                    class="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 text-xs font-medium rounded transition">
+                <i class="fas fa-eye"></i>
+                <span>Detail</span>
+            </button>
+        </div>
     </div>
 @else
     <div>
@@ -43,8 +50,13 @@
             {{-- Header --}}
             <div class="flex items-center justify-between p-6 border-b border-gray-200">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Hubungkan Akun Member</h3>
-                    <p class="text-sm text-gray-500 mt-1">Cari dan hubungkan data mahasiswa atau dosen/tendik</p>
+                    @if($linkedMember)
+                        <h3 class="text-lg font-semibold text-gray-900">Detail Akun Member</h3>
+                        <p class="text-sm text-gray-500 mt-1">Informasi akun member yang terhubung</p>
+                    @else
+                        <h3 class="text-lg font-semibold text-gray-900">Hubungkan Akun Member</h3>
+                        <p class="text-sm text-gray-500 mt-1">Cari dan hubungkan data mahasiswa atau dosen/tendik</p>
+                    @endif
                 </div>
                 <button @click="showLinkingModal = false" 
                         class="p-2 hover:bg-gray-100 rounded-lg transition">
@@ -54,6 +66,61 @@
 
             {{-- Content --}}
             <div class="p-6 max-h-[70vh] overflow-y-auto">
+                @if($linkedMember)
+                    {{-- Linked Member Details --}}
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-emerald-600 text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-emerald-900">{{ $linkedMember->name }}</h4>
+                                <p class="text-sm text-emerald-700">{{ $linkedMember->memberType->name ?? 'Member' }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="font-medium text-emerald-800">ID Member:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->member_id ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-emerald-800">NIM/NIDN:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->nim_nidn ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-emerald-800">Email:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->email ?? '-' }}</p>
+                            </div>
+                            <div>
+                                <span class="font-medium text-emerald-800">Status:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->is_active ? 'Aktif' : 'Tidak Aktif' }}</p>
+                            </div>
+                            @if($linkedMember->department)
+                            <div>
+                                <span class="font-medium text-emerald-800">Jurusan:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->department->name ?? '-' }}</p>
+                            </div>
+                            @endif
+                            @if($linkedMember->branch)
+                            <div>
+                                <span class="font-medium text-emerald-800">Cabang:</span>
+                                <p class="text-emerald-700">{{ $linkedMember->branch->name ?? '-' }}</p>
+                            </div>
+                            @endif
+                        </div>
+                        
+                        <div class="mt-4 pt-3 border-t border-emerald-200">
+                            <button wire:click="unlinkMember" 
+                                    class="text-sm text-red-600 hover:text-red-700 font-medium">
+                                <i class="fas fa-unlink mr-1"></i>
+                                Putuskan Hubungan
+                            </button>
+                        </div>
+                    </div>
+                @else
+                @endif
+
                 {{-- Flash Messages --}}
                 @if (session()->has('success'))
                     <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
