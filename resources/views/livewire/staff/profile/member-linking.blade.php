@@ -29,170 +29,155 @@
          @keydown.escape.window="showLinkingModal = false"
          class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
          x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
          x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0">
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
         
         {{-- Backdrop --}}
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="showLinkingModal = false"></div>
         
         {{-- Modal Content --}}
-        <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-             @click.stop>
-            
-            {{-- Icon Header --}}
-            <div class="pt-8 pb-4 flex justify-center">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center">
-                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                        <i class="fas fa-link text-white text-2xl"></i>
-                    </div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            {{-- Header --}}
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Hubungkan Akun Member</h3>
+                    <p class="text-sm text-gray-500 mt-1">Cari dan hubungkan data mahasiswa atau dosen/tendik</p>
                 </div>
+                <button @click="showLinkingModal = false" 
+                        class="p-2 hover:bg-gray-100 rounded-lg transition">
+                    <i class="fas fa-times text-gray-400"></i>
+                </button>
             </div>
-            
+
             {{-- Content --}}
-            <div class="px-6 pb-6">
-                <div class="text-center mb-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Hubungkan dengan Data Member</h3>
-                    <p class="text-gray-500 text-sm">
-                        Sambungkan akun staff dengan data mahasiswa/dosen untuk akses Member Portal
-                    </p>
-                </div>
-
-                {{-- Search Section --}}
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-search mr-2 text-emerald-500"></i>Cari Data Member
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="text" 
-                                   wire:model="searchName" 
-                                   wire:keydown.enter="searchPddikti"
-                                   placeholder="Masukkan NIM, NIDN, atau Nama (min. 2 karakter)..."
-                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
-                            <button type="button" 
-                                    wire:click="testMethod" 
-                                    wire:loading.attr="disabled"
-                                    class="px-5 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition disabled:opacity-50">
-                                <span wire:loading.remove wire:target="testMethod"><i class="fas fa-search"></i></span>
-                                <span wire:loading wire:target="testMethod"><i class="fas fa-spinner fa-spin"></i></span>
-                            </button>
-                        </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto">
+                {{-- Flash Messages --}}
+                @if (session()->has('success'))
+                    <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <p class="text-sm text-green-700">{{ session('success') }}</p>
                     </div>
+                @endif
 
-                    {{-- Loading State --}}
-                    @if($isSearching)
-                        <div class="text-center py-8">
-                            <i class="fas fa-spinner fa-spin text-emerald-600 text-2xl mb-3"></i>
-                            <p class="text-sm text-gray-500">Mencari data member...</p>
-                        </div>
-                    @endif
+                @if (session()->has('error'))
+                    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-sm text-red-700">{{ session('error') }}</p>
+                    </div>
+                @endif
 
-                    {{-- Search Results --}}
-                    @if(!empty($searchResults) && !$isSearching)
-                        <div class="max-h-96 overflow-y-auto space-y-3">
-                            <p class="text-sm font-medium text-gray-700 sticky top-0 bg-white py-2">
-                                Hasil Pencarian ({{ count($searchResults) }} ditemukan):
-                            </p>
-                            @foreach($searchResults as $result)
-                                <div class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex-1">
-                                            <div class="flex items-center gap-2 mb-2">
-                                                <h4 class="font-medium text-gray-900">{{ $result['name'] }}</h4>
-                                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                                    {{ $result['member_type'] }}
-                                                </span>
-                                                @if($result['match_score'] >= 90)
-                                                    <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                                                        <i class="fas fa-star mr-1"></i>{{ $result['match_score'] }}%
-                                                    </span>
-                                                @elseif($result['match_score'] >= 70)
-                                                    <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">
-                                                        {{ $result['match_score'] }}%
-                                                    </span>
-                                                @else
-                                                    <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
-                                                        {{ $result['match_score'] }}%
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            
-                                            <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                                                @if($result['member_id'] && $result['member_id'] !== '-')
-                                                    <div>
-                                                        <i class="fas fa-id-card mr-1"></i>
-                                                        ID: {{ $result['member_id'] }}
-                                                    </div>
-                                                @endif
-                                                
-                                                @if($result['nim_nidn'] && $result['nim_nidn'] !== '-')
-                                                    <div>
-                                                        <i class="fas fa-graduation-cap mr-1"></i>
-                                                        {{ $result['type'] === 'employee' ? 'NIDN/NIY' : 'NIM' }}: {{ $result['nim_nidn'] }}
-                                                    </div>
-                                                @endif
-                                                
-                                                @if($result['faculty'] !== '-')
-                                                    <div>
-                                                        <i class="fas fa-university mr-1"></i>
-                                                        {{ $result['faculty'] }}
-                                                    </div>
-                                                @endif
-                                                
-                                                @if($result['department'] !== '-')
-                                                    <div>
-                                                        <i class="fas fa-building mr-1"></i>
-                                                        {{ $result['department'] }}
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        
-                                        <button wire:click="linkMember({{ $result['id'] }}, '{{ $result['type'] }}')"
-                                                wire:confirm="Yakin ingin menghubungkan akun dengan {{ $result['name'] }}?"
-                                                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition">
-                                            <i class="fas fa-link mr-1"></i>
-                                            Hubungkan
-                                        </button>
-                                    </div>
+                {{-- Search Form --}}
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Cari Data Member
+                    </label>
+                    <div class="flex gap-3">
+                        <input type="text" 
+                               wire:model="searchName" 
+                               wire:keydown.enter="searchPddikti"
+                               placeholder="Masukkan NIM, NIDN, atau Nama (min. 2 karakter)..."
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+                        <button type="button" 
+                                wire:click="searchPddikti" 
+                                wire:loading.attr="disabled"
+                                class="px-5 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition disabled:opacity-50">
+                            <span wire:loading.remove wire:target="searchPddikti"><i class="fas fa-search"></i></span>
+                            <span wire:loading wire:target="searchPddikti"><i class="fas fa-spinner fa-spin"></i></span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Loading State --}}
+                @if($isSearching)
+                    <div class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-emerald-600 text-2xl mb-3"></i>
+                        <p class="text-sm text-gray-500">Mencari data member...</p>
+                    </div>
+                @endif
+
+                {{-- Mahasiswa Results --}}
+                @if(count($searchResults) > 0)
+                <div class="border border-gray-200 rounded-xl overflow-hidden mb-4">
+                    <div class="bg-blue-50 px-4 py-2 border-b border-gray-200">
+                        <p class="text-sm font-medium text-blue-700">
+                            <i class="fas fa-user-graduate mr-1"></i> Mahasiswa ({{ count($searchResults) }})
+                        </p>
+                    </div>
+                    <div class="max-h-40 overflow-y-auto">
+                        @foreach($searchResults as $result)
+                        @php
+                            $score = $result->_matchScore ?? 0;
+                            $colorClass = $score >= 90 ? 'bg-green-100 text-green-700 border-green-300' : 
+                                         ($score >= 70 ? 'bg-blue-100 text-blue-700 border-blue-300' : 
+                                         ($score >= 50 ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-amber-100 text-amber-700 border-amber-300'));
+                        @endphp
+                        <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition"
+                             wire:click="linkMember({{ $result->id }}, 'member')">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $result->name }}</p>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
                                 </div>
-                            @endforeach
+                                <p class="text-xs text-gray-500">{{ $result->member_id ?? '-' }}@if($result->department) · {{ $result->department->code ?? $result->department->name }}@endif</p>
+                            </div>
+                            <i class="fas fa-link text-emerald-600"></i>
                         </div>
-                    @elseif(strlen($searchName) >= 2 && !$isSearching && empty($searchResults))
-                        <div class="text-center py-8">
-                            <i class="fas fa-search text-gray-300 text-3xl mb-3"></i>
-                            <p class="text-gray-500">Tidak ada data member yang ditemukan</p>
-                            <p class="text-sm text-gray-400 mt-1">Coba gunakan kata kunci yang berbeda</p>
-                        </div>
-                    @elseif(strlen($searchName) < 2)
-                        <div class="text-center py-8">
-                            <i class="fas fa-info-circle text-blue-500 text-3xl mb-3"></i>
-                            <p class="text-gray-600">Ketik minimal 2 karakter untuk mulai pencarian</p>
-                            <p class="text-sm text-gray-500 mt-1">Cari berdasarkan nama, NIM/NIDN, atau ID member</p>
-                        </div>
-                    @endif
+                        @endforeach
+                    </div>
                 </div>
+                @endif
 
-                {{-- Actions --}}
-                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-                    <button @click="showLinkingModal = false" 
-                            class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition">
-                        Tutup
-                    </button>
+                {{-- Employee Results --}}
+                @if(isset($employeeResults) && count($employeeResults) > 0)
+                <div class="border border-gray-200 rounded-xl overflow-hidden mb-4">
+                    <div class="bg-green-50 px-4 py-2 border-b border-gray-200">
+                        <p class="text-sm font-medium text-green-700">
+                            <i class="fas fa-chalkboard-teacher mr-1"></i> Dosen / Tendik ({{ count($employeeResults) }})
+                        </p>
+                    </div>
+                    <div class="max-h-40 overflow-y-auto">
+                        @foreach($employeeResults as $emp)
+                        @php
+                            $score = $emp->_matchScore ?? 0;
+                            $colorClass = $score >= 90 ? 'bg-green-100 text-green-700 border-green-300' : 
+                                         ($score >= 70 ? 'bg-blue-100 text-blue-700 border-blue-300' : 
+                                         ($score >= 50 ? 'bg-cyan-100 text-cyan-700 border-cyan-300' : 'bg-amber-100 text-amber-700 border-amber-300'));
+                        @endphp
+                        <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition"
+                             wire:click="linkMember({{ $emp->id }}, 'employee')">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $emp->full_name ?? $emp->name }}</p>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded border font-medium {{ $colorClass }}">{{ $score }}%</span>
+                                </div>
+                                <p class="text-xs text-gray-500">NIY: {{ $emp->niy ?? '-' }}@if($emp->nidn) · NIDN: {{ $emp->nidn }}@endif</p>
+                            </div>
+                            <i class="fas fa-link text-emerald-600"></i>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
+                @endif
+
+                {{-- No Results --}}
+                @if(count($searchResults) === 0 && (!isset($employeeResults) || count($employeeResults) === 0) && strlen($searchName) >= 2 && !$isSearching)
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                    <p class="text-sm text-amber-700 font-medium"><i class="fas fa-exclamation-triangle mr-1"></i> Data tidak ditemukan</p>
+                    <p class="text-xs text-amber-600 mt-2">Coba gunakan NIM/NIY/NIDN untuk hasil lebih akurat</p>
+                </div>
+                @endif
+            </div>
+
+            {{-- Footer --}}
+            <div class="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+                <button @click="showLinkingModal = false" 
+                        class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
 </template>
 
 </div> {{-- Close x-data div --}}
-
