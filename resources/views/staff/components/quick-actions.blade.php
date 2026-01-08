@@ -39,7 +39,7 @@
         <div class="p-3 border-b border-gray-100">
             @if($visitorBranch)
             <a href="{{ route('visitor.kiosk', $visitorBranch->code) }}" target="_blank"
-               class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition">
+               class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition mb-2">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-door-open text-white"></i>
                     <span class="text-white font-semibold text-sm">Visitor</span>
@@ -47,7 +47,7 @@
                 <i class="fas fa-external-link-alt text-white/70 text-xs"></i>
             </a>
             @else
-            <div x-data="{ showBranches: false }" class="relative">
+            <div x-data="{ showBranches: false }" class="relative mb-2">
                 <button @click="showBranches = !showBranches" class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-door-open text-white"></i>
@@ -66,6 +66,126 @@
                 </div>
             </div>
             @endif
+            
+            {{-- Short URL Button --}}
+            <div x-data="shortUrlGenerator()">
+                <button @click="openModal()" 
+                        class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl transition">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-link text-white"></i>
+                        <span class="text-white font-semibold text-sm">Short URL</span>
+                    </div>
+                    <i class="fas fa-plus text-white/70 text-xs"></i>
+                </button>
+                
+                {{-- Short URL Modal --}}
+                <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] overflow-y-auto">
+                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="closeModal()"></div>
+                        
+                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <i class="fas fa-link text-blue-600"></i>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Buat Short URL</h3>
+                                        
+                                        <div x-show="!generatedUrl">
+                                            <div class="space-y-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Asli *</label>
+                                                    <input 
+                                                        type="url" 
+                                                        x-model="originalUrl"
+                                                        placeholder="https://onedrive.live.com/..."
+                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    >
+                                                    <span x-show="errors.url" class="text-red-500 text-xs" x-text="errors.url"></span>
+                                                </div>
+                                                
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul (Opsional)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        x-model="title"
+                                                        placeholder="Deskripsi singkat..."
+                                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    >
+                                                </div>
+                                                
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Kode Custom (Opsional)</label>
+                                                    <div class="flex">
+                                                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                                            {{ url('/s/') }}/
+                                                        </span>
+                                                        <input 
+                                                            type="text" 
+                                                            x-model="customCode"
+                                                            placeholder="abc123"
+                                                            class="flex-1 px-3 py-2 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            maxlength="10"
+                                                        >
+                                                    </div>
+                                                    <span x-show="errors.custom_code" class="text-red-500 text-xs" x-text="errors.custom_code"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div x-show="generatedUrl">
+                                            <div class="bg-green-50 border border-green-200 rounded-md p-4 mb-4">
+                                                <div class="flex">
+                                                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                                                    <div class="ml-3">
+                                                        <h3 class="text-sm font-medium text-green-800">Short URL Berhasil Dibuat!</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Short URL Anda:</label>
+                                                <div class="flex">
+                                                    <input 
+                                                        type="text" 
+                                                        x-model="generatedUrl"
+                                                        readonly
+                                                        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50"
+                                                    >
+                                                    <button 
+                                                        @click="copyToClipboard()"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700"
+                                                    >
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button 
+                                    x-show="!generatedUrl"
+                                    @click="generate()"
+                                    :disabled="loading"
+                                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    <span x-show="!loading">Generate</span>
+                                    <span x-show="loading">Loading...</span>
+                                </button>
+                                <button 
+                                    @click="closeModal()"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                >
+                                    <span x-text="generatedUrl ? 'Tutup' : 'Batal'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- Sirkulasi Section --}}
@@ -153,3 +273,88 @@
         </div>
     </div>
 </div>
+
+<script>
+function shortUrlGenerator() {
+    return {
+        showModal: false,
+        originalUrl: '',
+        title: '',
+        customCode: '',
+        generatedUrl: '',
+        loading: false,
+        errors: {},
+        
+        openModal() {
+            this.showModal = true;
+            this.reset();
+        },
+        
+        closeModal() {
+            this.showModal = false;
+        },
+        
+        reset() {
+            this.originalUrl = '';
+            this.title = '';
+            this.customCode = '';
+            this.generatedUrl = '';
+            this.errors = {};
+            this.loading = false;
+        },
+        
+        async generate() {
+            this.loading = true;
+            this.errors = {};
+            
+            try {
+                const response = await fetch('/api/short-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        url: this.originalUrl,
+                        title: this.title,
+                        custom_code: this.customCode
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    this.generatedUrl = data.data.short_url;
+                } else {
+                    this.errors = data.errors || {};
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.errors = { general: 'Terjadi kesalahan, coba lagi.' };
+            } finally {
+                this.loading = false;
+            }
+        },
+        
+        async copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText(this.generatedUrl);
+                
+                // Show toast
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-[200]';
+                toast.innerHTML = '<i class="fas fa-check mr-2"></i>URL berhasil disalin!';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
+                }, 3000);
+            } catch (error) {
+                console.error('Failed to copy:', error);
+            }
+        }
+    }
+}
+</script>
