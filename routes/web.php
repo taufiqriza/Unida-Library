@@ -51,8 +51,8 @@ Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page']
 
 // Short URL Routes
 Route::get('/s/{code}', [App\Http\Controllers\ShortUrlController::class, 'redirect'])->name('short.redirect');
-Route::post('/api/short-url', [App\Http\Controllers\ShortUrlController::class, 'create'])->name('short.create');
-Route::get('/api/short-url/{code}/stats', [App\Http\Controllers\ShortUrlController::class, 'stats'])->name('short.stats');
+Route::post('/api/short-url', [App\Http\Controllers\ShortUrlController::class, 'create'])->name('short.create')->middleware('auth');
+Route::get('/api/short-url/{code}/stats', [App\Http\Controllers\ShortUrlController::class, 'stats'])->name('short.stats')->middleware('auth');
 
 // Faculty Directory - Premium Feature
 Route::get('/direktori-akademisi', \App\Livewire\Opac\FacultyDirectory::class)->name('opac.faculty-directory');
