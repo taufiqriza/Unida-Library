@@ -43,8 +43,7 @@ class ShortUrlDashboard extends Component
             ->paginate(15);
 
         return view('livewire.staff.short-url.short-url-dashboard', compact('shortUrls'))
-            ->layout('staff.layouts.app', [
-                'title' => 'Short URL Dashboard'
-            ]);
+            ->extends('staff.layouts.app')
+            ->section('content');
     }
 }
