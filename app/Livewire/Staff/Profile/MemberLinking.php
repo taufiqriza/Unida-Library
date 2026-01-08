@@ -30,6 +30,8 @@ class MemberLinking extends Component
 
     public function searchPddikti()
     {
+        logger('MemberLinking: searchPddikti called with: ' . $this->searchName);
+        
         if (strlen($this->searchName) < 2) {
             $this->searchResults = [];
             $this->employeeResults = [];
