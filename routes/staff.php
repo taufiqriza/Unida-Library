@@ -161,6 +161,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             // Logout from web guard only - don't invalidate entire session
             auth()->guard('web')->logout();
             
+            // Clear modal session for fresh login experience
+            session()->forget('modal_dismissed');
+            
             // Regenerate token for security
             request()->session()->regenerateToken();
             

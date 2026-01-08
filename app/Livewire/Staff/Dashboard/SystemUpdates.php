@@ -14,10 +14,15 @@ class SystemUpdates extends Component
     {
         $this->loadUpdates();
         
+        logger('SystemUpdates mount: updates count = ' . $this->updates->count());
+        logger('SystemUpdates mount: modal_dismissed session = ' . (session()->has('modal_dismissed') ? 'true' : 'false'));
+        
         // Show modal only if not dismissed this session
         if ($this->updates->isNotEmpty() && !session()->has('modal_dismissed')) {
             $this->showSplashModal = true;
-            logger('SystemUpdates: showing splash modal on mount');
+            logger('SystemUpdates: SHOWING splash modal');
+        } else {
+            logger('SystemUpdates: NOT showing modal - updates empty or dismissed');
         }
     }
 
