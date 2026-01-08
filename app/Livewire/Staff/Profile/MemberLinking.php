@@ -15,6 +15,13 @@ class MemberLinking extends Component
     public $searchResults = [];
     public $isSearching = false;
     public $showLinkingSection = false;
+    public $employeeResults = [];
+
+    public function updatedSearchQuery()
+    {
+        logger('MemberLinking: updatedSearchQuery called with: ' . $this->searchQuery);
+        $this->searchMembers();
+    }
 
     public function mount()
     {
