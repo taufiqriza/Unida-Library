@@ -17,7 +17,6 @@
                     {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
                 </p>
             </div>
-            </div>
         </div>
         
         <div class="flex items-center gap-2">
