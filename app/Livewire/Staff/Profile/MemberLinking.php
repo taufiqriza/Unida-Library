@@ -42,13 +42,17 @@ class MemberLinking extends Component
 
     public function searchMembers()
     {
+        logger('MemberLinking: searchMembers called with query: ' . $this->searchQuery);
+        
         if (strlen($this->searchQuery) < 2) {
             $this->searchResults = [];
             $this->employeeResults = [];
+            logger('MemberLinking: Query too short, returning empty');
             return;
         }
 
         $this->isSearching = true;
+        logger('MemberLinking: Starting search...');
 
         $search = trim($this->searchQuery);
         $isNumeric = preg_match('/^\d{4,}$/', $search);
@@ -68,6 +72,8 @@ class MemberLinking extends Component
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->where('name', 'like', "%{$search}%")
                 ->limit(10)->get();
+            
+            logger('MemberLinking: Found ' . $mahasiswa->count() . ' members before scoring');
             
             $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
@@ -103,13 +109,17 @@ class MemberLinking extends Component
                     }
                 });
             }
+            
+            logger('MemberLinking: Found ' . $employees->count() . ' employees');
         } catch (\Exception $e) {
-            // Employee table might not exist
+            logger('MemberLinking: Employee search error: ' . $e->getMessage());
         }
         
         // Filter and store results - Exact copy from CompleteProfile
         $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
         $this->employeeResults = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
+
+        logger('MemberLinking: Filtered - Members: ' . $filteredMahasiswa->count() . ', Employees: ' . $this->employeeResults->count());
 
         // Convert to array format for view
         $this->searchResults = [];
@@ -148,6 +158,8 @@ class MemberLinking extends Component
 
         // Sort by match score
         usort($this->searchResults, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
+
+        logger('MemberLinking: Final results count: ' . count($this->searchResults));
 
         $this->isSearching = false;
     }
