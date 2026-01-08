@@ -51,6 +51,9 @@ class MemberLinking extends Component
         $isNumeric = preg_match('/^\d{4,}$/', $search);
         $searchUpper = strtoupper($search);
 
+        // Debug: Let's see what we're searching for
+        logger('Searching for: ' . $search . ' (numeric: ' . ($isNumeric ? 'yes' : 'no') . ')');
+
         // === Search Mahasiswa (SIAKAD) ===
         if ($isNumeric && strlen($search) >= 10) {
             // NIM/Member ID search
@@ -60,19 +63,29 @@ class MemberLinking extends Component
                     $q->where('member_id', $search)
                       ->orWhere('nim_nidn', $search);
                 })
-                ->whereNull('email') // Only unlinked members
+                ->where(function($q) {
+                    $q->whereNull('email')->orWhere('email', '');
+                })
                 ->limit(5)
                 ->get();
             
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
-            // Name search
+            // Name search - Remove email filter temporarily for debugging
             $mahasiswa = Member::withoutGlobalScope('branch')
                 ->with(['department', 'faculty', 'memberType'])
-                ->whereNull('email') // Only unlinked members
                 ->where('name', 'like', "%{$search}%")
                 ->limit(10)
                 ->get();
+            
+            logger('Found ' . $mahasiswa->count() . ' members before filtering');
+            
+            // Filter only unlinked members
+            $mahasiswa = $mahasiswa->filter(function($member) {
+                return empty($member->email);
+            });
+            
+            logger('Found ' . $mahasiswa->count() . ' unlinked members');
             
             $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
@@ -87,40 +100,48 @@ class MemberLinking extends Component
 
         // === Search Dosen/Tendik (Employee) ===
         $employees = collect();
-        if (class_exists('\App\Models\Employee')) {
-            if ($isNumeric) {
-                // NIY/NIDN search
-                $employees = \App\Models\Employee::where(function($q) use ($search) {
-                    $q->where('niy', $search)->orWhere('nidn', $search);
-                })
-                ->limit(5)
-                ->get();
+        try {
+            if (class_exists('\App\Models\Employee')) {
+                if ($isNumeric) {
+                    // NIY/NIDN search
+                    $employees = \App\Models\Employee::where(function($q) use ($search) {
+                        $q->where('niy', $search)->orWhere('nidn', $search);
+                    })
+                    ->limit(5)
+                    ->get();
+                    
+                    $employees->each(fn($e) => $e->_matchScore = 100);
+                } else {
+                    // Name search
+                    $employees = \App\Models\Employee::where(function($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%")
+                          ->orWhere('full_name', 'like', "%{$search}%");
+                    })
+                    ->limit(10)
+                    ->get();
+                    
+                    $employees->each(function($e) use ($searchUpper) {
+                        $nameUpper = strtoupper($e->full_name ?? $e->name);
+                        if ($nameUpper === $searchUpper) $e->_matchScore = 100;
+                        elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
+                        else {
+                            similar_text($searchUpper, $nameUpper, $percent);
+                            $e->_matchScore = (int) round($percent);
+                        }
+                    });
+                }
                 
-                $employees->each(fn($e) => $e->_matchScore = 100);
-            } else {
-                // Name search
-                $employees = \App\Models\Employee::where(function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('full_name', 'like', "%{$search}%");
-                })
-                ->limit(10)
-                ->get();
-                
-                $employees->each(function($e) use ($searchUpper) {
-                    $nameUpper = strtoupper($e->full_name ?? $e->name);
-                    if ($nameUpper === $searchUpper) $e->_matchScore = 100;
-                    elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
-                    else {
-                        similar_text($searchUpper, $nameUpper, $percent);
-                        $e->_matchScore = (int) round($percent);
-                    }
-                });
+                logger('Found ' . $employees->count() . ' employees');
             }
+        } catch (\Exception $e) {
+            logger('Employee search error: ' . $e->getMessage());
         }
 
         // Filter and combine results
         $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
         $filteredEmployees = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
+
+        logger('Filtered results - Members: ' . $filteredMahasiswa->count() . ', Employees: ' . $filteredEmployees->count());
 
         // Convert to array format for view
         $this->searchResults = [];
@@ -159,6 +180,8 @@ class MemberLinking extends Component
 
         // Sort by match score
         usort($this->searchResults, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
+
+        logger('Final results count: ' . count($this->searchResults));
 
         $this->isSearching = false;
     }
