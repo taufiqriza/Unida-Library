@@ -50,7 +50,8 @@ Route::get('/survey/{slug}', \App\Livewire\Opac\SurveyRespond::class)->name('opa
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
 // Short URL Routes
-Route::get('/s/{code}', [App\Http\Controllers\ShortUrlController::class, 'redirect'])->name('short.redirect');
+Route::get('/s/{code}', [App\Http\Controllers\ShortUrlController::class, 'preview'])->name('short.preview');
+Route::get('/s/{code}/go', [App\Http\Controllers\ShortUrlController::class, 'redirect'])->name('short.redirect');
 Route::post('/api/short-url', [App\Http\Controllers\ShortUrlController::class, 'create'])->name('short.create')->middleware('auth');
 Route::get('/api/short-url/{code}/stats', [App\Http\Controllers\ShortUrlController::class, 'stats'])->name('short.stats')->middleware('auth');
 

@@ -18,6 +18,17 @@ class ShortUrlController extends Controller
         return view('admin.short-urls.index', compact('shortUrls'));
     }
 
+    public function preview(string $code)
+    {
+        $shortUrl = ShortUrl::where('code', $code)->first();
+
+        if (!$shortUrl || !$shortUrl->isActive()) {
+            abort(404, 'Short URL not found or expired');
+        }
+
+        return view('short-url.preview', compact('shortUrl'));
+    }
+
     public function redirect(string $code): RedirectResponse
     {
         $shortUrl = ShortUrl::where('code', $code)->first();
