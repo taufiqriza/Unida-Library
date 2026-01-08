@@ -1,6 +1,9 @@
 @section('title', 'Dashboard')
 
 <div wire:init="loadData">
+    {{-- System Updates Component --}}
+    @livewire('staff.dashboard.system-updates')
+
     {{-- Desktop Header (hidden on mobile) --}}
     <div class="hidden lg:flex lg:items-center lg:justify-between gap-4 mb-5">
         <div class="flex items-center gap-4">
