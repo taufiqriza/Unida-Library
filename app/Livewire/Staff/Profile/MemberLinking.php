@@ -56,16 +56,14 @@ class MemberLinking extends Component
             // NIM search
             $mahasiswa = Member::with(['department', 'branch'])
                 ->where(fn($q) => $q->where('member_id', $search)->orWhere('nim_nidn', $search))
-                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
-                ->where('profile_completed', false)
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', '')->orWhere('email', '!=', $this->user->email))
                 ->limit(5)->get();
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
             // Name search - support multiple words
             $searchWords = explode(' ', $search);
             $mahasiswa = Member::with(['department', 'branch'])
-                ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
-                ->where('profile_completed', false)
+                ->where(fn($q) => $q->whereNull('email')->orWhere('email', '')->orWhere('email', '!=', $this->user->email))
                 ->where(function($query) use ($search, $searchWords) {
                     // Exact phrase match (highest priority)
                     $query->where('name', 'like', "%{$search}%");
