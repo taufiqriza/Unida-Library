@@ -1,4 +1,5 @@
 {{-- Member Linking Status & Button --}}
+<div x-data="{ showLinkingModal: false }">
 @if($linkedMember)
     <div class="space-y-1">
         <p class="text-xs text-emerald-200 font-medium">
@@ -193,4 +194,5 @@
     </div>
 </template>
 
+</div> {{-- Close x-data div --}}
 

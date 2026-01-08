@@ -11,7 +11,7 @@
     </div>
 
     {{-- Profile Card --}}
-    <div class="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white" x-data="{ showLinkingModal: false }">
+    <div class="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white">
         <div class="flex flex-col sm:flex-row items-center gap-5">
             {{-- Avatar with Upload --}}
             <div class="relative group">
