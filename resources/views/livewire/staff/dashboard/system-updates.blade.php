@@ -12,7 +12,7 @@
                     <div class="relative flex items-center justify-between">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
-                                <i class="fas fa-arrow-up text-2xl text-blue-100"></i>
+                                <i class="fas fa-cog text-2xl text-blue-100"></i>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
@@ -59,61 +59,62 @@
     </template>
     @endif
 
-    {{-- Account Integration Info Card --}}
-    <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-emerald-200/60 rounded-2xl p-6 shadow-sm mb-4">
-        <div class="flex items-start gap-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                <i class="fas fa-link text-white text-xl"></i>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-emerald-900 mb-2">Integrasikan Akun Anda</h3>
-                <p class="text-emerald-800 mb-4 font-medium">Hubungkan Google Account dan Member Account untuk pengalaman terpadu</p>
-                
-                <div class="grid md:grid-cols-2 gap-4">
-                    {{-- Google Account --}}
-                    <div class="bg-white/70 backdrop-blur-sm border border-emerald-200/40 rounded-xl p-4">
-                        @if(auth()->user()->socialAccounts()->where('provider', 'google')->exists())
-                            <div class="flex items-center gap-2 text-emerald-700 mb-2">
-                                <i class="fas fa-check-circle text-emerald-500"></i>
-                                <span class="font-semibold">Google Account Terhubung</span>
-                            </div>
-                        @else
-                            <div class="flex items-center gap-2 text-amber-700 mb-2">
-                                <i class="fas fa-exclamation-circle text-amber-500"></i>
-                                <span class="font-semibold">Google Account</span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-3">Hubungkan untuk login yang lebih mudah</p>
-                            <a href="{{ route('auth.google') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition">
-                                <i class="fab fa-google"></i>
-                                <span>Hubungkan</span>
-                            </a>
-                        @endif
-                    </div>
-
-                    {{-- Member Account --}}
-                    <div class="bg-white/70 backdrop-blur-sm border border-emerald-200/40 rounded-xl p-4">
-                        @php
-                            $linkedMember = \App\Models\Member::where('email', auth()->user()->email)->first();
-                        @endphp
-                        @if($linkedMember)
-                            <div class="flex items-center gap-2 text-emerald-700 mb-2">
-                                <i class="fas fa-check-circle text-emerald-500"></i>
-                                <span class="font-semibold">Member Account Terhubung</span>
-                            </div>
-                            <p class="text-sm text-emerald-600">{{ $linkedMember->name }}</p>
-                        @else
-                            <div class="flex items-center gap-2 text-amber-700 mb-2">
-                                <i class="fas fa-exclamation-circle text-amber-500"></i>
-                                <span class="font-semibold">Member Account</span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-3">Akses fasilitas perpustakaan</p>
-                            <a href="{{ route('staff.profile') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-500 text-white text-sm font-medium rounded-lg hover:bg-emerald-600 transition">
-                                <i class="fas fa-user-plus"></i>
-                                <span>Hubungkan</span>
-                            </a>
-                        @endif
-                    </div>
+    {{-- Simple Account Integration Cards --}}
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+        {{-- Google Account Card --}}
+        <div class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/60 rounded-xl p-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fab fa-google text-white"></i>
                 </div>
+                <div class="flex-1">
+                    @if(auth()->user()->socialAccounts()->where('provider', 'google')->exists())
+                        <h4 class="font-semibold text-red-900 text-sm">Google Account Terhubung</h4>
+                        <p class="text-xs text-red-600">Login lebih mudah</p>
+                    @else
+                        <h4 class="font-semibold text-red-900 text-sm">Hubungkan Google</h4>
+                        <p class="text-xs text-red-600">Login lebih mudah</p>
+                    @endif
+                </div>
+                @if(!auth()->user()->socialAccounts()->where('provider', 'google')->exists())
+                <a href="{{ route('auth.google') }}" class="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition">
+                    Hubungkan
+                </a>
+                @else
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check text-green-600 text-xs"></i>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Member Account Card --}}
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl p-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user-graduate text-white"></i>
+                </div>
+                <div class="flex-1">
+                    @php
+                        $linkedMember = \App\Models\Member::where('email', auth()->user()->email)->first();
+                    @endphp
+                    @if($linkedMember)
+                        <h4 class="font-semibold text-emerald-900 text-sm">Member Area Terhubung</h4>
+                        <p class="text-xs text-emerald-600">{{ $linkedMember->name }}</p>
+                    @else
+                        <h4 class="font-semibold text-emerald-900 text-sm">Hubungkan Member Area</h4>
+                        <p class="text-xs text-emerald-600">Akses fasilitas mahasiswa</p>
+                    @endif
+                </div>
+                @if(!$linkedMember)
+                <a href="{{ route('staff.profile') }}" class="px-3 py-1.5 bg-emerald-500 text-white text-xs font-medium rounded-lg hover:bg-emerald-600 transition">
+                    Hubungkan
+                </a>
+                @else
+                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check text-green-600 text-xs"></i>
+                </div>
+                @endif
             </div>
         </div>
     </div>
