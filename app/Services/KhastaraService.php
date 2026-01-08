@@ -14,7 +14,7 @@ class KhastaraService
     {
         $cacheKey = 'khastara_collections_' . md5(serialize($filters) . $page . $perPage);
         
-        return Cache::remember($cacheKey, 1800, function () use ($filters, $page, $perPage) {
+        return Cache::remember($cacheKey, 300, function () use ($filters, $page, $perPage) {
             try {
                 $params = [
                     'page' => $page,
@@ -260,16 +260,42 @@ class KhastaraService
     
     private function getFallbackData($filters, $page, $perPage)
     {
-        // Minimal fallback data
+        // Enhanced fallback data with more manuscripts
         $mockData = [
-            ['catalog_id' => '50513', 'title' => 'Syarh Aja\'ib al-Qalb', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50513.JPG', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab'],
-            ['catalog_id' => '50516', 'title' => 'Fath al-Muluk', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50516.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab']
+            ['catalog_id' => '50513', 'title' => 'Syarh Aja\'ib al-Qalb', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50513.JPG', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab', 'subject' => 'Tasawuf -- Manuskrip Arab', 'view_count' => 3407, 'konten_digital_count' => 13],
+            ['catalog_id' => '50516', 'title' => 'Fath al-Muluk', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50516.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab', 'subject' => 'Tasawuf -- Manuskrip Arab', 'view_count' => 2038, 'konten_digital_count' => 4],
+            ['catalog_id' => '50512', 'title' => 'Ilm At-Tasawwuf', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/50512_1.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab', 'subject' => 'Tasawuf', 'view_count' => 2044, 'konten_digital_count' => 23],
+            ['catalog_id' => '62091', 'title' => 'Babad Yogyakarta Jilid 2', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62091.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Jawa', 'subject' => 'Cerita historis -- Kesusastraan Jawa', 'view_count' => 2246, 'konten_digital_count' => 18],
+            ['catalog_id' => '62090', 'title' => 'Babad Yogyakarta Jilid 1', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62090.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Jawa', 'subject' => 'Cerita historis -- Kesusastraan Jawa', 'view_count' => 1340, 'konten_digital_count' => 1],
+            ['catalog_id' => '62088', 'title' => 'Wariga', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62088.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Jawa', 'subject' => 'Almanak Jawa -- Kesusastraan Jawa', 'view_count' => 709, 'konten_digital_count' => 7],
+            ['catalog_id' => '62089', 'title' => 'Geslachtslijst Der Menak\'s in De Preanger', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62089.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Arab', 'subject' => 'Cerita menak (Sunda) -- Kesusastraan Arab', 'view_count' => 250, 'konten_digital_count' => 6],
+            ['catalog_id' => '62438', 'title' => 'Fotocopie van de Grote Batakse', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62438.jpeg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Batak', 'subject' => 'Manuskrip Batak -- Kesusastraan Batak', 'view_count' => 265, 'konten_digital_count' => 5],
+            ['catalog_id' => '62434', 'title' => 'Nota van den Secretaris art.38-39', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62434.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Belanda', 'subject' => 'Surat, perjanjian, dsb -- Manuskrip Belanda', 'view_count' => 169, 'konten_digital_count' => 1],
+            ['catalog_id' => '62436', 'title' => 'Nota van den Secretaris art.44', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Manuskrip/62436.jpg', 'create_date' => '11/21/2007', 'worksheet_name' => 'Manuskrip', 'language_name' => 'Belanda', 'subject' => 'Surat, perjanjian, dsb -- Manuskrip Belanda', 'view_count' => 146, 'konten_digital_count' => 1],
+            ['catalog_id' => '50143', 'title' => 'Hubungan faktor-faktor dalam pembentukan reputasi perusahaan publik', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Monograf/50143.jpg', 'create_date' => '11/25/2011', 'worksheet_name' => 'Monograf', 'language_name' => 'Indonesia', 'subject' => 'Perpustakaan korporasi', 'view_count' => 1007, 'konten_digital_count' => 1],
+            ['catalog_id' => '50881', 'title' => 'Tafel voor snel opslaan van Coordinaten verschillen', 'cover_utama' => 'http://file-opac.perpusnas.go.id/uploaded_files/sampul_koleksi/original/Monograf/50881.jpg', 'create_date' => '12/26/2006', 'worksheet_name' => 'Monograf', 'language_name' => 'Belanda', 'subject' => 'Koordinat - Tabel', 'view_count' => 434, 'konten_digital_count' => 1]
         ];
         
+        // Apply filters if any
+        $filteredData = collect($mockData);
+        
+        if (!empty($filters)) {
+            foreach ($filters as $key => $value) {
+                if ($value) {
+                    $filteredData = $filteredData->filter(function ($item) use ($key, $value) {
+                        return stripos($item[$key] ?? '', $value) !== false;
+                    });
+                }
+            }
+        }
+        
+        $total = $filteredData->count();
+        $paginatedData = $filteredData->skip(($page - 1) * $perPage)->take($perPage);
+        
         return [
-            'data' => $mockData,
+            'data' => $paginatedData->values()->toArray(),
             'meta' => [
-                'total' => count($mockData),
+                'total' => $total,
                 'per_page' => $perPage,
                 'current_page' => $page
             ]
