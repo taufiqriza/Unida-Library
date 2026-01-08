@@ -34,8 +34,11 @@ class MemberLinking extends Component
 
     public function testMethod()
     {
-        logger('MemberLinking: testMethod called');
-        session()->flash('success', 'Test method berhasil dipanggil!');
+        logger('MemberLinking: testMethod called - SUCCESS');
+        $this->searchResults = collect([
+            (object)['id' => 1, 'name' => 'Test Member 1'],
+            (object)['id' => 2, 'name' => 'Test Member 2']
+        ]);
     }
 
     public function searchPddikti()
