@@ -14,14 +14,7 @@ class MemberLinking extends Component
     public $searchName = '';
     public $searchResults = [];
     public $isSearching = false;
-    public $showLinkingSection = false;
     public $employeeResults = [];
-
-    public function searchPddikti()
-    {
-        logger('MemberLinking: searchPddikti called with: ' . $this->searchName);
-        $this->searchMembers();
-    }
 
     public function mount()
     {
@@ -32,34 +25,20 @@ class MemberLinking extends Component
     public function checkExistingLink()
     {
         // Check if staff already has linked member account
-        $this->linkedMember = Member::withoutGlobalScope('branch')
-            ->where('email', $this->user->email)
-            ->first();
+        $this->linkedMember = Member::where('email', $this->user->email)->first();
     }
 
-    public function toggleLinkingSection()
+    public function searchPddikti()
     {
-        $this->showLinkingSection = !$this->showLinkingSection;
-        if (!$this->showLinkingSection) {
-            $this->reset(['searchQuery', 'searchResults', 'isSearching']);
-        }
-    }
-
-    public $employeeResults = [];
-
-    public function searchMembers()
-    {
-        logger('MemberLinking: searchMembers called with query: ' . $this->searchName);
-        
         if (strlen($this->searchName) < 2) {
             $this->searchResults = [];
             $this->employeeResults = [];
-            logger('MemberLinking: Query too short, returning empty');
             return;
         }
 
         $this->isSearching = true;
-        logger('MemberLinking: Starting search...');
+        $this->searchResults = [];
+        $this->employeeResults = [];
 
         $search = trim($this->searchName);
         $isNumeric = preg_match('/^\d{4,}$/', $search);
@@ -68,19 +47,19 @@ class MemberLinking extends Component
         // === Search Mahasiswa (SIAKAD) - Exact copy from CompleteProfile ===
         if ($isNumeric && strlen($search) >= 10) {
             // NIM search
-            $mahasiswa = Member::with(['department', 'branch', 'memberType'])
+            $mahasiswa = Member::with(['department', 'branch'])
                 ->where(fn($q) => $q->where('member_id', $search)->orWhere('nim_nidn', $search))
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                ->where('profile_completed', false)
                 ->limit(5)->get();
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
             // Name search
-            $mahasiswa = Member::with(['department', 'branch', 'memberType'])
+            $mahasiswa = Member::with(['department', 'branch'])
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
+                ->where('profile_completed', false)
                 ->where('name', 'like', "%{$search}%")
                 ->limit(10)->get();
-            
-            logger('MemberLinking: Found ' . $mahasiswa->count() . ' members before scoring');
             
             $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
@@ -94,80 +73,30 @@ class MemberLinking extends Component
         }
         
         // === Search Dosen/Tendik (Employee) - Exact copy from CompleteProfile ===
-        $employees = collect();
-        try {
-            if ($isNumeric) {
-                // NIY/NIDN search
-                $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
-                    ->limit(5)->get();
-                $employees->each(fn($e) => $e->_matchScore = 100);
-            } else {
-                // Name search
-                $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
-                    ->limit(10)->get();
-                
-                $employees->each(function($e) use ($searchUpper) {
-                    $nameUpper = strtoupper($e->full_name ?? $e->name);
-                    if ($nameUpper === $searchUpper) $e->_matchScore = 100;
-                    elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
-                    else {
-                        similar_text($searchUpper, $nameUpper, $percent);
-                        $e->_matchScore = (int) round($percent);
-                    }
-                });
-            }
+        if ($isNumeric) {
+            // NIY/NIDN search
+            $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
+                ->limit(5)->get();
+            $employees->each(fn($e) => $e->_matchScore = 100);
+        } else {
+            // Name search
+            $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
+                ->limit(10)->get();
             
-            logger('MemberLinking: Found ' . $employees->count() . ' employees');
-        } catch (\Exception $e) {
-            logger('MemberLinking: Employee search error: ' . $e->getMessage());
+            $employees->each(function($e) use ($searchUpper) {
+                $nameUpper = strtoupper($e->full_name ?? $e->name);
+                if ($nameUpper === $searchUpper) $e->_matchScore = 100;
+                elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
+                else {
+                    similar_text($searchUpper, $nameUpper, $percent);
+                    $e->_matchScore = (int) round($percent);
+                }
+            });
         }
         
-        // Filter and store results - Exact copy from CompleteProfile
-        $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
+        $this->searchResults = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
         $this->employeeResults = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
-
-        logger('MemberLinking: Filtered - Members: ' . $filteredMahasiswa->count() . ', Employees: ' . $this->employeeResults->count());
-
-        // Convert to array format for view
-        $this->searchResults = [];
-
-        // Add mahasiswa results
-        foreach ($filteredMahasiswa as $member) {
-            $this->searchResults[] = [
-                'id' => $member->id,
-                'type' => 'member',
-                'name' => $member->name,
-                'member_id' => $member->member_id,
-                'nim_nidn' => $member->nim_nidn,
-                'faculty' => $member->faculty->name ?? '-',
-                'department' => $member->department->name ?? '-',
-                'member_type' => $member->memberType->name ?? 'Mahasiswa',
-                'registration_type' => $member->registration_type ?? 'internal',
-                'match_score' => $member->_matchScore,
-            ];
-        }
-
-        // Add employee results
-        foreach ($this->employeeResults as $employee) {
-            $this->searchResults[] = [
-                'id' => $employee->id,
-                'type' => 'employee',
-                'name' => $employee->full_name ?? $employee->name,
-                'member_id' => $employee->niy ?? $employee->nidn ?? '-',
-                'nim_nidn' => $employee->nidn ?? $employee->niy ?? '-',
-                'faculty' => $employee->faculty ?? '-',
-                'department' => $employee->department ?? '-',
-                'member_type' => 'Dosen/Tendik',
-                'registration_type' => 'internal',
-                'match_score' => $employee->_matchScore,
-            ];
-        }
-
-        // Sort by match score
-        usort($this->searchResults, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
-
-        logger('MemberLinking: Final results count: ' . count($this->searchResults));
-
+        
         $this->isSearching = false;
     }
 
@@ -178,7 +107,7 @@ class MemberLinking extends Component
 
             if ($type === 'member') {
                 // Link existing member
-                $member = Member::withoutGlobalScope('branch')->find($memberId);
+                $member = Member::find($memberId);
                 
                 if (!$member) {
                     throw new \Exception('Data member tidak ditemukan');
@@ -208,9 +137,7 @@ class MemberLinking extends Component
                 }
 
                 // Check if member with this email already exists
-                $existingMember = Member::withoutGlobalScope('branch')
-                    ->where('email', $this->user->email)
-                    ->first();
+                $existingMember = Member::where('email', $this->user->email)->first();
 
                 if ($existingMember) {
                     throw new \Exception('Email sudah terhubung dengan member lain');
@@ -239,8 +166,7 @@ class MemberLinking extends Component
 
             DB::commit();
 
-            $this->showLinkingSection = false;
-            $this->reset(['searchQuery', 'searchResults']);
+            $this->reset(['searchName', 'searchResults']);
 
             session()->flash('success', 'Berhasil menghubungkan akun dengan data member!');
 
