@@ -68,6 +68,16 @@
                 <span class="hidden sm:inline">Log Aktivitas</span>
                 <span class="sm:hidden">Log</span>
             </button>
+            
+            @if(auth()->user()->role === 'super_admin')
+            <button wire:click="setMainTab('ranking')" 
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    {{ $mainTab === 'ranking' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-trophy"></i>
+                <span class="hidden sm:inline">Ranking Staff</span>
+                <span class="sm:hidden">Ranking</span>
+            </button>
+            @endif
         </div>
     </div>
 
@@ -608,6 +618,13 @@
             <p class="text-sm text-gray-400 mt-1">Log aktivitas akan muncul di sini</p>
         </div>
         @endif
+    </div>
+    @endif
+
+    {{-- Ranking Tab (Super Admin Only) --}}
+    @if($mainTab === 'ranking' && auth()->user()->role === 'super_admin')
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        @livewire('staff.settings.user-ranking')
     </div>
     @endif
 

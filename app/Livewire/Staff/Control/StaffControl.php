@@ -13,7 +13,7 @@ class StaffControl extends Component
 {
     use WithPagination;
 
-    public $mainTab = 'staff'; // 'staff', 'approval', 'activity', 'branches'
+    public $mainTab = 'staff'; // 'staff', 'approval', 'activity', 'branches', 'ranking'
     public $activeTab = 'all'; // for staff: all, super_admin, admin, librarian, staff
     public $search = '';
     public $selectedUser = null;
