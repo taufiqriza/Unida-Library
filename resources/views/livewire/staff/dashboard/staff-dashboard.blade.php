@@ -17,29 +17,6 @@
                     {{ now()->locale('id')->isoFormat('dddd, D MMMM Y') }}
                 </p>
             </div>
-            
-            {{-- New Features Card --}}
-            <div x-data="{ show: true }" x-show="show" x-cloak class="ml-4">
-                <div class="flex items-center gap-3 px-3 py-2 bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 border border-amber-200/60 rounded-xl shadow-sm">
-                    <span class="flex items-center justify-center w-7 h-7 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg shadow-sm">
-                        <i class="fas fa-rocket text-white text-xs"></i>
-                    </span>
-                    <div class="flex flex-col">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-xs font-bold text-amber-700">Update Terbaru!</span>
-                            <span class="px-1.5 py-0.5 text-[9px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded">v2.0</span>
-                        </div>
-                        <span class="text-[10px] text-amber-600/80">Copy Cataloging • Quick Cover • Digital Card • Import Excel • Analytics • Security</span>
-                        <div class="flex items-center gap-1 mt-0.5">
-                            <i class="fas fa-book-open text-[7px] text-amber-400"></i>
-                            <span class="text-[8px] text-amber-500 font-medium">SYSTEM ILMU</span>
-                            <span class="text-[8px] text-amber-400 italic">- Integrated Library UNIDA</span>
-                        </div>
-                    </div>
-                    <button @click="show = false" class="w-5 h-5 flex items-center justify-center text-amber-400 hover:text-amber-600 rounded-full transition">
-                        <i class="fas fa-times text-[10px]"></i>
-                    </button>
-                </div>
             </div>
         </div>
         
@@ -61,6 +38,26 @@
                     <a href="{{ route('staff.profile') }}" class="text-xs text-blue-700 hover:text-blue-800 font-semibold leading-tight">Hubungkan Google →</a>
                 </div>
                 <button @click="show = false; sessionStorage.setItem('hideGoogleNotice', '1')" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full transition">
+                    <i class="fas fa-times text-[10px]"></i>
+                </button>
+            </div>
+            @endif
+
+            {{-- Member Account Notice --}}
+            @php
+                $linkedMember = \App\Models\Member::where('email', auth()->user()->email)->first();
+            @endphp
+            @if(!$linkedMember)
+            <div x-data="{ show: !sessionStorage.getItem('hideMemberNotice') }" x-show="show" x-cloak
+                 class="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl shadow-sm">
+                <div class="w-6 h-6 bg-white rounded-md shadow-sm flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user-graduate text-emerald-600 text-sm"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 leading-tight">Akses fasilitas</span>
+                    <a href="{{ route('staff.profile') }}" class="text-xs text-emerald-700 hover:text-emerald-800 font-semibold leading-tight">Hubungkan Member →</a>
+                </div>
+                <button @click="show = false; sessionStorage.setItem('hideMemberNotice', '1')" class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full transition">
                     <i class="fas fa-times text-[10px]"></i>
                 </button>
             </div>
