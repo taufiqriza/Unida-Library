@@ -339,6 +339,7 @@
                                 @endif
                                 <button wire:click="showDetail({{ $member->id }})" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="Detail"><i class="fas fa-eye"></i></button>
                                 <a href="{{ route('staff.member.edit', $member->id) }}" class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition" title="Edit"><i class="fas fa-edit"></i></a>
+                                <button wire:click="confirmDelete({{ $member->id }})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition" title="Hapus"><i class="fas fa-trash"></i></button>
                                 <a href="{{ route('member.card', $member->id) }}" target="_blank" class="p-2 text-purple-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition" title="Cetak Kartu"><i class="fas fa-id-card"></i></a>
                             </div>
                         </td>
@@ -426,6 +427,7 @@
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
                     <button wire:click="closeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
                     <a href="{{ route('staff.member.edit', $selectedMember->id) }}" class="px-4 py-2 bg-gradient-to-r {{ $modalColor }} text-white font-medium rounded-xl transition"><i class="fas fa-edit mr-1"></i>Edit</a>
+                    <button wire:click="confirmDelete({{ $selectedMember->id }})" class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-medium rounded-xl hover:from-red-600 hover:to-red-700 transition"><i class="fas fa-trash mr-1"></i>Hapus</button>
                 </div>
             </div>
         </div>
@@ -473,6 +475,53 @@
                 </div>
                 <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
                     <button wire:click="closeEmployeeDetail" x-on:click="document.body.classList.remove('overflow-hidden')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </template>
+    @endif
+
+    {{-- Delete Confirmation Modal --}}
+    @if($showDeleteModal && $memberToDelete)
+    <template x-teleport="body">
+        <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" x-data x-init="document.body.classList.add('overflow-hidden')" x-destroy="document.body.classList.remove('overflow-hidden')">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="cancelDelete"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full">
+                {{-- Header --}}
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Konfirmasi Hapus</h3>
+                            <p class="text-sm text-gray-500">Tindakan ini tidak dapat dibatalkan</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Content --}}
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">
+                        Apakah Anda yakin ingin menghapus member <strong>{{ $memberToDelete->name }}</strong>?
+                    </p>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                        <p class="text-sm text-amber-700">
+                            <i class="fas fa-warning mr-1"></i>
+                            Data member yang dihapus tidak dapat dikembalikan.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div class="p-6 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                    <button wire:click="cancelDelete" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition">
+                        Batal
+                    </button>
+                    <button wire:click="deleteMember" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl transition">
+                        <i class="fas fa-trash mr-1"></i>
+                        Hapus
+                    </button>
                 </div>
             </div>
         </div>

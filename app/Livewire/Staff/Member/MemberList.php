@@ -21,6 +21,8 @@ class MemberList extends Component
     public $filterBranchId = '';
     public $showDetailModal = false;
     public $selectedMember = null;
+    public $showDeleteModal = false;
+    public $memberToDelete = null;
     
     // SDM filters
     public $sdmType = '';
@@ -107,6 +109,53 @@ class MemberList extends Component
             'umum' => MemberType::where('name', 'Umum')->value('id'),
             default => null
         };
+    }
+
+    public function confirmDelete($memberId)
+    {
+        $this->memberToDelete = Member::find($memberId);
+        $this->showDeleteModal = true;
+    }
+
+    public function deleteMember()
+    {
+        if (!$this->memberToDelete) {
+            return;
+        }
+
+        try {
+            // Check if member has any related data that should prevent deletion
+            $memberName = $this->memberToDelete->name;
+            
+            // Delete the member
+            $this->memberToDelete->delete();
+            
+            // Log the activity
+            ActivityLog::create([
+                'user_id' => auth()->id(),
+                'action' => 'delete',
+                'model' => 'Member',
+                'model_id' => $this->memberToDelete->id,
+                'description' => "Menghapus member: {$memberName}",
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
+            session()->flash('success', "Member {$memberName} berhasil dihapus.");
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menghapus member: ' . $e->getMessage());
+        }
+
+        $this->showDeleteModal = false;
+        $this->memberToDelete = null;
+        $this->resetPage();
+    }
+
+    public function cancelDelete()
+    {
+        $this->showDeleteModal = false;
+        $this->memberToDelete = null;
     }
 
     public function render()
