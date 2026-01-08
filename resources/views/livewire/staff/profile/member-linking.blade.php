@@ -1,19 +1,22 @@
 {{-- Member Linking Status & Button --}}
 @if($linkedMember)
-    <div class="flex items-center gap-2 mt-3">
-        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-200 text-xs font-medium rounded-full">
-            <i class="fas fa-link mr-1"></i>Terhubung: {{ $linkedMember->memberType->name ?? 'Member' }}
-        </span>
+    <div class="space-y-1">
+        <p class="text-xs text-emerald-200 font-medium">
+            <i class="fas fa-link mr-1"></i>{{ $linkedMember->memberType->name ?? 'Member' }}
+        </p>
         <a href="{{ route('auth.switch-portal', 'member') }}" 
-           class="px-3 py-1 bg-white/15 hover:bg-white/25 text-white text-xs font-medium rounded-full transition">
-            <i class="fas fa-exchange-alt mr-1"></i>Member Portal
+           class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 text-xs font-medium rounded transition">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Portal</span>
         </a>
     </div>
 @else
-    <div class="mt-3">
+    <div>
+        <p class="text-xs text-blue-200 mb-1">Member</p>
         <button @click="showLinkingModal = true" 
-                class="px-4 py-2 bg-white/15 hover:bg-white/25 text-white text-sm font-medium rounded-lg transition">
-            <i class="fas fa-link mr-2"></i>Hubungkan dengan Data Member
+                class="inline-flex items-center gap-1 px-2 py-1 bg-white/15 hover:bg-white/25 text-white text-xs font-medium rounded transition">
+            <i class="fas fa-link"></i>
+            <span>Hubungkan</span>
         </button>
     </div>
 @endif
@@ -180,10 +183,4 @@
     </div>
 </template>
 
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('memberLinking', () => ({
-        showLinkingModal: false
-    }))
-})
-</script>
+

@@ -11,7 +11,7 @@
     </div>
 
     {{-- Profile Card --}}
-    <div class="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white">
+    <div class="bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 rounded-2xl p-6 text-white" x-data="{ showLinkingModal: false }">
         <div class="flex flex-col sm:flex-row items-center gap-5">
             {{-- Avatar with Upload --}}
             <div class="relative group">
@@ -51,12 +51,9 @@
                     </span>
                     @endif
                 </div>
-                
-                {{-- Member Linking Component --}}
-                @livewire('staff.profile.member-linking')
             </div>
             
-            {{-- Stats --}}
+            {{-- Stats & Member Linking --}}
             <div class="flex gap-6 text-center">
                 <div>
                     <p class="text-2xl font-bold">{{ number_format($user->created_at->diffInDays(now()), 0) }}</p>
@@ -66,6 +63,11 @@
                 <div>
                     <p class="text-2xl font-bold">{{ $user->created_at->format('Y') }}</p>
                     <p class="text-xs text-blue-200">Bergabung</p>
+                </div>
+                <div class="w-px bg-white/20"></div>
+                <div class="text-left">
+                    {{-- Member Linking Component --}}
+                    @livewire('staff.profile.member-linking')
                 </div>
             </div>
         </div>
