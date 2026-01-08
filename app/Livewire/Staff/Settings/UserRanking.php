@@ -2,15 +2,14 @@
 
 namespace App\Livewire\Staff\Settings;
 
-use App\Models\User;
-use App\Models\ActivityLog;
 use Livewire\Component;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class UserRanking extends Component
 {
-    public $timeRange = '30'; // days
     public $rankings = [];
+    public $timeRange = 30;
 
     public function mount()
     {
@@ -24,45 +23,29 @@ class UserRanking extends Component
 
     public function loadRankings()
     {
-        $days = (int) $this->timeRange;
-        $startDate = now()->subDays($days);
-
-        // Get user statistics
         $this->rankings = User::select([
             'users.id',
             'users.name',
             'users.email',
-            'users.role',
             'users.branch_id',
-            'users.last_seen_at',
-            'users.created_at'
+            'branches.name as branch_name',
+            DB::raw('COUNT(DISTINCT DATE(activity_logs.created_at)) as login_days'),
+            DB::raw('COUNT(activity_logs.id) as total_activities'),
+            DB::raw('MAX(activity_logs.created_at) as last_activity')
         ])
-        ->selectRaw('
-            COUNT(DISTINCT DATE(activity_logs.created_at)) as login_days,
-            COUNT(activity_logs.id) as total_activities,
-            MAX(activity_logs.created_at) as last_activity,
-            TIMESTAMPDIFF(HOUR, users.created_at, NOW()) as account_age_hours
-        ')
-        ->leftJoin('activity_logs', function($join) use ($startDate) {
-            $join->on('users.id', '=', 'activity_logs.user_id')
-                 ->where('activity_logs.created_at', '>=', $startDate);
-        })
-        ->with('branch')
+        ->leftJoin('activity_logs', 'users.id', '=', 'activity_logs.user_id')
+        ->leftJoin('branches', 'users.branch_id', '=', 'branches.id')
         ->where('users.role', '!=', 'super_admin')
-        ->where('users.is_active', true)
-        ->groupBy('users.id')
+        ->where('activity_logs.created_at', '>=', now()->subDays($this->timeRange))
+        ->groupBy('users.id', 'users.name', 'users.email', 'users.branch_id', 'branches.name')
+        ->orderByDesc('total_activities')
+        ->orderByDesc('login_days')
         ->get()
         ->map(function($user) {
-            // Calculate activity score
-            $loginScore = $user->login_days * 10;
-            $activityScore = min($user->total_activities * 2, 200);
-            $recentScore = $user->last_activity ? 
-                max(0, 50 - now()->diffInDays($user->last_activity) * 2) : 0;
-            
-            $user->activity_score = $loginScore + $activityScore + $recentScore;
-            $user->login_frequency = $user->login_days > 0 ? 
-                round($user->total_activities / $user->login_days, 1) : 0;
-            
+            $user->activity_score = ($user->login_days * 10) + min($user->total_activities * 2, 200);
+            if ($user->last_activity) {
+                $user->activity_score += max(0, 50 - now()->diffInDays($user->last_activity) * 2);
+            }
             return $user;
         })
         ->sortByDesc('activity_score')
