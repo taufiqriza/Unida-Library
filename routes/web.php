@@ -49,6 +49,11 @@ Route::get('/survey', \App\Livewire\Opac\SurveyList::class)->name('opac.survey.i
 Route::get('/survey/{slug}', \App\Livewire\Opac\SurveyRespond::class)->name('opac.survey.show');
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
+// Short URL Routes
+Route::get('/s/{code}', [App\Http\Controllers\ShortUrlController::class, 'redirect'])->name('short.redirect');
+Route::post('/api/short-url', [App\Http\Controllers\ShortUrlController::class, 'create'])->name('short.create');
+Route::get('/api/short-url/{code}/stats', [App\Http\Controllers\ShortUrlController::class, 'stats'])->name('short.stats');
+
 // Faculty Directory - Premium Feature
 Route::get('/direktori-akademisi', \App\Livewire\Opac\FacultyDirectory::class)->name('opac.faculty-directory');
 
