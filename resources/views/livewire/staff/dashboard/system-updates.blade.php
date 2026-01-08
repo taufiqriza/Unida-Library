@@ -24,7 +24,7 @@
                                 <p class="text-amber-100 text-sm mb-2">{{ $updates->count() }} fitur terbaru SISTEM ILMU - Integrated Library Management UNIDA v.2.0</p>
                             </div>
                         </div>
-                        <button wire:click="closeSplash" class="p-2 hover:bg-white/20 rounded-xl transition border border-white/20">
+                        <button wire:click="closeSplash" class="w-10 h-10 flex items-center justify-center hover:bg-white/20 rounded-xl transition border border-white/20">
                             <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>

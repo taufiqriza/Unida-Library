@@ -14,8 +14,8 @@ class SystemUpdates extends Component
     {
         $this->loadUpdates();
         
-        // Always show modal on mount (first load after login)
-        if ($this->updates->isNotEmpty()) {
+        // Show modal only if not dismissed this session
+        if ($this->updates->isNotEmpty() && !session()->has('modal_dismissed')) {
             $this->showSplashModal = true;
             logger('SystemUpdates: showing splash modal on mount');
         }
@@ -29,6 +29,13 @@ class SystemUpdates extends Component
             ->orderByDesc('priority')
             ->orderByDesc('published_at')
             ->get();
+    }
+
+    public function dismissAll()
+    {
+        // Mark as dismissed for this session
+        session()->put('modal_dismissed', true);
+        $this->showSplashModal = false;
     }
 
     public function closeSplash()
