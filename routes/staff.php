@@ -93,6 +93,10 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             ->middleware('can:manage-staff')
             ->name('security.index');
 
+        // Short URL Dashboard
+        Route::get('/short-urls', \App\Livewire\Staff\ShortUrl\ShortUrlDashboard::class)
+            ->name('short-urls.index');
+
         // Profile
         Route::get('/profile', \App\Livewire\Staff\Profile\StaffProfile::class)->name('profile');
 

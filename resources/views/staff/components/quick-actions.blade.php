@@ -69,13 +69,13 @@
             
             {{-- Short URL Button --}}
             <div x-data="shortUrlGenerator()">
-                <button @click="@if(auth()->user()->role === 'super_admin') window.location.href='{{ route('admin.short-urls') }}' @else openModal() @endif" 
+                <button @click="@if(auth()->user()->role === 'super_admin') window.location.href='{{ route('staff.short-urls.index') }}' @else openModal() @endif" 
                         class="flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 rounded-xl transition">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-link text-white"></i>
                         <span class="text-white font-semibold text-sm">
                             @if(auth()->user()->role === 'super_admin')
-                                Short URL History
+                                Short URL Dashboard
                             @else
                                 Short URL
                             @endif
