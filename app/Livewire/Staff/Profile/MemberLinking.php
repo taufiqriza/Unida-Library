@@ -40,69 +40,197 @@ class MemberLinking extends Component
 
     public function searchMembers()
     {
-        if (strlen($this->searchQuery) < 3) {
+        if (strlen($this->searchQuery) < 2) {
             $this->searchResults = [];
             return;
         }
 
         $this->isSearching = true;
 
-        // Search in members table (SIAKAD data)
-        $members = Member::withoutGlobalScope('branch')
-            ->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->searchQuery . '%')
-                      ->orWhere('member_id', 'like', '%' . $this->searchQuery . '%')
-                      ->orWhere('nim_nidn', 'like', '%' . $this->searchQuery . '%')
-                      ->orWhere('email', 'like', '%' . $this->searchQuery . '%');
-            })
-            ->whereNull('email') // Only show members without email (not linked yet)
-            ->with(['faculty', 'department', 'memberType'])
-            ->limit(10)
-            ->get();
+        $search = trim($this->searchQuery);
+        $isNumeric = preg_match('/^\d{4,}$/', $search);
+        $searchUpper = strtoupper($search);
 
-        $this->searchResults = $members->map(function ($member) {
-            return [
+        // === Search Mahasiswa (SIAKAD) ===
+        if ($isNumeric && strlen($search) >= 10) {
+            // NIM/Member ID search
+            $mahasiswa = Member::withoutGlobalScope('branch')
+                ->with(['department', 'faculty', 'memberType'])
+                ->where(function($q) use ($search) {
+                    $q->where('member_id', $search)
+                      ->orWhere('nim_nidn', $search);
+                })
+                ->whereNull('email') // Only unlinked members
+                ->limit(5)
+                ->get();
+            
+            $mahasiswa->each(fn($r) => $r->_matchScore = 100);
+        } else {
+            // Name search
+            $mahasiswa = Member::withoutGlobalScope('branch')
+                ->with(['department', 'faculty', 'memberType'])
+                ->whereNull('email') // Only unlinked members
+                ->where('name', 'like', "%{$search}%")
+                ->limit(10)
+                ->get();
+            
+            $mahasiswa->each(function($r) use ($searchUpper) {
+                $nameUpper = strtoupper($r->name);
+                if ($nameUpper === $searchUpper) $r->_matchScore = 100;
+                elseif (str_starts_with($nameUpper, $searchUpper)) $r->_matchScore = 90;
+                else {
+                    similar_text($searchUpper, $nameUpper, $percent);
+                    $r->_matchScore = (int) round($percent);
+                }
+            });
+        }
+
+        // === Search Dosen/Tendik (Employee) ===
+        $employees = collect();
+        if (class_exists('\App\Models\Employee')) {
+            if ($isNumeric) {
+                // NIY/NIDN search
+                $employees = \App\Models\Employee::where(function($q) use ($search) {
+                    $q->where('niy', $search)->orWhere('nidn', $search);
+                })
+                ->limit(5)
+                ->get();
+                
+                $employees->each(fn($e) => $e->_matchScore = 100);
+            } else {
+                // Name search
+                $employees = \App\Models\Employee::where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('full_name', 'like', "%{$search}%");
+                })
+                ->limit(10)
+                ->get();
+                
+                $employees->each(function($e) use ($searchUpper) {
+                    $nameUpper = strtoupper($e->full_name ?? $e->name);
+                    if ($nameUpper === $searchUpper) $e->_matchScore = 100;
+                    elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
+                    else {
+                        similar_text($searchUpper, $nameUpper, $percent);
+                        $e->_matchScore = (int) round($percent);
+                    }
+                });
+            }
+        }
+
+        // Filter and combine results
+        $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
+        $filteredEmployees = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
+
+        // Convert to array format for view
+        $this->searchResults = [];
+
+        // Add mahasiswa results
+        foreach ($filteredMahasiswa as $member) {
+            $this->searchResults[] = [
                 'id' => $member->id,
+                'type' => 'member',
                 'name' => $member->name,
                 'member_id' => $member->member_id,
                 'nim_nidn' => $member->nim_nidn,
                 'faculty' => $member->faculty->name ?? '-',
                 'department' => $member->department->name ?? '-',
-                'member_type' => $member->memberType->name ?? '-',
-                'registration_type' => $member->registration_type,
+                'member_type' => $member->memberType->name ?? 'Mahasiswa',
+                'registration_type' => $member->registration_type ?? 'internal',
+                'match_score' => $member->_matchScore,
             ];
-        })->toArray();
+        }
+
+        // Add employee results
+        foreach ($filteredEmployees as $employee) {
+            $this->searchResults[] = [
+                'id' => $employee->id,
+                'type' => 'employee',
+                'name' => $employee->full_name ?? $employee->name,
+                'member_id' => $employee->niy ?? $employee->nidn ?? '-',
+                'nim_nidn' => $employee->nidn ?? $employee->niy ?? '-',
+                'faculty' => $employee->faculty ?? '-',
+                'department' => $employee->department ?? '-',
+                'member_type' => 'Dosen/Tendik',
+                'registration_type' => 'internal',
+                'match_score' => $employee->_matchScore,
+            ];
+        }
+
+        // Sort by match score
+        usort($this->searchResults, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
 
         $this->isSearching = false;
     }
 
-    public function linkMember($memberId)
+    public function linkMember($memberId, $type = 'member')
     {
         try {
             DB::beginTransaction();
 
-            $member = Member::withoutGlobalScope('branch')->find($memberId);
-            
-            if (!$member) {
-                throw new \Exception('Data member tidak ditemukan');
-            }
+            if ($type === 'member') {
+                // Link existing member
+                $member = Member::withoutGlobalScope('branch')->find($memberId);
+                
+                if (!$member) {
+                    throw new \Exception('Data member tidak ditemukan');
+                }
 
-            if ($member->email) {
-                throw new \Exception('Member ini sudah terhubung dengan akun lain');
-            }
+                if ($member->email) {
+                    throw new \Exception('Member ini sudah terhubung dengan akun lain');
+                }
 
-            // Link member with staff email
-            $member->update([
-                'email' => $this->user->email,
-                'password' => $this->user->password, // Use same password
-                'email_verified' => 'verified',
-                'email_verified_at' => now(),
-                'profile_completed' => true,
-            ]);
+                // Link member with staff email
+                $member->update([
+                    'email' => $this->user->email,
+                    'password' => $this->user->password,
+                    'email_verified' => 'verified',
+                    'email_verified_at' => now(),
+                    'profile_completed' => true,
+                ]);
+
+                $this->linkedMember = $member;
+
+            } else if ($type === 'employee') {
+                // Create member from employee data
+                $employee = \App\Models\Employee::find($memberId);
+                
+                if (!$employee) {
+                    throw new \Exception('Data employee tidak ditemukan');
+                }
+
+                // Check if member with this email already exists
+                $existingMember = Member::withoutGlobalScope('branch')
+                    ->where('email', $this->user->email)
+                    ->first();
+
+                if ($existingMember) {
+                    throw new \Exception('Email sudah terhubung dengan member lain');
+                }
+
+                // Create new member from employee data
+                $member = Member::create([
+                    'name' => $employee->full_name ?? $employee->name,
+                    'email' => $this->user->email,
+                    'password' => $this->user->password,
+                    'member_id' => $employee->niy ?? $employee->nidn ?? 'EMP' . $employee->id,
+                    'nim_nidn' => $employee->nidn ?? $employee->niy,
+                    'member_type_id' => 2, // Assuming 2 is for staff/lecturer
+                    'registration_type' => 'internal',
+                    'register_date' => now(),
+                    'expire_date' => now()->addYears(5),
+                    'is_active' => true,
+                    'profile_completed' => true,
+                    'email_verified' => 'verified',
+                    'email_verified_at' => now(),
+                    'branch_id' => $this->user->branch_id ?? 1,
+                ]);
+
+                $this->linkedMember = $member;
+            }
 
             DB::commit();
 
-            $this->linkedMember = $member;
             $this->showLinkingSection = false;
             $this->reset(['searchQuery', 'searchResults']);
 

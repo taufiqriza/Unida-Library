@@ -122,51 +122,64 @@
 
                         @if(!empty($searchResults))
                             <div class="space-y-2">
-                                <p class="text-sm font-medium text-gray-700">Hasil Pencarian:</p>
-                                @foreach($searchResults as $member)
+                                <p class="text-sm font-medium text-gray-700">Hasil Pencarian ({{ count($searchResults) }} ditemukan):</p>
+                                @foreach($searchResults as $result)
                                     <div class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition">
                                         <div class="flex items-center justify-between">
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2 mb-2">
-                                                    <h4 class="font-medium text-gray-900">{{ $member['name'] }}</h4>
+                                                    <h4 class="font-medium text-gray-900">{{ $result['name'] }}</h4>
                                                     <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
-                                                        {{ $member['member_type'] }}
+                                                        {{ $result['member_type'] }}
                                                     </span>
+                                                    @if($result['match_score'] >= 90)
+                                                        <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                                                            <i class="fas fa-star mr-1"></i>{{ $result['match_score'] }}%
+                                                        </span>
+                                                    @elseif($result['match_score'] >= 70)
+                                                        <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                                                            {{ $result['match_score'] }}%
+                                                        </span>
+                                                    @else
+                                                        <span class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full">
+                                                            {{ $result['match_score'] }}%
+                                                        </span>
+                                                    @endif
                                                 </div>
                                                 
                                                 <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                                                    @if($member['member_id'])
+                                                    @if($result['member_id'] && $result['member_id'] !== '-')
                                                         <div>
                                                             <i class="fas fa-id-card mr-1"></i>
-                                                            ID: {{ $member['member_id'] }}
+                                                            ID: {{ $result['member_id'] }}
                                                         </div>
                                                     @endif
                                                     
-                                                    @if($member['nim_nidn'])
+                                                    @if($result['nim_nidn'] && $result['nim_nidn'] !== '-')
                                                         <div>
                                                             <i class="fas fa-graduation-cap mr-1"></i>
-                                                            {{ $member['nim_nidn'] }}
+                                                            {{ $result['type'] === 'employee' ? 'NIDN/NIY' : 'NIM' }}: {{ $result['nim_nidn'] }}
                                                         </div>
                                                     @endif
                                                     
-                                                    @if($member['faculty'] !== '-')
+                                                    @if($result['faculty'] !== '-')
                                                         <div>
                                                             <i class="fas fa-university mr-1"></i>
-                                                            {{ $member['faculty'] }}
+                                                            {{ $result['faculty'] }}
                                                         </div>
                                                     @endif
                                                     
-                                                    @if($member['department'] !== '-')
+                                                    @if($result['department'] !== '-')
                                                         <div>
                                                             <i class="fas fa-building mr-1"></i>
-                                                            {{ $member['department'] }}
+                                                            {{ $result['department'] }}
                                                         </div>
                                                     @endif
                                                 </div>
                                             </div>
                                             
-                                            <button wire:click="linkMember({{ $member['id'] }})"
-                                                    wire:confirm="Yakin ingin menghubungkan akun dengan {{ $member['name'] }}?"
+                                            <button wire:click="linkMember({{ $result['id'] }}, '{{ $result['type'] }}')"
+                                                    wire:confirm="Yakin ingin menghubungkan akun dengan {{ $result['name'] }}?"
                                                     class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition">
                                                 <i class="fas fa-link mr-1"></i>
                                                 Hubungkan
@@ -175,7 +188,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                        @elseif(strlen($searchQuery) >= 3 && !$isSearching)
+                        @elseif(strlen($searchQuery) >= 2 && !$isSearching)
                             <div class="text-center py-8">
                                 <i class="fas fa-search text-gray-300 text-3xl mb-3"></i>
                                 <p class="text-gray-500">Tidak ada data member yang ditemukan</p>
