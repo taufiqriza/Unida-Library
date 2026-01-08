@@ -38,10 +38,13 @@ class MemberLinking extends Component
         }
     }
 
+    public $employeeResults = [];
+
     public function searchMembers()
     {
         if (strlen($this->searchQuery) < 2) {
             $this->searchResults = [];
+            $this->employeeResults = [];
             return;
         }
 
@@ -51,17 +54,17 @@ class MemberLinking extends Component
         $isNumeric = preg_match('/^\d{4,}$/', $search);
         $searchUpper = strtoupper($search);
 
-        // === Search Mahasiswa (SIAKAD) - Same as CompleteProfile ===
+        // === Search Mahasiswa (SIAKAD) - Exact copy from CompleteProfile ===
         if ($isNumeric && strlen($search) >= 10) {
             // NIM search
-            $mahasiswa = Member::with(['department', 'faculty', 'memberType'])
+            $mahasiswa = Member::with(['department', 'branch', 'memberType'])
                 ->where(fn($q) => $q->where('member_id', $search)->orWhere('nim_nidn', $search))
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->limit(5)->get();
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
             // Name search
-            $mahasiswa = Member::with(['department', 'faculty', 'memberType'])
+            $mahasiswa = Member::with(['department', 'branch', 'memberType'])
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->where('name', 'like', "%{$search}%")
                 ->limit(10)->get();
@@ -76,39 +79,37 @@ class MemberLinking extends Component
                 }
             });
         }
-
-        // === Search Dosen/Tendik (Employee) - Same as CompleteProfile ===
+        
+        // === Search Dosen/Tendik (Employee) - Exact copy from CompleteProfile ===
         $employees = collect();
         try {
-            if (class_exists('\App\Models\Employee')) {
-                if ($isNumeric) {
-                    // NIY/NIDN search
-                    $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
-                        ->limit(5)->get();
-                    $employees->each(fn($e) => $e->_matchScore = 100);
-                } else {
-                    // Name search
-                    $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
-                        ->limit(10)->get();
-                    
-                    $employees->each(function($e) use ($searchUpper) {
-                        $nameUpper = strtoupper($e->full_name ?? $e->name);
-                        if ($nameUpper === $searchUpper) $e->_matchScore = 100;
-                        elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
-                        else {
-                            similar_text($searchUpper, $nameUpper, $percent);
-                            $e->_matchScore = (int) round($percent);
-                        }
-                    });
-                }
+            if ($isNumeric) {
+                // NIY/NIDN search
+                $employees = \App\Models\Employee::where(fn($q) => $q->where('niy', $search)->orWhere('nidn', $search))
+                    ->limit(5)->get();
+                $employees->each(fn($e) => $e->_matchScore = 100);
+            } else {
+                // Name search
+                $employees = \App\Models\Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
+                    ->limit(10)->get();
+                
+                $employees->each(function($e) use ($searchUpper) {
+                    $nameUpper = strtoupper($e->full_name ?? $e->name);
+                    if ($nameUpper === $searchUpper) $e->_matchScore = 100;
+                    elseif (str_starts_with($nameUpper, $searchUpper)) $e->_matchScore = 90;
+                    else {
+                        similar_text($searchUpper, $nameUpper, $percent);
+                        $e->_matchScore = (int) round($percent);
+                    }
+                });
             }
         } catch (\Exception $e) {
             // Employee table might not exist
         }
-
-        // Filter and combine results - Same as CompleteProfile
-        $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
-        $filteredEmployees = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
+        
+        // Filter and store results - Exact copy from CompleteProfile
+        $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
+        $this->employeeResults = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore')->values();
 
         // Convert to array format for view
         $this->searchResults = [];
@@ -130,7 +131,7 @@ class MemberLinking extends Component
         }
 
         // Add employee results
-        foreach ($filteredEmployees as $employee) {
+        foreach ($this->employeeResults as $employee) {
             $this->searchResults[] = [
                 'id' => $employee->id,
                 'type' => 'employee',
