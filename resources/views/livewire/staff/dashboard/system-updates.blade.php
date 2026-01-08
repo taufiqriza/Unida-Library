@@ -59,63 +59,24 @@
     </template>
     @endif
 
-    {{-- Simple Account Integration Cards --}}
-    <div class="grid md:grid-cols-2 gap-4 mb-4">
-        {{-- Google Account Card --}}
-        <div class="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/60 rounded-xl p-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fab fa-google text-white"></i>
-                </div>
-                <div class="flex-1">
-                    @if(auth()->user()->socialAccounts()->where('provider', 'google')->exists())
-                        <h4 class="font-semibold text-red-900 text-sm">Google Account Terhubung</h4>
-                        <p class="text-xs text-red-600">Login lebih mudah</p>
-                    @else
-                        <h4 class="font-semibold text-red-900 text-sm">Hubungkan Google</h4>
-                        <p class="text-xs text-red-600">Login lebih mudah</p>
-                    @endif
-                </div>
-                @if(!auth()->user()->socialAccounts()->where('provider', 'google')->exists())
-                <a href="{{ route('auth.google') }}" class="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition">
-                    Hubungkan
-                </a>
-                @else
-                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-check text-green-600 text-xs"></i>
-                </div>
-                @endif
+    {{-- Member Account Card Only --}}
+    @php
+        $linkedMember = \App\Models\Member::where('email', auth()->user()->email)->first();
+    @endphp
+    @if(!$linkedMember)
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl p-4 mb-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-user-graduate text-white"></i>
             </div>
-        </div>
-
-        {{-- Member Account Card --}}
-        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl p-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-user-graduate text-white"></i>
-                </div>
-                <div class="flex-1">
-                    @php
-                        $linkedMember = \App\Models\Member::where('email', auth()->user()->email)->first();
-                    @endphp
-                    @if($linkedMember)
-                        <h4 class="font-semibold text-emerald-900 text-sm">Member Area Terhubung</h4>
-                        <p class="text-xs text-emerald-600">{{ $linkedMember->name }}</p>
-                    @else
-                        <h4 class="font-semibold text-emerald-900 text-sm">Hubungkan Member Area</h4>
-                        <p class="text-xs text-emerald-600">Akses fasilitas mahasiswa</p>
-                    @endif
-                </div>
-                @if(!$linkedMember)
-                <a href="{{ route('staff.profile') }}" class="px-3 py-1.5 bg-emerald-500 text-white text-xs font-medium rounded-lg hover:bg-emerald-600 transition">
-                    Hubungkan
-                </a>
-                @else
-                <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-check text-green-600 text-xs"></i>
-                </div>
-                @endif
+            <div class="flex-1">
+                <h4 class="font-semibold text-emerald-900 text-sm">Hubungkan Member Area</h4>
+                <p class="text-xs text-emerald-600">Akses fasilitas mahasiswa</p>
             </div>
+            <a href="{{ route('staff.profile') }}" class="px-3 py-1.5 bg-emerald-500 text-white text-xs font-medium rounded-lg hover:bg-emerald-600 transition">
+                Hubungkan
+            </a>
         </div>
     </div>
+    @endif
 </div>
