@@ -49,6 +49,11 @@ Route::get('/survey', \App\Livewire\Opac\SurveyList::class)->name('opac.survey.i
 Route::get('/survey/{slug}', \App\Livewire\Opac\SurveyRespond::class)->name('opac.survey.show');
 Route::get('/page/{slug}', [\App\Http\Controllers\OpacController::class, 'page'])->name('opac.page');
 
+// Admin Short URL Management
+Route::middleware(['auth', 'role:admin,superadmin,staff'])->group(function () {
+    Route::get('/admin/short-urls', \App\Livewire\Admin\ShortUrlHistory::class)->name('admin.short-urls');
+});
+
 // Short URL Routes
 Route::get('/s/{code}', [App\Http\Controllers\ShortUrlController::class, 'preview'])->name('short.preview');
 Route::get('/s/{code}/go', [App\Http\Controllers\ShortUrlController::class, 'redirect'])->name('short.redirect');
