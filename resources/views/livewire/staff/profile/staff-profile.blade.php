@@ -243,6 +243,9 @@
                 </div>
             </div>
 
+            {{-- Member Linking --}}
+            @livewire('staff.profile.member-linking')
+
             {{-- Account Info --}}
             <div class="bg-gray-50 rounded-2xl border border-gray-200 p-5">
                 <h4 class="font-medium text-gray-700 mb-3 text-sm flex items-center gap-2">
