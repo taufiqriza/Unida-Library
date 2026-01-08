@@ -60,6 +60,12 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/create', \App\Livewire\Staff\Member\MemberForm::class)->name('create');
             Route::get('/{member}', \App\Livewire\Staff\Member\MemberShow::class)->name('show');
             Route::get('/{member}/edit', \App\Livewire\Staff\Member\MemberForm::class)->name('edit');
+            
+            // Debug route
+            Route::get('/{member}/test', function($member) {
+                $memberModel = \App\Models\Member::findOrFail($member);
+                return "Member found: " . $memberModel->name . " (ID: " . $memberModel->id . ")";
+            })->name('test');
         });
 
         // Tasks (Kanban Board) & Schedule
