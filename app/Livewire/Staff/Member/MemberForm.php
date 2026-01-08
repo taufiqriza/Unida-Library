@@ -64,8 +64,11 @@ class MemberForm extends Component
     {
         $user = auth()->user();
         
-        if ($member) {
-            $this->member = Member::findOrFail($member);
+        // Get member from parameter or query string
+        $memberId = $member ?? request()->get('member');
+        
+        if ($memberId) {
+            $this->member = Member::findOrFail($memberId);
             
             // Check branch access
             if ($this->member->branch_id !== $user->branch_id && $user->role !== 'admin') {

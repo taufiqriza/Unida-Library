@@ -59,13 +59,11 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
             Route::get('/', \App\Livewire\Staff\Member\MemberList::class)->name('index');
             Route::get('/create', \App\Livewire\Staff\Member\MemberForm::class)->name('create');
             Route::get('/{member}', \App\Livewire\Staff\Member\MemberShow::class)->name('show');
-            Route::get('/{member}/edit', \App\Livewire\Staff\Member\MemberForm::class)->name('edit');
             
-            // Debug route
-            Route::get('/{member}/test', function($member) {
-                $memberModel = \App\Models\Member::findOrFail($member);
-                return "Member found: " . $memberModel->name . " (ID: " . $memberModel->id . ")";
-            })->name('test');
+            // Redirect edit to create with member parameter
+            Route::get('/{member}/edit', function($member) {
+                return redirect()->route('staff.member.create', ['member' => $member]);
+            })->name('edit');
         });
 
         // Tasks (Kanban Board) & Schedule
