@@ -71,10 +71,20 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-search mr-2 text-emerald-500"></i>Cari Data Member
                         </label>
-                        <input type="text" 
-                               wire:model.live.debounce.500ms="searchQuery"
-                               placeholder="Ketik nama, NIM/NIDN, atau ID member (min. 2 karakter)..."
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+                        <div class="flex gap-2">
+                            <input type="text" 
+                                   wire:model="searchName" 
+                                   wire:keydown.enter="searchPddikti"
+                                   placeholder="Masukkan NIM, NIDN, atau Nama (min. 2 karakter)..."
+                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition">
+                            <button type="button" 
+                                    wire:click="searchPddikti" 
+                                    wire:loading.attr="disabled"
+                                    class="px-5 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition disabled:opacity-50">
+                                <span wire:loading.remove wire:target="searchPddikti"><i class="fas fa-search"></i></span>
+                                <span wire:loading wire:target="searchPddikti"><i class="fas fa-spinner fa-spin"></i></span>
+                            </button>
+                        </div>
                     </div>
 
                     {{-- Loading State --}}
@@ -156,13 +166,13 @@
                                 </div>
                             @endforeach
                         </div>
-                    @elseif(strlen($searchQuery) >= 2 && !$isSearching && empty($searchResults))
+                    @elseif(strlen($searchName) >= 2 && !$isSearching && empty($searchResults))
                         <div class="text-center py-8">
                             <i class="fas fa-search text-gray-300 text-3xl mb-3"></i>
                             <p class="text-gray-500">Tidak ada data member yang ditemukan</p>
                             <p class="text-sm text-gray-400 mt-1">Coba gunakan kata kunci yang berbeda</p>
                         </div>
-                    @elseif(strlen($searchQuery) < 2)
+                    @elseif(strlen($searchName) < 2)
                         <div class="text-center py-8">
                             <i class="fas fa-info-circle text-blue-500 text-3xl mb-3"></i>
                             <p class="text-gray-600">Ketik minimal 2 karakter untuk mulai pencarian</p>

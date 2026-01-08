@@ -11,15 +11,15 @@ class MemberLinking extends Component
 {
     public $user;
     public $linkedMember;
-    public $searchQuery = '';
+    public $searchName = '';
     public $searchResults = [];
     public $isSearching = false;
     public $showLinkingSection = false;
     public $employeeResults = [];
 
-    public function updatedSearchQuery()
+    public function searchPddikti()
     {
-        logger('MemberLinking: updatedSearchQuery called with: ' . $this->searchQuery);
+        logger('MemberLinking: searchPddikti called with: ' . $this->searchName);
         $this->searchMembers();
     }
 
@@ -49,9 +49,9 @@ class MemberLinking extends Component
 
     public function searchMembers()
     {
-        logger('MemberLinking: searchMembers called with query: ' . $this->searchQuery);
+        logger('MemberLinking: searchMembers called with query: ' . $this->searchName);
         
-        if (strlen($this->searchQuery) < 2) {
+        if (strlen($this->searchName) < 2) {
             $this->searchResults = [];
             $this->employeeResults = [];
             logger('MemberLinking: Query too short, returning empty');
@@ -61,7 +61,7 @@ class MemberLinking extends Component
         $this->isSearching = true;
         logger('MemberLinking: Starting search...');
 
-        $search = trim($this->searchQuery);
+        $search = trim($this->searchName);
         $isNumeric = preg_match('/^\d{4,}$/', $search);
         $searchUpper = strtoupper($search);
 
