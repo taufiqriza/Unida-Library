@@ -61,11 +61,27 @@ class MemberLinking extends Component
                 ->limit(5)->get();
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
-            // Name search
+            // Name search - support multiple words
+            $searchWords = explode(' ', $search);
             $mahasiswa = Member::with(['department', 'branch'])
                 ->where(fn($q) => $q->whereNull('email')->orWhere('email', ''))
                 ->where('profile_completed', false)
-                ->where('name', 'like', "%{$search}%")
+                ->where(function($query) use ($search, $searchWords) {
+                    // Exact phrase match (highest priority)
+                    $query->where('name', 'like', "%{$search}%");
+                    
+                    // Multi-word search - all words must be present
+                    if (count($searchWords) > 1) {
+                        $query->orWhere(function($subQuery) use ($searchWords) {
+                            foreach ($searchWords as $word) {
+                                $word = trim($word);
+                                if (strlen($word) >= 2) {
+                                    $subQuery->where('name', 'like', "%{$word}%");
+                                }
+                            }
+                        });
+                    }
+                })
                 ->limit(10)->get();
             
             $mahasiswa->each(function($r) use ($searchUpper) {
@@ -86,9 +102,29 @@ class MemberLinking extends Component
                 ->limit(5)->get();
             $employees->each(fn($e) => $e->_matchScore = 100);
         } else {
-            // Name search
-            $employees = Employee::where(fn($q) => $q->where('name', 'like', "%{$search}%")->orWhere('full_name', 'like', "%{$search}%"))
-                ->limit(10)->get();
+            // Name search - support multiple words
+            $searchWords = explode(' ', $search);
+            $employees = Employee::where(function($query) use ($search, $searchWords) {
+                // Exact phrase match in full_name or name
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('full_name', 'like', "%{$search}%");
+                
+                // Multi-word search - all words must be present
+                if (count($searchWords) > 1) {
+                    $query->orWhere(function($subQuery) use ($searchWords) {
+                        foreach ($searchWords as $word) {
+                            $word = trim($word);
+                            if (strlen($word) >= 2) {
+                                $subQuery->where(function($nameQuery) use ($word) {
+                                    $nameQuery->where('name', 'like', "%{$word}%")
+                                             ->orWhere('full_name', 'like', "%{$word}%");
+                                });
+                            }
+                        }
+                    });
+                }
+            })
+            ->limit(10)->get();
             
             $employees->each(function($e) use ($searchUpper) {
                 $nameUpper = strtoupper($e->full_name ?? $e->name);
