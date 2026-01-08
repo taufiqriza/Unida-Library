@@ -28,31 +28,12 @@ class SystemUpdates extends Component
 
     public function loadUpdates()
     {
+        // Always show all active updates regardless of dismissal status
         $this->updates = SystemUpdate::active()
             ->forRole(auth()->user()->role)
-            ->notDismissedBy(auth()->id())
             ->orderByDesc('priority')
             ->orderByDesc('published_at')
             ->get();
-    }
-
-    public function dismissUpdate($updateId)
-    {
-        $update = SystemUpdate::find($updateId);
-        if ($update && $update->is_dismissible) {
-            $update->dismissedByUsers()->attach(auth()->id());
-            $this->loadUpdates();
-        }
-    }
-
-    public function dismissAll()
-    {
-        $dismissibleUpdates = $this->updates->where('is_dismissible', true);
-        foreach ($dismissibleUpdates as $update) {
-            $update->dismissedByUsers()->syncWithoutDetaching([auth()->id()]);
-        }
-        $this->loadUpdates();
-        $this->showSplashModal = false;
     }
 
     public function closeSplash()
