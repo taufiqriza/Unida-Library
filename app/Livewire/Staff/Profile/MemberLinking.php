@@ -4,6 +4,7 @@ namespace App\Livewire\Staff\Profile;
 
 use App\Models\Member;
 use App\Models\User;
+use App\Models\Employee;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
