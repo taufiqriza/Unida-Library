@@ -61,13 +61,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(SystemUpdate::class, 'user_dismissed_updates');
     }
 
-    public function chatRooms()
-    {
-        return $this->belongsToMany(ChatRoom::class, 'chat_room_members')
-            ->withPivot('role', 'is_muted', 'last_read_at')
-            ->withTimestamps();
-    }
-
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
