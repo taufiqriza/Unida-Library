@@ -86,123 +86,131 @@
                 
                 {{-- Short URL Modal --}}
                 <template x-teleport="body">
-                    <div x-show="showModal" x-cloak 
-                         @keydown.escape.window="closeModal()"
-                         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
-                         x-transition:enter="ease-out duration-300"
+                    <div x-show="showModal" 
+                         x-cloak
+                         class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+                         x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0"
                          x-transition:enter-end="opacity-100"
-                         x-transition:leave="ease-in duration-200"
+                         x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0">
+                         x-transition:leave-end="opacity-0"
+                         @keydown.escape.window="closeModal()">
                         
-                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg"
-                             x-transition:enter="ease-out duration-300"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             x-transition:leave="ease-in duration-200"
-                             x-transition:leave-start="opacity-100 scale-100"
-                             x-transition:leave-end="opacity-0 scale-95">
+                        {{-- Backdrop --}}
+                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeModal()"></div>
+                        
+                        {{-- Modal Content --}}
+                        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                             @click.stop>
                             
-                            {{-- Modal Header --}}
-                            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                                        <i class="fas fa-link text-blue-600 dark:text-blue-400"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Short URL Generator</h3>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Buat link pendek profesional</p>
+                            {{-- Icon Header --}}
+                            <div class="pt-8 pb-4 flex justify-center">
+                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                                    <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                                        <i class="fas fa-link text-white text-2xl"></i>
                                     </div>
                                 </div>
-                                <button @click="closeModal()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition">
-                                    <i class="fas fa-times text-gray-500"></i>
-                                </button>
                             </div>
-
-                            {{-- Modal Body --}}
-                            <div class="p-6 space-y-6">
-                                {{-- URL Input --}}
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <i class="fas fa-globe mr-2"></i>URL Asli
-                                    </label>
-                                    <input 
-                                        type="url" 
-                                        x-model="originalUrl"
-                                        placeholder="https://example.com/very-long-url"
-                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                                        required
-                                    >
+                            
+                            {{-- Content --}}
+                            <div class="px-6 pb-6">
+                                <div class="text-center mb-6">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2">Short URL Generator</h3>
+                                    <p class="text-gray-500 text-sm">
+                                        Buat link pendek profesional untuk berbagi dengan mudah
+                                    </p>
                                 </div>
 
-                                {{-- Title Input --}}
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <i class="fas fa-heading mr-2"></i>Judul (Opsional)
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        x-model="title"
-                                        placeholder="Judul untuk link ini"
-                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                                    >
-                                </div>
-
-                                {{-- Custom Code Input --}}
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <i class="fas fa-code mr-2"></i>Kode Kustom (Opsional)
-                                    </label>
-                                    <div class="flex">
-                                        <span class="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-lg dark:bg-gray-700 dark:text-gray-400 dark:border-gray-600">
-                                            library.unida.gontor.ac.id/s/
-                                        </span>
+                                <div class="space-y-4">
+                                    {{-- URL Input --}}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-globe mr-2 text-blue-500"></i>URL Asli
+                                        </label>
                                         <input 
-                                            type="text" 
-                                            x-model="customCode"
-                                            placeholder="kode-unik"
-                                            class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                                            type="url" 
+                                            x-model="originalUrl"
+                                            placeholder="https://example.com/very-long-url"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                            required
                                         >
                                     </div>
-                                </div>
 
-                                {{-- Generated URL Display --}}
-                                <div x-show="generatedUrl" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex-1">
-                                            <p class="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
-                                                <i class="fas fa-check-circle mr-2"></i>Short URL berhasil dibuat!
-                                            </p>
-                                            <div class="flex items-center gap-2">
-                                                <code class="text-sm bg-white dark:bg-gray-800 px-3 py-1 rounded border text-green-700 dark:text-green-300" x-text="generatedUrl"></code>
-                                                <button @click="copyUrl()" class="p-1.5 hover:bg-green-100 dark:hover:bg-green-800 rounded transition">
-                                                    <i class="fas fa-copy text-green-600 dark:text-green-400"></i>
-                                                </button>
+                                    {{-- Title Input --}}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-heading mr-2 text-purple-500"></i>Judul (Opsional)
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            x-model="title"
+                                            placeholder="Judul untuk link ini"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                                        >
+                                    </div>
+
+                                    {{-- Custom Code Input --}}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-code mr-2 text-green-500"></i>Kode Kustom (Opsional)
+                                        </label>
+                                        <div class="flex rounded-xl overflow-hidden border border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition">
+                                            <span class="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50">
+                                                library.unida.gontor.ac.id/s/
+                                            </span>
+                                            <input 
+                                                type="text" 
+                                                x-model="customCode"
+                                                placeholder="kode-unik"
+                                                class="flex-1 px-4 py-3 border-0 focus:ring-0"
+                                            >
+                                        </div>
+                                    </div>
+
+                                    {{-- Generated URL Display --}}
+                                    <div x-show="generatedUrl" class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-green-800 mb-2">
+                                                    <i class="fas fa-check-circle mr-2"></i>Short URL berhasil dibuat!
+                                                </p>
+                                                <div class="flex items-center gap-2">
+                                                    <code class="text-sm bg-white px-3 py-2 rounded-lg border text-green-700 flex-1 font-mono" x-text="generatedUrl"></code>
+                                                    <button @click="copyUrl()" class="p-2 hover:bg-green-100 rounded-lg transition">
+                                                        <i class="fas fa-copy text-green-600"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- Modal Footer --}}
-                            <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-xl">
-                                <button 
-                                    @click="closeModal()"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
-                                >
-                                    <span x-text="generatedUrl ? 'Tutup' : 'Batal'"></span>
-                                </button>
-                                <button 
-                                    x-show="!generatedUrl"
-                                    @click="generate()"
-                                    :disabled="loading || !originalUrl"
-                                    class="px-6 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition flex items-center gap-2"
-                                >
-                                    <i class="fas fa-magic" x-show="!loading"></i>
-                                    <i class="fas fa-spinner fa-spin" x-show="loading"></i>
-                                    <span x-text="loading ? 'Membuat...' : 'Generate'"></span>
-                                </button>
+                                {{-- Actions --}}
+                                <div class="flex gap-3 mt-6">
+                                    <button 
+                                        @click="closeModal()"
+                                        class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition"
+                                    >
+                                        <span x-text="generatedUrl ? 'Tutup' : 'Batal'"></span>
+                                    </button>
+                                    <button 
+                                        x-show="!generatedUrl"
+                                        @click="generate()"
+                                        :disabled="loading || !originalUrl"
+                                        class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <i class="fas fa-magic" x-show="!loading"></i>
+                                        <i class="fas fa-spinner fa-spin" x-show="loading"></i>
+                                        <span x-text="loading ? 'Membuat...' : 'Generate'"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
