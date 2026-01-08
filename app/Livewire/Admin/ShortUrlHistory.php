@@ -43,6 +43,8 @@ class ShortUrlHistory extends Component
             ->paginate(20);
 
         return view('livewire.admin.short-url-history', compact('shortUrls'))
-            ->layout('staff.layouts.app');
+            ->layout('staff.layouts.app', [
+                'title' => 'Short URL History'
+            ]);
     }
 }
