@@ -51,41 +51,30 @@ class MemberLinking extends Component
         $isNumeric = preg_match('/^\d{4,}$/', $search);
         $searchUpper = strtoupper($search);
 
-        // Debug: Let's see what we're searching for
-        logger('Searching for: ' . $search . ' (numeric: ' . ($isNumeric ? 'yes' : 'no') . ')');
-
         // === Search Mahasiswa (SIAKAD) ===
         if ($isNumeric && strlen($search) >= 10) {
             // NIM/Member ID search
-            $mahasiswa = Member::withoutGlobalScope('branch')
-                ->with(['department', 'faculty', 'memberType'])
-                ->where(function($q) use ($search) {
+            $mahasiswa = Member::where(function($q) use ($search) {
                     $q->where('member_id', $search)
                       ->orWhere('nim_nidn', $search);
                 })
                 ->where(function($q) {
                     $q->whereNull('email')->orWhere('email', '');
                 })
+                ->with(['department', 'faculty', 'memberType'])
                 ->limit(5)
                 ->get();
             
             $mahasiswa->each(fn($r) => $r->_matchScore = 100);
         } else {
-            // Name search - Remove email filter temporarily for debugging
-            $mahasiswa = Member::withoutGlobalScope('branch')
+            // Name search
+            $mahasiswa = Member::where('name', 'like', "%{$search}%")
+                ->where(function($q) {
+                    $q->whereNull('email')->orWhere('email', '');
+                })
                 ->with(['department', 'faculty', 'memberType'])
-                ->where('name', 'like', "%{$search}%")
                 ->limit(10)
                 ->get();
-            
-            logger('Found ' . $mahasiswa->count() . ' members before filtering');
-            
-            // Filter only unlinked members
-            $mahasiswa = $mahasiswa->filter(function($member) {
-                return empty($member->email);
-            });
-            
-            logger('Found ' . $mahasiswa->count() . ' unlinked members');
             
             $mahasiswa->each(function($r) use ($searchUpper) {
                 $nameUpper = strtoupper($r->name);
@@ -130,18 +119,14 @@ class MemberLinking extends Component
                         }
                     });
                 }
-                
-                logger('Found ' . $employees->count() . ' employees');
             }
         } catch (\Exception $e) {
-            logger('Employee search error: ' . $e->getMessage());
+            // Employee table might not exist
         }
 
         // Filter and combine results
         $filteredMahasiswa = $mahasiswa->filter(fn($r) => ($r->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
         $filteredEmployees = $employees->filter(fn($e) => ($e->_matchScore ?? 0) >= 20)->sortByDesc('_matchScore');
-
-        logger('Filtered results - Members: ' . $filteredMahasiswa->count() . ', Employees: ' . $filteredEmployees->count());
 
         // Convert to array format for view
         $this->searchResults = [];
@@ -180,8 +165,6 @@ class MemberLinking extends Component
 
         // Sort by match score
         usort($this->searchResults, fn($a, $b) => $b['match_score'] <=> $a['match_score']);
-
-        logger('Final results count: ' . count($this->searchResults));
 
         $this->isSearching = false;
     }
