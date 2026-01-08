@@ -154,8 +154,15 @@ class MemberLinking extends Component
                     throw new \Exception('Data member tidak ditemukan');
                 }
 
-                if ($member->email) {
-                    throw new \Exception('Member ini sudah terhubung dengan akun lain');
+                if ($member->email && $member->email !== $this->user->email) {
+                    // Check if this email belongs to another active user
+                    $existingUser = \App\Models\User::where('email', $member->email)->where('is_active', true)->first();
+                    if ($existingUser) {
+                        throw new \Exception('Member ini sudah terhubung dengan akun aktif: ' . $existingUser->name);
+                    }
+                    
+                    // If email exists but no active user, allow takeover with warning
+                    session()->flash('warning', 'Member ini memiliki email lama yang akan diganti dengan email staff Anda.');
                 }
 
                 // Link member with staff email
