@@ -89,7 +89,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+    @if(app()->environment('local'))
     <script src="https://cdn.tailwindcss.com"></script>
+    @endif
+    @if(app()->environment('local'))
     <script>
         tailwind.config = {
             theme: {
@@ -128,6 +131,7 @@
             }
         }
     </script>
+    @endif
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     {{-- Alpine.js is included in @filamentScripts - do not load CDN version --}}
 

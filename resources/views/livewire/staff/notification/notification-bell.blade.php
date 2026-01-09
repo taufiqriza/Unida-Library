@@ -17,7 +17,7 @@
     @if($showDropdown)
     <div class="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
          style="max-height: 80vh;"
-         wire:click.stop>
+         @click.stop>
         
         {{-- Header --}}
         <div class="px-4 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white">
