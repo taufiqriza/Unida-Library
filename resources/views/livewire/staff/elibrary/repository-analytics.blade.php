@@ -57,7 +57,7 @@
             <p class="text-3xl font-black text-gray-900">{{ $indexingStats['with_fulltext'] ?? 0 }}</p>
             <p class="text-xs text-purple-600 mt-1">{{ $indexingStats['fulltext_availability'] ?? 0 }}% available</p>
             @if(($indexingStats['with_fulltext'] ?? 0) == 0)
-            <p class="text-xs text-amber-600 mt-1">⚠ No fulltext files uploaded yet</p>
+            <p class="text-xs text-amber-600 mt-1">⚠ No PDF files found</p>
             @endif
         </div>
         

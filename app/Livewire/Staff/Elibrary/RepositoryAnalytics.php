@@ -30,7 +30,6 @@ class RepositoryAnalytics extends Component
             ->whereNotNull('keywords')
             ->count();
         $withFulltext = Ethesis::where('is_public', true)
-            ->where('is_fulltext_public', true)
             ->whereNotNull('file_path')
             ->count();
         $withSearchableContent = Ethesis::where('is_public', true)
