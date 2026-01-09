@@ -111,19 +111,34 @@ class BackupManager extends Component
             $totalSize = 0;
 
             foreach ($tables as $table => $query) {
-                $data = DB::select($query);
-                $count = count($data);
-                
-                if ($count > 0) {
-                    $fileName = "{$table}_{$timestamp}.json";
-                    $filePath = $backupDir . '/' . $fileName;
+                try {
+                    $data = DB::select($query);
+                    $count = count($data);
                     
-                    file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));
-                    
-                    $filePaths[] = $filePath;
+                    // Always record the count, even if 0
                     $dataCounts[$table] = $count;
                     $totalRecords += $count;
-                    $totalSize += filesize($filePath);
+                    
+                    if ($count > 0) {
+                        $fileName = "{$table}_{$timestamp}.json";
+                        $filePath = $backupDir . '/' . $fileName;
+                        
+                        file_put_contents($filePath, json_encode($data, JSON_PRETTY_PRINT));
+                        
+                        $filePaths[] = $filePath;
+                        $totalSize += filesize($filePath);
+                    } else {
+                        // Create empty file for tables with no data
+                        $fileName = "{$table}_{$timestamp}.json";
+                        $filePath = $backupDir . '/' . $fileName;
+                        file_put_contents($filePath, json_encode([], JSON_PRETTY_PRINT));
+                        $filePaths[] = $filePath;
+                        $totalSize += filesize($filePath);
+                    }
+                } catch (\Exception $tableError) {
+                    // Log table-specific errors but continue with other tables
+                    $dataCounts[$table] = 0;
+                    \Log::warning("Backup table error for {$table}: " . $tableError->getMessage());
                 }
             }
 
@@ -133,16 +148,19 @@ class BackupManager extends Component
                 'name' => $backup->name,
                 'type' => $backup->type,
                 'branch_id' => $backup->branch_id,
+                'branch_name' => $backup->branch?->name ?? 'All Branches',
                 'created_at' => $backup->created_at,
                 'tables' => array_keys($tables),
                 'data_counts' => $dataCounts,
                 'total_records' => $totalRecords,
-                'file_size' => $totalSize
+                'file_size' => $totalSize,
+                'queries_used' => $tables // For debugging
             ];
 
             $summaryPath = $backupDir . '/backup_summary.json';
             file_put_contents($summaryPath, json_encode($summary, JSON_PRETTY_PRINT));
             $filePaths[] = $summaryPath;
+            $totalSize += filesize($summaryPath);
 
             // Generate checksum
             $checksum = md5(serialize($dataCounts) . $totalRecords);
@@ -157,6 +175,11 @@ class BackupManager extends Component
                 'checksum' => $checksum,
                 'status' => 'completed',
                 'completed_at' => now(),
+                'metadata' => [
+                    'queries_executed' => count($tables),
+                    'files_created' => count($filePaths),
+                    'backup_duration' => now()->diffInSeconds($backup->created_at) . ' seconds'
+                ]
             ]);
 
         } catch (\Exception $e) {
@@ -164,6 +187,7 @@ class BackupManager extends Component
                 'status' => 'failed',
                 'error_message' => $e->getMessage(),
             ]);
+            \Log::error("Backup failed for backup ID {$backup->id}: " . $e->getMessage());
         }
     }
 
@@ -180,6 +204,8 @@ class BackupManager extends Component
                     'loans' => 'SELECT * FROM loans',
                     'book_author' => 'SELECT * FROM book_author',
                     'book_subject' => 'SELECT * FROM book_subject',
+                    'authors' => 'SELECT * FROM authors',
+                    'subjects' => 'SELECT * FROM subjects',
                 ];
                 break;
 
@@ -191,12 +217,15 @@ class BackupManager extends Component
                     'loans' => "SELECT * FROM loans WHERE branch_id = {$branchId}",
                     'book_author' => "SELECT ba.* FROM book_author ba JOIN books b ON ba.book_id = b.id WHERE b.branch_id = {$branchId}",
                     'book_subject' => "SELECT bs.* FROM book_subject bs JOIN books b ON bs.book_id = b.id WHERE b.branch_id = {$branchId}",
+                    'authors' => "SELECT DISTINCT a.* FROM authors a JOIN book_author ba ON a.id = ba.author_id JOIN books b ON ba.book_id = b.id WHERE b.branch_id = {$branchId}",
+                    'subjects' => "SELECT DISTINCT s.* FROM subjects s JOIN book_subject bs ON s.id = bs.subject_id JOIN books b ON bs.book_id = b.id WHERE b.branch_id = {$branchId}",
                 ];
                 break;
 
             case 'partial':
                 $tables = [
                     'books' => $branchId ? "SELECT * FROM books WHERE branch_id = {$branchId}" : 'SELECT * FROM books',
+                    'items' => $branchId ? "SELECT i.* FROM items i JOIN books b ON i.book_id = b.id WHERE b.branch_id = {$branchId}" : 'SELECT * FROM items',
                     'members' => $branchId ? "SELECT * FROM members WHERE branch_id = {$branchId}" : 'SELECT * FROM members',
                 ];
                 break;
