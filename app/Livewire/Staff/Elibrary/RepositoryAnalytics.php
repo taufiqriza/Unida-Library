@@ -72,7 +72,7 @@ class RepositoryAnalytics extends Component
                 'author' => $thesis->author,
                 'updated_at' => $thesis->updated_at,
                 'has_metadata' => !empty($thesis->abstract) && !empty($thesis->keywords),
-                'has_fulltext' => $thesis->is_fulltext_public && !empty($thesis->file_path),
+                'has_fulltext' => !empty($thesis->file_path), // Fixed: check file_path instead of is_fulltext_public
             ])
             ->toArray();
     }

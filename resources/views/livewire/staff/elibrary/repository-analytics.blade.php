@@ -1,4 +1,32 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ showAlert: false, alertType: '', alertMessage: '' }" 
+     @alert.window="showAlert = true; alertType = $event.detail[0].type; alertMessage = $event.detail[0].message; setTimeout(() => showAlert = false, 5000)">
+    
+    {{-- Alert --}}
+    <div x-show="showAlert" x-transition class="fixed top-4 right-4 z-50 max-w-sm">
+        <div class="rounded-lg p-4 shadow-lg" 
+             :class="{
+                'bg-green-100 border border-green-200 text-green-800': alertType === 'success',
+                'bg-red-100 border border-red-200 text-red-800': alertType === 'error',
+                'bg-yellow-100 border border-yellow-200 text-yellow-800': alertType === 'warning',
+                'bg-blue-100 border border-blue-200 text-blue-800': alertType === 'info'
+             }">
+            <div class="flex items-start gap-3">
+                <i class="fas text-lg mt-0.5"
+                   :class="{
+                       'fa-check-circle': alertType === 'success',
+                       'fa-exclamation-circle': alertType === 'error',
+                       'fa-exclamation-triangle': alertType === 'warning',
+                       'fa-info-circle': alertType === 'info'
+                   }"></i>
+                <div class="flex-1">
+                    <p class="text-sm font-medium" x-text="alertMessage"></p>
+                </div>
+                <button @click="showAlert = false" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </div>
     {{-- Header --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">

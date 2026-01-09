@@ -68,54 +68,54 @@
         </div>
     </div>
 
-    {{-- Tabs & Filter Pills - INLINE --}}
-    <div class="flex flex-col lg:flex-row lg:items-center gap-3">
-        {{-- Tabs --}}
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-1 inline-flex flex-wrap gap-1 flex-shrink-0">
-            <button wire:click="setTab('ebook')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ebook' ? 'bg-violet-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-book-open mr-2"></i>E-Book
-            </button>
-            <button wire:click="setTab('ethesis')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ethesis' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-graduation-cap mr-2"></i>E-Thesis
-            </button>
-            <button wire:click="setTab('submissions')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'submissions' ? 'bg-amber-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-upload mr-2"></i>Unggah Mandiri
-            </button>
-            <button wire:click="setTab('plagiarism')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'plagiarism' ? 'bg-rose-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-shield-halved mr-2"></i>Cek Plagiasi
-            </button>
-            <button wire:click="setTab('analytics')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'analytics' ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                <i class="fas fa-search-plus mr-2"></i>Repository Analytics
-            </button>
+    {{-- Tabs & Filter Pills --}}
+    <div class="flex flex-col gap-3">
+        {{-- Centered Tabs --}}
+        <div class="flex justify-center">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-1 inline-flex flex-wrap gap-1">
+                <button wire:click="setTab('ebook')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ebook' ? 'bg-violet-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-book-open mr-2"></i>E-Book
+                </button>
+                <button wire:click="setTab('ethesis')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ethesis' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-graduation-cap mr-2"></i>E-Thesis
+                </button>
+                <button wire:click="setTab('submissions')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'submissions' ? 'bg-amber-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-upload mr-2"></i>Unggah Mandiri
+                </button>
+                <button wire:click="setTab('plagiarism')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'plagiarism' ? 'bg-rose-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-shield-halved mr-2"></i>Cek Plagiasi
+                </button>
+                <button wire:click="setTab('analytics')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'analytics' ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-search-plus mr-2"></i>Repository Analytics
+                </button>
+            </div>
         </div>
 
-        {{-- Filter Pills - Inline with Tabs --}}
+        {{-- Small Filter Pills Below Tabs --}}
         @if($activeTab === 'submissions')
-        <div class="flex items-center gap-2 lg:border-l lg:border-gray-200 lg:pl-3">
-            <span class="text-xs text-gray-400 font-medium hidden lg:inline">Filter:</span>
-            <div class="flex flex-wrap gap-1">
-                <button wire:click="setStatusFilter('')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</button>
-                <button wire:click="setStatusFilter('submitted')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'submitted' ? 'bg-amber-500 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">Diajukan ({{ $submissionStats['submitted'] }})</button>
-                <button wire:click="setStatusFilter('revision_required')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'revision_required' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-700 hover:bg-orange-100' }}">Revisi ({{ $submissionStats['revision_required'] }})</button>
-                <button wire:click="setStatusFilter('approved')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'approved' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">Disetujui ({{ $submissionStats['approved'] }})</button>
-                <button wire:click="setStatusFilter('rejected')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'rejected' ? 'bg-red-500 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100' }}">Ditolak ({{ $submissionStats['rejected'] }})</button>
-                <button wire:click="setStatusFilter('published')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'published' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">Published ({{ $submissionStats['published'] }})</button>
+        <div class="flex justify-center">
+            <div class="flex items-center gap-1 text-xs">
+                <button wire:click="setStatusFilter('')" class="px-2 py-1 rounded-full font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All</button>
+                <button wire:click="setStatusFilter('submitted')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'submitted' ? 'bg-amber-500 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100' }}">Diajukan ({{ $submissionStats['submitted'] }})</button>
+                <button wire:click="setStatusFilter('revision_required')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'revision_required' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-700 hover:bg-orange-100' }}">Revisi ({{ $submissionStats['revision_required'] }})</button>
+                <button wire:click="setStatusFilter('approved')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'approved' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">Disetujui ({{ $submissionStats['approved'] }})</button>
+                <button wire:click="setStatusFilter('rejected')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'rejected' ? 'bg-red-500 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100' }}">Ditolak ({{ $submissionStats['rejected'] }})</button>
+                <button wire:click="setStatusFilter('published')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'published' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">Published ({{ $submissionStats['published'] }})</button>
             </div>
         </div>
         @elseif($activeTab === 'plagiarism')
-        <div class="flex items-center gap-2 lg:border-l lg:border-gray-200 lg:pl-3">
-            <span class="text-xs text-gray-400 font-medium hidden lg:inline">Filter:</span>
-            <div class="flex flex-wrap gap-1">
-                <button wire:click="setStatusFilter('')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All ({{ $plagiarismStats['all'] }})</button>
+        <div class="flex justify-center">
+            <div class="flex items-center gap-1 text-xs">
+                <button wire:click="setStatusFilter('')" class="px-2 py-1 rounded-full font-medium transition {{ !$statusFilter ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">All ({{ $plagiarismStats['all'] }})</button>
                 @if($plagiarismStats['external_pending'] > 0)
-                <button wire:click="setStatusFilter('external_pending')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'external_pending' ? 'bg-violet-500 text-white' : 'bg-violet-50 text-violet-700 hover:bg-violet-100' }}">
+                <button wire:click="setStatusFilter('external_pending')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'external_pending' ? 'bg-violet-500 text-white' : 'bg-violet-50 text-violet-700 hover:bg-violet-100' }}">
                     <i class="fas fa-upload mr-1"></i>Eksternal ({{ $plagiarismStats['external_pending'] }})
                 </button>
                 @endif
-                <button wire:click="setStatusFilter('pending')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'pending' ? 'bg-gray-500 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">Pending ({{ $plagiarismStats['pending'] }})</button>
-                <button wire:click="setStatusFilter('processing')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'processing' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">Processing ({{ $plagiarismStats['processing'] }})</button>
-                <button wire:click="setStatusFilter('completed')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'completed' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">Selesai ({{ $plagiarismStats['completed'] }})</button>
-                <button wire:click="setStatusFilter('failed')" class="px-2.5 py-1 rounded-full text-xs font-medium transition {{ $statusFilter === 'failed' ? 'bg-red-500 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100' }}">Gagal ({{ $plagiarismStats['failed'] }})</button>
+                <button wire:click="setStatusFilter('pending')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'pending' ? 'bg-gray-500 text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100' }}">Pending ({{ $plagiarismStats['pending'] }})</button>
+                <button wire:click="setStatusFilter('processing')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'processing' ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">Processing ({{ $plagiarismStats['processing'] }})</button>
+                <button wire:click="setStatusFilter('completed')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'completed' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">Selesai ({{ $plagiarismStats['completed'] }})</button>
+                <button wire:click="setStatusFilter('failed')" class="px-2 py-1 rounded-full font-medium transition {{ $statusFilter === 'failed' ? 'bg-red-500 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100' }}">Gagal ({{ $plagiarismStats['failed'] }})</button>
             </div>
         </div>
         @endif
