@@ -78,6 +78,15 @@
                 <span class="sm:hidden">Ranking</span>
             </button>
             @endif
+            
+            {{-- Backup Tab --}}
+            <button wire:click="setMainTab('backup')" 
+                    class="flex-1 min-w-[120px] px-4 py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2
+                    {{ $mainTab === 'backup' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-database"></i>
+                <span class="hidden sm:inline">Backup</span>
+                <span class="sm:hidden">Backup</span>
+            </button>
         </div>
     </div>
 
@@ -625,6 +634,13 @@
     @if($mainTab === 'ranking' && auth()->user()->role === 'super_admin')
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         @livewire('staff.settings.user-ranking')
+    </div>
+    @endif
+
+    {{-- Backup Tab --}}
+    @if($mainTab === 'backup')
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        @livewire('staff.settings.backup-manager')
     </div>
     @endif
 
