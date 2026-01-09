@@ -2,7 +2,7 @@
      @alert.window="showAlert = true; alertType = $event.detail[0].type; alertMessage = $event.detail[0].message; setTimeout(() => showAlert = false, 5000)">
     
     {{-- Alert --}}
-    <div x-show="showAlert" x-transition class="fixed top-4 right-4 z-50 max-w-sm">
+    <div x-show="showAlert" x-transition class="fixed top-4 right-4 z-[99999] max-w-sm">
         <div class="rounded-lg p-4 shadow-lg" 
              :class="{
                 'bg-green-100 border border-green-200 text-green-800': alertType === 'success',

@@ -70,23 +70,51 @@
 
     {{-- Tabs & Filter Pills --}}
     <div class="flex flex-col gap-3">
-        {{-- Centered Tabs --}}
-        <div class="flex justify-center">
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-1 inline-flex flex-wrap gap-1">
-                <button wire:click="setTab('ebook')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ebook' ? 'bg-violet-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-book-open mr-2"></i>E-Book
+        {{-- Full Width Tabs like Catalog --}}
+        <div class="bg-white rounded-lg lg:rounded-2xl shadow-sm border border-gray-100 p-1 lg:p-2">
+            <div class="flex gap-0.5 lg:gap-1">
+                <button wire:click="setTab('ebook')" @class([
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'bg-gradient-to-r from-violet-600 to-violet-700 text-white shadow-md' => $activeTab === 'ebook',
+                    'text-gray-500 hover:bg-gray-100' => $activeTab !== 'ebook',
+                ])>
+                    <i class="fas fa-book-open text-xs"></i>
+                    <span>E-Book</span>
                 </button>
-                <button wire:click="setTab('ethesis')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'ethesis' ? 'bg-blue-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-graduation-cap mr-2"></i>E-Thesis
+                <button wire:click="setTab('ethesis')" @class([
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md' => $activeTab === 'ethesis',
+                    'text-gray-500 hover:bg-gray-100' => $activeTab !== 'ethesis',
+                ])>
+                    <i class="fas fa-graduation-cap text-xs"></i>
+                    <span>E-Thesis</span>
                 </button>
-                <button wire:click="setTab('submissions')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'submissions' ? 'bg-amber-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-upload mr-2"></i>Unggah Mandiri
+                <button wire:click="setTab('submissions')" @class([
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md' => $activeTab === 'submissions',
+                    'text-gray-500 hover:bg-gray-100' => $activeTab !== 'submissions',
+                ])>
+                    <i class="fas fa-upload text-xs"></i>
+                    <span class="hidden sm:inline">Unggah Mandiri</span>
+                    <span class="sm:hidden">Upload</span>
                 </button>
-                <button wire:click="setTab('plagiarism')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'plagiarism' ? 'bg-rose-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-shield-halved mr-2"></i>Cek Plagiasi
+                <button wire:click="setTab('plagiarism')" @class([
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md' => $activeTab === 'plagiarism',
+                    'text-gray-500 hover:bg-gray-100' => $activeTab !== 'plagiarism',
+                ])>
+                    <i class="fas fa-shield-halved text-xs"></i>
+                    <span class="hidden sm:inline">Cek Plagiasi</span>
+                    <span class="sm:hidden">Plagiasi</span>
                 </button>
-                <button wire:click="setTab('analytics')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'analytics' ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-search-plus mr-2"></i>Repository Analytics
+                <button wire:click="setTab('analytics')" @class([
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md' => $activeTab === 'analytics',
+                    'text-gray-500 hover:bg-gray-100' => $activeTab !== 'analytics',
+                ])>
+                    <i class="fas fa-search-plus text-xs"></i>
+                    <span class="hidden sm:inline">Analytics</span>
+                    <span class="sm:hidden">Stats</span>
                 </button>
             </div>
         </div>
