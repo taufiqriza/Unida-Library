@@ -117,7 +117,8 @@ class SecurityHeaders
                 "https://fonts.googleapis.com " .
                 "https://cdn.jsdelivr.net " .
                 "https://cdnjs.cloudflare.com " .
-                "https://cdn.tailwindcss.com",
+                "https://cdn.tailwindcss.com " .
+                "https://unpkg.com",
             
             // Fonts
             "font-src 'self' " .
@@ -141,6 +142,7 @@ class SecurityHeaders
                 "https://region1.google-analytics.com " .
                 "https://maps.googleapis.com " .
                 "https://maps.gstatic.com " .
+                "https://unpkg.com " .
                 "wss: ws:",
             
             // Frames: Google OAuth, YouTube, embedded content, blob for PDF

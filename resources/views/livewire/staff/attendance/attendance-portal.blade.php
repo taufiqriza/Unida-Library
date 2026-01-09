@@ -947,8 +947,11 @@ function attendanceApp() {
 
                 // Fit bounds if multiple locations
                 if (locations.length > 1) {
-                    const group = new L.featureGroup(this.map._layers);
-                    this.map.fitBounds(group.getBounds().pad(0.1));
+                    const bounds = L.latLngBounds();
+                    locations.forEach(loc => {
+                        bounds.extend([loc.lat, loc.lng]);
+                    });
+                    this.map.fitBounds(bounds, { padding: [20, 20] });
                 }
 
             } catch (error) {
