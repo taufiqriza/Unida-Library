@@ -39,11 +39,14 @@ class OaiPmhController extends Controller
     
     private function identify(): Response
     {
+        $earliestDate = Ethesis::where('is_public', true)->min('created_at');
+        $earliestDatestamp = $earliestDate ? \Carbon\Carbon::parse($earliestDate) : now();
+        
         $xml = view('oai.identify', [
             'baseUrl' => $this->baseUrl,
             'repositoryName' => $this->repositoryName,
             'adminEmail' => $this->adminEmail,
-            'earliestDatestamp' => Ethesis::where('is_public', true)->min('created_at') ?? now(),
+            'earliestDatestamp' => $earliestDatestamp,
         ])->render();
         
         return response($xml)->header('Content-Type', 'application/xml');
