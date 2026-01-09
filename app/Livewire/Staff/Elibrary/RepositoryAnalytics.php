@@ -5,7 +5,7 @@ namespace App\Livewire\Staff\Elibrary;
 use App\Models\Ethesis;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\SitemapController;
 
 class RepositoryAnalytics extends Component
 {
@@ -31,14 +31,27 @@ class RepositoryAnalytics extends Component
             ->where('is_fulltext_public', true)
             ->whereNotNull('file_path')
             ->count();
+        $withSearchableContent = Ethesis::where('is_public', true)
+            ->whereNotNull('searchable_content')
+            ->count();
             
         $this->indexingStats = [
             'total_public' => $total,
             'with_metadata' => $withMetadata,
             'with_fulltext' => $withFulltext,
+            'with_searchable_content' => $withSearchableContent,
             'metadata_completeness' => $total > 0 ? round(($withMetadata / $total) * 100, 1) : 0,
             'fulltext_availability' => $total > 0 ? round(($withFulltext / $total) * 100, 1) : 0,
+            'content_indexed' => $total > 0 ? round(($withSearchableContent / $total) * 100, 1) : 0,
         ];
+    }
+    
+    public function generateSitemap()
+    {
+        $controller = app(SitemapController::class);
+        $result = $controller->generate();
+        
+        $this->dispatch('alert', ['type' => 'success', 'message' => "Sitemap generated! {$result['total_urls']} URLs indexed."]);
     }
     
     public function loadRecentIndexed()
@@ -91,15 +104,16 @@ class RepositoryAnalytics extends Component
         }
     }
     
-    public function generateSitemap()
+    public function processFullText()
     {
-        // Generate XML sitemap for e-thesis
-        $etheses = Ethesis::where('is_public', true)->get();
-        $xml = view('sitemap.ethesis', compact('etheses'))->render();
+        $service = app(FullTextExtractionService::class);
+        $result = $service->batchProcess(5); // Process 5 at a time
         
-        file_put_contents(public_path('sitemap-ethesis.xml'), $xml);
+        $message = "Processed {$result['total']} thesis. Success: {$result['processed']}, Failed: {$result['failed']}";
+        $type = count($result['failed']) > 0 ? 'warning' : 'success';
         
-        $this->dispatch('alert', ['type' => 'success', 'message' => 'Sitemap generated successfully!']);
+        $this->dispatch('alert', ['type' => $type, 'message' => $message]);
+        $this->loadIndexingStats(); // Refresh stats
     }
     
     public function render()

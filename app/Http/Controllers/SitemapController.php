@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Ethesis;
+use Illuminate\Http\Response;
+
+class SitemapController extends Controller
+{
+    public function index(): Response
+    {
+        $xml = view('sitemap.index')->render();
+        return response($xml)->header('Content-Type', 'application/xml');
+    }
+    
+    public function ethesis(): Response
+    {
+        $etheses = Ethesis::where('is_public', true)
+            ->orderByDesc('updated_at')
+            ->get();
+            
+        $xml = view('sitemap.ethesis', compact('etheses'))->render();
+        return response($xml)->header('Content-Type', 'application/xml');
+    }
+    
+    public function generate(): array
+    {
+        // Generate main sitemap
+        $mainSitemap = view('sitemap.index')->render();
+        file_put_contents(public_path('sitemap.xml'), $mainSitemap);
+        
+        // Generate e-thesis sitemap
+        $etheses = Ethesis::where('is_public', true)->orderByDesc('updated_at')->get();
+        $ethesisSitemap = view('sitemap.ethesis', compact('etheses'))->render();
+        file_put_contents(public_path('sitemap-ethesis.xml'), $ethesisSitemap);
+        
+        return [
+            'main_sitemap' => 'sitemap.xml',
+            'ethesis_sitemap' => 'sitemap-ethesis.xml',
+            'total_urls' => $etheses->count() + 1,
+        ];
+    }
+}

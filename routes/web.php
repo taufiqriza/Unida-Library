@@ -27,6 +27,11 @@ Route::get('/locale/{locale}', function (string $locale) {
 // Visitor Kiosk (Public - No Auth)
 Route::get('/visitor/{code}', \App\Livewire\Visitor\VisitorKiosk::class)->name('visitor.kiosk');
 
+// OAI-PMH & Sitemap Routes
+Route::get('/oai-pmh', [App\Http\Controllers\OaiPmhController::class, 'index']);
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+Route::get('/sitemap-ethesis.xml', [App\Http\Controllers\SitemapController::class, 'ethesis']);
+
 // OPAC Routes (Livewire)
 Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
 Route::get('/search', fn() => view('opac.search'))->name('opac.search');

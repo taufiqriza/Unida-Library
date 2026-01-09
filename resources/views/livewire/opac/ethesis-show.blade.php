@@ -1,3 +1,79 @@
+@push('head')
+    {{-- Google Scholar Meta Tags --}}
+    <meta name="citation_title" content="{{ $thesis->title }}">
+    <meta name="citation_author" content="{{ $thesis->author }}">
+    <meta name="citation_publication_date" content="{{ $thesis->year }}/01/01">
+    <meta name="citation_dissertation_institution" content="Universitas Darussalam Gontor">
+    @if($thesis->is_fulltext_public && $thesis->file_path)
+    <meta name="citation_pdf_url" content="{{ asset('storage/thesis/' . $thesis->file_path) }}">
+    @endif
+    <meta name="citation_abstract_html_url" content="{{ url()->current() }}">
+    @if($thesis->keywords)
+    <meta name="citation_keywords" content="{{ $thesis->keywords }}">
+    @endif
+    <meta name="citation_language" content="id">
+    @if($thesis->advisor1)
+    <meta name="citation_dissertation_advisor" content="{{ $thesis->advisor1 }}">
+    @endif
+    @if($thesis->department)
+    <meta name="citation_dissertation_department" content="{{ $thesis->department->name }}">
+    @endif
+    
+    {{-- Dublin Core Fallback --}}
+    <meta name="DC.title" content="{{ $thesis->title }}">
+    <meta name="DC.creator" content="{{ $thesis->author }}">
+    <meta name="DC.date" content="{{ $thesis->year }}">
+    <meta name="DC.type" content="Thesis">
+    <meta name="DC.publisher" content="Universitas Darussalam Gontor">
+    <meta name="DC.identifier" content="{{ url()->current() }}">
+    <meta name="DC.language" content="id">
+    @if($thesis->abstract)
+    <meta name="DC.description" content="{{ Str::limit($thesis->abstract, 300) }}">
+    @endif
+    
+    {{-- Open Graph for Social Sharing --}}
+    <meta property="og:title" content="{{ $thesis->title }}">
+    <meta property="og:description" content="{{ Str::limit($thesis->abstract ?? 'E-Thesis dari Universitas Darussalam Gontor', 160) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="{{ $thesis->cover_url }}">
+    
+    {{-- JSON-LD Structured Data --}}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Thesis",
+        "name": "{{ $thesis->title }}",
+        "author": {
+            "@type": "Person",
+            "name": "{{ $thesis->author }}"
+        },
+        "datePublished": "{{ $thesis->year }}",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Universitas Darussalam Gontor",
+            "url": "https://unida.gontor.ac.id"
+        },
+        @if($thesis->abstract)
+        "abstract": "{{ str_replace(['"', "\n", "\r"], ['\"', ' ', ' '], $thesis->abstract) }}",
+        @endif
+        "url": "{{ url()->current() }}",
+        "inLanguage": "id",
+        @if($thesis->department)
+        "department": "{{ $thesis->department->name }}",
+        @endif
+        @if($thesis->keywords)
+        "keywords": "{{ $thesis->keywords }}",
+        @endif
+        "educationalLevel": "{{ ucfirst($thesis->type) }}"
+    }
+    </script>
+    
+    {{-- Page Title & Description --}}
+    <title>{{ $thesis->title }} - {{ $thesis->author }} | E-Thesis UNIDA Gontor</title>
+    <meta name="description" content="{{ Str::limit($thesis->abstract ?? 'E-Thesis dari Universitas Darussalam Gontor oleh ' . $thesis->author, 160) }}">
+@endpush
+
 <div>
     <div class="lg:max-w-7xl lg:mx-auto lg:px-4 lg:py-8">
         

@@ -1,6 +1,20 @@
 User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: {{ url('/sitemap.xml') }}
+Sitemap: {{ url('/sitemap-ethesis.xml') }}
+
+# Allow crawling of thesis content
+Allow: /ethesis/
+Allow: /storage/thesis/
+
+# Block admin areas
 Disallow: /staff/
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://library.unida.gontor.ac.id/sitemap.xml
+# Block dynamic search results
+Disallow: /search?
+Disallow: /*?q=*
+Disallow: /*?search=*
