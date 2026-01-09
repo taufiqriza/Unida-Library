@@ -245,25 +245,44 @@ class BackupManager extends Component
         try {
             $backup = Backup::find($backupId);
             
-            // Delete files
-            foreach ($backup->file_paths as $filePath) {
-                if (file_exists($filePath)) {
-                    unlink($filePath);
+            if (!$backup) {
+                session()->flash('error', 'Backup tidak ditemukan.');
+                return;
+            }
+            
+            // Check permission
+            if (auth()->user()->role !== 'super_admin' && $backup->branch_id !== auth()->user()->branch_id) {
+                session()->flash('error', 'Tidak memiliki akses untuk menghapus backup ini.');
+                return;
+            }
+            
+            // Delete files if they exist
+            if ($backup->file_paths && is_array($backup->file_paths)) {
+                foreach ($backup->file_paths as $filePath) {
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
                 }
             }
             
-            // Delete directory if empty
-            $backupDir = dirname($backup->file_paths[0] ?? '');
-            if (file_exists($backupDir) && count(scandir($backupDir)) <= 2) {
-                rmdir($backupDir);
+            // Delete directory if exists and empty
+            $backupDir = storage_path('app/backups/' . $backup->id);
+            if (file_exists($backupDir)) {
+                $files = array_diff(scandir($backupDir), ['.', '..']);
+                if (empty($files)) {
+                    rmdir($backupDir);
+                }
             }
             
+            // Delete backup record
             $backup->delete();
             $this->loadBackups();
             
             session()->flash('message', 'Backup berhasil dihapus.');
+            
         } catch (\Exception $e) {
             session()->flash('error', 'Gagal menghapus backup: ' . $e->getMessage());
+            \Log::error("Delete backup error: " . $e->getMessage());
         }
     }
 
