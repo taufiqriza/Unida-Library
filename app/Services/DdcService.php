@@ -38,12 +38,6 @@ class DdcService
         $query = strtolower(trim($query));
         $isCodeSearch = preg_match('/^[0-9xX.]+$/', $query);
         
-        // Handle special cases
-        if ($query === '2x' || $query === '2X') {
-            // Keep 2X as is for Islamic classifications
-            $query = '2x';
-        }
-        
         $exactMatches = [];
         $startsWithMatches = [];
         $sameClassMatches = [];
@@ -99,73 +93,6 @@ class DdcService
         
         // Combine results with priority
         $results = array_merge($exactMatches, $startsWithMatches, $sameClassMatches, $containsMatches, $relatedMatches);
-        
-        return array_slice($results, 0, $limit);
-    }
-            
-            if ($isCodeSearch) {
-                // Enhanced code search with DDC hierarchy
-                if ($code === $query) {
-                    $exactMatches[] = $item;
-                } elseif (str_starts_with($code, $query . '.')) {
-                    $startsWithMatches[] = $item;
-                } elseif ($this->isSameDdcClass($query, $code)) {
-                    $sameClassMatches[] = $item;
-                } elseif ($this->isRelatedDdcCode($query, $code)) {
-                    $relatedMatches[] = $item;
-                }
-            } else {
-                // Enhanced text search with multiple criteria
-                $searchTerms = explode(' ', $query);
-                $matchScore = 0;
-                
-                // Check for exact code match
-                if ($code === $query) {
-                    $exactMatches[] = $item;
-                    continue;
-                }
-                
-                // Check for code starts with
-                if (str_starts_with($code, $query)) {
-                    $startsWithMatches[] = $item;
-                    continue;
-                }
-                
-                // Multi-term search in description
-                foreach ($searchTerms as $term) {
-                    if (strlen($term) >= 2) {
-                        if (str_contains($desc, $term)) {
-                            $matchScore++;
-                        }
-                    }
-                }
-                
-                // Categorize by match quality
-                if ($matchScore === count($searchTerms) && count($searchTerms) > 1) {
-                    // All terms found - high relevance
-                    $startsWithMatches[] = $item;
-                } elseif ($matchScore > 0) {
-                    // Some terms found
-                    $containsMatches[] = $item;
-                }
-            }
-        }
-        
-        // Enhanced sorting with relevance scoring
-        $this->sortByRelevance($exactMatches, $query);
-        $this->sortByRelevance($startsWithMatches, $query);
-        $this->sortByRelevance($sameClassMatches, $query);
-        $this->sortByRelevance($containsMatches, $query);
-        $this->sortByRelevance($relatedMatches, $query);
-        
-        // Merge with priority: exact > starts-with > same-class > contains > related
-        $results = array_merge(
-            $exactMatches, 
-            $startsWithMatches, 
-            $sameClassMatches, 
-            $containsMatches,
-            $relatedMatches
-        );
         
         return array_slice($results, 0, $limit);
     }
