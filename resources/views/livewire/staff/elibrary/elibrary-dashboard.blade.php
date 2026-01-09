@@ -30,21 +30,21 @@
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl p-4 text-white cursor-pointer hover:shadow-lg transition" wire:click="setTab('ebook')">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm cursor-pointer hover:shadow-lg transition" wire:click="setTab('ebook')">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-book-open text-lg"></i></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center"><i class="fas fa-book-open text-white text-lg"></i></div>
                 <div>
-                    <p class="text-2xl font-bold">{{ $stats['ebooks'] }}</p>
-                    <p class="text-xs text-violet-100">E-Book</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['ebooks'] }}</p>
+                    <p class="text-xs text-gray-500">E-Book</p>
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-4 text-white cursor-pointer hover:shadow-lg transition" wire:click="setTab('ethesis')">
+        <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm cursor-pointer hover:shadow-lg transition" wire:click="setTab('ethesis')">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><i class="fas fa-graduation-cap text-lg"></i></div>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg flex items-center justify-center"><i class="fas fa-graduation-cap text-white text-lg"></i></div>
                 <div>
-                    <p class="text-2xl font-bold">{{ $stats['ethesis'] }}</p>
-                    <p class="text-xs text-blue-100">E-Thesis</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $stats['ethesis'] }}</p>
+                    <p class="text-xs text-gray-500">E-Thesis</p>
                 </div>
             </div>
         </div>
