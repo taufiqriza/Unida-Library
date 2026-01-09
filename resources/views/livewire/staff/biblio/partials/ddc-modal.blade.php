@@ -262,7 +262,7 @@ function enhancedDdcModal() {
         
         selectClass(code) {
             if (code === '2X') {
-                this.search = '29';  // Search for Islamic classifications (297, 298, etc)
+                this.search = '2X';  // Search for Islamic classifications with 2X prefix
             } else {
                 this.search = code;
             }

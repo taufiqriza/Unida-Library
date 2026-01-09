@@ -40,7 +40,8 @@ class DdcService
         
         // Handle special cases
         if ($query === '2x' || $query === '2X') {
-            $query = '2'; // Search for Islamic classifications
+            // Keep 2X as is for Islamic classifications
+            $query = '2x';
         }
         
         $exactMatches = [];
