@@ -28,35 +28,21 @@ class SitemapController extends Controller
         try {
             // Generate main sitemap
             $mainSitemap = view('sitemap.index')->render();
-            $tempMain = tempnam(sys_get_temp_dir(), 'sitemap_main_');
-            file_put_contents($tempMain, $mainSitemap);
+            \Storage::disk('public')->put('sitemap.xml', $mainSitemap);
             
             // Generate e-thesis sitemap  
             $etheses = Ethesis::where('is_public', true)->orderByDesc('updated_at')->get();
             $ethesisSitemap = view('sitemap.ethesis', compact('etheses'))->render();
-            $tempEthesis = tempnam(sys_get_temp_dir(), 'sitemap_ethesis_');
-            file_put_contents($tempEthesis, $ethesisSitemap);
-            
-            // Move to public directory with proper permissions
-            $publicPath = public_path();
-            $mainTarget = $publicPath . '/sitemap.xml';
-            $ethesisTarget = $publicPath . '/sitemap-ethesis.xml';
-            
-            // Use copy and unlink for better permission handling
-            if (copy($tempMain, $mainTarget)) {
-                chmod($mainTarget, 0644);
-                unlink($tempMain);
-            }
-            
-            if (copy($tempEthesis, $ethesisTarget)) {
-                chmod($ethesisTarget, 0644);
-                unlink($tempEthesis);
-            }
+            \Storage::disk('public')->put('sitemap-ethesis.xml', $ethesisSitemap);
             
             return [
                 'main_sitemap' => 'sitemap.xml',
                 'ethesis_sitemap' => 'sitemap-ethesis.xml',
                 'total_urls' => $etheses->count() + 1,
+                'urls' => [
+                    asset('storage/sitemap.xml'),
+                    asset('storage/sitemap-ethesis.xml')
+                ]
             ];
         } catch (\Exception $e) {
             \Log::error('Sitemap generation error: ' . $e->getMessage());

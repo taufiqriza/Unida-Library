@@ -218,7 +218,7 @@
             <i class="fas fa-tools text-purple-500"></i> Quick Actions
         </h3>
         <div class="grid md:grid-cols-3 gap-4">
-            <a href="/sitemap-ethesis.xml" target="_blank" class="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition">
+            <a href="/sitemap.xml" target="_blank" class="flex items-center gap-3 p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition">
                 <div class="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
                     <i class="fas fa-sitemap text-white"></i>
                 </div>

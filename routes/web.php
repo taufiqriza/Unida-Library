@@ -29,8 +29,20 @@ Route::get('/visitor/{code}', \App\Livewire\Visitor\VisitorKiosk::class)->name('
 
 // OAI-PMH & Sitemap Routes
 Route::get('/oai-pmh', [App\Http\Controllers\OaiPmhController::class, 'index']);
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
-Route::get('/sitemap-ethesis.xml', [App\Http\Controllers\SitemapController::class, 'ethesis']);
+Route::get('/sitemap.xml', function() {
+    if (\Storage::disk('public')->exists('sitemap.xml')) {
+        return response(\Storage::disk('public')->get('sitemap.xml'))
+            ->header('Content-Type', 'application/xml');
+    }
+    return response('Sitemap not found', 404);
+});
+Route::get('/sitemap-ethesis.xml', function() {
+    if (\Storage::disk('public')->exists('sitemap-ethesis.xml')) {
+        return response(\Storage::disk('public')->get('sitemap-ethesis.xml'))
+            ->header('Content-Type', 'application/xml');
+    }
+    return response('Sitemap not found', 404);
+});
 
 // OPAC Routes (Livewire)
 Route::get('/', \App\Livewire\Opac\OpacHome::class)->name('opac.home');
