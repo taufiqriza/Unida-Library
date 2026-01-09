@@ -926,9 +926,9 @@ function attendanceApp() {
                     let staffList = loc.staff.map(s => 
                         `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f3f4f6;">
                             <span style="font-weight:500;">${s.name}</span>
-                            <span style="color:${s.is_late ? '#d97706' : '#10b981'};font-weight:600;">${s.time}</span>
+                            <span style="color:${s.is_late ? '#d97706' : '#10b981'};font-weight:600;">${s.date} ${s.time}</span>
                         </div>`
-                    ).join('') || '<p style="color:#9ca3af;font-style:italic;">Belum ada kehadiran hari ini</p>';
+                    ).join('') || '<p style="color:#9ca3af;font-style:italic;">Belum ada kehadiran minggu ini</p>';
 
                     marker.bindPopup(`
                         <div style="min-width:220px;font-family:system-ui;">
@@ -936,7 +936,7 @@ function attendanceApp() {
                             <p style="font-size:12px;color:#6b7280;margin:0 0 12px 0;background:#f9fafb;padding:4px 8px;border-radius:4px;">${loc.branch}</p>
                             <div style="font-size:13px;max-height:150px;overflow-y:auto;">${staffList}</div>
                             <div style="margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;">
-                                Radius: ${loc.radius}m • Total: ${loc.today_count} orang
+                                Radius: ${loc.radius}m • Ditampilkan: ${loc.today_count} • Total 7 hari: ${loc.total_week}
                             </div>
                         </div>
                     `, {

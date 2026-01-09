@@ -523,21 +523,21 @@ class AttendancePortal extends Component
         $today = today();
         
         return $locations->map(function ($location) use ($today) {
-            // Check today first, if no data then check yesterday for demo
-            $todayAttendances = Attendance::where('location_id', $location->id)
-                ->whereDate('date', $today)
+            // Check last 7 days for better data visualization
+            $recentAttendances = Attendance::where('location_id', $location->id)
                 ->where('type', 'check_in')
+                ->where('created_at', '>=', $today->copy()->subDays(7))
                 ->with('user:id,name')
+                ->orderBy('created_at', 'desc')
                 ->get();
             
-            // If no data today, check yesterday for demo purposes
-            if ($todayAttendances->isEmpty()) {
-                $todayAttendances = Attendance::where('location_id', $location->id)
-                    ->whereDate('date', $today->copy()->subDay())
-                    ->where('type', 'check_in')
-                    ->with('user:id,name')
-                    ->get();
-            }
+            // Group by date to show today's count primarily
+            $todayAttendances = $recentAttendances->filter(function($att) use ($today) {
+                return $att->created_at->format('Y-m-d') === $today->format('Y-m-d');
+            });
+            
+            // If no data today, show recent data (last 7 days)
+            $displayAttendances = $todayAttendances->isNotEmpty() ? $todayAttendances : $recentAttendances->take(10);
             
             return [
                 'id' => $location->id,
@@ -548,10 +548,12 @@ class AttendancePortal extends Component
                 'radius' => $location->radius_meters,
                 'is_active' => $location->is_active,
                 'branch' => $location->branch?->name ?? 'Pusat',
-                'today_count' => $todayAttendances->count(),
-                'staff' => $todayAttendances->map(fn($a) => [
+                'today_count' => $displayAttendances->count(),
+                'total_week' => $recentAttendances->count(),
+                'staff' => $displayAttendances->map(fn($a) => [
                     'name' => $a->user->name,
                     'time' => Carbon::parse($a->scanned_at)->format('H:i'),
+                    'date' => Carbon::parse($a->scanned_at)->format('d/m'),
                     'is_late' => $a->is_late,
                 ])->toArray(),
             ];
