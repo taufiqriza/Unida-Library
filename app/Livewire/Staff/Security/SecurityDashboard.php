@@ -29,17 +29,37 @@ class SecurityDashboard extends Component
 
     public function loadStats()
     {
-        $logPath = storage_path('logs/laravel.log');
-        $securityLogPath = storage_path('logs/security.log');
+        $logDir = storage_path('logs');
+        $allLogContent = '';
+        $securityContent = '';
         
-        $logContent = File::exists($logPath) ? File::get($logPath) : '';
-        $securityContent = File::exists($securityLogPath) ? File::get($securityLogPath) : '';
+        // Read all Laravel log files (last 7 days)
+        for ($i = 0; $i < 7; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $logFile = $logDir . '/laravel-' . $date . '.log';
+            
+            if (File::exists($logFile)) {
+                $allLogContent .= File::get($logFile) . "\n";
+            }
+        }
         
+        // Also read main laravel.log
+        $mainLog = $logDir . '/laravel.log';
+        if (File::exists($mainLog)) {
+            $allLogContent .= File::get($mainLog);
+        }
+        
+        // Read security log
+        $securityLog = $logDir . '/security.log';
+        if (File::exists($securityLog)) {
+            $securityContent = File::get($securityLog);
+        }
+
         $this->stats = [
-            'blocked_requests' => substr_count($logContent, 'Blocked suspicious content'),
-            'rate_limited' => substr_count($logContent, 'Rate limit exceeded'),
-            'honeypot_triggered' => substr_count($logContent, 'Honeypot triggered'),
-            'suspicious_agents' => substr_count($logContent, 'Suspicious user agent'),
+            'blocked_requests' => substr_count($allLogContent, 'Blocked suspicious content'),
+            'rate_limited' => substr_count($allLogContent, 'Rate limit exceeded'),
+            'honeypot_triggered' => substr_count($allLogContent, 'Honeypot triggered'),
+            'suspicious_agents' => substr_count($allLogContent, 'Suspicious user agent'),
             'failed_logins' => $this->countFailedLogins(),
             'content_violations' => substr_count($securityContent, 'Content filter violation'),
             'spam_blocked' => substr_count($securityContent, 'Gambling/spam content'),
@@ -49,7 +69,28 @@ class SecurityDashboard extends Component
 
     protected function countFailedLogins(): int
     {
-        return Cache::get('failed_login_count_' . now()->format('Y-m-d'), 0);
+        $count = 0;
+        $logDir = storage_path('logs');
+        
+        // Count from all Laravel log files (last 7 days)
+        for ($i = 0; $i < 7; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $logFile = $logDir . '/laravel-' . $date . '.log';
+            
+            if (File::exists($logFile)) {
+                $content = File::get($logFile);
+                $count += substr_count($content, 'Login failed');
+            }
+        }
+        
+        // Also check main laravel.log
+        $mainLog = $logDir . '/laravel.log';
+        if (File::exists($mainLog)) {
+            $content = File::get($mainLog);
+            $count += substr_count($content, 'Login failed');
+        }
+        
+        return $count;
     }
 
     public function loadFailedLogins()
