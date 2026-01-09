@@ -695,11 +695,16 @@
 </div>
 
 @push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+#attendance-map {
+    width: 100%;
+    height: 500px;
+}
+</style>
 @endpush
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgHz-EG4_DQ&libraries=geometry"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
@@ -831,124 +836,78 @@ function attendanceApp() {
             // Show loading
             if (loadingElement) loadingElement.style.display = 'flex';
             if (errorElement) errorElement.style.display = 'none';
-            
-            if (this.map) {
-                this.map.remove();
-            }
 
             // Default center (Indonesia)
-            let center = [-7.5, 110.4];
+            let center = { lat: -7.5, lng: 110.4 };
             let zoom = 8;
 
             if (locations && locations.length > 0) {
-                center = [locations[0].lat, locations[0].lng];
+                center = { lat: locations[0].lat, lng: locations[0].lng };
                 zoom = 12;
             }
 
             try {
-                this.map = L.map('attendance-map').setView(center, zoom);
-                
-                // Try multiple tile providers for better reliability
-                const tileProviders = [
-                    {
-                        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        options: {
-                            attribution: '© OpenStreetMap contributors',
-                            maxZoom: 18,
-                            crossOrigin: true
+                // Initialize Google Map
+                this.map = new google.maps.Map(mapElement, {
+                    center: center,
+                    zoom: zoom,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    styles: [
+                        {
+                            featureType: "poi",
+                            elementType: "labels",
+                            stylers: [{ visibility: "off" }]
                         }
-                    },
-                    {
-                        url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-                        options: {
-                            attribution: '© Google Maps',
-                            maxZoom: 18,
-                            crossOrigin: true
-                        }
-                    },
-                    {
-                        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-                        options: {
-                            attribution: '© Esri',
-                            maxZoom: 18,
-                            crossOrigin: true
-                        }
-                    }
-                ];
+                    ]
+                });
 
-                // Try to load tiles with fallback
-                let tileLayer = null;
-                let providerIndex = 0;
-                let tilesLoaded = false;
-
-                const tryTileProvider = () => {
-                    if (providerIndex >= tileProviders.length) {
-                        console.error('All tile providers failed');
-                        if (loadingElement) loadingElement.style.display = 'none';
-                        if (errorElement) errorElement.style.display = 'flex';
-                        return;
-                    }
-
-                    const provider = tileProviders[providerIndex];
-                    tileLayer = L.tileLayer(provider.url, provider.options);
-                    
-                    let tilesLoadedCount = 0;
-                    let tilesErrorCount = 0;
-                    
-                    tileLayer.on('tileload', () => {
-                        tilesLoadedCount++;
-                        if (tilesLoadedCount >= 3 && !tilesLoaded) { // Wait for at least 3 tiles
-                            tilesLoaded = true;
-                            if (loadingElement) loadingElement.style.display = 'none';
-                        }
-                    });
-
-                    tileLayer.on('tileerror', () => {
-                        tilesErrorCount++;
-                        if (tilesErrorCount >= 5) { // Too many tile errors
-                            console.warn(`Tile provider ${providerIndex} has too many errors, trying next...`);
-                            if (tileLayer) {
-                                this.map.removeLayer(tileLayer);
-                            }
-                            providerIndex++;
-                            setTimeout(tryTileProvider, 500);
-                        }
-                    });
-
-                    tileLayer.addTo(this.map);
-                };
-
-                tryTileProvider();
-
-                // Hide loading after 3 seconds even if tiles haven't loaded
-                setTimeout(() => {
-                    if (loadingElement && loadingElement.style.display !== 'none') {
-                        loadingElement.style.display = 'none';
-                    }
-                }, 3000);
+                // Hide loading when map is ready
+                google.maps.event.addListenerOnce(this.map, 'idle', () => {
+                    if (loadingElement) loadingElement.style.display = 'none';
+                });
 
                 if (!locations || locations.length === 0) return;
 
+                const bounds = new google.maps.LatLngBounds();
+
                 locations.forEach(loc => {
+                    const position = { lat: loc.lat, lng: loc.lng };
+                    
                     // Circle for radius
-                    L.circle([loc.lat, loc.lng], {
-                        color: '#10b981',
+                    new google.maps.Circle({
+                        strokeColor: '#10b981',
+                        strokeOpacity: 0.8,
+                        strokeWeight: 2,
                         fillColor: '#10b981',
                         fillOpacity: 0.1,
+                        map: this.map,
+                        center: position,
                         radius: loc.radius
-                    }).addTo(this.map);
-
-                    // Marker
-                    const icon = L.divIcon({
-                        html: `<div style="width:40px;height:40px;background:linear-gradient(135deg,#10b981,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;box-shadow:0 4px 6px rgba(0,0,0,0.3);border:2px solid white;">${loc.today_count}</div>`,
-                        className: '',
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20]
                     });
 
-                    const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(this.map);
-                    
-                    // Popup content
+                    // Custom marker
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: this.map,
+                        icon: {
+                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="20" cy="20" r="18" fill="url(#grad)" stroke="white" stroke-width="2"/>
+                                    <text x="20" y="26" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${loc.today_count}</text>
+                                </svg>
+                            `),
+                            scaledSize: new google.maps.Size(40, 40),
+                            anchor: new google.maps.Point(20, 20)
+                        }
+                    });
+
+                    // Info window content
                     let staffList = loc.staff.map(s => 
                         `<div style="display:flex;justify-content:space-between;padding:4px 0;">
                             <span>${s.name}</span>
@@ -956,22 +915,30 @@ function attendanceApp() {
                         </div>`
                     ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
 
-                    marker.bindPopup(`
-                        <div style="min-width:200px">
-                            <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
-                            <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
-                            <div style="font-size:13px;">${staffList}</div>
-                        </div>
-                    `);
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div style="min-width:200px">
+                                <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
+                                <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
+                                <div style="font-size:13px;">${staffList}</div>
+                            </div>
+                        `
+                    });
+
+                    marker.addListener('click', () => {
+                        infoWindow.open(this.map, marker);
+                    });
+
+                    bounds.extend(position);
                 });
 
                 // Fit bounds if multiple locations
                 if (locations.length > 1) {
-                    const bounds = L.latLngBounds(locations.map(l => [l.lat, l.lng]));
-                    this.map.fitBounds(bounds, { padding: [50, 50] });
+                    this.map.fitBounds(bounds);
                 }
+
             } catch (error) {
-                console.error('Map initialization error:', error);
+                console.error('Google Maps initialization error:', error);
                 if (loadingElement) loadingElement.style.display = 'none';
                 if (errorElement) errorElement.style.display = 'flex';
             }
