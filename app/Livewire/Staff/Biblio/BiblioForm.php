@@ -344,8 +344,16 @@ class BiblioForm extends Component
     {
         if (strlen($this->subjectSearch) < 2) return;
         
-        $subject = Subject::create(['name' => $this->subjectSearch, 'type' => 'topic']);
-        $this->addSubject($subject->id, $subject->name);
+        try {
+            $subject = Subject::create([
+                'name' => $this->subjectSearch,
+                'classification' => null // Use classification instead of type
+            ]);
+            $this->addSubject($subject->id, $subject->name);
+            $this->subjectSearch = ''; // Clear search after creation
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal membuat subject: ' . $e->getMessage());
+        }
     }
 
     // Publisher Search (via API)
