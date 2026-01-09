@@ -17,7 +17,7 @@
                             </div>
                             <div>
                                 <h3 class="text-2xl font-bold">DDC - Dewey Decimal Classification</h3>
-                                <div class="text-blue-100 font-medium">Valid & SAH - Edition 23</div>
+                                <div class="text-blue-100 font-medium">✅ GUNAKAN DDC INI - VALID DAN SAH</div>
                                 <div class="text-blue-200 text-sm">4,715 Klasifikasi Tersedia</div>
                             </div>
                         </div>
@@ -126,8 +126,8 @@
                                             
                                             {{-- Description --}}
                                             <div class="flex-1 min-w-0">
-                                                <div class="text-gray-900 font-medium leading-relaxed" x-text="getMainDescription(ddc.description)"></div>
-                                                <div x-show="getAdditionalInfo(ddc.description)" class="text-sm text-gray-600 mt-2 leading-relaxed" x-text="getAdditionalInfo(ddc.description)"></div>
+                                                <div class="text-gray-900 font-medium leading-relaxed" x-html="highlightSearch(getMainDescription(ddc.description), search)"></div>
+                                                <div x-show="getAdditionalInfo(ddc.description)" class="text-sm text-gray-600 mt-2 leading-relaxed" x-html="highlightSearch(getAdditionalInfo(ddc.description), search)"></div>
                                                 <div x-show="getCrossReferences(ddc.description)" class="text-xs text-blue-600 mt-2 italic" x-text="getCrossReferences(ddc.description)"></div>
                                             </div>
                                             
@@ -341,6 +341,21 @@ function enhancedDdcModal() {
         
         isFavorite(code) {
             return this.favorites.some(f => f.code === code);
+        },
+        
+        // Highlight search terms
+        highlightSearch(text, searchTerm) {
+            if (!text || !searchTerm || searchTerm.length < 2) return text;
+            
+            const terms = searchTerm.toLowerCase().split(' ').filter(t => t.length >= 2);
+            let highlighted = text;
+            
+            terms.forEach(term => {
+                const regex = new RegExp(`(${term})`, 'gi');
+                highlighted = highlighted.replace(regex, '<mark class="bg-yellow-200 px-1 rounded font-semibold">$1</mark>');
+            });
+            
+            return highlighted;
         },
         
         // Initialize

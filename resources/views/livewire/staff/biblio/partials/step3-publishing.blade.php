@@ -127,6 +127,13 @@
             </span>
             Klasifikasi
         </h3>
+        <div class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+            <div class="flex items-center gap-2 text-blue-700">
+                <i class="fas fa-exclamation-triangle text-sm"></i>
+                <span class="text-sm font-semibold">WAJIB GUNAKAN e-DDC SYSTEM</span>
+            </div>
+            <p class="text-xs text-blue-600 mt-1">Gunakan tombol DDC untuk memilih klasifikasi yang valid dan sah</p>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">No. Klasifikasi (DDC) <span class="text-red-500">*</span></label>
