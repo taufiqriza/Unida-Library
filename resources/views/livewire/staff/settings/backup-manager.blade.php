@@ -177,242 +177,244 @@
         @endif
     </div>
 
-    {{-- Modern Create Backup Modal --}}
-    @if($showCreateModal)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
-                {{-- Header --}}
-                <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fas fa-plus-circle"></i>
-                            Buat Backup Baru
-                        </h3>
-                        <button wire:click="resetForm" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                {{-- Body --}}
-                <form wire:submit.prevent="createBackup" class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Backup</label>
-                        <input wire:model="backupName" type="text" 
-                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                               placeholder="Contoh: Backup Harian 09-01-2026">
-                        @error('backupName') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Backup</label>
-                        <div class="grid grid-cols-1 gap-3">
-                            <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50
-                                {{ $backupType === 'branch' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200' }}">
-                                <input wire:model.live="backupType" type="radio" value="branch" class="sr-only">
-                                <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center
-                                    {{ $backupType === 'branch' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300' }}">
-                                    @if($backupType === 'branch')
-                                        <div class="w-2 h-2 bg-white rounded-full"></div>
-                                    @endif
-                                </div>
-                                <div class="flex-1">
-                                    <div class="font-semibold text-gray-900">Backup Cabang</div>
-                                    <div class="text-sm text-gray-500">Data spesifik cabang (books, items, members)</div>
-                                </div>
-                            </label>
-                            
-                            @if(auth()->user()->role === 'super_admin')
-                                <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50
-                                    {{ $backupType === 'full' ? 'border-red-500 bg-red-50' : 'border-gray-200' }}">
-                                    <input wire:model.live="backupType" type="radio" value="full" class="sr-only">
-                                    <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center
-                                        {{ $backupType === 'full' ? 'border-red-500 bg-red-500' : 'border-gray-300' }}">
-                                        @if($backupType === 'full')
-                                            <div class="w-2 h-2 bg-white rounded-full"></div>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-semibold text-gray-900">Backup Lengkap</div>
-                                        <div class="text-sm text-gray-500">Semua data sistem dan cabang</div>
-                                    </div>
-                                </label>
-                                
-                                <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50
-                                    {{ $backupType === 'partial' ? 'border-green-500 bg-green-50' : 'border-gray-200' }}">
-                                    <input wire:model.live="backupType" type="radio" value="partial" class="sr-only">
-                                    <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center
-                                        {{ $backupType === 'partial' ? 'border-green-500 bg-green-500' : 'border-gray-300' }}">
-                                        @if($backupType === 'partial')
-                                            <div class="w-2 h-2 bg-white rounded-full"></div>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1">
-                                        <div class="font-semibold text-gray-900">Backup Sebagian</div>
-                                        <div class="text-sm text-gray-500">Data tertentu sesuai kebutuhan</div>
-                                    </div>
-                                </label>
-                            @endif
-                        </div>
-                    </div>
-
-                    @if($backupType === 'branch' && count($branches) > 1)
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Cabang</label>
-                            <select wire:model="selectedBranch" 
-                                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
-                                <option value="">Pilih Cabang</option>
-                                @foreach($branches as $branch)
-                                    <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('selectedBranch') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    @endif
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi (Opsional)</label>
-                        <textarea wire:model="description" rows="3"
-                                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                                  placeholder="Deskripsi backup..."></textarea>
-                    </div>
-
-                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                        <button type="button" wire:click="resetForm" 
-                                class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
-                            Batal
-                        </button>
-                        <button type="submit" :disabled="$wire.isCreating"
-                                class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center gap-2">
-                            <span wire:loading.remove wire:target="createBackup">
-                                <i class="fas fa-save"></i>
-                                Buat Backup
-                            </span>
-                            <span wire:loading wire:target="createBackup" class="flex items-center gap-2">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Membuat...
-                            </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    @endif
-
-    {{-- Modern Detail Modal --}}
-    @if($showDetailModal && $selectedBackup)
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden">
-                {{-- Header --}}
-                <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-bold flex items-center gap-2">
-                            <i class="fas fa-info-circle"></i>
-                            Detail Backup: {{ $selectedBackup->name }}
-                        </h3>
-                        <button wire:click="$set('showDetailModal', false)" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                {{-- Body --}}
-                <div class="p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {{-- General Info --}}
-                        <div class="space-y-4">
-                            <div class="bg-gray-50 rounded-xl p-4">
-                                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <i class="fas fa-info text-blue-600"></i>
-                                    Informasi Umum
-                                </h4>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Tipe:</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
-                                            {{ $selectedBackup->type === 'full' ? 'bg-red-100 text-red-700' : 
-                                               ($selectedBackup->type === 'branch' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') }}">
-                                            {{ ucfirst($selectedBackup->type) }}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Cabang:</span>
-                                        <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->branch?->name ?? 'Semua' }}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Status:</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $selectedBackup->status_badge }}">
-                                            {{ ucfirst($selectedBackup->status) }}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Ukuran:</span>
-                                        <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->formatted_size }}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Dibuat:</span>
-                                        <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->created_at->format('d/m/Y H:i') }}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-gray-600">Oleh:</span>
-                                        <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->creator->name }}</span>
-                                    </div>
-                                </div>
+    {{-- Modals teleported to body for proper z-index --}}
+    <template x-teleport="body">
+        <div style="position: relative; z-index: 99999;">
+            {{-- Modern Create Backup Modal --}}
+            @if($showCreateModal)
+                <div class="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4" x-data x-transition>
+                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" @click.stop>
+                        {{-- Header --}}
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Buat Backup Baru
+                                </h3>
+                                <button wire:click="resetForm" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                         
-                        {{-- Data Breakdown --}}
-                        <div class="space-y-4">
-                            <div class="bg-gray-50 rounded-xl p-4">
-                                <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <i class="fas fa-database text-green-600"></i>
-                                    Data yang Dibackup
-                                </h4>
-                                <div class="space-y-3">
-                                    @foreach($selectedBackup->data_counts as $table => $count)
-                                        <div class="flex justify-between items-center">
-                                            <span class="text-sm text-gray-600 capitalize">{{ str_replace('_', ' ', $table) }}:</span>
-                                            <span class="text-sm font-medium text-gray-900">{{ number_format($count) }} records</span>
+                        {{-- Body --}}
+                        <form wire:submit.prevent="createBackup" class="p-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Backup</label>
+                                <input wire:model.defer="backupName" type="text" 
+                                       class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                                       placeholder="Contoh: Backup Harian 09-01-2026">
+                                @error('backupName') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe Backup</label>
+                                <div class="grid grid-cols-1 gap-3" x-data="{ backupType: @entangle('backupType').defer }">
+                                    <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
+                                           :class="backupType === 'branch' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'"
+                                           @click="backupType = 'branch'">
+                                        <input type="radio" value="branch" class="sr-only" x-model="backupType">
+                                        <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center"
+                                             :class="backupType === 'branch' ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300'">
+                                            <div class="w-2 h-2 bg-white rounded-full" x-show="backupType === 'branch'"></div>
                                         </div>
-                                    @endforeach
-                                    <div class="border-t border-gray-200 pt-3 mt-3">
-                                        <div class="flex justify-between items-center font-semibold">
-                                            <span class="text-sm text-gray-900">Total Records:</span>
-                                            <span class="text-sm text-gray-900">{{ number_format($selectedBackup->total_records) }}</span>
+                                        <div class="flex-1">
+                                            <div class="font-semibold text-gray-900">Backup Cabang</div>
+                                            <div class="text-sm text-gray-500">Data spesifik cabang (books, items, members)</div>
+                                        </div>
+                                    </label>
+                                    
+                                    @if(auth()->user()->role === 'super_admin')
+                                        <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
+                                               :class="backupType === 'full' ? 'border-red-500 bg-red-50' : 'border-gray-200'"
+                                               @click="backupType = 'full'">
+                                            <input type="radio" value="full" class="sr-only" x-model="backupType">
+                                            <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center"
+                                                 :class="backupType === 'full' ? 'border-red-500 bg-red-500' : 'border-gray-300'">
+                                                <div class="w-2 h-2 bg-white rounded-full" x-show="backupType === 'full'"></div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="font-semibold text-gray-900">Backup Lengkap</div>
+                                                <div class="text-sm text-gray-500">Semua data sistem dan cabang</div>
+                                            </div>
+                                        </label>
+                                        
+                                        <label class="flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all hover:bg-gray-50"
+                                               :class="backupType === 'partial' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+                                               @click="backupType = 'partial'">
+                                            <input type="radio" value="partial" class="sr-only" x-model="backupType">
+                                            <div class="w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center"
+                                                 :class="backupType === 'partial' ? 'border-green-500 bg-green-500' : 'border-gray-300'">
+                                                <div class="w-2 h-2 bg-white rounded-full" x-show="backupType === 'partial'"></div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="font-semibold text-gray-900">Backup Sebagian</div>
+                                                <div class="text-sm text-gray-500">Data tertentu sesuai kebutuhan</div>
+                                            </div>
+                                        </label>
+                                    @endif
+                                </div>
+                            </div>
+
+                            @if($backupType === 'branch' && count($branches) > 1)
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Cabang</label>
+                                    <select wire:model.defer="selectedBranch" 
+                                            class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                                        <option value="">Pilih Cabang</option>
+                                        @foreach($branches as $branch)
+                                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('selectedBranch') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            @endif
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi (Opsional)</label>
+                                <textarea wire:model.defer="description" rows="3"
+                                          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+                                          placeholder="Deskripsi backup..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                                <button type="button" wire:click="resetForm" 
+                                        class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                                    Batal
+                                </button>
+                                <button type="submit" wire:loading.attr="disabled"
+                                        class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center gap-2">
+                                    <span wire:loading.remove wire:target="createBackup">
+                                        <i class="fas fa-save"></i>
+                                        Buat Backup
+                                    </span>
+                                    <span wire:loading wire:target="createBackup" class="flex items-center gap-2">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Membuat...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Modern Detail Modal --}}
+            @if($showDetailModal && $selectedBackup)
+                <div class="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center p-4" x-data x-transition>
+                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden" @click.stop>
+                        {{-- Header --}}
+                        <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-bold flex items-center gap-2">
+                                    <i class="fas fa-info-circle"></i>
+                                    Detail Backup: {{ $selectedBackup->name }}
+                                </h3>
+                                <button wire:click="$set('showDetailModal', false)" class="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {{-- Body --}}
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {{-- General Info --}}
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 rounded-xl p-4">
+                                        <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-info text-blue-600"></i>
+                                            Informasi Umum
+                                        </h4>
+                                        <div class="space-y-3">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Tipe:</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                                    {{ $selectedBackup->type === 'full' ? 'bg-red-100 text-red-700' : 
+                                                       ($selectedBackup->type === 'branch' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') }}">
+                                                    {{ ucfirst($selectedBackup->type) }}
+                                                </span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Cabang:</span>
+                                                <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->branch?->name ?? 'Semua' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Status:</span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $selectedBackup->status_badge }}">
+                                                    {{ ucfirst($selectedBackup->status) }}
+                                                </span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Ukuran:</span>
+                                                <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->formatted_size }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Dibuat:</span>
+                                                <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->created_at->format('d/m/Y H:i') }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm text-gray-600">Oleh:</span>
+                                                <span class="text-sm font-medium text-gray-900">{{ $selectedBackup->creator->name }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {{-- Data Breakdown --}}
+                                <div class="space-y-4">
+                                    <div class="bg-gray-50 rounded-xl p-4">
+                                        <h4 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-database text-green-600"></i>
+                                            Data yang Dibackup
+                                        </h4>
+                                        <div class="space-y-3">
+                                            @foreach($selectedBackup->data_counts as $table => $count)
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-sm text-gray-600 capitalize">{{ str_replace('_', ' ', $table) }}:</span>
+                                                    <span class="text-sm font-medium text-gray-900">{{ number_format($count) }} records</span>
+                                                </div>
+                                            @endforeach
+                                            <div class="border-t border-gray-200 pt-3 mt-3">
+                                                <div class="flex justify-between items-center font-semibold">
+                                                    <span class="text-sm text-gray-900">Total Records:</span>
+                                                    <span class="text-sm text-gray-900">{{ number_format($selectedBackup->total_records) }}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    @if($selectedBackup->description)
-                        <div class="mt-6">
-                            <div class="bg-blue-50 rounded-xl p-4">
-                                <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                    <i class="fas fa-comment text-blue-600"></i>
-                                    Deskripsi
-                                </h4>
-                                <p class="text-sm text-gray-700">{{ $selectedBackup->description }}</p>
+                            @if($selectedBackup->description)
+                                <div class="mt-6">
+                                    <div class="bg-blue-50 rounded-xl p-4">
+                                        <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                            <i class="fas fa-comment text-blue-600"></i>
+                                            Deskripsi
+                                        </h4>
+                                        <p class="text-sm text-gray-700">{{ $selectedBackup->description }}</p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Actions --}}
+                            <div class="mt-6 flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                                @if($selectedBackup->status === 'completed')
+                                    <button class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl transition-all duration-200 flex items-center gap-2">
+                                        <i class="fas fa-undo"></i>
+                                        Restore Backup
+                                    </button>
+                                @endif
+                                <button wire:click="$set('showDetailModal', false)" 
+                                        class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                                    Tutup
+                                </button>
                             </div>
                         </div>
-                    @endif
-
-                    {{-- Actions --}}
-                    <div class="mt-6 flex justify-end space-x-3 pt-4 border-t border-gray-100">
-                        @if($selectedBackup->status === 'completed')
-                            <button class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl transition-all duration-200 flex items-center gap-2">
-                                <i class="fas fa-undo"></i>
-                                Restore Backup
-                            </button>
-                        @endif
-                        <button wire:click="$set('showDetailModal', false)" 
-                                class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
-                            Tutup
-                        </button>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
-    @endif
+    </template>
 </div>
