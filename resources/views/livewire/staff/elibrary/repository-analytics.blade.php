@@ -11,11 +11,15 @@
             </div>
         </div>
         <div class="flex gap-2">
-            <button wire:click="testGoogleScholar" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
-                <i class="fas fa-vial"></i> Test Crawler Access
+            <button wire:click="testGoogleScholar" wire:loading.attr="disabled" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50">
+                <i class="fas fa-vial" wire:loading.class="fa-spin" wire:target="testGoogleScholar"></i> 
+                <span wire:loading.remove wire:target="testGoogleScholar">Test Crawler Access</span>
+                <span wire:loading wire:target="testGoogleScholar">Testing...</span>
             </button>
-            <button wire:click="generateSitemap" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 flex items-center gap-2">
-                <i class="fas fa-sitemap"></i> Generate Sitemap
+            <button wire:click="generateSitemap" wire:loading.attr="disabled" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 flex items-center gap-2 disabled:opacity-50">
+                <i class="fas fa-sitemap" wire:loading.class="fa-spin" wire:target="generateSitemap"></i>
+                <span wire:loading.remove wire:target="generateSitemap">Generate Sitemap</span>
+                <span wire:loading wire:target="generateSitemap">Generating...</span>
             </button>
         </div>
     </div>
@@ -199,15 +203,18 @@
                 </div>
             </a>
             
-            <a href="https://scholar.google.com" target="_blank" class="flex items-center gap-3 p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition">
-                <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <i class="fab fa-google text-white"></i>
+            <button wire:click="processFullText" wire:loading.attr="disabled" class="flex items-center gap-3 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition disabled:opacity-50">
+                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-text text-white" wire:loading.class="fa-spin" wire:target="processFullText"></i>
                 </div>
                 <div>
-                    <p class="font-semibold text-gray-900">Google Scholar</p>
-                    <p class="text-xs text-orange-600">Check indexing status</p>
+                    <p class="font-semibold text-gray-900">
+                        <span wire:loading.remove wire:target="processFullText">Process Full-Text</span>
+                        <span wire:loading wire:target="processFullText">Processing...</span>
+                    </p>
+                    <p class="text-xs text-purple-600">Extract PDF content for search</p>
                 </div>
-            </a>
+            </button>
         </div>
     </div>
 </div>
