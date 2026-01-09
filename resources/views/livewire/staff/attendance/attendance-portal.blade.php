@@ -704,7 +704,17 @@
 @endpush
 
 @push('scripts')
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgHz-EG4_DQ&libraries=geometry"></script>
+<script>
+// Global callback for Google Maps
+window.initGoogleMaps = function() {
+    console.log('Google Maps API loaded successfully');
+    // Trigger map initialization if Alpine is ready
+    if (window.Alpine && window.Alpine.store) {
+        document.dispatchEvent(new CustomEvent('google-maps-loaded'));
+    }
+};
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgHz-EG4_DQ&libraries=geometry&callback=initGoogleMaps" async defer></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
@@ -837,111 +847,123 @@ function attendanceApp() {
             if (loadingElement) loadingElement.style.display = 'flex';
             if (errorElement) errorElement.style.display = 'none';
 
-            // Default center (Indonesia)
-            let center = { lat: -7.5, lng: 110.4 };
-            let zoom = 8;
-
-            if (locations && locations.length > 0) {
-                center = { lat: locations[0].lat, lng: locations[0].lng };
-                zoom = 12;
-            }
-
-            try {
-                // Initialize Google Map
-                this.map = new google.maps.Map(mapElement, {
-                    center: center,
-                    zoom: zoom,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP,
-                    styles: [
-                        {
-                            featureType: "poi",
-                            elementType: "labels",
-                            stylers: [{ visibility: "off" }]
-                        }
-                    ]
-                });
-
-                // Hide loading when map is ready
-                google.maps.event.addListenerOnce(this.map, 'idle', () => {
-                    if (loadingElement) loadingElement.style.display = 'none';
-                });
-
-                if (!locations || locations.length === 0) return;
-
-                const bounds = new google.maps.LatLngBounds();
-
-                locations.forEach(loc => {
-                    const position = { lat: loc.lat, lng: loc.lng };
-                    
-                    // Circle for radius
-                    new google.maps.Circle({
-                        strokeColor: '#10b981',
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: '#10b981',
-                        fillOpacity: 0.1,
-                        map: this.map,
-                        center: position,
-                        radius: loc.radius
-                    });
-
-                    // Custom marker
-                    const marker = new google.maps.Marker({
-                        position: position,
-                        map: this.map,
-                        icon: {
-                            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                                <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <circle cx="20" cy="20" r="18" fill="url(#grad)" stroke="white" stroke-width="2"/>
-                                    <text x="20" y="26" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${loc.today_count}</text>
-                                </svg>
-                            `),
-                            scaledSize: new google.maps.Size(40, 40),
-                            anchor: new google.maps.Point(20, 20)
-                        }
-                    });
-
-                    // Info window content
-                    let staffList = loc.staff.map(s => 
-                        `<div style="display:flex;justify-content:space-between;padding:4px 0;">
-                            <span>${s.name}</span>
-                            <span style="color:${s.is_late ? '#d97706' : '#10b981'}">${s.time}</span>
-                        </div>`
-                    ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
-
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="min-width:200px">
-                                <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
-                                <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
-                                <div style="font-size:13px;">${staffList}</div>
-                            </div>
-                        `
-                    });
-
-                    marker.addListener('click', () => {
-                        infoWindow.open(this.map, marker);
-                    });
-
-                    bounds.extend(position);
-                });
-
-                // Fit bounds if multiple locations
-                if (locations.length > 1) {
-                    this.map.fitBounds(bounds);
+            // Wait for Google Maps API to load
+            const initializeMap = () => {
+                if (typeof google === 'undefined' || !google.maps) {
+                    console.log('Waiting for Google Maps API...');
+                    setTimeout(initializeMap, 100);
+                    return;
                 }
 
-            } catch (error) {
-                console.error('Google Maps initialization error:', error);
-                if (loadingElement) loadingElement.style.display = 'none';
-                if (errorElement) errorElement.style.display = 'flex';
-            }
+                // Default center (Indonesia)
+                let center = { lat: -7.5, lng: 110.4 };
+                let zoom = 8;
+
+                if (locations && locations.length > 0) {
+                    center = { lat: locations[0].lat, lng: locations[0].lng };
+                    zoom = 12;
+                }
+
+                try {
+                    // Initialize Google Map
+                    this.map = new google.maps.Map(mapElement, {
+                        center: center,
+                        zoom: zoom,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        styles: [
+                            {
+                                featureType: "poi",
+                                elementType: "labels",
+                                stylers: [{ visibility: "off" }]
+                            }
+                        ]
+                    });
+
+                    // Hide loading when map is ready
+                    google.maps.event.addListenerOnce(this.map, 'idle', () => {
+                        if (loadingElement) loadingElement.style.display = 'none';
+                    });
+
+                    if (!locations || locations.length === 0) return;
+
+                    const bounds = new google.maps.LatLngBounds();
+
+                    locations.forEach(loc => {
+                        const position = { lat: loc.lat, lng: loc.lng };
+                        
+                        // Circle for radius
+                        new google.maps.Circle({
+                            strokeColor: '#10b981',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 2,
+                            fillColor: '#10b981',
+                            fillOpacity: 0.1,
+                            map: this.map,
+                            center: position,
+                            radius: loc.radius
+                        });
+
+                        // Custom marker
+                        const marker = new google.maps.Marker({
+                            position: position,
+                            map: this.map,
+                            icon: {
+                                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="20" cy="20" r="18" fill="url(#grad)" stroke="white" stroke-width="2"/>
+                                        <text x="20" y="26" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">${loc.today_count}</text>
+                                    </svg>
+                                `),
+                                scaledSize: new google.maps.Size(40, 40),
+                                anchor: new google.maps.Point(20, 20)
+                            }
+                        });
+
+                        // Info window content
+                        let staffList = loc.staff.map(s => 
+                            `<div style="display:flex;justify-content:space-between;padding:4px 0;">
+                                <span>${s.name}</span>
+                                <span style="color:${s.is_late ? '#d97706' : '#10b981'}">${s.time}</span>
+                            </div>`
+                        ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
+
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `
+                                <div style="min-width:200px">
+                                    <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
+                                    <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
+                                    <div style="font-size:13px;">${staffList}</div>
+                                </div>
+                            `
+                        });
+
+                        marker.addListener('click', () => {
+                            infoWindow.open(this.map, marker);
+                        });
+
+                        bounds.extend(position);
+                    });
+
+                    // Fit bounds if multiple locations
+                    if (locations.length > 1) {
+                        this.map.fitBounds(bounds);
+                    }
+
+                } catch (error) {
+                    console.error('Google Maps initialization error:', error);
+                    if (loadingElement) loadingElement.style.display = 'none';
+                    if (errorElement) errorElement.style.display = 'flex';
+                }
+            };
+
+            // Start initialization
+            initializeMap();
         }
     }
 }

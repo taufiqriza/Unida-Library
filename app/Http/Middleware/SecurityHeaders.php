@@ -108,7 +108,9 @@ class SecurityHeaders
                 "https://accounts.google.com " .
                 "https://cdn.tailwindcss.com " .
                 "https://www.googletagmanager.com " .
-                "https://www.google-analytics.com",
+                "https://www.google-analytics.com " .
+                "https://maps.googleapis.com " .
+                "https://maps.gstatic.com",
             
             // Styles: self + Google Fonts + inline for Tailwind
             "style-src 'self' 'unsafe-inline' " .
@@ -137,6 +139,8 @@ class SecurityHeaders
                 "https://accounts.google.com " .
                 "https://www.google-analytics.com " .
                 "https://region1.google-analytics.com " .
+                "https://maps.googleapis.com " .
+                "https://maps.gstatic.com " .
                 "wss: ws:",
             
             // Frames: Google OAuth, YouTube, embedded content, blob for PDF
