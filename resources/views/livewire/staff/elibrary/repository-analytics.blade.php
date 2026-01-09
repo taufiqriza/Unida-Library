@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data="{ showAlert: false, alertType: '', alertMessage: '' }" 
+<div class="max-w-7xl mx-auto px-4 lg:px-6 space-y-6" x-data="{ showAlert: false, alertType: '', alertMessage: '' }" 
      @alert.window="showAlert = true; alertType = $event.detail[0].type; alertMessage = $event.detail[0].message; setTimeout(() => showAlert = false, 5000)">
     
     {{-- Alert --}}
@@ -27,31 +27,33 @@
             </div>
         </div>
     </div>
-    {{-- Header --}}
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                <i class="fas fa-search-plus text-2xl"></i>
+
+    {{-- Modern Header Card --}}
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 lg:p-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                    <i class="fas fa-search-plus text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl lg:text-3xl font-bold text-gray-900">Repository Analytics</h1>
+                    <p class="text-gray-600 mt-1">Monitor indexing & discoverability status</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Repository Analytics</h1>
-                <p class="text-sm text-gray-500">Monitor indexing & discoverability status</p>
+            <div class="flex gap-3">
+                <button wire:click="testGoogleScholar" wire:loading.attr="disabled" class="px-5 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 shadow-sm hover:shadow-md transition-all">
+                    <i class="fas fa-vial" wire:loading.class="fa-spin" wire:target="testGoogleScholar"></i> 
+                    <span wire:loading.remove wire:target="testGoogleScholar">Test Crawler Access</span>
+                    <span wire:loading wire:target="testGoogleScholar">Testing...</span>
+                </button>
+                <button wire:click="generateSitemap" wire:loading.attr="disabled" class="px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 flex items-center gap-2 disabled:opacity-50 shadow-sm hover:shadow-md transition-all">
+                    <i class="fas fa-sitemap" wire:loading.class="fa-spin" wire:target="generateSitemap"></i>
+                    <span wire:loading.remove wire:target="generateSitemap">Generate Sitemap</span>
+                    <span wire:loading wire:target="generateSitemap">Generating...</span>
+                </button>
             </div>
-        </div>
-        <div class="flex gap-2">
-            <button wire:click="testGoogleScholar" wire:loading.attr="disabled" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50">
-                <i class="fas fa-vial" wire:loading.class="fa-spin" wire:target="testGoogleScholar"></i> 
-                <span wire:loading.remove wire:target="testGoogleScholar">Test Crawler Access</span>
-                <span wire:loading wire:target="testGoogleScholar">Testing...</span>
-            </button>
-            <button wire:click="generateSitemap" wire:loading.attr="disabled" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 flex items-center gap-2 disabled:opacity-50">
-                <i class="fas fa-sitemap" wire:loading.class="fa-spin" wire:target="generateSitemap"></i>
-                <span wire:loading.remove wire:target="generateSitemap">Generate Sitemap</span>
-                <span wire:loading wire:target="generateSitemap">Generating...</span>
-            </button>
         </div>
     </div>
-
     {{-- Indexing Stats --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
