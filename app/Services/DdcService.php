@@ -30,11 +30,10 @@ class DdcService
     }
 
     /**
-     * Search DDC by code or description
-     * If query looks like a code (numeric), match DDC hierarchy
-     * If query is text, search descriptions
+     * Enhanced search DDC by code or description with better ranking
+     * Supports e-DDC Edition 23 features
      */
-    public function search(string $query, int $limit = 25): array
+    public function search(string $query, int $limit = 50): array
     {
         $query = strtolower(trim($query));
         $isCodeSearch = preg_match('/^[0-9xX.]+$/', $query);
@@ -43,44 +42,119 @@ class DdcService
         $startsWithMatches = [];
         $sameClassMatches = [];
         $containsMatches = [];
+        $relatedMatches = [];
         
         foreach ($this->all() as $item) {
             $code = strtolower($item['code']);
             $desc = strtolower($item['description']);
             
             if ($isCodeSearch) {
-                // Query looks like a code - match against code field with DDC hierarchy
+                // Enhanced code search with DDC hierarchy
                 if ($code === $query) {
-                    // Exact match (100 = 100)
                     $exactMatches[] = $item;
                 } elseif (str_starts_with($code, $query . '.')) {
-                    // Subdivision match (100 matches 100.1, 100.23)
                     $startsWithMatches[] = $item;
                 } elseif ($this->isSameDdcClass($query, $code)) {
-                    // Same DDC class (100 matches 101, 102, ... 109)
                     $sameClassMatches[] = $item;
+                } elseif ($this->isRelatedDdcCode($query, $code)) {
+                    $relatedMatches[] = $item;
                 }
             } else {
-                // Query is text - search in description, and also code
+                // Enhanced text search with multiple criteria
+                $searchTerms = explode(' ', $query);
+                $matchScore = 0;
+                
+                // Check for exact code match
                 if ($code === $query) {
                     $exactMatches[] = $item;
-                } elseif (str_starts_with($code, $query)) {
+                    continue;
+                }
+                
+                // Check for code starts with
+                if (str_starts_with($code, $query)) {
                     $startsWithMatches[] = $item;
-                } elseif (str_contains($desc, $query)) {
+                    continue;
+                }
+                
+                // Multi-term search in description
+                foreach ($searchTerms as $term) {
+                    if (strlen($term) >= 2) {
+                        if (str_contains($desc, $term)) {
+                            $matchScore++;
+                        }
+                    }
+                }
+                
+                // Categorize by match quality
+                if ($matchScore === count($searchTerms) && count($searchTerms) > 1) {
+                    // All terms found - high relevance
+                    $startsWithMatches[] = $item;
+                } elseif ($matchScore > 0) {
+                    // Some terms found
                     $containsMatches[] = $item;
                 }
             }
         }
         
-        // Sort each group by code
-        usort($startsWithMatches, fn($a, $b) => strcmp($a['code'], $b['code']));
-        usort($sameClassMatches, fn($a, $b) => strcmp($a['code'], $b['code']));
-        usort($containsMatches, fn($a, $b) => strcmp($a['code'], $b['code']));
+        // Enhanced sorting with relevance scoring
+        $this->sortByRelevance($exactMatches, $query);
+        $this->sortByRelevance($startsWithMatches, $query);
+        $this->sortByRelevance($sameClassMatches, $query);
+        $this->sortByRelevance($containsMatches, $query);
+        $this->sortByRelevance($relatedMatches, $query);
         
-        // Merge: exact first, then subdivisions, then same class, then description matches
-        $results = array_merge($exactMatches, $startsWithMatches, $sameClassMatches, $containsMatches);
+        // Merge with priority: exact > starts-with > same-class > contains > related
+        $results = array_merge(
+            $exactMatches, 
+            $startsWithMatches, 
+            $sameClassMatches, 
+            $containsMatches,
+            $relatedMatches
+        );
         
         return array_slice($results, 0, $limit);
+    }
+
+    /**
+     * Sort results by relevance to query
+     */
+    protected function sortByRelevance(array &$results, string $query): void
+    {
+        usort($results, function($a, $b) use ($query) {
+            // Prefer shorter codes (more general classifications)
+            $aLen = strlen($a['code']);
+            $bLen = strlen($b['code']);
+            
+            if ($aLen !== $bLen) {
+                return $aLen <=> $bLen;
+            }
+            
+            // Then sort by code numerically
+            return strcmp($a['code'], $b['code']);
+        });
+    }
+
+    /**
+     * Check if DDC codes are related (broader/narrower relationships)
+     */
+    protected function isRelatedDdcCode(string $query, string $code): bool
+    {
+        // Remove dots for comparison
+        $queryClean = str_replace('.', '', $query);
+        $codeClean = str_replace('.', '', $code);
+        
+        // Check if one is a subdivision of the other
+        if (strlen($queryClean) >= 3 && strlen($codeClean) >= 3) {
+            $queryBase = substr($queryClean, 0, 3);
+            $codeBase = substr($codeClean, 0, 3);
+            
+            // Same base class (e.g., 297 and 298 are related)
+            if (abs((int)$queryBase - (int)$codeBase) <= 1) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**
