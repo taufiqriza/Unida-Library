@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Heyitsmi\ContentGuard\Facades\ContentGuard;
+use Heyitsmi\ContentGuard\Facades\ContentGuard as ContentGuardFacade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
@@ -29,7 +29,7 @@ class ContentFilterService
         
         return Cache::remember($cacheKey, $this->cacheMinutes, function () use ($content) {
             try {
-                return ContentGuard::hasBadWords($content);
+                return ContentGuardFacade::hasBadWords($content);
             } catch (\Exception $e) {
                 Log::warning('ContentGuard check failed', [
                     'error' => $e->getMessage(),
@@ -50,7 +50,7 @@ class ContentFilterService
         }
 
         try {
-            return ContentGuard::sanitize($content);
+            return ContentGuardFacade::sanitize($content);
         } catch (\Exception $e) {
             Log::warning('ContentGuard sanitize failed', [
                 'error' => $e->getMessage(),

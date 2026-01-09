@@ -5,9 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Heyitsmi\ContentGuard\Facades\ContentGuard;
-
-use Heyitsmi\ContentGuard\Facades\ContentGuard;
+use Heyitsmi\ContentGuard\Facades\ContentGuard as ContentGuardFacade;
 
 /**
  * Content Security Filter Middleware
@@ -95,12 +93,12 @@ class ContentSecurityFilter
         foreach ($allInput as $key => $value) {
             if (is_string($value) && $this->shouldScanField($key) && strlen($value) > 3) {
                 try {
-                    if (ContentGuard::hasBadWords($value)) {
+                    if (ContentGuardFacade::hasBadWords($value)) {
                         $violations[] = [
                             'field' => $key,
                             'length' => strlen($value),
                             'sample' => substr($value, 0, 50) . (strlen($value) > 50 ? '...' : ''),
-                            'cleaned_sample' => substr(ContentGuard::sanitize($value), 0, 50)
+                            'cleaned_sample' => substr(ContentGuardFacade::sanitize($value), 0, 50)
                         ];
                     }
                 } catch (\Exception $e) {
