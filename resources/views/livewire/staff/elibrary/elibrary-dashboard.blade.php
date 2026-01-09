@@ -144,7 +144,7 @@
             @livewire('staff.elibrary.repository-analytics')
         @endif
 
-        @if($data->hasPages())
+        @if(isset($data) && method_exists($data, 'hasPages') && $data->hasPages())
         <div class="p-4 border-t border-gray-100 bg-gray-50">{{ $data->links() }}</div>
         @endif
     </div>

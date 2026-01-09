@@ -5,6 +5,8 @@ namespace App\Livewire\Staff\Elibrary;
 use App\Models\Ethesis;
 use Livewire\Component;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use App\Services\FullTextExtractionService;
 use App\Http\Controllers\SitemapController;
 
 class RepositoryAnalytics extends Component

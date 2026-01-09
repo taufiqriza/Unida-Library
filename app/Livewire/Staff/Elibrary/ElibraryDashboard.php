@@ -436,6 +436,9 @@ class ElibraryDashboard extends Component
             }
             
             $data = $query->latest()->paginate(10);
+        } elseif ($this->activeTab === 'analytics') {
+            // Analytics tab doesn't need paginated data
+            $data = collect();
         }
 
         return view('livewire.staff.elibrary.elibrary-dashboard', [
