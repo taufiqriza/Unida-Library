@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12189735d90a405e07d32a509ead4b7e",
+    "content-hash": "48a9783366e8204fa0605817a8844458",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3388,6 +3388,69 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "heyitsmi/content-guard",
+            "version": "v1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/heyitsmi/content-guard.git",
+                "reference": "c75ad3452a0c8366e663566221a58c5bdf74f748"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/heyitsmi/content-guard/zipball/c75ad3452a0c8366e663566221a58c5bdf74f748",
+                "reference": "c75ad3452a0c8366e663566221a58c5bdf74f748",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.8",
+                "phpunit/phpunit": "^12.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "ContentGuard": "Heyitsmi\\ContentGuard\\Facades\\ContentGuard"
+                    },
+                    "providers": [
+                        "Heyitsmi\\ContentGuard\\ContentGuardServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Heyitsmi\\ContentGuard\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hilmi",
+                    "email": "hilmi.workspace@gmail.com"
+                }
+            ],
+            "description": "A content sanitization library to filter negative content and online gambling spam.",
+            "keywords": [
+                "content-moderation",
+                "filter",
+                "indonesia",
+                "judi-online",
+                "laravel",
+                "php",
+                "spam-detection"
+            ],
+            "support": {
+                "issues": "https://github.com/heyitsmi/content-guard/issues",
+                "source": "https://github.com/heyitsmi/content-guard/tree/v1.1.0"
+            },
+            "time": "2026-01-08T06:44:53+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",

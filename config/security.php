@@ -72,10 +72,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Content Filtering
+    |--------------------------------------------------------------------------
+    |
+    | ContentGuard integration settings for spam and profanity filtering.
+    |
+    */
+    'content_filter_enabled' => env('CONTENT_FILTER_ENABLED', true),
+    'content_filter_strict' => env('CONTENT_FILTER_STRICT', false),
+    'content_filter_mask_char' => env('CONTENT_FILTER_MASK', '*'),
+    
+    /*
+    |--------------------------------------------------------------------------
     | Logging & Audit
     |--------------------------------------------------------------------------
     */
     'log_auth_events' => env('LOG_AUTH_EVENTS', true),
     'log_admin_actions' => env('LOG_ADMIN_ACTIONS', true),
     'log_file_access' => env('LOG_FILE_ACCESS', false),
+    'log_content_violations' => env('LOG_CONTENT_VIOLATIONS', true),
 ];

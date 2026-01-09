@@ -22,7 +22,9 @@ class SecurityScan extends Command
         'preg_replace.*\/e' => 'Dangerous preg_replace with /e modifier',
         'assert\s*\(' => 'Assert function (potential code execution)',
         'create_function\s*\(' => 'Create function (deprecated, dangerous)',
-        'slot\s*gacor|judi\s*online|togel|sbobet' => 'Gambling content detected',
+        // Enhanced with ContentGuard patterns
+        'slot\s*gacor|judi\s*online|togel|sbobet|g4c0r|s\.l\.o\.t' => 'Gambling/spam content detected',
+        'b[o0]k[e3]p|t[o0]g[e3]l|sl[o0]t|g[a4]c[o0]r' => 'Masked gambling terms',
     ];
 
     // Files/patterns to exclude from scanning (known safe)

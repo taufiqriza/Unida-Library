@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Security middleware - applied globally
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(\App\Http\Middleware\ContentSecurityFilter::class);
         $middleware->append(\App\Http\Middleware\BlockSuspiciousUserAgents::class);
         
         // Web group middleware

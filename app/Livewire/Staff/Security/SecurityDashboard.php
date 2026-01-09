@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+use App\Services\ContentFilterService;
+
 class SecurityDashboard extends Component
 {
     public array $stats = [];
     public array $recentLogs = [];
     public array $blockedIps = [];
     public array $failedLogins = [];
+    public array $contentStats = [];
     public string $scanResult = '';
     public bool $isScanning = false;
 
@@ -21,12 +24,16 @@ class SecurityDashboard extends Component
         $this->loadStats();
         $this->loadRecentLogs();
         $this->loadFailedLogins();
+        $this->loadContentStats();
     }
 
     public function loadStats()
     {
         $logPath = storage_path('logs/laravel.log');
+        $securityLogPath = storage_path('logs/security.log');
+        
         $logContent = File::exists($logPath) ? File::get($logPath) : '';
+        $securityContent = File::exists($securityLogPath) ? File::get($securityLogPath) : '';
         
         $this->stats = [
             'blocked_requests' => substr_count($logContent, 'Blocked suspicious content'),
@@ -34,6 +41,8 @@ class SecurityDashboard extends Component
             'honeypot_triggered' => substr_count($logContent, 'Honeypot triggered'),
             'suspicious_agents' => substr_count($logContent, 'Suspicious user agent'),
             'failed_logins' => $this->countFailedLogins(),
+            'content_violations' => substr_count($securityContent, 'Content filter violation'),
+            'spam_blocked' => substr_count($securityContent, 'Gambling/spam content'),
             'last_scan' => $this->getLastScanTime(),
         ];
     }
@@ -167,6 +176,12 @@ class SecurityDashboard extends Component
         }
         $this->loadStats();
         $this->loadRecentLogs();
+    }
+
+    public function loadContentStats()
+    {
+        $contentService = app(ContentFilterService::class);
+        $this->contentStats = $contentService->getStats();
     }
 
     public function render()

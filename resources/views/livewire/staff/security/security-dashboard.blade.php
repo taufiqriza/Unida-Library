@@ -120,6 +120,15 @@
                     <p class="text-xs text-green-600">Aktif - CSP, XSS, CSRF</p>
                 </div>
             </div>
+            <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-filter text-white"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-900">Content Filter</p>
+                    <p class="text-xs text-blue-600">Aktif - Spam & Profanity Detection</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -189,6 +198,33 @@
             </a>
         </div>
     </div>
+
+    {{-- Content Filter Stats --}}
+    @if(isset($contentStats) && ($contentStats['total_violations'] > 0 || $contentStats['today_violations'] > 0))
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                <i class="fas fa-filter text-blue-500"></i> Content Filter Statistics
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600">{{ $contentStats['total_violations'] }}</div>
+                    <div class="text-sm text-gray-600">Total Violations</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-orange-600">{{ $contentStats['today_violations'] }}</div>
+                    <div class="text-sm text-gray-600">Today</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm font-medium text-gray-900">{{ $contentStats['most_common_field'] ?? 'N/A' }}</div>
+                    <div class="text-sm text-gray-600">Most Common Field</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     {{-- Failed Logins Detail --}}
     @if(count($failedLogins) > 0)
