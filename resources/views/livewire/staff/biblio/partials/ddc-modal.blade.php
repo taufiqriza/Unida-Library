@@ -258,7 +258,11 @@ function enhancedDdcModal() {
         ],
         
         selectClass(code) {
-            this.search = code;
+            if (code === '2X') {
+                this.search = '2';  // Search for Islamic classifications starting with 2
+            } else {
+                this.search = code;
+            }
             this.doSearch();
         },
         
@@ -351,7 +355,8 @@ function enhancedDdcModal() {
             let highlighted = text;
             
             terms.forEach(term => {
-                const regex = new RegExp(`(${term})`, 'gi');
+                const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedTerm})`, 'gi');
                 highlighted = highlighted.replace(regex, '<mark class="bg-yellow-200 px-1 rounded font-semibold">$1</mark>');
             });
             
