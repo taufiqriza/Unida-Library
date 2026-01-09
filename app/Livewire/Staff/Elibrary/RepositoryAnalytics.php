@@ -89,19 +89,22 @@ class RepositoryAnalytics extends Component
     
     public function testGoogleScholar()
     {
-        // Test if Google Scholar can access our pages
-        $sampleThesis = Ethesis::where('is_public', true)->first();
-        if (!$sampleThesis) {
-            $this->dispatch('alert', ['type' => 'warning', 'message' => 'No public thesis found for testing']);
-            return;
-        }
-        
-        $url = route('opac.ethesis.show', $sampleThesis->id);
-        
         try {
-            $response = Http::timeout(10)->get($url);
+            // Test if Google Scholar can access our pages
+            $sampleThesis = Ethesis::where('is_public', true)->first();
+            if (!$sampleThesis) {
+                $this->dispatch('alert', ['type' => 'warning', 'message' => 'No public thesis found for testing']);
+                return;
+            }
+            
+            $url = route('opac.ethesis.show', $sampleThesis->id);
+            
+            $response = Http::timeout(10)
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1)'])
+                ->get($url);
+                
             if ($response->successful()) {
-                $this->dispatch('alert', ['type' => 'success', 'message' => 'Test successful! Page is accessible to crawlers']);
+                $this->dispatch('alert', ['type' => 'success', 'message' => 'Test successful! Page is accessible to crawlers. Sample: ' . $sampleThesis->title]);
             } else {
                 $this->dispatch('alert', ['type' => 'error', 'message' => 'Test failed! HTTP ' . $response->status()]);
             }
@@ -112,14 +115,24 @@ class RepositoryAnalytics extends Component
     
     public function processFullText()
     {
-        $service = app(FullTextExtractionService::class);
-        $result = $service->batchProcess(5); // Process 5 at a time
-        
-        $message = "Processed {$result['total']} thesis. Success: {$result['processed']}, Failed: {$result['failed']}";
-        $type = count($result['failed']) > 0 ? 'warning' : 'success';
-        
-        $this->dispatch('alert', ['type' => $type, 'message' => $message]);
-        $this->loadIndexingStats(); // Refresh stats
+        try {
+            $service = app(FullTextExtractionService::class);
+            $result = $service->batchProcess(10); // Process 10 at a time for better performance
+            
+            if (count($result['processed']) > 0) {
+                $message = "✅ Successfully processed {$result['total']} thesis. Success: " . count($result['processed']) . ", Failed: " . count($result['failed']);
+                $type = count($result['failed']) > 0 ? 'warning' : 'success';
+            } else {
+                $message = "ℹ️ No thesis found for processing. All may already be processed.";
+                $type = 'info';
+            }
+            
+            $this->dispatch('alert', ['type' => $type, 'message' => $message]);
+            $this->loadIndexingStats(); // Refresh stats
+        } catch (\Exception $e) {
+            \Log::error('Full-text processing failed: ' . $e->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Processing failed: ' . $e->getMessage()]);
+        }
     }
     
     public function render()
