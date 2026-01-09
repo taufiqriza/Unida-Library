@@ -460,7 +460,25 @@
                 <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-500 rounded-full"></span>{{ $stats['total_late'] }} Telat</span>
             </div>
         </div>
-        <div id="attendance-map" class="h-[500px]" wire:ignore x-init="initMap(@js($mapData))"></div>
+        <div class="relative">
+            <div id="attendance-map" class="h-[500px]" wire:ignore x-init="initMap(@js($mapData))"></div>
+            <div id="map-loading" class="absolute inset-0 bg-gray-100 flex items-center justify-center" style="display: none;">
+                <div class="text-center">
+                    <div class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                    <p class="text-sm text-gray-600">Memuat peta...</p>
+                </div>
+            </div>
+            <div id="map-error" class="absolute inset-0 bg-gray-100 flex items-center justify-center" style="display: none;">
+                <div class="text-center p-6">
+                    <i class="fas fa-exclamation-triangle text-4xl text-amber-500 mb-3"></i>
+                    <h3 class="font-semibold text-gray-900 mb-2">Gagal Memuat Peta</h3>
+                    <p class="text-sm text-gray-600 mb-4">Terjadi masalah saat memuat peta. Silakan refresh halaman.</p>
+                    <button onclick="location.reload()" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm hover:bg-emerald-600 transition">
+                        <i class="fas fa-refresh mr-2"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
     @endif
 
@@ -805,7 +823,14 @@ function attendanceApp() {
 
         initMap(locations) {
             const mapElement = document.getElementById('attendance-map');
+            const loadingElement = document.getElementById('map-loading');
+            const errorElement = document.getElementById('map-error');
+            
             if (!mapElement) return;
+            
+            // Show loading
+            if (loadingElement) loadingElement.style.display = 'flex';
+            if (errorElement) errorElement.style.display = 'none';
             
             if (this.map) {
                 this.map.remove();
@@ -820,54 +845,127 @@ function attendanceApp() {
                 zoom = 12;
             }
 
-            this.map = L.map('attendance-map').setView(center, zoom);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(this.map);
+            try {
+                this.map = L.map('attendance-map').setView(center, zoom);
+                
+                // Try multiple tile providers for better reliability
+                const tileProviders = [
+                    {
+                        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        options: {
+                            attribution: '© OpenStreetMap contributors',
+                            maxZoom: 19
+                        }
+                    },
+                    {
+                        url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                        options: {
+                            attribution: '© CartoDB © OpenStreetMap contributors',
+                            maxZoom: 19,
+                            subdomains: 'abcd'
+                        }
+                    },
+                    {
+                        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                        options: {
+                            attribution: '© CartoDB © OpenStreetMap contributors',
+                            maxZoom: 19,
+                            subdomains: 'abcd'
+                        }
+                    }
+                ];
 
-            if (!locations || locations.length === 0) return;
+                // Try to load tiles with fallback
+                let tileLayer = null;
+                let providerIndex = 0;
+                let tilesLoaded = false;
 
-            locations.forEach(loc => {
-                // Circle for radius
-                L.circle([loc.lat, loc.lng], {
-                    color: '#10b981',
-                    fillColor: '#10b981',
-                    fillOpacity: 0.1,
-                    radius: loc.radius
-                }).addTo(this.map);
+                const tryTileProvider = () => {
+                    if (providerIndex >= tileProviders.length) {
+                        console.error('All tile providers failed');
+                        if (loadingElement) loadingElement.style.display = 'none';
+                        if (errorElement) errorElement.style.display = 'flex';
+                        return;
+                    }
 
-                // Marker
-                const icon = L.divIcon({
-                    html: `<div style="width:40px;height:40px;background:linear-gradient(135deg,#10b981,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;box-shadow:0 4px 6px rgba(0,0,0,0.3);border:2px solid white;">${loc.today_count}</div>`,
-                    className: '',
-                    iconSize: [40, 40],
-                    iconAnchor: [20, 20]
+                    const provider = tileProviders[providerIndex];
+                    tileLayer = L.tileLayer(provider.url, provider.options);
+                    
+                    tileLayer.on('load', () => {
+                        if (!tilesLoaded) {
+                            tilesLoaded = true;
+                            if (loadingElement) loadingElement.style.display = 'none';
+                        }
+                    });
+
+                    tileLayer.on('tileerror', () => {
+                        console.warn(`Tile provider ${providerIndex} failed, trying next...`);
+                        if (tileLayer) {
+                            this.map.removeLayer(tileLayer);
+                        }
+                        providerIndex++;
+                        setTimeout(tryTileProvider, 1000); // Wait 1 second before trying next provider
+                    });
+
+                    tileLayer.addTo(this.map);
+                };
+
+                tryTileProvider();
+
+                // Hide loading after 3 seconds even if tiles haven't loaded
+                setTimeout(() => {
+                    if (loadingElement && loadingElement.style.display !== 'none') {
+                        loadingElement.style.display = 'none';
+                    }
+                }, 3000);
+
+                if (!locations || locations.length === 0) return;
+
+                locations.forEach(loc => {
+                    // Circle for radius
+                    L.circle([loc.lat, loc.lng], {
+                        color: '#10b981',
+                        fillColor: '#10b981',
+                        fillOpacity: 0.1,
+                        radius: loc.radius
+                    }).addTo(this.map);
+
+                    // Marker
+                    const icon = L.divIcon({
+                        html: `<div style="width:40px;height:40px;background:linear-gradient(135deg,#10b981,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;box-shadow:0 4px 6px rgba(0,0,0,0.3);border:2px solid white;">${loc.today_count}</div>`,
+                        className: '',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20]
+                    });
+
+                    const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(this.map);
+                    
+                    // Popup content
+                    let staffList = loc.staff.map(s => 
+                        `<div style="display:flex;justify-content:space-between;padding:4px 0;">
+                            <span>${s.name}</span>
+                            <span style="color:${s.is_late ? '#d97706' : '#10b981'}">${s.time}</span>
+                        </div>`
+                    ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
+
+                    marker.bindPopup(`
+                        <div style="min-width:200px">
+                            <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
+                            <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
+                            <div style="font-size:13px;">${staffList}</div>
+                        </div>
+                    `);
                 });
 
-                const marker = L.marker([loc.lat, loc.lng], { icon }).addTo(this.map);
-                
-                // Popup content
-                let staffList = loc.staff.map(s => 
-                    `<div style="display:flex;justify-content:space-between;padding:4px 0;">
-                        <span>${s.name}</span>
-                        <span style="color:${s.is_late ? '#d97706' : '#10b981'}">${s.time}</span>
-                    </div>`
-                ).join('') || '<p style="color:#9ca3af">Belum ada kehadiran</p>';
-
-                marker.bindPopup(`
-                    <div style="min-width:200px">
-                        <h4 style="font-weight:bold;margin:0 0 4px 0;">${loc.name}</h4>
-                        <p style="font-size:12px;color:#6b7280;margin:0 0 8px 0;">${loc.branch}</p>
-                        <div style="font-size:13px;">${staffList}</div>
-                    </div>
-                `);
-            });
-
-            // Fit bounds if multiple locations
-            if (locations.length > 1) {
-                const bounds = L.latLngBounds(locations.map(l => [l.lat, l.lng]));
-                this.map.fitBounds(bounds, { padding: [50, 50] });
+                // Fit bounds if multiple locations
+                if (locations.length > 1) {
+                    const bounds = L.latLngBounds(locations.map(l => [l.lat, l.lng]));
+                    this.map.fitBounds(bounds, { padding: [50, 50] });
+                }
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (errorElement) errorElement.style.display = 'flex';
             }
         }
     }
