@@ -28,19 +28,29 @@ class SitemapController extends Controller
         try {
             // Generate main sitemap
             $mainSitemap = view('sitemap.index')->render();
-            file_put_contents(public_path('sitemap.xml'), $mainSitemap);
+            $tempMain = tempnam(sys_get_temp_dir(), 'sitemap_main_');
+            file_put_contents($tempMain, $mainSitemap);
             
             // Generate e-thesis sitemap  
             $etheses = Ethesis::where('is_public', true)->orderByDesc('updated_at')->get();
             $ethesisSitemap = view('sitemap.ethesis', compact('etheses'))->render();
-            file_put_contents(public_path('sitemap-ethesis.xml'), $ethesisSitemap);
+            $tempEthesis = tempnam(sys_get_temp_dir(), 'sitemap_ethesis_');
+            file_put_contents($tempEthesis, $ethesisSitemap);
             
-            // Ensure proper permissions
-            if (file_exists(public_path('sitemap.xml'))) {
-                chmod(public_path('sitemap.xml'), 0644);
+            // Move to public directory with proper permissions
+            $publicPath = public_path();
+            $mainTarget = $publicPath . '/sitemap.xml';
+            $ethesisTarget = $publicPath . '/sitemap-ethesis.xml';
+            
+            // Use copy and unlink for better permission handling
+            if (copy($tempMain, $mainTarget)) {
+                chmod($mainTarget, 0644);
+                unlink($tempMain);
             }
-            if (file_exists(public_path('sitemap-ethesis.xml'))) {
-                chmod(public_path('sitemap-ethesis.xml'), 0644);
+            
+            if (copy($tempEthesis, $ethesisTarget)) {
+                chmod($ethesisTarget, 0644);
+                unlink($tempEthesis);
             }
             
             return [
