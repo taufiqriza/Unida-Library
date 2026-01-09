@@ -84,6 +84,9 @@
             <button wire:click="setTab('plagiarism')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'plagiarism' ? 'bg-rose-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
                 <i class="fas fa-shield-halved mr-2"></i>Cek Plagiasi
             </button>
+            <button wire:click="setTab('analytics')" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $activeTab === 'analytics' ? 'bg-emerald-600 text-white shadow' : 'text-gray-600 hover:bg-gray-100' }}">
+                <i class="fas fa-search-plus mr-2"></i>Repository Analytics
+            </button>
         </div>
 
         {{-- Filter Pills - Inline with Tabs --}}
@@ -137,6 +140,8 @@
             @include('livewire.staff.elibrary.partials.submissions-list')
         @elseif($activeTab === 'plagiarism')
             @include('livewire.staff.elibrary.partials.plagiarism-list')
+        @elseif($activeTab === 'analytics')
+            @livewire('staff.elibrary.repository-analytics')
         @endif
 
         @if($data->hasPages())
