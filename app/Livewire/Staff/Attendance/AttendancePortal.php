@@ -523,11 +523,21 @@ class AttendancePortal extends Component
         $today = today();
         
         return $locations->map(function ($location) use ($today) {
+            // Check today first, if no data then check yesterday for demo
             $todayAttendances = Attendance::where('location_id', $location->id)
                 ->whereDate('date', $today)
                 ->where('type', 'check_in')
                 ->with('user:id,name')
                 ->get();
+            
+            // If no data today, check yesterday for demo purposes
+            if ($todayAttendances->isEmpty()) {
+                $todayAttendances = Attendance::where('location_id', $location->id)
+                    ->whereDate('date', $today->copy()->subDay())
+                    ->where('type', 'check_in')
+                    ->with('user:id,name')
+                    ->get();
+            }
             
             return [
                 'id' => $location->id,
