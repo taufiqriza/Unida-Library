@@ -6,7 +6,7 @@
         
         {{-- Modal Content - Enhanced Professional Layout --}}
         <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none;">
-            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white rounded-3xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden border border-gray-200" style="pointer-events: auto;">
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white rounded-3xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden border border-gray-200 flex flex-col" style="pointer-events: auto;">
                 
                 {{-- Header - Full Blue --}}
                 <div class="p-6 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
@@ -58,7 +58,7 @@
                 </div>
 
                 {{-- Content Area --}}
-                <div class="flex h-[500px]">
+                <div class="flex flex-1 min-h-0">
                     {{-- Left Panel: Main Classes / Favorites --}}
                     <div class="w-80 border-r border-gray-200 bg-gray-50 overflow-y-auto">
                         {{-- Main Classes --}}
@@ -179,23 +179,27 @@
                     </div>
                 </div>
 
-                {{-- Enhanced Footer --}}
+                {{-- Enhanced Footer with Fixed Selection Preview --}}
                 <div class="bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
-                    {{-- Selection Preview --}}
-                    <div x-show="selectedCode" class="px-6 py-4 border-b border-gray-200 bg-white">
-                        <div class="flex items-start gap-4">
+                    {{-- Compact Selection Preview --}}
+                    <div x-show="selectedCode" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                        <div class="flex items-center gap-3">
                             <div class="flex-shrink-0">
-                                <div class="w-16 h-16 bg-blue-600 text-white rounded-xl flex items-center justify-center">
-                                    <span class="font-mono font-bold text-lg" x-text="selectedCode"></span>
+                                <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                    <span class="font-mono font-bold text-sm" x-text="selectedCode"></span>
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-gray-900 text-lg mb-1">Klasifikasi Terpilih</h4>
-                                <div class="text-gray-700 leading-relaxed" x-text="getMainDescription(selectedDesc)"></div>
-                                <div x-show="getAdditionalInfo(selectedDesc)" class="text-sm text-gray-600 mt-2" x-text="getAdditionalInfo(selectedDesc)"></div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <i class="fas fa-check-circle text-green-300 text-sm"></i>
+                                    <span class="font-semibold text-sm">Terpilih</span>
+                                </div>
+                                <div class="text-blue-100 text-sm leading-tight line-clamp-2" x-text="getMainDescription(selectedDesc)"></div>
                             </div>
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                            <div class="flex-shrink-0">
+                                <button @click="selectedCode = null; selectedDesc = ''" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 text-white/80 hover:text-white transition-colors">
+                                    <i class="fas fa-times text-sm"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
