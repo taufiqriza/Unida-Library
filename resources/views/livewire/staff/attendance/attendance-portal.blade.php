@@ -851,26 +851,27 @@ function attendanceApp() {
                 // Try multiple tile providers for better reliability
                 const tileProviders = [
                     {
-                        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                         options: {
                             attribution: '© OpenStreetMap contributors',
-                            maxZoom: 19
+                            maxZoom: 18,
+                            crossOrigin: true
                         }
                     },
                     {
-                        url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+                        url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
                         options: {
-                            attribution: '© CartoDB © OpenStreetMap contributors',
-                            maxZoom: 19,
-                            subdomains: 'abcd'
+                            attribution: '© Google Maps',
+                            maxZoom: 18,
+                            crossOrigin: true
                         }
                     },
                     {
-                        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
                         options: {
-                            attribution: '© CartoDB © OpenStreetMap contributors',
-                            maxZoom: 19,
-                            subdomains: 'abcd'
+                            attribution: '© Esri',
+                            maxZoom: 18,
+                            crossOrigin: true
                         }
                     }
                 ];
@@ -891,20 +892,27 @@ function attendanceApp() {
                     const provider = tileProviders[providerIndex];
                     tileLayer = L.tileLayer(provider.url, provider.options);
                     
-                    tileLayer.on('load', () => {
-                        if (!tilesLoaded) {
+                    let tilesLoadedCount = 0;
+                    let tilesErrorCount = 0;
+                    
+                    tileLayer.on('tileload', () => {
+                        tilesLoadedCount++;
+                        if (tilesLoadedCount >= 3 && !tilesLoaded) { // Wait for at least 3 tiles
                             tilesLoaded = true;
                             if (loadingElement) loadingElement.style.display = 'none';
                         }
                     });
 
                     tileLayer.on('tileerror', () => {
-                        console.warn(`Tile provider ${providerIndex} failed, trying next...`);
-                        if (tileLayer) {
-                            this.map.removeLayer(tileLayer);
+                        tilesErrorCount++;
+                        if (tilesErrorCount >= 5) { // Too many tile errors
+                            console.warn(`Tile provider ${providerIndex} has too many errors, trying next...`);
+                            if (tileLayer) {
+                                this.map.removeLayer(tileLayer);
+                            }
+                            providerIndex++;
+                            setTimeout(tryTileProvider, 500);
                         }
-                        providerIndex++;
-                        setTimeout(tryTileProvider, 1000); // Wait 1 second before trying next provider
                     });
 
                     tileLayer.addTo(this.map);
