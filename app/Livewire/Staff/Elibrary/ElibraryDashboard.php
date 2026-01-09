@@ -420,7 +420,7 @@ class ElibraryDashboard extends Component
                 $query->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
             }
             
-            $data = $query->latest()->paginate(10);
+            $data = $query->orderByRaw("CASE WHEN status = 'submitted' THEN 0 ELSE 1 END")->latest()->paginate(10);
         } elseif ($this->activeTab === 'plagiarism') {
             $query = PlagiarismCheck::with(['member', 'thesisSubmission'])
                 ->when($this->search, fn($q) => $q->where(function($sub) {
@@ -435,7 +435,7 @@ class ElibraryDashboard extends Component
                 $query->whereHas('member', fn($q) => $q->where('branch_id', $userBranchId));
             }
             
-            $data = $query->latest()->paginate(10);
+            $data = $query->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")->latest()->paginate(10);
         } elseif ($this->activeTab === 'analytics') {
             // Analytics tab doesn't need paginated data
             $data = collect();

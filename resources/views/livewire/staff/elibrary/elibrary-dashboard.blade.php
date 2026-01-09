@@ -90,22 +90,32 @@
                     <span>E-Thesis</span>
                 </button>
                 <button wire:click="setTab('submissions')" @class([
-                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2 relative',
                     'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md' => $activeTab === 'submissions',
                     'text-gray-500 hover:bg-gray-100' => $activeTab !== 'submissions',
                 ])>
                     <i class="fas fa-upload text-xs"></i>
                     <span class="hidden sm:inline">Unggah Mandiri</span>
                     <span class="sm:hidden">Upload</span>
+                    @if($stats['submissions_pending'] > 0)
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                            {{ $stats['submissions_pending'] > 99 ? '99+' : $stats['submissions_pending'] }}
+                        </span>
+                    @endif
                 </button>
                 <button wire:click="setTab('plagiarism')" @class([
-                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
+                    'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2 relative',
                     'bg-gradient-to-r from-rose-600 to-rose-700 text-white shadow-md' => $activeTab === 'plagiarism',
                     'text-gray-500 hover:bg-gray-100' => $activeTab !== 'plagiarism',
                 ])>
                     <i class="fas fa-shield-halved text-xs"></i>
                     <span class="hidden sm:inline">Cek Plagiasi</span>
                     <span class="sm:hidden">Plagiasi</span>
+                    @if($stats['plagiarism_pending'] > 0)
+                        <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                            {{ $stats['plagiarism_pending'] > 99 ? '99+' : $stats['plagiarism_pending'] }}
+                        </span>
+                    @endif
                 </button>
                 <button wire:click="setTab('analytics')" @class([
                     'flex-1 px-2 lg:px-4 py-2 lg:py-2.5 rounded-md lg:rounded-xl text-xs lg:text-sm font-medium transition-all flex items-center justify-center gap-1 lg:gap-2',
