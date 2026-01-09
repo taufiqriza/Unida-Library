@@ -38,15 +38,69 @@ class DdcService
         $query = strtolower(trim($query));
         $isCodeSearch = preg_match('/^[0-9xX.]+$/', $query);
         
+        // Handle special cases
+        if ($query === '2x' || $query === '2X') {
+            $query = '2'; // Search for Islamic classifications
+        }
+        
         $exactMatches = [];
         $startsWithMatches = [];
         $sameClassMatches = [];
         $containsMatches = [];
         $relatedMatches = [];
         
+        // Split search terms for multi-word search
+        $searchTerms = array_filter(explode(' ', $query), fn($term) => strlen($term) >= 2);
+        
         foreach ($this->all() as $item) {
             $code = strtolower($item['code']);
             $desc = strtolower($item['description']);
+            
+            // Code-based search
+            if ($isCodeSearch) {
+                if ($code === $query) {
+                    $exactMatches[] = $item;
+                } elseif (str_starts_with($code, $query)) {
+                    $startsWithMatches[] = $item;
+                } elseif (str_contains($code, $query)) {
+                    $containsMatches[] = $item;
+                }
+                continue;
+            }
+            
+            // Multi-term description search
+            if (!empty($searchTerms)) {
+                $matchCount = 0;
+                $exactWordMatches = 0;
+                
+                foreach ($searchTerms as $term) {
+                    if (str_contains($desc, $term)) {
+                        $matchCount++;
+                        // Check for exact word match
+                        if (preg_match('/\b' . preg_quote($term, '/') . '\b/', $desc)) {
+                            $exactWordMatches++;
+                        }
+                    }
+                }
+                
+                // Categorize by match quality
+                if ($matchCount === count($searchTerms)) {
+                    if ($exactWordMatches === count($searchTerms)) {
+                        $exactMatches[] = $item;
+                    } else {
+                        $startsWithMatches[] = $item;
+                    }
+                } elseif ($matchCount > 0) {
+                    $containsMatches[] = $item;
+                }
+            }
+        }
+        
+        // Combine results with priority
+        $results = array_merge($exactMatches, $startsWithMatches, $sameClassMatches, $containsMatches, $relatedMatches);
+        
+        return array_slice($results, 0, $limit);
+    }
             
             if ($isCodeSearch) {
                 // Enhanced code search with DDC hierarchy

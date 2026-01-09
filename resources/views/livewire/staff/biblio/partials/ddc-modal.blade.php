@@ -128,7 +128,10 @@
                                             <div class="flex-1 min-w-0">
                                                 <div class="text-gray-900 font-medium leading-relaxed" x-html="highlightSearch(getMainDescription(ddc.description), search)"></div>
                                                 <div x-show="getAdditionalInfo(ddc.description)" class="text-sm text-gray-600 mt-2 leading-relaxed" x-html="highlightSearch(getAdditionalInfo(ddc.description), search)"></div>
-                                                <div x-show="getCrossReferences(ddc.description)" class="text-xs text-blue-600 mt-2 italic" x-text="getCrossReferences(ddc.description)"></div>
+                                                <div x-show="getCrossReferences(ddc.description)" class="text-xs text-blue-600 mt-2 italic cursor-pointer hover:text-blue-800 transition-colors" 
+                                                     x-text="getCrossReferences(ddc.description)"
+                                                     @click.stop="navigateToReference(ddc.description)"
+                                                     title="Klik untuk melihat referensi terkait"></div>
                                             </div>
                                             
                                             {{-- Actions --}}
@@ -259,7 +262,7 @@ function enhancedDdcModal() {
         
         selectClass(code) {
             if (code === '2X') {
-                this.search = '2';  // Search for Islamic classifications starting with 2
+                this.search = '29';  // Search for Islamic classifications (297, 298, etc)
             } else {
                 this.search = code;
             }
@@ -325,6 +328,20 @@ function enhancedDdcModal() {
             return match ? match.join(' ') : '';
         },
         
+        // Navigate to cross-reference
+        navigateToReference(description) {
+            const crossRefs = this.getCrossReferences(description);
+            if (!crossRefs) return;
+            
+            // Extract DDC codes from cross-references
+            const codeMatches = crossRefs.match(/\b\d{3}(?:\.\d+)?\b/g);
+            if (codeMatches && codeMatches.length > 0) {
+                // Use the first found code
+                this.search = codeMatches[0];
+                this.doSearch();
+            }
+        },
+        
         // Favorites functionality
         toggleFavorite(ddc) {
             const index = this.favorites.findIndex(f => f.code === ddc.code);
@@ -351,12 +368,17 @@ function enhancedDdcModal() {
         highlightSearch(text, searchTerm) {
             if (!text || !searchTerm || searchTerm.length < 2) return text;
             
-            const terms = searchTerm.toLowerCase().split(' ').filter(t => t.length >= 2);
+            // Split search terms and filter out short terms
+            const terms = searchTerm.toLowerCase().split(/\s+/).filter(t => t.length >= 2);
             let highlighted = text;
+            
+            // Sort terms by length (longest first) to avoid partial replacements
+            terms.sort((a, b) => b.length - a.length);
             
             terms.forEach(term => {
                 const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                // Use word boundary for better matching
+                const regex = new RegExp(`\\b(${escapedTerm})`, 'gi');
                 highlighted = highlighted.replace(regex, '<mark class="bg-yellow-200 px-1 rounded font-semibold">$1</mark>');
             });
             
