@@ -266,13 +266,15 @@
         </div>
     </div>
 
-    {{-- Loading Overlay --}}
-    <div wire:loading.flex wire:target="save,nextStep,previousStep" class="fixed inset-0 bg-black/50 items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-xl">
-            <i class="fas fa-spinner fa-spin text-2xl text-primary-600"></i>
-            <span class="text-gray-900 font-medium">Memproses...</span>
+    {{-- Loading Overlay - Teleported to body for highest z-index --}}
+    <template x-teleport="body">
+        <div wire:loading.flex wire:target="save,nextStep,previousStep" class="fixed inset-0 bg-black/50 items-center justify-center z-[9999]">
+            <div class="bg-white rounded-2xl p-6 flex items-center gap-4 shadow-xl">
+                <i class="fas fa-spinner fa-spin text-2xl text-primary-600"></i>
+                <span class="text-gray-900 font-medium">Memproses...</span>
+            </div>
         </div>
-    </div>
+    </template>
 
     {{-- DDC Modal via teleport --}}
     @include('livewire.staff.biblio.partials.ddc-modal')
