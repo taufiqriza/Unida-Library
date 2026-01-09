@@ -25,19 +25,24 @@ class SitemapController extends Controller
     
     public function generate(): array
     {
-        // Generate main sitemap
-        $mainSitemap = view('sitemap.index')->render();
-        file_put_contents(public_path('sitemap.xml'), $mainSitemap);
-        
-        // Generate e-thesis sitemap
-        $etheses = Ethesis::where('is_public', true)->orderByDesc('updated_at')->get();
-        $ethesisSitemap = view('sitemap.ethesis', compact('etheses'))->render();
-        file_put_contents(public_path('sitemap-ethesis.xml'), $ethesisSitemap);
-        
-        return [
-            'main_sitemap' => 'sitemap.xml',
-            'ethesis_sitemap' => 'sitemap-ethesis.xml',
-            'total_urls' => $etheses->count() + 1,
-        ];
+        try {
+            // Generate main sitemap
+            $mainSitemap = view('sitemap.index')->render();
+            file_put_contents(public_path('sitemap.xml'), $mainSitemap);
+            
+            // Generate e-thesis sitemap
+            $etheses = Ethesis::where('is_public', true)->orderByDesc('updated_at')->get();
+            $ethesisSitemap = view('sitemap.ethesis', compact('etheses'))->render();
+            file_put_contents(public_path('sitemap-ethesis.xml'), $ethesisSitemap);
+            
+            return [
+                'main_sitemap' => 'sitemap.xml',
+                'ethesis_sitemap' => 'sitemap-ethesis.xml',
+                'total_urls' => $etheses->count() + 1,
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Sitemap generation error: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }

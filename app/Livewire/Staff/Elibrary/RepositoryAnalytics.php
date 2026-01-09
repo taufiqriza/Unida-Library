@@ -50,10 +50,15 @@ class RepositoryAnalytics extends Component
     
     public function generateSitemap()
     {
-        $controller = app(SitemapController::class);
-        $result = $controller->generate();
-        
-        $this->dispatch('alert', ['type' => 'success', 'message' => "Sitemap generated! {$result['total_urls']} URLs indexed."]);
+        try {
+            $controller = app(SitemapController::class);
+            $result = $controller->generate();
+            
+            $this->dispatch('alert', ['type' => 'success', 'message' => "Sitemap generated! {$result['total_urls']} URLs indexed."]);
+        } catch (\Exception $e) {
+            \Log::error('Sitemap generation failed: ' . $e->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Sitemap generation failed: ' . $e->getMessage()]);
+        }
     }
     
     public function loadRecentIndexed()
