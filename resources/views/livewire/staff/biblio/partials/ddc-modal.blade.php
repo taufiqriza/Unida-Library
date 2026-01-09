@@ -4,50 +4,56 @@
         {{-- Backdrop --}}
         <div x-show="open" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7);" @click="open = false"></div>
         
-        {{-- Modal Content - Enhanced Size --}}
+        {{-- Modal Content - Enhanced Professional Layout --}}
         <div style="position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none;">
-            <div x-show="open" x-transition:enter="ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden" style="pointer-events: auto;">
+            <div x-show="open" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white rounded-3xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden border border-gray-200" style="pointer-events: auto;">
                 
-                {{-- Header --}}
-                <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700 text-white">
+                {{-- Header - Full Blue --}}
+                <div class="p-6 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-bold flex items-center gap-3">
-                                <i class="fas fa-layer-group text-2xl"></i> 
-                                <div>
-                                    <div>e-DDC Edition 23 Lookup</div>
-                                    <div class="text-sm text-indigo-200 font-normal">Dewey Decimal Classification System</div>
-                                </div>
-                            </h3>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                                <i class="fas fa-layer-group text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold">DDC - Dewey Decimal Classification</h3>
+                                <div class="text-blue-100 font-medium">Valid & SAH - Edition 23</div>
+                                <div class="text-blue-200 text-sm">4,715 Klasifikasi Tersedia</div>
+                            </div>
                         </div>
-                        <button @click="open = false" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/20 text-white transition-colors">
-                            <i class="fas fa-times text-lg"></i>
+                        <button @click="open = false" class="w-12 h-12 flex items-center justify-center rounded-xl hover:bg-white/20 text-white transition-colors">
+                            <i class="fas fa-times text-xl"></i>
                         </button>
                     </div>
                 </div>
 
-                {{-- Search Section --}}
-                <div class="p-6 border-b border-gray-100 bg-gray-50">
+                {{-- Search Section - Enhanced --}}
+                <div class="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
                     <div class="flex gap-4">
                         <div class="flex-1 relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-blue-400 text-lg"></i>
+                            </div>
                             <input type="text" x-model="search" @input.debounce.300ms="doSearch()" 
-                                   class="w-full pl-12 pr-4 py-4 text-base border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white" 
+                                   class="w-full pl-12 pr-4 py-4 text-base border-2 border-blue-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 bg-white shadow-sm transition-all" 
                                    placeholder="Cari nomor klasifikasi (contoh: 297) atau deskripsi (contoh: islam, teknologi)..." 
                                    autofocus>
                         </div>
                         <button @click="showFavorites = !showFavorites" 
-                                :class="showFavorites ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 border border-gray-200'"
-                                class="px-6 py-4 rounded-xl font-medium transition-colors flex items-center gap-2">
+                                :class="showFavorites ? 'bg-blue-600 text-white shadow-lg' : 'bg-white text-blue-600 border-2 border-blue-200 hover:border-blue-300'"
+                                class="px-6 py-4 rounded-2xl font-semibold transition-all flex items-center gap-2">
                             <i class="fas fa-star"></i>
                             <span class="hidden sm:inline">Favorit</span>
                         </button>
                     </div>
                     
                     {{-- Search Stats --}}
-                    <div x-show="results.length > 0" class="mt-3 flex items-center justify-between text-sm text-gray-600">
-                        <span><span x-text="results.length"></span> hasil ditemukan</span>
-                        <span x-show="search.length >= 2">untuk "<span x-text="search" class="font-medium"></span>"</span>
+                    <div x-show="results.length > 0" class="mt-4 flex items-center justify-between text-sm">
+                        <div class="flex items-center gap-2 text-blue-700">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="font-medium"><span x-text="results.length"></span> hasil ditemukan</span>
+                        </div>
+                        <span x-show="search.length >= 2" class="text-blue-600">untuk "<span x-text="search" class="font-semibold"></span>"</span>
                     </div>
                 </div>
 
@@ -170,31 +176,54 @@
                     </div>
                 </div>
 
-                {{-- Footer --}}
-                <div class="p-6 border-t border-gray-100 bg-gray-50">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div x-show="selectedCode" class="flex items-center gap-3">
-                                <span class="px-4 py-2 bg-indigo-600 text-white font-mono font-bold text-lg rounded-lg" x-text="selectedCode"></span>
-                                <div class="max-w-md">
-                                    <div class="font-medium text-gray-900" x-text="getMainDescription(selectedDesc)"></div>
-                                    <div class="text-sm text-gray-600" x-text="selectedCode ? 'Siap digunakan' : ''"></div>
+                {{-- Enhanced Footer --}}
+                <div class="bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-200">
+                    {{-- Selection Preview --}}
+                    <div x-show="selectedCode" class="px-6 py-4 border-b border-gray-200 bg-white">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-blue-600 text-white rounded-xl flex items-center justify-center">
+                                    <span class="font-mono font-bold text-lg" x-text="selectedCode"></span>
                                 </div>
                             </div>
-                            <div x-show="!selectedCode" class="text-gray-500 italic">Pilih klasifikasi DDC</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-gray-900 text-lg mb-1">Klasifikasi Terpilih</h4>
+                                <div class="text-gray-700 leading-relaxed" x-text="getMainDescription(selectedDesc)"></div>
+                                <div x-show="getAdditionalInfo(selectedDesc)" class="text-sm text-gray-600 mt-2" x-text="getAdditionalInfo(selectedDesc)"></div>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                            </div>
                         </div>
-                        
-                        <div class="flex items-center gap-3">
-                            <button type="button" @click="open = false" 
-                                    class="px-6 py-3 text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                                Batal
-                            </button>
-                            <button type="button" @click="apply()" :disabled="!selectedCode" 
-                                    :class="selectedCode ? 'bg-indigo-600 hover:bg-indigo-700 text-white' : 'bg-gray-200 text-gray-400 cursor-not-allowed'" 
-                                    class="px-8 py-3 font-semibold rounded-xl transition-colors flex items-center gap-2">
-                                <i class="fas fa-check"></i> 
-                                Gunakan Klasifikasi
-                            </button>
+                    </div>
+                    
+                    {{-- Action Buttons --}}
+                    <div class="px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div x-show="!selectedCode" class="flex items-center gap-2 text-gray-500">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="text-sm">Pilih klasifikasi DDC untuk melanjutkan</span>
+                                </div>
+                                <div x-show="selectedCode" class="flex items-center gap-2 text-green-600">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span class="text-sm font-medium">Siap digunakan</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <button type="button" @click="open = false" 
+                                        class="px-6 py-3 text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all font-medium">
+                                    <i class="fas fa-times mr-2"></i>
+                                    Batal
+                                </button>
+                                <button type="button" @click="apply()" :disabled="!selectedCode" 
+                                        :class="selectedCode ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl' : 'bg-gray-200 text-gray-400 cursor-not-allowed'" 
+                                        class="px-8 py-3 font-bold rounded-xl transition-all flex items-center gap-2 border-2 border-transparent">
+                                    <i class="fas fa-check text-lg"></i> 
+                                    <span>Gunakan Klasifikasi</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
