@@ -95,6 +95,7 @@ class GlobalSearch extends Component
     {
         $this->query = $this->sanitizeInput($value);
         $this->page = 1;
+        $this->aiAnalysis = null; // Reset AI analysis when query changes
     }
 
     /**
@@ -870,6 +871,9 @@ class GlobalSearch extends Component
     public function toggleAiPanel()
     {
         $this->showAiPanel = !$this->showAiPanel;
+        if (!$this->showAiPanel) {
+            $this->aiAnalysis = null;
+        }
     }
 
     public function searchRelated(string $topic)

@@ -42,7 +42,7 @@ class SearchAiService
                 ])->timeout(8)->post($this->baseUrl, [
                     'model' => 'llama-3.1-8b-instant',
                     'messages' => [
-                        ['role' => 'system', 'content' => 'Kamu asisten perpustakaan universitas. Jawab dalam bahasa Indonesia, singkat dan informatif. Output JSON saja tanpa markdown.'],
+                        ['role' => 'system', 'content' => 'Kamu asisten perpustakaan UNIDA Gontor. Jawab dalam bahasa Indonesia, singkat dan informatif. Output JSON saja tanpa markdown.'],
                         ['role' => 'user', 'content' => $this->buildPrompt($query, $counts, $topTitles)]
                     ],
                     'max_tokens' => 400,
