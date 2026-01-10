@@ -356,35 +356,40 @@ function smartDdcModal() {
         highlightSearch(text, searchTerm) {
             if (!text || !searchTerm || searchTerm.length < 1) return text;
             
-            // Escape special regex characters
             const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            let highlighted = text;
             
-            // First, try to match the entire search term as a phrase
-            const fullPhrase = searchTerm.trim();
-            if (fullPhrase.length >= 2) {
-                const phraseRegex = new RegExp(`(${escapeRegex(fullPhrase)})`, 'gi');
+            // Get words from search term
+            const words = searchTerm.toLowerCase().trim().split(/\s+/).filter(w => w.length >= 2);
+            if (words.length === 0) return text;
+            
+            // Strategy 1: Try full phrase match first
+            if (searchTerm.trim().length >= 3) {
+                const phraseRegex = new RegExp(`(${escapeRegex(searchTerm.trim())})`, 'gi');
                 if (phraseRegex.test(text)) {
                     return text.replace(phraseRegex, '<mark class="bg-yellow-300 px-0.5 rounded font-semibold">$1</mark>');
                 }
             }
             
-            // Then try multi-word combinations (2+ words together)
-            const words = searchTerm.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
-            let highlighted = text;
-            
-            // Try 2-word combinations first
-            for (let i = 0; i < words.length - 1; i++) {
-                const twoWords = words[i] + '\\s+' + words[i + 1];
-                const twoWordRegex = new RegExp(`(${twoWords})`, 'gi');
-                highlighted = highlighted.replace(twoWordRegex, '<mark class="bg-yellow-300 px-0.5 rounded font-semibold">$1</mark>');
+            // Strategy 2: Try consecutive 2-word combinations
+            if (words.length >= 2) {
+                for (let i = 0; i < words.length - 1; i++) {
+                    const phrase = words[i] + '\\s+' + words[i + 1];
+                    const phraseRegex = new RegExp(`(${phrase})`, 'gi');
+                    highlighted = highlighted.replace(phraseRegex, '<mark class="bg-yellow-300 px-0.5 rounded font-semibold">$1</mark>');
+                }
             }
             
-            // Then highlight remaining individual words
+            // Strategy 3: Highlight individual words (different color)
             words.forEach(word => {
-                // Skip if already highlighted
-                if (highlighted.includes(`>${word}<`)) return;
-                const wordRegex = new RegExp(`(?<!<mark[^>]*>)\\b(${escapeRegex(word)})\\b(?![^<]*<\\/mark>)`, 'gi');
-                highlighted = highlighted.replace(wordRegex, '<mark class="bg-amber-200 px-0.5 rounded">$1</mark>');
+                const wordRegex = new RegExp(`(?<![\\w>])(${escapeRegex(word)})(?![\\w<])`, 'gi');
+                highlighted = highlighted.replace(wordRegex, (match, p1) => {
+                    // Don't double-highlight
+                    if (highlighted.indexOf(`<mark`) > -1 && highlighted.indexOf(p1) < highlighted.indexOf(`<mark`)) {
+                        return match;
+                    }
+                    return `<mark class="bg-amber-200/70 px-0.5 rounded">${p1}</mark>`;
+                });
             });
             
             return highlighted;
