@@ -14,7 +14,13 @@ class ClearanceLetterController extends Controller
             abort(404, 'Surat belum disetujui');
         }
         
-        $letter->load(['member', 'thesisSubmission', 'thesisSubmission.department', 'thesisSubmission.department.faculty', 'approver']);
+        $letter->load([
+            'member' => fn($q) => $q->withoutGlobalScope('branch'),
+            'thesisSubmission', 
+            'thesisSubmission.department', 
+            'thesisSubmission.department.faculty', 
+            'approver'
+        ]);
         
         $logoPath = public_path('storage/logo.png');
         $logoBase64 = file_exists($logoPath) 
