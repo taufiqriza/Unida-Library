@@ -131,21 +131,9 @@ class ChatbotService
             $keywords = $data['keywords'] ?? [];
             
             foreach ($keywords as $keyword) {
-                // Skip very short keywords (< 3 chars) unless exact word match
-                if (strlen($keyword) < 3) {
-                    if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/u', $message)) {
-                        $score += 10;
-                    }
-                    continue;
-                }
-                
-                if (str_contains($message, $keyword)) {
-                    // Longer keyword = higher score
-                    $score += strlen($keyword) * 2;
-                    // Exact word match bonus
-                    if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/u', $message)) {
-                        $score += 5;
-                    }
+                // Require word boundary match for all keywords
+                if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/ui', $message)) {
+                    $score += strlen($keyword) * 3; // Higher weight for exact match
                 }
             }
             
@@ -154,8 +142,8 @@ class ChatbotService
             }
         }
         
-        // Require minimum score threshold to avoid false positives
-        $minScore = 20;
+        // Require minimum score - longer keywords = higher threshold met easier
+        $minScore = 12;
         
         if (empty($scores) || max($scores) < $minScore) {
             return null; // Let AI handle it
