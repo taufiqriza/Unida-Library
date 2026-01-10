@@ -264,44 +264,18 @@ function enhancedDdcModal() {
             {code: '900', label: 'Sejarah', bg: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', color: '#334155', icon: '🌍'},
         ],
         
-        // REVOLUTIONARY DDC MODAL - SUPER SIMPLE & ACCURATE
+        // DDC Main Class Selection
         selectClass(code) {
-            console.log('🎯 DDC Class Selected:', code);
-            
-            // DIRECT SEARCH - NO COMPLEX LOGIC
-            if (code === '2X') {
-                this.search = '2X';
-            } else if (code === '000') {
-                this.search = '0';  // Search ALL 0xx classes
-            } else if (code === '100') {
-                this.search = '1';  // Search ALL 1xx classes  
-            } else if (code === '200') {
-                this.search = '2';  // Search ALL 2xx classes
-            } else if (code === '300') {
-                this.search = '3';  // Search ALL 3xx classes
-            } else if (code === '400') {
-                this.search = '4';  // Search ALL 4xx classes
-            } else if (code === '500') {
-                this.search = '5';  // Search ALL 5xx classes
-            } else if (code === '600') {
-                this.search = '6';  // Search ALL 6xx classes
-            } else if (code === '700') {
-                this.search = '7';  // Search ALL 7xx classes
-            } else if (code === '800') {
-                this.search = '8';  // Search ALL 8xx classes
-            } else if (code === '900') {
-                this.search = '9';  // Search ALL 9xx classes
-            } else {
-                this.search = code;
-            }
-            
-            console.log('🔍 Search Query:', this.search);
+            // Map main class codes to search queries
+            const searchMap = {
+                '000': '0', '100': '1', '200': '2', '300': '3', '400': '4',
+                '500': '5', '600': '6', '700': '7', '800': '8', '900': '9', '2X': '2X'
+            };
+            this.search = searchMap[code] || code;
             this.doSearch();
         },
         
         async doSearch() {
-            console.log('🚀 Starting DDC Search for:', this.search);
-            
             if (!this.search || this.search.length < 1) { 
                 this.results = []; 
                 return; 
@@ -310,20 +284,10 @@ function enhancedDdcModal() {
             this.loading = true;
             
             try {
-                const limit = 300; // High limit for comprehensive results
-                const url = '/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=' + limit;
-                console.log('📡 API Call:', url);
-                
-                const res = await fetch(url);
-                const data = await res.json();
-                this.results = data || [];
-                
-                console.log('✅ DDC Results:', this.results.length, 'entries found');
-                console.log('📋 Sample results:', this.results.slice(0, 5).map(r => r.code));
-                
+                const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=300');
+                this.results = await res.json() || [];
             } catch (e) { 
                 this.results = []; 
-                console.error('❌ DDC Search Error:', e);
             }
             
             this.loading = false;

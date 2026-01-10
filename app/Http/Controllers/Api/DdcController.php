@@ -11,9 +11,10 @@ class DdcController extends Controller
     public function search(Request $request, DdcService $ddcService)
     {
         $query = $request->get('q', '');
-        $limit = min($request->get('limit', 25), 50);
+        $limit = min($request->get('limit', 100), 500);
 
-        if (strlen($query) < 2) {
+        // Allow single digit for main class search (0-9)
+        if (strlen($query) < 1) {
             return response()->json([]);
         }
 
