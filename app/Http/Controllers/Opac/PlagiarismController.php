@@ -292,4 +292,23 @@ class PlagiarismController extends Controller
         // Use JS redirect to avoid nginx header size limit
         return response()->view('opac.plagiarism.redirect', ['url' => $url]);
     }
+
+    /**
+     * View full report on iThenticate (public/staff access)
+     */
+    public function viewReportPublic(PlagiarismCheck $check)
+    {
+        if (!$check->isCompleted() || !$check->external_id || $check->provider !== 'ithenticate') {
+            abort(404, 'Report tidak tersedia.');
+        }
+
+        $provider = new \App\Services\Plagiarism\Providers\IthenticateProvider();
+        $url = $provider->getReportUrl($check->external_id);
+
+        if (!$url) {
+            abort(500, 'Gagal mengambil link report.');
+        }
+
+        return response()->view('opac.plagiarism.redirect', ['url' => $url]);
+    }
 }
