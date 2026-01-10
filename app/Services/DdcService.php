@@ -30,23 +30,19 @@ class DdcService
     }
 
     /**
-     * REVOLUTIONARY DDC SEARCH - SUPER ACCURATE & SMART
-     * Complete rewrite for maximum accuracy and usability
+     * DDC Search - Supports code and description search
      */
     public function search(string $query, int $limit = 300): array
     {
         $query = trim($query);
-        if (empty($query)) return [];
+        if ($query === '') return [];
         
         $all = $this->all();
-        $results = [];
         
-        // SMART DDC CLASSIFICATION LOGIC
+        // Code-based search (numbers, X, dots)
         if (preg_match('/^[0-9xX.]+$/', $query)) {
-            // CODE-BASED SEARCH
             $results = $this->searchByCode($all, $query);
         } else {
-            // DESCRIPTION-BASED SEARCH  
             $results = $this->searchByDescription($all, $query);
         }
         
