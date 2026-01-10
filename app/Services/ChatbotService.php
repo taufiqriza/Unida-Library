@@ -12,14 +12,18 @@ class ChatbotService
     protected array $thanks = ['terima kasih', 'terimakasih', 'makasih', 'thanks', 'thank you', 'ok', 'oke', 'baik', 'siap', 'mantap', 'good', 'bagus', 'sip'];
     protected array $confirmations = ['iya', 'ya', 'yup', 'yes', 'betul', 'benar', 'bener'];
     protected array $negations = ['tidak', 'nggak', 'gak', 'no', 'bukan', 'belum', 'jangan'];
+    
+    protected ChatAiService $aiService;
 
-    public function __construct()
+    public function __construct(ChatAiService $aiService)
     {
         $this->knowledge = config('chatbot', []);
+        $this->aiService = $aiService;
     }
 
     public function processMessage(ChatRoom $room, string $message): ?array
     {
+        $originalMessage = $message;
         $message = $this->normalizeMessage($message);
         
         // Check greeting
@@ -48,8 +52,8 @@ class ChatbotService
             return $this->buildResponse($match['category'], $match['subtype']);
         }
         
-        // No match
-        return $this->noMatchResponse();
+        // No match - try AI fallback
+        return $this->noMatchResponse($room, $originalMessage);
     }
 
     protected function normalizeMessage(string $message): string
@@ -276,8 +280,25 @@ class ChatbotService
         ];
     }
 
-    protected function noMatchResponse(): array
+    protected function noMatchResponse(ChatRoom $room = null, string $originalMessage = ''): array
     {
+        // Try AI response as fallback
+        if ($this->aiService->isEnabled() && $room && strlen($originalMessage) >= 5) {
+            $aiResponse = $this->aiService->generateResponse(
+                $originalMessage,
+                $room->topic ?? 'lainnya',
+                ['member_name' => $room->member?->name]
+            );
+            
+            if ($aiResponse) {
+                return [
+                    'message' => "🤖 " . $aiResponse,
+                    'type' => 'bot',
+                    'handled' => true,
+                ];
+            }
+        }
+        
         return [
             'message' => "🤔 Maaf, saya belum paham pertanyaan Anda.\n\nCoba ketik salah satu:\n" . $this->getQuickMenu() . "\n\nAtau ketik **staff** untuk bicara dengan pustakawan.",
             'type' => 'bot',
