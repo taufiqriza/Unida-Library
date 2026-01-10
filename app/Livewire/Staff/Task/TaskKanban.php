@@ -59,6 +59,11 @@ class TaskKanban extends Component
         if (!in_array($user->role, ['super_admin'])) {
             $this->filterBranch = $user->branch_id;
         }
+        
+        // Check for view mode from URL query parameter
+        if (request()->query('view') === 'timeline') {
+            $this->viewMode = 'timeline';
+        }
     }
 
     public function moveTask($taskId, $newStatusId)

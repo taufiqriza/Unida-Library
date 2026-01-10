@@ -77,29 +77,20 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- View Mode Toggle --}}
+            {{-- Unified 3-Tab Navigation --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <button wire:click="$set('viewMode', 'kanban')" 
-                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'kanban' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'kanban' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
                 </button>
                 <button wire:click="$set('viewMode', 'timeline')" 
-                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'timeline' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'timeline' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-stream"></i>
                     <span class="hidden sm:inline">Timeline</span>
                 </button>
-            </div>
-            
-            {{-- Tab Switch --}}
-            <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
-                <a href="{{ route('staff.task.index') }}" 
-                   class="px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 bg-violet-600 text-white">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span class="hidden sm:inline">Tugas</span>
-                </a>
                 <a href="{{ route('staff.task.schedule') }}" 
-                   class="px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
                 </a>

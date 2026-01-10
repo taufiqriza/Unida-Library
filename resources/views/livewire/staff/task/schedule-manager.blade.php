@@ -17,22 +17,26 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Tab Switch --}}
+            {{-- Unified 3-Tab Navigation --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <a href="{{ route('staff.task.index') }}" 
-                   class="px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span class="hidden sm:inline">Tugas</span>
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-columns"></i>
+                    <span class="hidden sm:inline">Kanban</span>
                 </a>
-                <a href="{{ route('staff.task.schedule') }}" 
-                   class="px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 bg-emerald-600 text-white">
+                <a href="{{ route('staff.task.index') }}?view=timeline" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-stream"></i>
+                    <span class="hidden sm:inline">Timeline</span>
+                </a>
+                <span class="px-3 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm flex items-center gap-2">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
-                </a>
+                </span>
             </div>
             
-            {{-- View Toggle --}}
-            <div class="bg-white rounded-xl p-1 border border-gray-200 flex">
+            {{-- View Toggle (Week/Month) --}}
+            <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <button wire:click="$set('viewMode', 'week')" 
                         class="px-3 py-1.5 text-sm font-medium rounded-lg transition {{ $viewMode === 'week' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-calendar-week mr-1"></i>Minggu
