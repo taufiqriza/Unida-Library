@@ -1148,28 +1148,6 @@ class StaffChat extends Component
         $this->typingUsers = $typing;
     }
 
-    // Read receipts
-    public $showReadReceipts = false;
-    public $readReceiptsMessageId = null;
-    public $readReceiptsList = [];
-
-    public function showMessageReaders($messageId)
-    {
-        $msg = collect($this->messages)->firstWhere('id', $messageId);
-        if (!$msg || $msg['sender_id'] !== auth()->id()) return;
-        
-        $this->readReceiptsMessageId = $messageId;
-        $this->readReceiptsList = $msg['readers'] ?? [];
-        $this->showReadReceipts = true;
-    }
-
-    public function closeReadReceipts()
-    {
-        $this->showReadReceipts = false;
-        $this->readReceiptsMessageId = null;
-        $this->readReceiptsList = [];
-    }
-
     public function render()
     {
         return view('livewire.staff.chat.staff-chat');
