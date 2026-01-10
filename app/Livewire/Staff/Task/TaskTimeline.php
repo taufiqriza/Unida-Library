@@ -58,7 +58,7 @@ class TaskTimeline extends Component
             ->where(function($q) {
                 $q->whereNotNull('due_date')->orWhereNotNull('start_date');
             })
-            ->whereHas('status', fn($q) => $q->where('is_completed', false));
+            ->whereHas('status', fn($q) => $q->where('is_done', false));
         
         // Apply branch filter
         if ($this->filterBranch) {
@@ -96,6 +96,6 @@ class TaskTimeline extends Component
             'timelineStart' => $timelineStart,
             'timelineEnd' => $timelineEnd,
             'timelineDays' => $timelineDays,
-        ]);
+        ])->extends('staff.layouts.app')->section('content');
     }
 }

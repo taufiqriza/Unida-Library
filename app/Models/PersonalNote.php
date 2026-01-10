@@ -15,10 +15,12 @@ class PersonalNote extends Model
         'color',
         'is_pinned',
         'pinned_at',
+        'is_public',
     ];
 
     protected $casts = [
         'is_pinned' => 'boolean',
+        'is_public' => 'boolean',
         'pinned_at' => 'datetime',
     ];
 
