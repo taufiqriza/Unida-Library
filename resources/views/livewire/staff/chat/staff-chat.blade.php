@@ -1874,53 +1874,51 @@
     @endif
 
     {{-- Read Receipts Modal (Alpine.js - instant) --}}
-    <div x-data="{ show: false, readers: [] }" 
-         @show-readers.window="readers = $event.detail.readers; show = true"
-         @keydown.escape.window="show = false">
-        <template x-if="show">
-            <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50" @click.self="show = false">
-                <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden" x-transition>
-                    <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-eye text-blue-600 text-sm"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900 text-sm">Dibaca oleh</h3>
-                                <p class="text-xs text-gray-500"><span x-text="readers.length"></span> orang</p>
-                            </div>
-                        </div>
-                        <button @click="show = false" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-times text-gray-400"></i>
-                        </button>
+    <div x-data="{ showReaders: false, readers: [] }" 
+         @show-readers.window="readers = $event.detail.readers; showReaders = true"
+         @keydown.escape.window="showReaders = false"
+         x-show="showReaders"
+         x-cloak
+         class="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-black/50"
+         @click.self="showReaders = false">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs overflow-hidden" x-show="showReaders" x-transition>
+            <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-eye text-blue-600 text-sm"></i>
                     </div>
-                    <div class="max-h-64 overflow-y-auto">
-                        <template x-for="reader in readers" :key="reader.name">
-                            <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                                <template x-if="reader.photo">
-                                    <img :src="'/storage/' + reader.photo" class="w-9 h-9 rounded-full object-cover">
-                                </template>
-                                <template x-if="!reader.photo">
-                                    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold" x-text="reader.name.charAt(0).toUpperCase()"></div>
-                                </template>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate" x-text="reader.name"></p>
-                                    <p class="text-xs text-gray-500" x-text="reader.read_at"></p>
-                                </div>
-                                <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <path d="M2 12l5 5L18 6M8 12l5 5L24 6" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                        </template>
-                        <template x-if="readers.length === 0">
-                            <div class="px-4 py-8 text-center text-gray-400">
-                                <i class="fas fa-eye-slash text-2xl mb-2"></i>
-                                <p class="text-sm">Belum ada yang membaca</p>
-                            </div>
-                        </template>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 text-sm">Dibaca oleh</h3>
+                        <p class="text-xs text-gray-500"><span x-text="readers.length"></span> orang</p>
                     </div>
                 </div>
+                <button @click="showReaders = false" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-full">
+                    <i class="fas fa-times text-gray-400"></i>
+                </button>
             </div>
-        </template>
+            <div class="max-h-64 overflow-y-auto">
+                <template x-for="reader in readers" :key="reader.name">
+                    <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                        <template x-if="reader.photo">
+                            <img :src="'/storage/' + reader.photo" class="w-9 h-9 rounded-full object-cover">
+                        </template>
+                        <template x-if="!reader.photo">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold" x-text="reader.name.charAt(0).toUpperCase()"></div>
+                        </template>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate" x-text="reader.name"></p>
+                            <p class="text-xs text-gray-500" x-text="reader.read_at"></p>
+                        </div>
+                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M2 12l5 5L18 6M8 12l5 5L24 6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </template>
+                <div x-show="readers.length === 0" class="px-4 py-8 text-center text-gray-400">
+                    <i class="fas fa-eye-slash text-2xl mb-2"></i>
+                    <p class="text-sm">Belum ada yang membaca</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
