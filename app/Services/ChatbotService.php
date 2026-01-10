@@ -49,7 +49,7 @@ class ChatbotService
         // Find matching intent with context understanding
         $match = $this->findIntent($message, $room);
         if ($match) {
-            return $this->buildResponse($match['category'], $match['subtype']);
+            return $this->buildResponse($match['category'], $match['subtype'], $room, $originalMessage);
         }
         
         // No match - try AI fallback
@@ -77,7 +77,7 @@ class ChatbotService
             'aja' => 'saja', 'aj' => 'saja',
             'dpt' => 'dapat', 'bgt' => 'banget',
             'skripsi' => 'skripsi thesis', 'tesis' => 'thesis',
-            'ta' => 'tugas akhir', 'tugas akhir' => 'tugas akhir thesis',
+            ' ta ' => ' tugas akhir ', 'tugas akhir' => 'tugas akhir thesis',
         ];
         foreach ($typos as $typo => $fix) {
             $message = str_replace($typo, $fix, $message);
@@ -208,13 +208,13 @@ class ChatbotService
         return 'main';
     }
 
-    protected function buildResponse(string $category, string $subtype): array
+    protected function buildResponse(string $category, string $subtype, ChatRoom $room = null, string $originalMessage = ''): array
     {
         $responses = $this->knowledge[$category]['responses'] ?? [];
         $response = $responses[$subtype] ?? $responses['main'] ?? null;
         
         if (!$response) {
-            return $this->noMatchResponse();
+            return $this->noMatchResponse($room, $originalMessage);
         }
         
         return [
