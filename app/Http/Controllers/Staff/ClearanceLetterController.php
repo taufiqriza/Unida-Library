@@ -22,7 +22,7 @@ class ClearanceLetterController extends Controller
             'approver'
         ]);
         
-        $logoPath = public_path('favicon-32.png');
+        $logoPath = public_path('storage/logo-unida.png');
         $logoBase64 = file_exists($logoPath) 
             ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) 
             : null;

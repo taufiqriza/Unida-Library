@@ -52,7 +52,7 @@
                     {{-- Clearance Badge --}}
                     @if($item->clearanceLetter && $item->clearanceLetter->status === 'approved')
                     <span class="px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full font-medium flex items-center gap-1">
-                        <i class="fas fa-file-certificate text-[10px]"></i> Bebas Pustaka
+                        <i class="fas fa-file-circle-check text-[10px]"></i> Bebas Pustaka
                     </span>
                     @endif
 
@@ -85,6 +85,11 @@
 
             {{-- Actions --}}
             <div class="flex items-center gap-1 flex-shrink-0">
+                @if($item->clearanceLetter && $item->clearanceLetter->status === 'approved')
+                <a href="{{ route('staff.clearance-letter.download', $item->clearanceLetter) }}" class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition" title="Download Surat Bebas Pustaka">
+                    <i class="fas fa-file-arrow-down"></i>
+                </a>
+                @endif
                 <button wire:click="viewDetail({{ $item->id }}, 'submission')" class="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Lihat Detail">
                     <i class="fas fa-eye"></i>
                 </button>
