@@ -276,8 +276,9 @@ class StaffChat extends Component
                 'reactions.user:id,name',
                 'forwardedFrom:id,sender_id,message',
                 'forwardedFrom.sender:id,name',
+                'reads:id,message_id,user_id,read_at',
+                'reads.user:id,name,photo',
             ])
-            ->withCount('reads')
             ->orderBy('created_at', 'desc')
             ->take(50)
             ->get()
@@ -288,12 +289,18 @@ class StaffChat extends Component
         
         $this->messages = $messages->map(function($msg) use ($roomMemberCount) {
             $arr = $msg->toArray();
-            $arr['reads_count'] = $msg->reads_count;
+            $arr['reads_count'] = count($msg->reads);
             $arr['total_recipients'] = $roomMemberCount - 1;
             $arr['reactions_grouped'] = collect($msg->reactions)->groupBy('emoji')->map(fn($r) => [
                 'count' => $r->count(),
                 'users' => $r->pluck('user.name')->toArray(),
                 'user_ids' => $r->pluck('user_id')->toArray(),
+            ])->toArray();
+            // Pre-format reads for modal
+            $arr['readers'] = $msg->reads->map(fn($r) => [
+                'name' => $r->user->name ?? 'Unknown',
+                'photo' => $r->user->photo ?? null,
+                'read_at' => $r->read_at->format('d M H:i'),
             ])->toArray();
             return $arr;
         })->toArray();
@@ -1148,16 +1155,11 @@ class StaffChat extends Component
 
     public function showMessageReaders($messageId)
     {
-        $message = ChatMessage::with(['reads.user:id,name,photo'])->find($messageId);
-        if (!$message || $message->sender_id !== auth()->id()) return;
+        $msg = collect($this->messages)->firstWhere('id', $messageId);
+        if (!$msg || $msg['sender_id'] !== auth()->id()) return;
         
         $this->readReceiptsMessageId = $messageId;
-        $this->readReceiptsList = $message->reads->map(fn($r) => [
-            'id' => $r->user_id,
-            'name' => $r->user->name,
-            'photo' => $r->user->photo,
-            'read_at' => $r->read_at->format('d M H:i'),
-        ])->toArray();
+        $this->readReceiptsList = $msg['readers'] ?? [];
         $this->showReadReceipts = true;
     }
 
