@@ -18,11 +18,13 @@ class DdcRecommendationService
         'machine learning' => '006.31', 'data science' => '006.312', 'big data' => '005.7',
         'cybersecurity' => '005.8', 'keamanan siber' => '005.8', 'algoritma' => '005.1',
         'perpustakaan' => '020', 'library' => '020', 'informasi' => '020',
+        'sistem informasi' => '004', 'information system' => '004',
         
         // 100 - Philosophy, Psychology
         'filsafat' => '100', 'philosophy' => '100', 'psikologi' => '150', 'psychology' => '150',
         'etika' => '170', 'ethics' => '170', 'logika' => '160', 'logic' => '160',
         'metafisika' => '110', 'epistemologi' => '121', 'akhlak' => '170',
+        'moral' => '170', 'karakter' => '155.2',
         
         // 200 - Religion
         'agama' => '200', 'religion' => '200', 'teologi' => '230', 'theology' => '230',
@@ -31,13 +33,16 @@ class DdcRecommendationService
         // 2X0 - Islam (Indonesian DDC extension)
         'islam' => '2X0', 'islamic' => '2X0', 'muslim' => '2X0', 'quran' => '2X1',
         'alquran' => '2X1', 'al-quran' => '2X1', 'hadis' => '2X2', 'hadith' => '2X2',
-        'fiqih' => '2X4', 'fiqh' => '2X4', 'syariah' => '2X4', 'sharia' => '2X4',
-        'tasawuf' => '2X5', 'sufism' => '2X5', 'akidah' => '2X3', 'aqidah' => '2X3',
+        'fiqih' => '2X4', 'fiqh' => '2X4', 'fikih' => '2X4', 'syariah' => '2X4', 'sharia' => '2X4',
+        'tasawuf' => '2X5', 'sufism' => '2X5', 'akidah' => '2X3', 'aqidah' => '2X3', 'tauhid' => '2X3',
         'tafsir' => '2X1.4', 'dakwah' => '2X7', 'islamic education' => '2X7',
-        'pendidikan islam' => '2X7', 'ekonomi islam' => '2X6.3', 'islamic economics' => '2X6.3',
-        'perbankan syariah' => '2X6.32', 'islamic banking' => '2X6.32',
-        'hukum islam' => '2X4', 'islamic law' => '2X4', 'ushul fiqh' => '2X4.1',
-        'sejarah islam' => '2X9', 'islamic history' => '2X9', 'sirah' => '2X9.1',
+        'pendidikan islam' => '2X7', 'tarbiyah' => '2X7', 'ekonomi islam' => '2X6.3', 'islamic economics' => '2X6.3',
+        'perbankan syariah' => '2X6.32', 'islamic banking' => '2X6.32', 'bank syariah' => '2X6.32',
+        'hukum islam' => '2X4', 'islamic law' => '2X4', 'ushul fiqh' => '2X4.1', 'usul fikih' => '2X4.1',
+        'sejarah islam' => '2X9', 'islamic history' => '2X9', 'sirah' => '2X9.1', 'sirah nabawiyah' => '2X9.12',
+        'ulumul quran' => '2X1.1', 'ilmu hadis' => '2X2.1', 'musthalah hadis' => '2X2.1',
+        'muamalah' => '2X4.3', 'ibadah' => '2X4.2', 'shalat' => '2X4.21', 'zakat' => '2X4.24',
+        'haji' => '2X4.25', 'puasa' => '2X4.22', 'waris' => '2X4.4', 'nikah' => '2X4.5',
         
         // 300 - Social Sciences
         'sosiologi' => '301', 'sociology' => '301', 'antropologi' => '306', 'anthropology' => '306',
@@ -48,6 +53,7 @@ class DdcRecommendationService
         'hukum' => '340', 'law' => '340', 'legal' => '340', 'undang-undang' => '348',
         'pendidikan' => '370', 'education' => '370', 'pembelajaran' => '371', 'teaching' => '371',
         'kurikulum' => '375', 'curriculum' => '375', 'pedagogi' => '371.3',
+        'metodologi' => '001.42', 'penelitian' => '001.4', 'research' => '001.4',
         'komunikasi' => '302.2', 'communication' => '302.2', 'media' => '302.23',
         'jurnalistik' => '070', 'journalism' => '070', 'pers' => '070.4',
         
