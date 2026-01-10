@@ -97,6 +97,11 @@
 
             {{-- Actions --}}
             <div class="flex items-center gap-1 flex-shrink-0">
+                @if($item->provider === 'ithenticate' && $item->external_id && $item->status === 'completed')
+                <a href="{{ route('opac.member.plagiarism.report', $item) }}" target="_blank" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Buka Report iThenticate">
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+                @endif
                 <button wire:click="viewDetail({{ $item->id }}, 'plagiarism')" class="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition" title="Lihat Detail">
                     <i class="fas fa-eye"></i>
                 </button>
