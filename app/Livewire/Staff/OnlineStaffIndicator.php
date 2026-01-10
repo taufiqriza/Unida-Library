@@ -19,14 +19,13 @@ class OnlineStaffIndicator extends Component
             $query->where('branch_id', $user->branch_id);
         }
         
-        return $query->orderByDesc('is_online')
-            ->orderByDesc('last_seen_at')
-            ->get(['id', 'name', 'role', 'photo', 'last_seen_at', 'is_online']);
+        return $query->orderByDesc('last_seen_at')
+            ->get(['id', 'name', 'role', 'photo', 'last_seen_at']);
     }
 
     public function getOnlineCountProperty()
     {
-        return $this->onlineStaff->where('is_online', true)->count();
+        return $this->onlineStaff->filter(fn($s) => $s->isReallyOnline())->count();
     }
 
     public function render()

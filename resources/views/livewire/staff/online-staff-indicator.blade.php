@@ -37,7 +37,7 @@
                     <div class="w-9 h-9 rounded-full overflow-hidden border-2" :class="$store.darkMode ? 'border-slate-600' : 'border-slate-200'">
                         <img src="{{ $staff->getAvatarUrl(50) }}" class="w-full h-full object-cover">
                     </div>
-                    <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 {{ $staff->is_online ? 'bg-emerald-500' : 'bg-slate-400' }}" :class="$store.darkMode ? 'border-slate-800' : 'border-white'"></span>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 {{ $staff->isReallyOnline() ? 'bg-emerald-500' : 'bg-slate-400' }}" :class="$store.darkMode ? 'border-slate-800' : 'border-white'"></span>
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium truncate" :class="$store.darkMode ? 'text-slate-200' : 'text-slate-900'">{{ $staff->name }}</p>
@@ -46,14 +46,8 @@
                             {{ $staff->role === 'super_admin' ? 'bg-red-100 text-red-700' : ($staff->role === 'admin' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700') }}">
                             {{ $staff->role === 'super_admin' ? 'Super Admin' : ($staff->role === 'admin' ? 'Admin' : 'Staff') }}
                         </span>
-                        <span class="text-[10px] {{ $staff->is_online ? 'text-emerald-500' : '' }}" :class="$store.darkMode ? 'text-slate-500' : 'text-slate-400'">
-                            @if($staff->is_online)
-                                <i class="fas fa-circle text-[6px] mr-1"></i>Online
-                            @elseif($staff->last_seen_at)
-                                {{ $staff->last_seen_at->diffForHumans() }}
-                            @else
-                                Belum pernah login
-                            @endif
+                        <span class="text-[10px] {{ $staff->isReallyOnline() ? 'text-emerald-500' : '' }}" :class="$store.darkMode ? 'text-slate-500' : 'text-slate-400'">
+                            {{ $staff->getOnlineStatusText() }}
                         </span>
                     </div>
                 </div>
