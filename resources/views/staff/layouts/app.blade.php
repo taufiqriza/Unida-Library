@@ -510,8 +510,8 @@
                        :class="darkMode ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'"></i>
                 </button>
                 
-                {{-- Online Staff Indicator (Super Admin Only) --}}
-                @if($user->role === 'super_admin')
+                {{-- Online Staff Indicator (Super Admin & Admin) --}}
+                @if(in_array($user->role, ['super_admin', 'admin']))
                 @livewire('staff.online-staff-indicator')
                 @endif
                 
