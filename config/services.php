@@ -64,4 +64,14 @@ return [
         'base_url' => env('EPRINTS_BASE_URL', 'https://repo.unida.gontor.ac.id'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Groq AI API (Free tier: 14,400 requests/day)
+    |--------------------------------------------------------------------------
+    */
+
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+    ],
+
 ];
