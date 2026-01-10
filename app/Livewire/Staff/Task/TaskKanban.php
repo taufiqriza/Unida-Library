@@ -446,6 +446,23 @@ class TaskKanban extends Component
         $timelineStart = now()->startOfDay();
         $timelineEnd = now()->addDays($timelineDays)->endOfDay();
 
+        // Get schedules for timeline (integrated view)
+        $timelineSchedulesQuery = StaffSchedule::with(['user', 'branch'])
+            ->whereBetween('schedule_date', [$timelineStart, $timelineEnd])
+            ->whereIn('status', ['scheduled', 'ongoing']);
+        
+        // Apply branch filter
+        if ($this->filterBranch) {
+            $timelineSchedulesQuery->where('branch_id', $this->filterBranch);
+        } elseif (!$isSuperAdmin) {
+            $timelineSchedulesQuery->where(function($q) use ($user) {
+                $q->where('branch_id', $user->branch_id)
+                  ->orWhere('user_id', $user->id);
+            });
+        }
+        
+        $timelineSchedules = $timelineSchedulesQuery->orderBy('schedule_date')->get();
+
         return view('livewire.staff.task.kanban', [
             'statuses' => $statuses,
             'tasksByStatus' => $tasksByStatus,
@@ -458,6 +475,7 @@ class TaskKanban extends Component
             'timelineStart' => $timelineStart,
             'timelineEnd' => $timelineEnd,
             'timelineDays' => $timelineDays,
+            'timelineSchedules' => $timelineSchedules,
         ])->extends('staff.layouts.app')->section('content');
     }
 }
