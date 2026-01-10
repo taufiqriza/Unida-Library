@@ -608,13 +608,6 @@
                                                         <p class="text-xs text-gray-500">Cek keaslian karya</p>
                                                     </div>
                                                 </a>
-                                                <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
-                                                    <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition"><i class="fas fa-user-graduate text-orange-600"></i></div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">{{ __('opac.guide_menu.ospek_guide') }}</p>
-                                                        <p class="text-xs text-gray-500">Panduan mahasiswa baru</p>
-                                                    </div>
-                                                </a>
                                             </div>
                                         </div>
                                         <!-- Materi & Akademik -->
@@ -626,6 +619,13 @@
                                                 <h3 class="font-bold text-gray-900 text-sm">{{ __('opac.guide_menu.academic') }}</h3>
                                             </div>
                                             <div class="space-y-1">
+                                                <a href="{{ route('opac.page', 'panduan-ospek') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
+                                                    <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition"><i class="fas fa-user-graduate text-orange-600"></i></div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">{{ __('opac.guide_menu.ospek_guide') }}</p>
+                                                        <p class="text-xs text-gray-500">Panduan mahasiswa baru</p>
+                                                    </div>
+                                                </a>
                                                 <a href="{{ route('opac.page', 'panduan-akademik') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
                                                     <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition"><i class="fas fa-graduation-cap text-purple-600"></i></div>
                                                     <div class="flex-1 min-w-0">
@@ -638,13 +638,6 @@
                                                     <div class="flex-1 min-w-0">
                                                         <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">{{ __('opac.guide_menu.library_materials') }}</p>
                                                         <p class="text-xs text-gray-500">Materi literasi informasi</p>
-                                                    </div>
-                                                </a>
-                                                <a href="{{ route('opac.page', 'download-eddc') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 group transition">
-                                                    <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition"><i class="fas fa-download text-indigo-600"></i></div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-semibold text-gray-900 group-hover:text-primary-600 transition">{{ __('opac.guide_menu.download_eddc') }}</p>
-                                                        <p class="text-xs text-gray-500">Klasifikasi DDC elektronik</p>
                                                     </div>
                                                 </a>
                                             </div>
