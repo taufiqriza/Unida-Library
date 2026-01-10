@@ -16,7 +16,7 @@
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
-         class="absolute right-0 mt-2 w-72 rounded-xl shadow-xl border overflow-hidden z-50"
+         class="absolute right-0 mt-2 w-80 rounded-xl shadow-xl border overflow-hidden z-50"
          :class="$store.darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'">
         
         <div class="px-4 py-3 border-b" :class="$store.darkMode ? 'border-slate-700' : 'border-slate-100'">
@@ -42,7 +42,21 @@
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium truncate" :class="$store.darkMode ? 'text-slate-200' : 'text-slate-900'">{{ $staff->name }}</p>
                     <p class="text-[10px] truncate" :class="$store.darkMode ? 'text-slate-400' : 'text-slate-500'">
-                        <span class="{{ $staff->role === 'super_admin' ? 'text-red-500' : ($staff->role === 'admin' ? 'text-amber-600' : 'text-blue-500') }}">{{ $staff->role === 'super_admin' ? 'SA' : ($staff->role === 'admin' ? 'Admin' : 'Staff') }}</span>
+                        @php
+                            $roleLabel = match($staff->role) {
+                                'super_admin' => 'SA',
+                                'admin' => 'Admin',
+                                'librarian' => 'Pustakawan',
+                                default => 'Staff'
+                            };
+                            $roleColor = match($staff->role) {
+                                'super_admin' => 'text-red-500',
+                                'admin' => 'text-amber-600',
+                                'librarian' => 'text-purple-500',
+                                default => 'text-blue-500'
+                            };
+                        @endphp
+                        <span class="{{ $roleColor }}">{{ $roleLabel }}</span>
                         @if($staff->branch)<span class="mx-1">·</span>{{ $staff->branch->name }}@endif
                         <span class="mx-1">·</span>
                         <span class="{{ $staff->isReallyOnline() ? 'text-emerald-500' : '' }}">{{ $staff->getOnlineStatusText() }}</span>
