@@ -131,11 +131,19 @@ class ChatbotService
             $keywords = $data['keywords'] ?? [];
             
             foreach ($keywords as $keyword) {
+                // Skip very short keywords (< 3 chars) unless exact word match
+                if (strlen($keyword) < 3) {
+                    if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/u', $message)) {
+                        $score += 10;
+                    }
+                    continue;
+                }
+                
                 if (str_contains($message, $keyword)) {
                     // Longer keyword = higher score
                     $score += strlen($keyword) * 2;
                     // Exact word match bonus
-                    if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/', $message)) {
+                    if (preg_match('/\b' . preg_quote($keyword, '/') . '\b/u', $message)) {
                         $score += 5;
                     }
                 }
@@ -147,27 +155,10 @@ class ChatbotService
         }
         
         // Require minimum score threshold to avoid false positives
-        // Let AI handle low-confidence matches
         $minScore = 15;
         
         if (empty($scores) || max($scores) < $minScore) {
-            // Try context from room topic only for very short messages
-            if (strlen($message) < 20) {
-                $topicMap = [
-                    'unggah' => 'unggah', 'unggah_mandiri' => 'unggah',
-                    'plagiasi' => 'plagiasi',
-                    'bebas' => 'bebas', 'bebas_pustaka' => 'bebas',
-                    'pinjam' => 'pinjam', 'peminjaman' => 'pinjam',
-                ];
-                $roomTopic = $room->topic ?? '';
-                if (isset($topicMap[$roomTopic])) {
-                    return [
-                        'category' => $topicMap[$roomTopic],
-                        'subtype' => $this->detectSubtype($message, $topicMap[$roomTopic])
-                    ];
-                }
-            }
-            return null;
+            return null; // Let AI handle it
         }
         
         // Get highest scoring category
