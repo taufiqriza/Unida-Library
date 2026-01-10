@@ -9,17 +9,9 @@ class OnlineStaffIndicator extends Component
 {
     public function getOnlineStaffProperty()
     {
-        $user = auth()->user();
-        
-        $query = User::query()
-            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff']);
-        
-        // Admin cabang hanya lihat staff di cabangnya
-        if ($user->role === 'admin' && $user->branch_id) {
-            $query->where('branch_id', $user->branch_id);
-        }
-        
-        return $query->orderByDesc('last_seen_at')
+        return User::query()
+            ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff'])
+            ->orderByDesc('last_seen_at')
             ->get(['id', 'name', 'role', 'photo', 'last_seen_at']);
     }
 
