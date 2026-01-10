@@ -38,3 +38,14 @@ storage/database/shamela_content.db
 docs/google-analytics.json
 docs/
 /storage
+
+# Development files (exclude from production)
+kiro-last.md
+last
+fix-nim.php
+retry-watermark.php
+sample-certif.html
+
+# Development directories
+tests/
+scripts/
