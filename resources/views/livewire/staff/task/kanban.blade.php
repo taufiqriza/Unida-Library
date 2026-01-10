@@ -77,6 +77,20 @@
         </div>
 
         <div class="flex items-center gap-3">
+            {{-- View Mode Toggle --}}
+            <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
+                <button wire:click="$set('viewMode', 'kanban')" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'kanban' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-columns"></i>
+                    <span class="hidden sm:inline">Kanban</span>
+                </button>
+                <button wire:click="$set('viewMode', 'timeline')" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'timeline' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <i class="fas fa-stream"></i>
+                    <span class="hidden sm:inline">Timeline</span>
+                </button>
+            </div>
+            
             {{-- Tab Switch --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <a href="{{ route('staff.task.index') }}" 
@@ -257,6 +271,7 @@
     </div>
 
     {{-- Kanban Board with Scroll Navigation --}}
+    @if($viewMode === 'kanban')
     <div class="relative" 
          x-data="{ 
              canScrollLeft: false, 
@@ -442,6 +457,180 @@
         @endforeach
         </div>
     </div>
+    @endif
+
+    {{-- Timeline View --}}
+    @if($viewMode === 'timeline')
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        {{-- Timeline Header --}}
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-stream text-violet-600 text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 text-sm">Timeline Tugas</h3>
+                    <p class="text-xs text-gray-500">{{ $timelineStart->format('d M') }} - {{ $timelineEnd->format('d M Y') }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                {{-- Zoom Controls --}}
+                <div class="flex bg-gray-100 rounded-lg p-0.5">
+                    <button wire:click="$set('timelineZoom', 'day')" 
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'day' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        7 Hari
+                    </button>
+                    <button wire:click="$set('timelineZoom', 'week')" 
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'week' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        14 Hari
+                    </button>
+                    <button wire:click="$set('timelineZoom', 'month')" 
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'month' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        30 Hari
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Timeline Body --}}
+        <div class="overflow-x-auto">
+            <div class="min-w-[800px]">
+                {{-- Date Headers --}}
+                <div class="flex border-b border-gray-100">
+                    <div class="w-48 flex-shrink-0 px-3 py-2 bg-gray-50 border-r border-gray-100">
+                        <span class="text-xs font-semibold text-gray-500">TUGAS</span>
+                    </div>
+                    <div class="flex-1 flex">
+                        @for($i = 0; $i < $timelineDays; $i++)
+                            @php
+                                $date = $timelineStart->copy()->addDays($i);
+                                $isToday = $date->isToday();
+                                $isWeekend = $date->isWeekend();
+                            @endphp
+                            <div class="flex-1 min-w-[40px] text-center py-2 border-r border-gray-50 {{ $isToday ? 'bg-violet-50' : ($isWeekend ? 'bg-gray-50/50' : '') }}">
+                                <p class="text-[10px] font-semibold {{ $isToday ? 'text-violet-600' : 'text-gray-400' }}">
+                                    {{ $date->locale('id')->isoFormat('ddd') }}
+                                </p>
+                                <p class="text-xs font-bold {{ $isToday ? 'text-violet-600' : 'text-gray-700' }}">
+                                    {{ $date->format('d') }}
+                                </p>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+
+                {{-- Task Rows --}}
+                <div class="divide-y divide-gray-50">
+                    @php
+                        $tasksWithDates = $tasks->filter(fn($t) => $t->due_date || $t->start_date)->sortBy('due_date');
+                    @endphp
+                    
+                    @forelse($tasksWithDates as $task)
+                        @php
+                            $taskStart = $task->start_date ?? $task->created_at;
+                            $taskEnd = $task->due_date ?? $taskStart->copy()->addDays(1);
+                            
+                            // Calculate position
+                            $startOffset = max(0, $taskStart->diffInDays($timelineStart, false));
+                            $endOffset = min($timelineDays, $taskEnd->diffInDays($timelineStart, false) + 1);
+                            $duration = max(1, $endOffset - $startOffset);
+                            
+                            $leftPercent = ($startOffset / $timelineDays) * 100;
+                            $widthPercent = ($duration / $timelineDays) * 100;
+                            
+                            // Priority colors
+                            $barColors = [
+                                'urgent' => 'bg-gradient-to-r from-red-500 to-red-600',
+                                'high' => 'bg-gradient-to-r from-orange-500 to-orange-600',
+                                'medium' => 'bg-gradient-to-r from-blue-500 to-indigo-600',
+                                'low' => 'bg-gradient-to-r from-emerald-500 to-teal-600',
+                            ];
+                            $barColor = $barColors[$task->priority] ?? $barColors['medium'];
+                            
+                            // Check if task is visible in timeline
+                            $isVisible = $startOffset < $timelineDays && $endOffset > 0;
+                        @endphp
+                        
+                        @if($isVisible)
+                        <div class="flex hover:bg-gray-50/50 transition-colors">
+                            {{-- Task Name --}}
+                            <div class="w-48 flex-shrink-0 px-3 py-3 border-r border-gray-100 flex items-center gap-2">
+                                @php
+                                    $priorityStyles = [
+                                        'urgent' => 'bg-red-100 text-red-600',
+                                        'high' => 'bg-orange-100 text-orange-600',
+                                        'medium' => 'bg-blue-100 text-blue-600',
+                                        'low' => 'bg-emerald-100 text-emerald-600',
+                                    ];
+                                @endphp
+                                <div class="w-2 h-2 rounded-full flex-shrink-0 {{ $priorityStyles[$task->priority] ?? 'bg-gray-100' }}"></div>
+                                <div class="min-w-0 flex-1">
+                                    <p wire:click="openTaskModal({{ $task->id }})" 
+                                       class="text-xs font-medium text-gray-900 truncate cursor-pointer hover:text-violet-600 transition">
+                                        {{ Str::limit($task->title, 22) }}
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 truncate">
+                                        {{ $task->assignee?->name ?? 'Belum ditugaskan' }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {{-- Timeline Bar Area --}}
+                            <div class="flex-1 relative py-2">
+                                {{-- Grid Lines --}}
+                                <div class="absolute inset-0 flex">
+                                    @for($i = 0; $i < $timelineDays; $i++)
+                                        @php $date = $timelineStart->copy()->addDays($i); @endphp
+                                        <div class="flex-1 border-r border-gray-50 {{ $date->isToday() ? 'bg-violet-50/30' : '' }}"></div>
+                                    @endfor
+                                </div>
+                                
+                                {{-- Task Bar --}}
+                                <div class="absolute top-1/2 -translate-y-1/2 h-6 rounded-full shadow-sm flex items-center px-2 text-white text-[10px] font-semibold {{ $barColor }} {{ $task->isOverdue() ? 'ring-2 ring-red-300 ring-offset-1' : '' }}"
+                                     style="left: {{ $leftPercent }}%; width: {{ max(3, $widthPercent) }}%;"
+                                     title="{{ $task->title }} ({{ $taskStart->format('d M') }} - {{ $taskEnd->format('d M') }})">
+                                    @if($widthPercent > 10)
+                                        <span class="truncate">{{ Str::limit($task->title, 15) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    @empty
+                        <div class="text-center py-12">
+                            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                                <i class="fas fa-calendar-times text-gray-300 text-2xl"></i>
+                            </div>
+                            <p class="text-gray-500 text-sm font-medium">Tidak ada tugas dengan tanggal</p>
+                            <p class="text-gray-400 text-xs mt-1">Tambahkan due date pada tugas untuk melihatnya di timeline</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        {{-- Legend --}}
+        <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-4 flex-wrap">
+            <span class="text-xs text-gray-500 font-medium">Prioritas:</span>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded"></div>
+                <span class="text-xs text-gray-600">Mendesak</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-gradient-to-r from-orange-500 to-orange-600 rounded"></div>
+                <span class="text-xs text-gray-600">Tinggi</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded"></div>
+                <span class="text-xs text-gray-600">Sedang</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded"></div>
+                <span class="text-xs text-gray-600">Rendah</span>
+            </div>
+        </div>
+    </div>
+    @endif
 
     {{-- Modals teleported to body for proper z-index --}}
     <template x-teleport="body">

@@ -19,6 +19,10 @@ class TaskKanban extends Component
     public $filterBranch = '';
     public $searchQuery = '';
     
+    // View mode: kanban or timeline
+    public $viewMode = 'kanban';
+    public $timelineZoom = 'week'; // day, week, month
+    
     // For task quick create
     public $newTaskTitle = '';
     public $newTaskStatusId = null;
@@ -427,14 +431,29 @@ class TaskKanban extends Component
             ->orderBy('start_time')
             ->get();
 
+        // Timeline date range calculation
+        $timelineDays = match($this->timelineZoom) {
+            'day' => 7,
+            'week' => 14,
+            'month' => 30,
+            default => 14,
+        };
+        $timelineStart = now()->startOfDay();
+        $timelineEnd = now()->addDays($timelineDays)->endOfDay();
+
         return view('livewire.staff.task.kanban', [
             'statuses' => $statuses,
             'tasksByStatus' => $tasksByStatus,
+            'tasks' => $tasks,
             'stats' => $stats,
             'users' => $users,
             'branches' => $branches,
             'isSuperAdmin' => $isSuperAdmin,
             'todaySchedules' => $todaySchedules,
+            'timelineStart' => $timelineStart,
+            'timelineEnd' => $timelineEnd,
+            'timelineDays' => $timelineDays,
         ])->extends('staff.layouts.app')->section('content');
     }
 }
+
