@@ -98,7 +98,7 @@
             {{-- Actions --}}
             <div class="flex items-center gap-1 flex-shrink-0">
                 @if($item->provider === 'ithenticate' && $item->external_id && $item->status === 'completed')
-                <a href="{{ route('opac.member.plagiarism.report', $item) }}" target="_blank" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Buka Report iThenticate">
+                <a href="{{ route('plagiarism.report.public', $item) }}" target="_blank" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Buka Report iThenticate">
                     <i class="fas fa-external-link-alt"></i>
                 </a>
                 @endif

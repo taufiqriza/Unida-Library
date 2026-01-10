@@ -220,7 +220,7 @@
 
     {{-- iThenticate Report Link --}}
     @if($selectedItem->provider === 'ithenticate' && $selectedItem->external_id && $selectedItem->status === 'completed')
-    <a href="{{ route('opac.member.plagiarism.report', $selectedItem) }}" target="_blank" 
+    <a href="{{ route('plagiarism.report.public', $selectedItem) }}" target="_blank" 
        class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">

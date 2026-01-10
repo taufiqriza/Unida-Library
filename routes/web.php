@@ -168,6 +168,9 @@ Route::get('/verify/{certificate}', [App\Http\Controllers\Opac\PlagiarismControl
 // Public Certificate Download (for admin/staff to share via WhatsApp)
 Route::get('/certificate/{check}/download', [App\Http\Controllers\Opac\PlagiarismController::class, 'publicDownload'])->name('plagiarism.certificate.download');
 
+// Public iThenticate Report (for staff access)
+Route::get('/plagiarism/{check}/report', [App\Http\Controllers\Opac\PlagiarismController::class, 'viewReport'])->name('plagiarism.report.public');
+
 // Testing route for certificate
 Route::get('/test-certificate/{id}', function($id) {
     $check = \App\Models\PlagiarismCheck::findOrFail($id);
