@@ -670,64 +670,18 @@
         <div style="position: relative; z-index: 9999;">
             {{-- Task Detail Modal --}}
             @if($showTaskModal && $selectedTask)
-                    <div class="bg-violet-50/30 px-3 py-2 border-b border-violet-100">
-                        <span class="text-xs font-bold text-violet-700 flex items-center gap-1">
-                            <i class="fas fa-clipboard-list"></i> TUGAS ({{ $tasksWithDates->count() }})
-                        </span>
-                    </div>
-                    @foreach($tasksWithDates as $task)
-                        @php
-                            $taskStart = $task->start_date ?? $task->created_at;
-                            $taskEnd = $task->due_date ?? $taskStart->copy()->addDays(1);
-                            
-                            $startOffset = max(0, $taskStart->diffInDays($timelineStart, false));
-                            $endOffset = min($timelineDays, $taskEnd->diffInDays($timelineStart, false) + 1);
-                            $duration = max(1, $endOffset - $startOffset);
-                            
-                            $leftPercent = ($startOffset / $timelineDays) * 100;
-                            $widthPercent = ($duration / $timelineDays) * 100;
-                            
-                            $barColors = [
-                                'urgent' => 'bg-gradient-to-r from-red-500 to-red-600',
-                                'high' => 'bg-gradient-to-r from-orange-500 to-orange-600',
-                                'medium' => 'bg-gradient-to-r from-violet-500 to-purple-600',
-                                'low' => 'bg-gradient-to-r from-emerald-500 to-teal-600',
-                            ];
-                            $barColor = $barColors[$task->priority] ?? $barColors['medium'];
-                            $isVisible = $startOffset < $timelineDays && $endOffset > 0;
-                        @endphp
-                        
-                        @if($isVisible)
-                        <div class="flex hover:bg-violet-50/30 transition-colors">
-                            <div class="w-48 flex-shrink-0 px-3 py-3 border-r border-gray-100 flex items-center gap-2">
-                                <div class="w-5 h-5 rounded bg-violet-100 flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-clipboard-check text-violet-600 text-[10px]"></i>
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p wire:click="openTaskModal({{ $task->id }})" 
-                                       class="text-xs font-medium text-gray-900 truncate cursor-pointer hover:text-violet-600 transition">
-                                        {{ Str::limit($task->title, 20) }}
-                                    </p>
-                                    <p class="text-[10px] text-gray-400 truncate">
-                                        {{ $task->assignee?->name ?? 'Belum PIC' }}
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex-1 relative py-2">
-                                <div class="absolute inset-0 flex">
-                                    @for($i = 0; $i < $timelineDays; $i++)
-                                        @php $date = $timelineStart->copy()->addDays($i); @endphp
-                                        <div class="flex-1 border-r border-gray-50 {{ $date->isToday() ? 'bg-violet-50/30' : '' }}"></div>
-                                    @endfor
-                                </div>
-                                
-                                <div class="absolute top-1/2 -translate-y-1/2 h-6 rounded-full shadow-sm flex items-center px-2 text-white text-[10px] font-semibold {{ $barColor }} {{ $task->isOverdue() ? 'ring-2 ring-red-300 ring-offset-1' : '' }}"
-                                     style="left: {{ $leftPercent }}%; width: {{ max(3, $widthPercent) }}%;"
-                                     title="{{ $task->title }}">
-                                    @if($widthPercent > 12)
-                                        <span class="truncate">{{ Str::limit($task->title, 12) }}</span>
-                                    @endif
+            <div class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                 x-data="{ activeTab: 'details' }"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col" 
+                     @click.away="$wire.closeTaskModal()">
+            
+            {{-- Modal Header --}}
+            <div class="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0" 
+                 style="background: linear-gradient(135deg, {{ $selectedTask->status->color }}15, {{ $selectedTask->status->color }}05);">
+                <div class="flex items-center gap-3">
                                 </div>
                             </div>
                         </div>
