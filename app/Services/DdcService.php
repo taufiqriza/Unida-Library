@@ -30,32 +30,34 @@ class DdcService
     }
 
     /**
-     * Enhanced search DDC by code or description with better ranking
-     * Supports e-DDC Edition 23 features
+     * Enhanced DDC search with proper Dewey Decimal Classification logic
+     * Supports hierarchical classification and smart matching
      */
-    public function search(string $query, int $limit = 50): array
+    public function search(string $query, int $limit = 100): array
     {
-        $originalQuery = trim($query); // Keep original case
-        $query = strtolower($originalQuery); // For description search only
+        $originalQuery = trim($query);
+        $query = strtolower($originalQuery);
         $isCodeSearch = preg_match('/^[0-9xX.]+$/', $originalQuery);
         
         $exactMatches = [];
+        $hierarchicalMatches = [];
         $startsWithMatches = [];
-        $sameClassMatches = [];
         $containsMatches = [];
-        $relatedMatches = [];
+        $descriptionMatches = [];
         
         // Split search terms for multi-word search
         $searchTerms = array_filter(explode(' ', $query), fn($term) => strlen($term) >= 2);
         
         foreach ($this->all() as $item) {
-            $code = $item['code']; // Keep original case for DDC codes
+            $code = $item['code'];
             $desc = strtolower($item['description']);
             
-            // Code-based search
+            // Code-based search with DDC hierarchy logic
             if ($isCodeSearch) {
                 if ($code === $originalQuery) {
                     $exactMatches[] = $item;
+                } elseif ($this->isInDdcHierarchy($code, $originalQuery)) {
+                    $hierarchicalMatches[] = $item;
                 } elseif (str_starts_with($code, $originalQuery)) {
                     $startsWithMatches[] = $item;
                 } elseif (str_contains($code, $originalQuery)) {
@@ -64,38 +66,92 @@ class DdcService
                 continue;
             }
             
-            // Multi-term description search
+            // Description-based search with relevance scoring
             if (!empty($searchTerms)) {
-                $matchCount = 0;
-                $exactWordMatches = 0;
-                
-                foreach ($searchTerms as $term) {
-                    if (str_contains($desc, $term)) {
-                        $matchCount++;
-                        // Check for exact word match
-                        if (preg_match('/\b' . preg_quote($term, '/') . '\b/', $desc)) {
-                            $exactWordMatches++;
-                        }
-                    }
-                }
-                
-                // Categorize by match quality
-                if ($matchCount === count($searchTerms)) {
-                    if ($exactWordMatches === count($searchTerms)) {
-                        $exactMatches[] = $item;
-                    } else {
-                        $startsWithMatches[] = $item;
-                    }
-                } elseif ($matchCount > 0) {
-                    $containsMatches[] = $item;
+                $matchScore = $this->calculateRelevanceScore($desc, $searchTerms);
+                if ($matchScore > 0) {
+                    $item['_score'] = $matchScore;
+                    $descriptionMatches[] = $item;
                 }
             }
         }
         
-        // Combine results with priority
-        $results = array_merge($exactMatches, $startsWithMatches, $sameClassMatches, $containsMatches, $relatedMatches);
+        // Sort description matches by relevance score
+        usort($descriptionMatches, fn($a, $b) => $b['_score'] <=> $a['_score']);
+        
+        // Combine results with proper DDC hierarchy priority
+        $results = array_merge(
+            $exactMatches,
+            $hierarchicalMatches,
+            $startsWithMatches,
+            $containsMatches,
+            $descriptionMatches
+        );
         
         return array_slice($results, 0, $limit);
+    }
+    
+    /**
+     * Check if a DDC code belongs to the hierarchy of another code
+     * Implements proper DDC classification logic
+     */
+    private function isInDdcHierarchy(string $code, string $parentCode): bool
+    {
+        // Remove dots for comparison
+        $cleanCode = str_replace('.', '', $code);
+        $cleanParent = str_replace('.', '', $parentCode);
+        
+        // DDC Hierarchy Rules:
+        // 1. Main class (0, 1, 2, etc.) includes all subclasses
+        // 2. Division (00, 10, 20, etc.) includes all subdivisions
+        // 3. Section (000, 100, 200, etc.) includes all subsections
+        
+        if (strlen($cleanParent) === 1) {
+            // Main class search (0, 1, 2, etc.)
+            return str_starts_with($cleanCode, $cleanParent);
+        } elseif (strlen($cleanParent) === 2) {
+            // Division search (00, 10, 20, etc.)
+            return str_starts_with($cleanCode, $cleanParent);
+        } elseif (strlen($cleanParent) === 3) {
+            // Section search (000, 100, 200, etc.)
+            return str_starts_with($cleanCode, $cleanParent);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Calculate relevance score for description matching
+     */
+    private function calculateRelevanceScore(string $description, array $searchTerms): float
+    {
+        $score = 0;
+        $totalTerms = count($searchTerms);
+        
+        foreach ($searchTerms as $term) {
+            // Exact word match (highest score)
+            if (preg_match('/\b' . preg_quote($term, '/') . '\b/i', $description)) {
+                $score += 10;
+            }
+            // Partial match (lower score)
+            elseif (str_contains($description, $term)) {
+                $score += 5;
+            }
+        }
+        
+        // Bonus for matching all terms
+        $matchedTerms = 0;
+        foreach ($searchTerms as $term) {
+            if (str_contains($description, $term)) {
+                $matchedTerms++;
+            }
+        }
+        
+        if ($matchedTerms === $totalTerms) {
+            $score += 20; // Bonus for complete match
+        }
+        
+        return $score / $totalTerms; // Normalize by number of terms
     }
 
     /**

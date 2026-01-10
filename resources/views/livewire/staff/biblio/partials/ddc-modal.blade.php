@@ -265,12 +265,13 @@ function enhancedDdcModal() {
         ],
         
         selectClass(code) {
-            // For main classes, search by the first 2 digits to get all sub-classes
+            // Implement proper DDC hierarchy selection
             if (code === '2X') {
                 this.search = '2X';  // Special case for Islamic classifications
             } else if (code.length === 3 && code.endsWith('00')) {
-                // For main classes like 000, 100, 200, search by first 2 digits
-                this.search = code.substring(0, 2);  // "000" -> "00", "100" -> "10"
+                // For main class sections (000, 100, 200, etc.)
+                // Search by the main class digit to get ALL subclasses
+                this.search = code.charAt(0);  // "000" -> "0", "100" -> "1", "200" -> "2"
             } else {
                 this.search = code;
             }
@@ -278,14 +279,16 @@ function enhancedDdcModal() {
         },
         
         async doSearch() {
-            if (this.search.length < 2) { 
+            if (this.search.length < 1) { 
                 this.results = []; 
                 return; 
             }
             
             this.loading = true;
             try {
-                const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=50');
+                // Increase limit for comprehensive results
+                const limit = this.search.length === 1 ? 200 : 100; // More results for main classes
+                const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=' + limit);
                 this.results = await res.json();
             } catch (e) { 
                 this.results = []; 
