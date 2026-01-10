@@ -510,6 +510,11 @@
                        :class="darkMode ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'"></i>
                 </button>
                 
+                {{-- Online Staff Indicator (Super Admin Only) --}}
+                @if($user->role === 'super_admin')
+                @livewire('staff.online-staff-indicator')
+                @endif
+                
                 <div class="h-8 w-px" :class="darkMode ? 'bg-slate-600' : 'bg-slate-200'"></div>
                 
                 {{-- Profile Dropdown --}}
