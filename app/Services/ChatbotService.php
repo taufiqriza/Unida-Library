@@ -155,7 +155,7 @@ class ChatbotService
         }
         
         // Require minimum score threshold to avoid false positives
-        $minScore = 15;
+        $minScore = 20;
         
         if (empty($scores) || max($scores) < $minScore) {
             return null; // Let AI handle it
