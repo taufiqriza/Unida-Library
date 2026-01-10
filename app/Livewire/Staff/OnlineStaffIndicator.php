@@ -9,10 +9,10 @@ class OnlineStaffIndicator extends Component
 {
     public function getOnlineStaffProperty()
     {
-        return User::query()
+        return User::with('branch')
             ->whereIn('role', ['super_admin', 'admin', 'librarian', 'staff'])
             ->orderByDesc('last_seen_at')
-            ->get(['id', 'name', 'role', 'photo', 'last_seen_at']);
+            ->get(['id', 'name', 'role', 'photo', 'last_seen_at', 'branch_id']);
     }
 
     public function getOnlineCountProperty()
