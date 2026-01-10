@@ -60,15 +60,6 @@ class DdcService
                 } elseif (str_contains($code, $query)) {
                     $containsMatches[] = $item;
                 }
-                
-                // Special handling for main class search (e.g., "100", "200")
-                // If searching for main class like "100", also include all sub-classes starting with "1"
-                if (strlen($query) === 3 && str_ends_with($query, '00')) {
-                    $mainDigit = substr($query, 0, 1);
-                    if (str_starts_with($code, $mainDigit) && $code !== $query && !str_starts_with($code, $query)) {
-                        $sameClassMatches[] = $item;
-                    }
-                }
                 continue;
             }
             

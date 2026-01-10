@@ -265,13 +265,8 @@ function enhancedDdcModal() {
         ],
         
         selectClass(code) {
-            if (code === '2X') {
-                this.search = '2X';  // Search for Islamic classifications with 2X prefix
-            } else {
-                // For main classes like 100, 200, etc., search by first digit to get all sub-classes
-                const firstDigit = code.charAt(0);
-                this.search = firstDigit;  // Search "1" instead of "100" to get all 1xx classes
-            }
+            // Set search to the exact code to get all sub-classes
+            this.search = code;
             this.doSearch();
         },
         
