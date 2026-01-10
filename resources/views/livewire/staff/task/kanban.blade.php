@@ -77,22 +77,27 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Unified 3-Tab Navigation --}}
+            {{-- Unified 4-Tab Navigation --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
-                <button wire:click="$set('viewMode', 'kanban')" 
+                <a href="{{ route('staff.task.index') }}" 
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'kanban' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
-                </button>
-                <button wire:click="$set('viewMode', 'timeline')" 
-                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'timeline' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
-                    <i class="fas fa-stream"></i>
+                </a>
+                <a href="{{ route('staff.task.timeline') }}" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-chart-gantt"></i>
                     <span class="hidden sm:inline">Timeline</span>
-                </button>
+                </a>
                 <a href="{{ route('staff.task.schedule') }}" 
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
+                </a>
+                <a href="{{ route('staff.task.notes') }}" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="hidden sm:inline">Notes</span>
                 </a>
             </div>
             
@@ -450,56 +455,59 @@
     </div>
     @endif
 
-    {{-- Timeline View - Gantt Style --}}
+    {{-- Timeline View --}}
     @if($viewMode === 'timeline')
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         {{-- Timeline Header --}}
-        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50 to-white">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-violet-500/25">
-                    <i class="fas fa-chart-gantt text-lg"></i>
+                <div class="w-8 h-8 bg-violet-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-stream text-violet-600 text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-gray-900">Gantt Timeline</h3>
+                    <h3 class="font-bold text-gray-900 text-sm">Timeline Tugas</h3>
                     <p class="text-xs text-gray-500">{{ $timelineStart->format('d M') }} - {{ $timelineEnd->format('d M Y') }}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <div class="flex bg-gray-100 rounded-xl p-1">
+                {{-- Zoom Controls --}}
+                <div class="flex bg-gray-100 rounded-lg p-0.5">
                     <button wire:click="$set('timelineZoom', 'day')" 
-                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition {{ $timelineZoom === 'day' ? 'bg-white text-violet-600 shadow' : 'text-gray-500 hover:text-gray-700' }}">
-                        7D
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'day' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        7 Hari
                     </button>
                     <button wire:click="$set('timelineZoom', 'week')" 
-                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition {{ $timelineZoom === 'week' ? 'bg-white text-violet-600 shadow' : 'text-gray-500 hover:text-gray-700' }}">
-                        14D
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'week' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        14 Hari
                     </button>
                     <button wire:click="$set('timelineZoom', 'month')" 
-                            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition {{ $timelineZoom === 'month' ? 'bg-white text-violet-600 shadow' : 'text-gray-500 hover:text-gray-700' }}">
-                        30D
+                            class="px-2 py-1 text-xs font-medium rounded-md transition {{ $timelineZoom === 'month' ? 'bg-white text-violet-600 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}">
+                        30 Hari
                     </button>
                 </div>
             </div>
         </div>
 
-        {{-- Gantt Chart Body --}}
+        {{-- Timeline Body --}}
         <div class="overflow-x-auto">
-            <div class="min-w-[900px] relative">
+            <div class="min-w-[800px]">
                 {{-- Date Headers --}}
-                <div class="flex sticky top-0 z-10 bg-white border-b border-gray-200">
-                    <div class="w-4 flex-shrink-0"></div>
-                    <div class="flex-1 flex relative">
+                <div class="flex border-b border-gray-100">
+                    <div class="w-48 flex-shrink-0 px-3 py-2 bg-gray-50 border-r border-gray-100">
+                        <span class="text-xs font-semibold text-gray-500">TUGAS</span>
+                    </div>
+                    <div class="flex-1 flex">
                         @for($i = 0; $i < $timelineDays; $i++)
                             @php
                                 $date = $timelineStart->copy()->addDays($i);
                                 $isToday = $date->isToday();
                                 $isWeekend = $date->isWeekend();
                             @endphp
-                            <div class="flex-1 min-w-[35px] text-center py-2 border-r border-gray-100 {{ $isWeekend ? 'bg-gray-50/50' : '' }}">
-                                <p class="text-[9px] font-bold uppercase tracking-wide {{ $isToday ? 'text-red-500' : 'text-gray-400' }}">
-                                    {{ $date->locale('id')->isoFormat('dd') }}
+                            <div class="flex-1 min-w-[40px] text-center py-2 border-r border-gray-50 {{ $isToday ? 'bg-violet-50' : ($isWeekend ? 'bg-gray-50/50' : '') }}">
+                                <p class="text-[10px] font-semibold {{ $isToday ? 'text-violet-600' : 'text-gray-400' }}">
+                                    {{ $date->locale('id')->isoFormat('ddd') }}
                                 </p>
-                                <p class="text-xs font-bold {{ $isToday ? 'text-red-500' : 'text-gray-600' }}">
+                                <p class="text-xs font-bold {{ $isToday ? 'text-violet-600' : 'text-gray-700' }}">
                                     {{ $date->format('d') }}
                                 </p>
                             </div>
@@ -507,233 +515,65 @@
                     </div>
                 </div>
 
-                {{-- Today Vertical Line --}}
-                @php
-                    $todayOffset = now()->startOfDay()->diffInDays($timelineStart, false);
-                    $todayLeftPercent = ($todayOffset / $timelineDays) * 100;
-                @endphp
-
-                {{-- Gantt Rows --}}
-                <div class="relative">
-                    {{-- Today line overlay --}}
-                    @if($todayOffset >= 0 && $todayOffset < $timelineDays)
-                    <div class="absolute top-0 bottom-0 w-0.5 bg-red-400 z-30 pointer-events-none" 
-                         style="left: calc(16px + (100% - 16px) * {{ $todayLeftPercent / 100 }});"></div>
-                    @endif
-                    
+                {{-- Task Rows --}}
+                <div class="divide-y divide-gray-50">
                     @php
                         $tasksWithDates = $tasks->filter(fn($t) => $t->due_date || $t->start_date)->sortBy('due_date');
-                        $allItems = collect();
-                        
-                        foreach($tasksWithDates as $task) {
-                            $allItems->push([
-                                'type' => 'task',
-                                'item' => $task,
-                                'title' => $task->title,
-                                'user' => $task->assignee,
-                                'start' => $task->start_date ?? $task->created_at,
-                                'end' => $task->due_date ?? ($task->start_date ?? $task->created_at)->copy()->addDays(1),
-                                'color' => match($task->priority) {
-                                    'urgent' => 'from-rose-400 to-rose-500',
-                                    'high' => 'from-orange-400 to-amber-500',
-                                    'medium' => 'from-violet-400 to-purple-500',
-                                    'low' => 'from-cyan-400 to-blue-500',
-                                    default => 'from-blue-400 to-indigo-500'
-                                },
-                                'isOverdue' => $task->isOverdue(),
-                            ]);
-                        }
-                        
-                        foreach($timelineSchedules as $schedule) {
-                            $typeColors = [
-                                'blue' => 'from-blue-400 to-blue-500',
-                                'indigo' => 'from-indigo-400 to-indigo-500',
-                                'emerald' => 'from-emerald-400 to-emerald-500',
-                                'violet' => 'from-violet-400 to-violet-500',
-                                'amber' => 'from-amber-400 to-amber-500',
-                                'cyan' => 'from-cyan-400 to-cyan-500',
-                                'rose' => 'from-rose-400 to-rose-500',
-                            ];
-                            $typeInfo = $schedule->getTypeInfo();
-                            
-                            $allItems->push([
-                                'type' => 'schedule',
-                                'item' => $schedule,
-                                'title' => $schedule->title,
-                                'user' => $schedule->user,
-                                'start' => $schedule->schedule_date,
-                                'end' => $schedule->schedule_date->copy()->addDay(),
-                                'color' => $typeColors[$typeInfo['color']] ?? 'from-gray-400 to-gray-500',
-                                'isOverdue' => false,
-                                'icon' => $typeInfo['icon'],
-                            ]);
-                        }
-                        
-                        $allItems = $allItems->sortBy('start');
                     @endphp
                     
-                    @forelse($allItems as $index => $data)
+                    @forelse($tasksWithDates as $task)
                         @php
-                            $startOffset = max(0, $data['start']->diffInDays($timelineStart, false));
-                            $endOffset = min($timelineDays, $data['end']->diffInDays($timelineStart, false));
+                            $taskStart = $task->start_date ?? $task->created_at;
+                            $taskEnd = $task->due_date ?? $taskStart->copy()->addDays(1);
+                            
+                            // Calculate position
+                            $startOffset = max(0, $taskStart->diffInDays($timelineStart, false));
+                            $endOffset = min($timelineDays, $taskEnd->diffInDays($timelineStart, false) + 1);
                             $duration = max(1, $endOffset - $startOffset);
                             
                             $leftPercent = ($startOffset / $timelineDays) * 100;
                             $widthPercent = ($duration / $timelineDays) * 100;
-                            $isVisible = $startOffset < $timelineDays && $endOffset > 0;
                             
-                            $rowBg = $index % 2 === 0 ? 'bg-white' : 'bg-gray-50/30';
-                        @endphp
-                        
-                        @if($isVisible)
-                        <div class="flex items-stretch min-h-[52px] border-b border-gray-100 {{ $rowBg }} hover:bg-blue-50/30 transition-colors">
-                            <div class="w-4 flex-shrink-0"></div>
-                            <div class="flex-1 relative flex items-center py-2.5">
-                                {{-- Grid --}}
-                                <div class="absolute inset-0 flex pointer-events-none">
-                                    @for($i = 0; $i < $timelineDays; $i++)
-                                        @php $date = $timelineStart->copy()->addDays($i); @endphp
-                                        <div class="flex-1 border-r border-gray-100/50 {{ $date->isWeekend() ? 'bg-gray-50/30' : '' }}"></div>
-                                    @endfor
-                                </div>
-                                
-                                {{-- Bar --}}
-                                <div class="absolute h-8 rounded-full bg-gradient-to-r {{ $data['color'] }} shadow-lg flex items-center gap-1.5 pl-1 pr-3 cursor-pointer hover:scale-[1.02] hover:shadow-xl transition-all {{ $data['isOverdue'] ? 'ring-2 ring-red-400 ring-offset-1' : '' }}"
-                                     style="left: {{ $leftPercent }}%; width: {{ max(8, $widthPercent) }}%;"
-                                     @if($data['type'] === 'task') wire:click="openTaskModal({{ $data['item']->id }})" @endif
-                                     title="{{ $data['title'] }}">
-                                    
-                                    @if($data['user'])
-                                        @if($data['user']->avatar)
-                                            <img src="{{ asset('storage/' . $data['user']->avatar) }}" 
-                                                 class="w-6 h-6 rounded-full border-2 border-white/80 object-cover flex-shrink-0">
-                                        @else
-                                            <div class="w-6 h-6 rounded-full bg-white/30 border-2 border-white/50 flex items-center justify-center flex-shrink-0">
-                                                <span class="text-[10px] font-bold text-white">{{ strtoupper(substr($data['user']->name, 0, 1)) }}</span>
-                                            </div>
-                                        @endif
-                                    @else
-                                        <div class="w-6 h-6 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center flex-shrink-0">
-                                            <i class="fas {{ $data['type'] === 'schedule' ? ($data['icon'] ?? 'fa-calendar') : 'fa-user' }} text-white text-[8px]"></i>
-                                        </div>
-                                    @endif
-                                    
-                                    @if($widthPercent > 12)
-                                        <span class="text-white text-[11px] font-semibold truncate">{{ Str::limit($data['title'], 18) }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    @empty
-                        <div class="text-center py-16">
-                            <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <i class="fas fa-chart-gantt text-gray-300 text-3xl"></i>
-                            </div>
-                            <p class="text-gray-500 font-medium">Tidak ada item di timeline</p>
-                            <p class="text-gray-400 text-sm mt-1">Tambahkan due date pada tugas atau buat jadwal baru</p>
-                        </div>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-
-        {{-- Legend --}}
-        <div class="px-4 py-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white flex items-center gap-5 flex-wrap">
-            <div class="flex items-center gap-1.5">
-                <div class="w-0.5 h-4 bg-red-400 rounded"></div>
-                <span class="text-xs text-gray-600 font-medium">Hari Ini</span>
-            </div>
-            <div class="h-4 w-px bg-gray-200"></div>
-            <div class="flex items-center gap-1.5">
-                <div class="w-5 h-3 bg-gradient-to-r from-rose-400 to-rose-500 rounded-full"></div>
-                <span class="text-xs text-gray-500">Mendesak</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <div class="w-5 h-3 bg-gradient-to-r from-orange-400 to-amber-500 rounded-full"></div>
-                <span class="text-xs text-gray-500">Tinggi</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <div class="w-5 h-3 bg-gradient-to-r from-violet-400 to-purple-500 rounded-full"></div>
-                <span class="text-xs text-gray-500">Sedang</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <div class="w-5 h-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
-                <span class="text-xs text-gray-500">Rendah</span>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- Modals teleported to body for proper z-index --}}
-    <template x-teleport="body">
-        <div style="position: relative; z-index: 9999;">
-            {{-- Task Detail Modal --}}
-            @if($showTaskModal && $selectedTask)
-            <div class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                 x-data="{ activeTab: 'details' }"
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100">
-                <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col" 
-                     @click.away="$wire.closeTaskModal()">
-            
-            {{-- Modal Header --}}
-            <div class="p-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0" 
-                 style="background: linear-gradient(135deg, {{ $selectedTask->status->color }}15, {{ $selectedTask->status->color }}05);">
-                <div class="flex items-center gap-3">
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
-                    @endif
-                    
-                    {{-- SCHEDULES SECTION --}}
-                    @if($timelineSchedules->count() > 0)
-                    <div class="bg-emerald-50/30 px-3 py-2 border-b border-emerald-100">
-                        <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                            <i class="fas fa-calendar-alt"></i> JADWAL ({{ $timelineSchedules->count() }})
-                        </span>
-                    </div>
-                    @foreach($timelineSchedules as $schedule)
-                        @php
-                            $schedDate = $schedule->schedule_date;
-                            $startOffset = max(0, $schedDate->diffInDays($timelineStart, false));
-                            $leftPercent = ($startOffset / $timelineDays) * 100;
-                            $isVisible = $startOffset >= 0 && $startOffset < $timelineDays;
-                            
-                            $typeInfo = $schedule->getTypeInfo();
-                            $typeColors = [
-                                'blue' => 'bg-gradient-to-r from-blue-500 to-blue-600',
-                                'indigo' => 'bg-gradient-to-r from-indigo-500 to-indigo-600',
-                                'emerald' => 'bg-gradient-to-r from-emerald-500 to-emerald-600',
-                                'violet' => 'bg-gradient-to-r from-violet-500 to-violet-600',
-                                'amber' => 'bg-gradient-to-r from-amber-500 to-amber-600',
-                                'cyan' => 'bg-gradient-to-r from-cyan-500 to-cyan-600',
-                                'rose' => 'bg-gradient-to-r from-rose-500 to-rose-600',
-                                'gray' => 'bg-gradient-to-r from-gray-500 to-gray-600',
+                            // Priority colors
+                            $barColors = [
+                                'urgent' => 'bg-gradient-to-r from-red-500 to-red-600',
+                                'high' => 'bg-gradient-to-r from-orange-500 to-orange-600',
+                                'medium' => 'bg-gradient-to-r from-blue-500 to-indigo-600',
+                                'low' => 'bg-gradient-to-r from-emerald-500 to-teal-600',
                             ];
-                            $barColor = $typeColors[$typeInfo['color']] ?? $typeColors['gray'];
+                            $barColor = $barColors[$task->priority] ?? $barColors['medium'];
+                            
+                            // Check if task is visible in timeline
+                            $isVisible = $startOffset < $timelineDays && $endOffset > 0;
                         @endphp
                         
                         @if($isVisible)
-                        <div class="flex hover:bg-emerald-50/30 transition-colors">
+                        <div class="flex hover:bg-gray-50/50 transition-colors">
+                            {{-- Task Name --}}
                             <div class="w-48 flex-shrink-0 px-3 py-3 border-r border-gray-100 flex items-center gap-2">
-                                <div class="w-5 h-5 rounded bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                                    <i class="fas {{ $typeInfo['icon'] }} text-emerald-600 text-[10px]"></i>
-                                </div>
+                                @php
+                                    $priorityStyles = [
+                                        'urgent' => 'bg-red-100 text-red-600',
+                                        'high' => 'bg-orange-100 text-orange-600',
+                                        'medium' => 'bg-blue-100 text-blue-600',
+                                        'low' => 'bg-emerald-100 text-emerald-600',
+                                    ];
+                                @endphp
+                                <div class="w-2 h-2 rounded-full flex-shrink-0 {{ $priorityStyles[$task->priority] ?? 'bg-gray-100' }}"></div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-xs font-medium text-gray-900 truncate">
-                                        {{ Str::limit($schedule->title, 20) }}
+                                    <p wire:click="openTaskModal({{ $task->id }})" 
+                                       class="text-xs font-medium text-gray-900 truncate cursor-pointer hover:text-violet-600 transition">
+                                        {{ Str::limit($task->title, 22) }}
                                     </p>
                                     <p class="text-[10px] text-gray-400 truncate">
-                                        {{ $schedule->user?->name ?? '-' }} • {{ $schedule->getTimeRange() ?: $typeInfo['label'] }}
+                                        {{ $task->assignee?->name ?? 'Belum ditugaskan' }}
                                     </p>
                                 </div>
                             </div>
                             
+                            {{-- Timeline Bar Area --}}
                             <div class="flex-1 relative py-2">
+                                {{-- Grid Lines --}}
                                 <div class="absolute inset-0 flex">
                                     @for($i = 0; $i < $timelineDays; $i++)
                                         @php $date = $timelineStart->copy()->addDays($i); @endphp
@@ -741,42 +581,33 @@
                                     @endfor
                                 </div>
                                 
-                                <div class="absolute top-1/2 -translate-y-1/2 h-6 rounded-lg shadow-sm flex items-center px-2 text-white text-[10px] font-semibold {{ $barColor }}"
-                                     style="left: {{ $leftPercent }}%; width: {{ max(3, (1 / $timelineDays) * 100) }}%;"
-                                     title="{{ $schedule->title }} ({{ $schedDate->format('d M') }})">
+                                {{-- Task Bar --}}
+                                <div class="absolute top-1/2 -translate-y-1/2 h-6 rounded-full shadow-sm flex items-center px-2 text-white text-[10px] font-semibold {{ $barColor }} {{ $task->isOverdue() ? 'ring-2 ring-red-300 ring-offset-1' : '' }}"
+                                     style="left: {{ $leftPercent }}%; width: {{ max(3, $widthPercent) }}%;"
+                                     title="{{ $task->title }} ({{ $taskStart->format('d M') }} - {{ $taskEnd->format('d M') }})">
+                                    @if($widthPercent > 10)
+                                        <span class="truncate">{{ Str::limit($task->title, 15) }}</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                         @endif
-                    @endforeach
-                    @endif
-                    
-                    {{-- Empty State --}}
-                    @if(!$hasItems)
+                    @empty
                         <div class="text-center py-12">
                             <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                                 <i class="fas fa-calendar-times text-gray-300 text-2xl"></i>
                             </div>
-                            <p class="text-gray-500 text-sm font-medium">Tidak ada item di timeline</p>
-                            <p class="text-gray-400 text-xs mt-1">Tambahkan due date pada tugas atau buat jadwal baru</p>
+                            <p class="text-gray-500 text-sm font-medium">Tidak ada tugas dengan tanggal</p>
+                            <p class="text-gray-400 text-xs mt-1">Tambahkan due date pada tugas untuk melihatnya di timeline</p>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
         </div>
 
         {{-- Legend --}}
         <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-4 flex-wrap">
-            <span class="text-xs text-gray-500 font-medium">Keterangan:</span>
-            <div class="flex items-center gap-1">
-                <div class="w-4 h-4 bg-violet-100 rounded flex items-center justify-center"><i class="fas fa-clipboard-check text-violet-600 text-[8px]"></i></div>
-                <span class="text-xs text-gray-600">Tugas</span>
-            </div>
-            <div class="flex items-center gap-1">
-                <div class="w-4 h-4 bg-emerald-100 rounded flex items-center justify-center"><i class="fas fa-calendar-alt text-emerald-600 text-[8px]"></i></div>
-                <span class="text-xs text-gray-600">Jadwal</span>
-            </div>
-            <div class="h-4 w-px bg-gray-200"></div>
+            <span class="text-xs text-gray-500 font-medium">Prioritas:</span>
             <div class="flex items-center gap-1">
                 <div class="w-3 h-3 bg-gradient-to-r from-red-500 to-red-600 rounded"></div>
                 <span class="text-xs text-gray-600">Mendesak</span>
@@ -786,9 +617,12 @@
                 <span class="text-xs text-gray-600">Tinggi</span>
             </div>
             <div class="flex items-center gap-1">
-                <div class="w-3 h-3 bg-gradient-to-r from-violet-500 to-purple-600 rounded"></div>
+                <div class="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded"></div>
                 <span class="text-xs text-gray-600">Sedang</span>
             </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded"></div>
+                <span class="text-xs text-gray-600">Rendah</span>
             </div>
         </div>
     </div>

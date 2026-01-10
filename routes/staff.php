@@ -69,7 +69,9 @@ Route::middleware(['auth:web', \App\Http\Middleware\EnsureStaffAccess::class])
         // Tasks (Kanban Board) & Schedule
         Route::prefix('task')->name('task.')->group(function () {
             Route::get('/', \App\Livewire\Staff\Task\TaskKanban::class)->name('index');
+            Route::get('/timeline', \App\Livewire\Staff\Task\TaskTimeline::class)->name('timeline');
             Route::get('/schedule', \App\Livewire\Staff\Task\StaffScheduleManager::class)->name('schedule');
+            Route::get('/notes', \App\Livewire\Staff\Task\PersonalNotes::class)->name('notes');
             Route::get('/create', \App\Livewire\Staff\Task\TaskForm::class)->name('create');
             Route::get('/{task}/edit', \App\Livewire\Staff\Task\TaskForm::class)->name('edit');
         });

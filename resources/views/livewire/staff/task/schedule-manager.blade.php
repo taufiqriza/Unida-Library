@@ -17,22 +17,27 @@
         </div>
 
         <div class="flex items-center gap-3">
-            {{-- Unified 3-Tab Navigation --}}
+            {{-- Unified 4-Tab Navigation --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <a href="{{ route('staff.task.index') }}" 
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
                 </a>
-                <a href="{{ route('staff.task.index') }}?view=timeline" 
+                <a href="{{ route('staff.task.timeline') }}" 
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
-                    <i class="fas fa-stream"></i>
+                    <i class="fas fa-chart-gantt"></i>
                     <span class="hidden sm:inline">Timeline</span>
                 </a>
                 <span class="px-3 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm flex items-center gap-2">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
                 </span>
+                <a href="{{ route('staff.task.notes') }}" 
+                   class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-sticky-note"></i>
+                    <span class="hidden sm:inline">Notes</span>
+                </a>
             </div>
             
             {{-- View Toggle (Week/Month) --}}
