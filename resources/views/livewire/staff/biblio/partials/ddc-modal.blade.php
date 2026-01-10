@@ -35,10 +35,16 @@
                                 <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded">Local AI</span>
                             </div>
                             
-                            {{-- Book Title --}}
-                            <div x-show="bookTitle" class="mb-2 p-2 bg-white/80 rounded-lg border border-purple-100">
-                                <div class="text-[10px] text-gray-500 uppercase tracking-wide">Judul Buku</div>
-                                <div class="text-sm text-gray-800 font-medium" x-text="bookTitle"></div>
+                            {{-- Book Title - Editable --}}
+                            <div class="mb-2">
+                                <div class="text-[10px] text-gray-500 uppercase tracking-wide mb-1">Judul Buku (klik untuk edit)</div>
+                                <div class="flex gap-2">
+                                    <input type="text" x-model="bookTitle" @keydown.enter="getAiRecommendations()" 
+                                           class="flex-1 text-sm text-gray-800 font-medium px-2 py-1.5 border border-purple-200 rounded-lg bg-white/80 focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500">
+                                    <button @click="getAiRecommendations()" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition flex items-center gap-1">
+                                        <i class="fas fa-sync-alt"></i> Analisis
+                                    </button>
+                                </div>
                             </div>
                             
                             <div x-show="aiLoading" class="flex items-center gap-2 py-2 text-sm text-gray-600">
