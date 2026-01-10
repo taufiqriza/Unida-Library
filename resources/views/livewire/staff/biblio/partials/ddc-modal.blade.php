@@ -265,8 +265,15 @@ function enhancedDdcModal() {
         ],
         
         selectClass(code) {
-            // Set search to the exact code to get all sub-classes
-            this.search = code;
+            // For main classes, search by the first 2 digits to get all sub-classes
+            if (code === '2X') {
+                this.search = '2X';  // Special case for Islamic classifications
+            } else if (code.length === 3 && code.endsWith('00')) {
+                // For main classes like 000, 100, 200, search by first 2 digits
+                this.search = code.substring(0, 2);  // "000" -> "00", "100" -> "10"
+            } else {
+                this.search = code;
+            }
             this.doSearch();
         },
         

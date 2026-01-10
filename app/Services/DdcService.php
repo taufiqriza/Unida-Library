@@ -35,8 +35,9 @@ class DdcService
      */
     public function search(string $query, int $limit = 50): array
     {
-        $query = strtolower(trim($query));
-        $isCodeSearch = preg_match('/^[0-9xX.]+$/', $query);
+        $originalQuery = trim($query); // Keep original case
+        $query = strtolower($originalQuery); // For description search only
+        $isCodeSearch = preg_match('/^[0-9xX.]+$/', $originalQuery);
         
         $exactMatches = [];
         $startsWithMatches = [];
@@ -48,16 +49,16 @@ class DdcService
         $searchTerms = array_filter(explode(' ', $query), fn($term) => strlen($term) >= 2);
         
         foreach ($this->all() as $item) {
-            $code = strtolower($item['code']);
+            $code = $item['code']; // Keep original case for DDC codes
             $desc = strtolower($item['description']);
             
             // Code-based search
             if ($isCodeSearch) {
-                if ($code === $query) {
+                if ($code === $originalQuery) {
                     $exactMatches[] = $item;
-                } elseif (str_starts_with($code, $query)) {
+                } elseif (str_starts_with($code, $originalQuery)) {
                     $startsWithMatches[] = $item;
-                } elseif (str_contains($code, $query)) {
+                } elseif (str_contains($code, $originalQuery)) {
                     $containsMatches[] = $item;
                 }
                 continue;
