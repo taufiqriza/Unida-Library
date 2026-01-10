@@ -45,7 +45,7 @@ class ClearanceLetterController extends Controller
 
     private function getCompressedLogo(): ?string
     {
-        $logoPath = public_path('storage/logo-unida.png');
+        $logoPath = public_path('storage/logo-portal-small.png');
         if (!file_exists($logoPath)) return null;
 
         return 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
