@@ -93,7 +93,7 @@
                         $roomPhoto = $room->type === 'direct' && $otherUser ? $otherUser->photo : null;
                     @endphp
                     <button wire:click="forwardTo({{ $room->id }})" 
-                            class="w-full flex items-center gap-3 p-2.5 hover:bg-blue-50 rounded-xl transition text-left group">
+                            class="w-full flex items-center gap-3 p-2.5 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition text-left group">
                         @if($roomPhoto)
                             <img src="{{ asset('storage/' . $roomPhoto) }}" class="w-11 h-11 rounded-full object-cover flex-shrink-0">
                         @else
@@ -263,15 +263,15 @@
                         <div x-show="open" @click.away="open = false" x-transition
                              class="absolute right-0 top-10 w-44 bg-white rounded-xl shadow-xl border overflow-hidden z-50">
                             @if($activeView === 'chat' && $activeRoomId)
-                            <button wire:click="toggleMessageSearch" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 text-gray-700 text-sm">
+                            <button wire:click="toggleMessageSearch" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 text-sm">
                                 <i class="fas fa-search w-4"></i> Cari Pesan
                             </button>
                             @endif
-                            <button wire:click="toggleSound" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 text-gray-700 text-sm">
+                            <button wire:click="toggleSound" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 text-sm">
                                 <i class="fas {{ $soundEnabled ? 'fa-volume-up' : 'fa-volume-mute' }} w-4"></i>
                                 {{ $soundEnabled ? 'Matikan Suara' : 'Nyalakan Suara' }}
                             </button>
-                            <button wire:click="$toggle('isExpanded')" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 text-gray-700 text-sm border-t">
+                            <button wire:click="$toggle('isExpanded')" @click="open = false" class="w-full px-3 py-2.5 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 text-sm border-t">
                                 <i class="fas fa-expand-alt w-4"></i> Perbesar
                             </button>
                         </div>
@@ -306,7 +306,7 @@
             @if(count($searchResults) > 0)
             <div class="mt-2 max-h-40 overflow-y-auto rounded-lg bg-white border border-gray-200 divide-y">
                 @foreach($searchResults as $result)
-                <div class="p-2 hover:bg-blue-50 cursor-pointer text-left">
+                <div class="p-2 hover:bg-blue-50 dark:hover:bg-slate-700 cursor-pointer text-left">
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-xs font-medium text-gray-800">{{ $result['sender']['name'] ?? 'Unknown' }}</span>
                         <span class="text-[10px] text-gray-400">{{ \Carbon\Carbon::parse($result['created_at'])->setTimezone('Asia/Jakarta')->format('d M H:i') }}</span>
@@ -491,13 +491,13 @@
                                             class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full text-base hover:scale-125 transition">{{ $emoji }}</button>
                                     @endforeach
                                 </div>
-                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
-                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-share text-gray-400 w-3"></i> <span class="text-gray-700">Teruskan</span>
                                 </button>
-                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-3"></i> 
                                     <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas' : 'Pin' }}</span>
                                 </button>
@@ -721,13 +721,13 @@
                                             class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 rounded-full text-base hover:scale-125 transition">{{ $emoji }}</button>
                                     @endforeach
                                 </div>
-                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="replyToMessage({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-reply text-gray-400 w-3"></i> <span class="text-gray-700">Balas</span>
                                 </button>
-                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="openForwardModal({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-share text-gray-400 w-3"></i> <span class="text-gray-700">Teruskan</span>
                                 </button>
-                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 flex items-center gap-2">
+                                <button wire:click.stop="togglePin({{ $msg['id'] }})" @click="menuOpen = false" class="w-full px-3 py-1.5 text-left text-xs hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2">
                                     <i class="fas fa-thumbtack {{ ($msg['is_pinned'] ?? false) ? 'text-amber-500' : 'text-gray-400' }} w-3"></i> 
                                     <span class="text-gray-700">{{ ($msg['is_pinned'] ?? false) ? 'Lepas' : 'Pin' }}</span>
                                 </button>
@@ -949,7 +949,7 @@
                         <p class="px-3 py-1 text-[10px] text-gray-400 uppercase">Mention seseorang</p>
                         <template x-for="member in filteredMembers" :key="member.id">
                             <button type="button" @click="selectMention(member.name)" 
-                                    class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50 text-left">
+                                    class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-slate-700 text-left">
                                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold"
                                      x-text="member.name.charAt(0).toUpperCase()"></div>
                                 <span class="text-sm text-gray-700" x-text="member.name"></span>
@@ -966,14 +966,14 @@
                         </button>
                         <div x-show="open" @click.away="open = false" x-transition
                              class="absolute bottom-10 right-0 bg-white rounded-xl shadow-xl border py-1 z-50 w-40">
-                            <label class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-700">
+                            <label class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer text-sm text-gray-700">
                                 <i class="fas fa-image text-blue-500 w-4"></i> Gambar
                                 <input type="file" wire:model="attachment" class="hidden" accept="image/*,.pdf,.doc,.docx" @change="open = false">
                             </label>
-                            <button type="button" wire:click="openTaskPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-sm text-gray-700 text-left">
+                            <button type="button" wire:click="openTaskPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-sm text-gray-700 text-left">
                                 <i class="fas fa-clipboard-list text-violet-500 w-4"></i> Task
                             </button>
-                            <button type="button" wire:click="openBookPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-sm text-gray-700 text-left">
+                            <button type="button" wire:click="openBookPicker" @click="open = false" class="w-full px-3 py-2 flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-sm text-gray-700 text-left">
                                 <i class="fas fa-book text-green-500 w-4"></i> Buku
                             </button>
                         </div>
@@ -1014,7 +1014,7 @@
                 <div class="flex-1 overflow-y-auto">
                     @forelse($this->availableTasks as $task)
                     <button wire:click="attachTask({{ $task->id }})" 
-                            class="w-full p-3 flex items-center gap-3 hover:bg-blue-50 transition border-b border-gray-50 text-left">
+                            class="w-full p-3 flex items-center gap-3 hover:bg-blue-50 dark:hover:bg-slate-700 transition border-b border-gray-50 text-left">
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-tasks text-white text-sm"></i>
                         </div>
@@ -1104,7 +1104,7 @@
                 </div>
             </div>
             @forelse($this->branchContacts as $user)
-            <button wire:click="openDirectChat({{ $user->id }})" class="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 transition border-b border-gray-50">
+            <button wire:click="openDirectChat({{ $user->id }})" class="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 dark:hover:bg-slate-700 transition border-b border-gray-50">
                 <div class="relative flex-shrink-0">
                     @if($user->photo)
                         <img src="{{ $user->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
@@ -1218,7 +1218,7 @@
             @php $member = $room->member; @endphp
             @if($member)
             <div @if($canAccessSupport) wire:click="openRoom({{ $room->id }})" @endif
-                    class="w-full px-4 py-3 flex items-center gap-3 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }} {{ $canAccessSupport ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default' }}">
+                    class="w-full px-4 py-3 flex items-center gap-3 transition border-b border-gray-50 {{ $room->status === 'resolved' ? 'opacity-60' : '' }} {{ $canAccessSupport ? 'hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer' : 'cursor-default' }}">
                 <div class="relative flex-shrink-0">
                     @if($member->photo)
                         <img src="{{ Storage::url($member->photo) }}" class="w-11 h-11 rounded-full object-cover">
@@ -1277,7 +1277,7 @@
             @if($otherUser)
             <div class="relative group">
                 <button wire:click="openRoom({{ $room->id }})" 
-                        class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition border-b border-gray-50">
+                        class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-slate-700 transition border-b border-gray-50">
                     <div class="relative flex-shrink-0">
                         @if($otherUser->photo)
                             <img src="{{ $otherUser->getAvatarUrl(100) }}" class="w-11 h-11 rounded-full object-cover">
@@ -1365,7 +1365,7 @@
             {{-- Groups List --}}
             @forelse($this->rooms['groups'] as $room)
             <button wire:click="openRoom({{ $room->id }})" 
-                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 transition border-b border-gray-50">
+                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 dark:hover:bg-slate-700 transition border-b border-gray-50">
                 {{-- Group Avatar with colored bg --}}
                 <div class="w-11 h-11 rounded-full bg-gradient-to-br {{ $room->isGlobal() ? 'from-blue-500 to-indigo-600' : 'from-green-500 to-emerald-600' }} flex items-center justify-center flex-shrink-0 shadow-lg">
                     <i class="fas {{ $room->getIconClass() }} text-white text-lg"></i>
@@ -1507,7 +1507,7 @@
                     <div class="divide-y divide-gray-50 max-h-36 overflow-y-auto">
                         @foreach($this->branches->take(5) as $branch)
                         <button wire:click="selectBranch({{ $branch->id }})" 
-                                class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50/50 transition group">
+                                class="w-full px-3 py-2 flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-slate-700/50 transition group">
                             <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
                                 <i class="fas fa-building text-white text-[10px]"></i>
                             </div>
@@ -1563,7 +1563,7 @@
                         </p>
                     </div>
                     @foreach($users as $user)
-                    <button wire:click="openDirectChat({{ $user->id }})" class="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-blue-50 transition">
+                    <button wire:click="openDirectChat({{ $user->id }})" class="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-blue-50 dark:hover:bg-slate-700 transition">
                         <div class="relative flex-shrink-0">
                             @if($user->photo)
                                 <img src="{{ $user->getAvatarUrl(80) }}" class="w-10 h-10 rounded-full object-cover">
@@ -1892,7 +1892,7 @@
             </div>
             <div class="max-h-64 overflow-y-auto">
                 @forelse($readReceiptsList as $reader)
-                <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                <div class="px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-slate-700 border-b border-gray-50 last:border-0">
                     @if($reader['photo'])
                         <img src="{{ asset('storage/' . $reader['photo']) }}" class="w-9 h-9 rounded-full object-cover">
                     @else
