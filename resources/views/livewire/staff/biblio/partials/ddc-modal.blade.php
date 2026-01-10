@@ -265,6 +265,7 @@ function enhancedDdcModal() {
         ],
         
         selectClass(code) {
+            console.log('selectClass called with:', code);
             // Implement proper DDC hierarchy selection
             if (code === '2X') {
                 this.search = '2X';  // Special case for Islamic classifications
@@ -275,10 +276,12 @@ function enhancedDdcModal() {
             } else {
                 this.search = code;
             }
+            console.log('Search query set to:', this.search);
             this.doSearch();
         },
         
         async doSearch() {
+            // Allow single character search for main classes
             if (this.search.length < 1) { 
                 this.results = []; 
                 return; 
@@ -287,9 +290,11 @@ function enhancedDdcModal() {
             this.loading = true;
             try {
                 // Increase limit for comprehensive results
-                const limit = this.search.length === 1 ? 200 : 100; // More results for main classes
+                const limit = this.search.length === 1 ? 250 : 100; // More results for main classes
                 const res = await fetch('/api/ddc/search?q=' + encodeURIComponent(this.search) + '&limit=' + limit);
-                this.results = await res.json();
+                const data = await res.json();
+                this.results = data || [];
+                console.log('DDC Search Results:', this.results.length, 'for query:', this.search);
             } catch (e) { 
                 this.results = []; 
                 console.error('DDC Search Error:', e);
