@@ -90,7 +90,8 @@ class ClearanceLetter extends Model
 
     public function generateMemberSignatureQr(): string
     {
-        $data = json_encode(['d'=>'SBP','i'=>$this->id,'n'=>$this->member->member_id,'h'=>substr(md5('M'.$this->id.$this->member_id),0,8)]);
+        $memberId = $this->member?->member_id ?? $this->member_id;
+        $data = json_encode(['d'=>'SBP','i'=>$this->id,'n'=>$memberId,'h'=>substr(md5('M'.$this->id.$this->member_id),0,8)]);
         $qr = QrCode::format('svg')->size(100)->margin(0)->generate($data);
         return 'data:image/svg+xml;base64,' . base64_encode($qr);
     }
