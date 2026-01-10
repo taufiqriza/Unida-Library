@@ -106,7 +106,10 @@ class ChatbotService
 
     protected function isAskingHelp(string $message): bool
     {
-        $helpWords = ['help', 'bantuan', 'menu', 'apa saja', 'bisa apa', 'layanan apa', 'fitur', 'ada apa'];
+        // Only trigger for short, direct help requests
+        if (strlen($message) > 30) return false;
+        
+        $helpWords = ['help', 'bantuan', 'apa saja', 'bisa apa', 'layanan apa', 'ada apa saja'];
         foreach ($helpWords as $h) {
             if (str_contains($message, $h)) return true;
         }
