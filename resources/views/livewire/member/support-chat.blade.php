@@ -118,14 +118,22 @@
                         </span>
                     </div>
                 @elseif($msg['type'] === 'bot')
-                    {{-- Bot Message (Compact) --}}
+                    {{-- Bot Message --}}
+                    @php
+                        $isAiResponse = str_starts_with($msg['message'] ?? '', '🤖');
+                    @endphp
                     <div class="flex justify-start gap-1.5">
-                        <div class="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div class="w-6 h-6 {{ $isAiResponse ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-violet-500' }} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                             <i class="fas fa-robot text-white text-[10px]"></i>
                         </div>
-                        <div class="max-w-[85%] bg-violet-50 border border-violet-100 px-3 py-2 rounded-xl rounded-tl-sm">
-                            <div class="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{!! preg_replace('/\*\*(.+?)\*\*/', '<strong class="text-violet-700">$1</strong>', e($msg['message'])) !!}</div>
-                            <p class="text-[9px] text-violet-400 mt-1">{{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}</p>
+                        <div class="max-w-[85%] {{ $isAiResponse ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100' : 'bg-violet-50 border-violet-100' }} border px-3 py-2 rounded-xl rounded-tl-sm">
+                            @if($isAiResponse)
+                            <p class="text-[9px] text-indigo-500 font-semibold mb-1 flex items-center gap-1">
+                                <i class="fas fa-sparkles"></i> UNIDA Library AI
+                            </p>
+                            @endif
+                            <div class="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{!! preg_replace('/\*\*(.+?)\*\*/', '<strong class="' . ($isAiResponse ? 'text-indigo-700' : 'text-violet-700') . '">$1</strong>', e(ltrim($msg['message'], '🤖 '))) !!}</div>
+                            <p class="text-[9px] {{ $isAiResponse ? 'text-indigo-400' : 'text-violet-400' }} mt-1">{{ \Carbon\Carbon::parse($msg['created_at'])->format('H:i') }}</p>
                         </div>
                     </div>
                 @elseif(is_null($msg['sender_id']))

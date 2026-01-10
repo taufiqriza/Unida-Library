@@ -146,20 +146,26 @@ class ChatbotService
             }
         }
         
-        if (empty($scores)) {
-            // Try context from room topic
-            $topicMap = [
-                'unggah' => 'unggah', 'unggah_mandiri' => 'unggah',
-                'plagiasi' => 'plagiasi',
-                'bebas' => 'bebas', 'bebas_pustaka' => 'bebas',
-                'pinjam' => 'pinjam', 'peminjaman' => 'pinjam',
-            ];
-            $roomTopic = $room->topic ?? '';
-            if (isset($topicMap[$roomTopic])) {
-                return [
-                    'category' => $topicMap[$roomTopic],
-                    'subtype' => $this->detectSubtype($message, $topicMap[$roomTopic])
+        // Require minimum score threshold to avoid false positives
+        // Let AI handle low-confidence matches
+        $minScore = 15;
+        
+        if (empty($scores) || max($scores) < $minScore) {
+            // Try context from room topic only for very short messages
+            if (strlen($message) < 20) {
+                $topicMap = [
+                    'unggah' => 'unggah', 'unggah_mandiri' => 'unggah',
+                    'plagiasi' => 'plagiasi',
+                    'bebas' => 'bebas', 'bebas_pustaka' => 'bebas',
+                    'pinjam' => 'pinjam', 'peminjaman' => 'pinjam',
                 ];
+                $roomTopic = $room->topic ?? '';
+                if (isset($topicMap[$roomTopic])) {
+                    return [
+                        'category' => $topicMap[$roomTopic],
+                        'subtype' => $this->detectSubtype($message, $topicMap[$roomTopic])
+                    ];
+                }
             }
             return null;
         }
