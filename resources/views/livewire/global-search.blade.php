@@ -364,6 +364,69 @@
 
             {{-- Results Section --}}
             <main class="flex-1 min-w-0 pb-8">
+                {{-- AI Analysis Panel --}}
+                @if($aiAnalysis && $query)
+                <div class="mb-6 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-2xl border border-indigo-100 overflow-hidden">
+                    <div class="p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-sm">Asisten AI</h3>
+                                    <p class="text-xs text-gray-500">Analisis hasil pencarian</p>
+                                </div>
+                            </div>
+                            <button wire:click="toggleAiPanel" class="text-gray-400 hover:text-gray-600 p-1">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        {{-- Summary --}}
+                        <p class="mt-3 text-sm text-gray-700 leading-relaxed">{{ $aiAnalysis['summary'] }}</p>
+                        
+                        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Tips --}}
+                            @if(!empty($aiAnalysis['tips']))
+                            <div>
+                                <h4 class="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-2">
+                                    <i class="fas fa-lightbulb mr-1"></i> Tips Pencarian
+                                </h4>
+                                <ul class="space-y-1">
+                                    @foreach($aiAnalysis['tips'] as $tip)
+                                    <li class="text-xs text-gray-600 flex items-start gap-2">
+                                        <i class="fas fa-check text-green-500 mt-0.5"></i>
+                                        <span>{{ $tip }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif
+                            
+                            {{-- Related Topics --}}
+                            @if(!empty($aiAnalysis['related']))
+                            <div>
+                                <h4 class="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-2">
+                                    <i class="fas fa-tags mr-1"></i> Topik Terkait
+                                </h4>
+                                <div class="flex flex-wrap gap-1.5">
+                                    @foreach($aiAnalysis['related'] as $topic)
+                                    <button 
+                                        wire:click="searchRelated('{{ $topic }}')"
+                                        class="px-2.5 py-1 bg-white border border-purple-200 text-purple-700 text-xs rounded-full hover:bg-purple-50 hover:border-purple-300 transition"
+                                    >
+                                        {{ $topic }}
+                                    </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 {{-- Results Header --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>

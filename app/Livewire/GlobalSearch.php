@@ -14,6 +14,7 @@ use App\Models\JournalSource;
 use App\Services\OpenLibraryService;
 use App\Services\ShamelaService;
 use App\Services\KubukuService;
+use App\Services\SearchAiService;
 use Livewire\Component;
 use Illuminate\Support\Collection;
 
@@ -52,6 +53,10 @@ class GlobalSearch extends Component
     public bool $showMobileFilters = false;
     public bool $showAdvancedFilters = false;
     public bool $sidebarCollapsed = false;
+    
+    // AI Analysis
+    public ?array $aiAnalysis = null;
+    public bool $showAiPanel = true;
 
     protected $queryString = [
         'query' => ['as' => 'q', 'except' => ''],
@@ -844,9 +849,33 @@ class GlobalSearch extends Component
 
     public function render()
     {
+        $results = $this->results;
+        $counts = $this->counts;
+        
+        // AI Analysis (lazy load, only when query exists)
+        if ($this->query && $this->showAiPanel && $this->page === 1) {
+            $this->aiAnalysis = app(SearchAiService::class)->analyze(
+                $this->query, 
+                $results->toArray(), 
+                $counts
+            );
+        }
+        
         return view('livewire.global-search', [
-            'results' => $this->results,
-            'counts' => $this->counts,
+            'results' => $results,
+            'counts' => $counts,
         ]);
+    }
+
+    public function toggleAiPanel()
+    {
+        $this->showAiPanel = !$this->showAiPanel;
+    }
+
+    public function searchRelated(string $topic)
+    {
+        $this->query = $topic;
+        $this->page = 1;
+        $this->aiAnalysis = null;
     }
 }
