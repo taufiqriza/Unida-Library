@@ -86,7 +86,7 @@ Route::get('/naskah-nusantara/{id}', \App\Livewire\Opac\KhastaraDetail::class)->
 
 // Panduan Pages
 Route::get('/panduan/cek-plagiasi', fn() => view('opac.pages.cek-plagiasi'))->name('opac.panduan.plagiarism');
-Route::get('/panduan/unggah-tugas-akhir', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');
+Route::get('/unggah', fn() => view('opac.pages.unggah-tugas-akhir'))->name('opac.panduan.thesis');
 Route::get('/panduan/member', fn() => view('opac.pages.panduan-member'))->name('opac.panduan.member');
 
 // E-Learning Course Detail
