@@ -45,7 +45,7 @@ class SearchAiService
                         ['role' => 'system', 'content' => 'Kamu asisten perpustakaan UNIDA Gontor. Jawab dalam bahasa Indonesia, singkat dan informatif. Output JSON saja tanpa markdown.'],
                         ['role' => 'user', 'content' => $this->buildPrompt($query, $counts, $topTitles)]
                     ],
-                    'max_tokens' => 400,
+                    'max_tokens' => 500,
                     'temperature' => 0.7,
                 ]);
 
@@ -63,12 +63,23 @@ class SearchAiService
 
     private function buildPrompt(string $query, array $counts, string $topTitles): string
     {
-        return "Pencarian: \"{$query}\"
-Hasil: {$counts['book']} buku, {$counts['ebook']} ebook, {$counts['ethesis']} tugas akhir, {$counts['journal']} jurnal
-Contoh judul: {$topTitles}
+        return "Analisis pencarian di Perpustakaan UNIDA Gontor untuk: \"{$query}\"
 
-Berikan JSON:
-{\"summary\":\"ringkasan 1-2 kalimat tentang hasil pencarian\",\"tips\":[\"tip pencarian 1\",\"tip 2\"],\"related\":[\"topik terkait 1\",\"topik 2\",\"topik 3\"]}";
+DATA HASIL:
+- Buku fisik: {$counts['book']}
+- E-book digital: {$counts['ebook']} 
+- Tugas akhir/skripsi: {$counts['ethesis']}
+- Artikel jurnal: {$counts['journal']}
+
+CONTOH JUDUL DITEMUKAN:
+{$topTitles}
+
+Berikan analisis dalam format JSON (tanpa markdown):
+{
+  \"summary\": \"Berikan ringkasan informatif 2-3 kalimat tentang hasil pencarian, sebutkan jumlah dan jenis koleksi yang relevan, serta rekomendasi koleksi mana yang paling cocok untuk topik ini\",
+  \"tips\": [\"tip spesifik untuk mempersempit pencarian\", \"saran kata kunci alternatif\", \"rekomendasi filter yang bisa digunakan\"],
+  \"related\": [\"topik akademik terkait 1\", \"topik terkait 2\", \"topik terkait 3\", \"topik terkait 4\"]
+}";
     }
 
     private function parseResponse(string $content): ?array

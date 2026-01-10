@@ -371,11 +371,11 @@
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-wand-magic-sparkles text-white text-sm"></i>
+                                    <i class="fas fa-robot text-white text-sm"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-900 text-sm">Asisten AI</h3>
-                                    <p class="text-xs text-gray-500">Analisis hasil pencarian</p>
+                                    <h3 class="font-semibold text-gray-900 text-sm">UNIDA Library AI</h3>
+                                    <p class="text-xs text-gray-500">Asisten pencarian cerdas</p>
                                 </div>
                             </div>
                             <button wire:click="toggleAiPanel" class="text-gray-400 hover:text-gray-600 p-1">

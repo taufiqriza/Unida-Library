@@ -95,7 +95,8 @@ class GlobalSearch extends Component
     {
         $this->query = $this->sanitizeInput($value);
         $this->page = 1;
-        $this->aiAnalysis = null; // Reset AI analysis when query changes
+        $this->aiAnalysis = null;
+        $this->showAiPanel = true; // Re-show panel for new search
     }
 
     /**
