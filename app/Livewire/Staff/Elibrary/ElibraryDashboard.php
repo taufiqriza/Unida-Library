@@ -63,9 +63,9 @@ class ElibraryDashboard extends Component
     {
         $this->selectedType = $type;
         if ($type === 'submission') {
-            $this->selectedItem = ThesisSubmission::with(['member', 'department', 'department.faculty', 'reviewer', 'clearanceLetter'])->find($id);
+            $this->selectedItem = ThesisSubmission::with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'department', 'department.faculty', 'reviewer', 'clearanceLetter'])->find($id);
         } elseif ($type === 'plagiarism') {
-            $this->selectedItem = PlagiarismCheck::with(['member', 'thesisSubmission'])->find($id);
+            $this->selectedItem = PlagiarismCheck::with(['member' => fn($q) => $q->withoutGlobalScope('branch'), 'thesisSubmission'])->find($id);
         }
         $this->showDetailModal = true;
         $this->reviewNotes = '';

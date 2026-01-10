@@ -45,31 +45,9 @@ class ClearanceLetterController extends Controller
 
     private function getCompressedLogo(): ?string
     {
-        $logoPath = public_path('storage/logo-portal.png');
+        $logoPath = public_path('storage/logo.png');
         if (!file_exists($logoPath)) return null;
 
-        // If GD available, resize logo
-        if (function_exists('imagecreatefrompng')) {
-            $img = @imagecreatefrompng($logoPath);
-            if ($img) {
-                $w = imagesx($img);
-                $h = imagesy($img);
-                $newW = 100;
-                $newH = (int)($h * $newW / $w);
-                $thumb = imagecreatetruecolor($newW, $newH);
-                imagesavealpha($thumb, true);
-                $trans = imagecolorallocatealpha($thumb, 0, 0, 0, 127);
-                imagefill($thumb, 0, 0, $trans);
-                imagecopyresampled($thumb, $img, 0, 0, 0, 0, $newW, $newH, $w, $h);
-                ob_start();
-                imagepng($thumb, null, 9);
-                $data = ob_get_clean();
-                imagedestroy($img);
-                imagedestroy($thumb);
-                return 'data:image/png;base64,' . base64_encode($data);
-            }
-        }
-        
         return 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
     }
 }

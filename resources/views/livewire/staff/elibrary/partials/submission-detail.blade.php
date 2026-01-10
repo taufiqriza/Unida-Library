@@ -45,7 +45,7 @@
     @if($selectedItem->clearanceLetter && $selectedItem->clearanceLetter->status === 'approved')
     <div class="p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl flex items-center gap-3">
         <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-file-certificate text-emerald-600"></i>
+            <i class="fas fa-file-circle-check text-emerald-600"></i>
         </div>
         <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold text-emerald-800">Surat Bebas Pustaka Terbit</p>
