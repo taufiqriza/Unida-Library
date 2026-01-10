@@ -33,7 +33,12 @@
                                 </div>
                                 <span class="font-semibold text-gray-800 text-sm">Rekomendasi AI</span>
                                 <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded">Local AI</span>
-                                <span x-show="bookTitle" class="text-xs text-gray-500 ml-auto truncate max-w-[200px]">"<span x-text="bookTitle.substring(0, 40)"></span>..."</span>
+                            </div>
+                            
+                            {{-- Book Title --}}
+                            <div x-show="bookTitle" class="mb-2 p-2 bg-white/80 rounded-lg border border-purple-100">
+                                <div class="text-[10px] text-gray-500 uppercase tracking-wide">Judul Buku</div>
+                                <div class="text-sm text-gray-800 font-medium" x-text="bookTitle"></div>
                             </div>
                             
                             <div x-show="aiLoading" class="flex items-center gap-2 py-2 text-sm text-gray-600">
@@ -41,13 +46,23 @@
                                 <span>Menganalisis judul...</span>
                             </div>
                             
+                            {{-- Summary --}}
                             <div x-show="aiSummary && !aiLoading" class="mb-2 p-2 rounded-lg border text-xs" :class="{
                                 'bg-emerald-50 border-emerald-200 text-emerald-800': aiSummary?.status === 'confident',
                                 'bg-blue-50 border-blue-200 text-blue-800': aiSummary?.status === 'suggested',
                                 'bg-gray-50 border-gray-200 text-gray-700': aiSummary?.status !== 'confident' && aiSummary?.status !== 'suggested'
                             }">
-                                <i class="fas fa-lightbulb mr-1"></i>
-                                <span x-text="aiSummary?.message?.replace('🤖 AI merekomendasikan', 'Rekomendasi:')"></span>
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-lightbulb mt-0.5"></i>
+                                    <div>
+                                        <span x-text="aiSummary?.message?.replace('🤖 AI merekomendasikan', 'Rekomendasi:')"></span>
+                                        <div x-show="aiKeywords?.length > 0" class="mt-1 flex flex-wrap gap-1">
+                                            <template x-for="kw in aiKeywords.slice(0, 6)" :key="kw">
+                                                <span class="px-1.5 py-0.5 bg-white text-gray-600 text-[10px] rounded border border-gray-200" x-text="kw"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div x-show="aiRecommendations.length > 0 && !aiLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5">
@@ -61,7 +76,7 @@
                                             <span class="font-mono font-bold text-sm" :class="selectedCode === rec.code ? 'text-white' : 'text-indigo-600'" x-text="rec.code"></span>
                                             <span class="w-2 h-2 rounded-full" :class="{'bg-emerald-400': rec.confidence === 'high', 'bg-yellow-400': rec.confidence === 'medium', 'bg-gray-400': rec.confidence === 'low'}"></span>
                                         </div>
-                                        <div class="text-[10px] line-clamp-2" :class="selectedCode === rec.code ? 'text-indigo-100' : 'text-gray-600'" x-text="rec.description.split('/')[0].substring(0, 40)"></div>
+                                        <div class="text-[10px] line-clamp-2" :class="selectedCode === rec.code ? 'text-indigo-100' : 'text-gray-600'" x-text="rec.description.split('/')[0]"></div>
                                     </button>
                                 </template>
                             </div>
@@ -125,12 +140,15 @@
                             <div x-show="results.length > 0" class="p-2 space-y-1">
                                 <template x-for="ddc in results" :key="ddc.code">
                                     <div :class="selectedCode === ddc.code ? 'bg-blue-50 border-blue-400' : 'bg-white border-gray-200 hover:border-blue-300'" 
-                                         class="border rounded-lg p-2 transition cursor-pointer"
+                                         class="border rounded-lg p-2.5 transition cursor-pointer"
                                          @click="select(ddc.code, ddc.description)">
                                         <div class="flex items-start gap-2">
                                             <span :class="selectedCode === ddc.code ? 'bg-blue-600 text-white' : 'bg-gray-100 text-blue-600'" 
                                                   class="px-1.5 py-0.5 rounded font-mono font-bold text-sm flex-shrink-0" x-text="ddc.code"></span>
-                                            <div class="flex-1 min-w-0 text-sm text-gray-800" x-html="highlightSearch(getMainDescription(ddc.description), search)"></div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-sm text-gray-800" x-html="highlightSearch(getMainDescription(ddc.description), search)"></div>
+                                                <div x-show="getAdditionalInfo(ddc.description)" class="text-xs text-gray-500 mt-0.5 line-clamp-1" x-html="highlightSearch(getAdditionalInfo(ddc.description), search)"></div>
+                                            </div>
                                             <div class="flex items-center gap-1 flex-shrink-0">
                                                 <button @click.stop="toggleFavorite(ddc)" :class="isFavorite(ddc.code) ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-500'" class="w-5 h-5 flex items-center justify-center">
                                                     <i class="fas fa-star text-xs"></i>
@@ -245,7 +263,8 @@ function smartDdcModal() {
         
         select(code, desc) { this.selectedCode = code; this.selectedDesc = desc; },
         apply() { if (this.selectedCode) { @this.set('classification', this.selectedCode); this.open = false; } },
-        getMainDescription(d) { return d ? (d.split(/\s{2,}/)[0] || d).substring(0, 80) : ''; },
+        getMainDescription(d) { return d ? (d.split(/\s{2,}/)[0] || d).substring(0, 100) : ''; },
+        getAdditionalInfo(d) { if (!d) return ''; const p = d.split(/\s{2,}/); return p.slice(1).filter(x => !x.toLowerCase().includes('lihat juga')).join(' ').substring(0, 100); },
         
         toggleFavorite(ddc) {
             const i = this.favorites.findIndex(f => f.code === ddc.code);
@@ -258,10 +277,32 @@ function smartDdcModal() {
         
         highlightSearch(text, term) {
             if (!text || !term || term.length < 2) return text;
-            const words = term.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
-            let r = text;
-            words.forEach(w => { r = r.replace(new RegExp(`(${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark class="bg-yellow-200 rounded px-0.5">$1</mark>'); });
-            return r;
+            const escape = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const words = term.toLowerCase().trim().split(/\s+/).filter(w => w.length >= 2);
+            if (!words.length) return text;
+            
+            let result = text;
+            
+            // Try full phrase first
+            if (term.trim().length >= 3) {
+                const pr = new RegExp(`(${escape(term.trim())})`, 'gi');
+                if (pr.test(text)) return text.replace(pr, '<mark class="bg-yellow-300 px-0.5 rounded font-medium">$1</mark>');
+            }
+            
+            // Try 2-word combinations
+            for (let i = 0; i < words.length - 1; i++) {
+                const twoWord = new RegExp(`(${escape(words[i])}\\s+${escape(words[i+1])})`, 'gi');
+                result = result.replace(twoWord, '<mark class="bg-yellow-300 px-0.5 rounded font-medium">$1</mark>');
+            }
+            
+            // Single words
+            words.forEach(w => {
+                if (!result.toLowerCase().includes(`>${w}<`)) {
+                    result = result.replace(new RegExp(`(${escape(w)})`, 'gi'), '<mark class="bg-yellow-200 px-0.5 rounded">$1</mark>');
+                }
+            });
+            
+            return result;
         }
     }
 }
