@@ -272,10 +272,23 @@ function smartDdcModal() {
         
         openModal() {
             this.open = true;
-            const titleEl = document.querySelector('textarea[wire\\:model="title"]');
-            if (titleEl && titleEl.value.length >= 5) {
+            // Try multiple selectors to find title
+            const titleEl = document.querySelector('textarea[wire\\:model="title"]') 
+                         || document.querySelector('textarea[wire\\:model\\.live="title"]')
+                         || document.querySelector('textarea[wire\\:model\\.defer="title"]');
+            
+            if (titleEl && titleEl.value && titleEl.value.length >= 5) {
                 this.bookTitle = titleEl.value;
                 this.getAiRecommendations();
+            } else {
+                // Fallback: try to get from Livewire component
+                try {
+                    const title = @this.get('title');
+                    if (title && title.length >= 5) {
+                        this.bookTitle = title;
+                        this.getAiRecommendations();
+                    }
+                } catch(e) {}
             }
         },
         
