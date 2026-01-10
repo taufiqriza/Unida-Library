@@ -191,6 +191,7 @@ Route::middleware('auth')->group(function () {
 
 // DDC API (for admin panel DDC lookup)
 Route::get('/api/ddc/search', [DdcController::class, 'search'])->name('api.ddc.search');
+Route::get('/api/ddc/recommend', [DdcController::class, 'recommend'])->name('api.ddc.recommend');
 Route::get('/api/ddc/main-classes', [DdcController::class, 'mainClasses'])->name('api.ddc.main-classes');
 
 // Publisher API (for biblio form)
