@@ -41,18 +41,12 @@
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium truncate" :class="$store.darkMode ? 'text-slate-200' : 'text-slate-900'">{{ $staff->name }}</p>
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="text-[10px] px-1.5 py-0.5 rounded font-medium
-                            {{ $staff->role === 'super_admin' ? 'bg-red-100 text-red-700' : ($staff->role === 'admin' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700') }}">
-                            {{ $staff->role === 'super_admin' ? 'Super Admin' : ($staff->role === 'admin' ? 'Admin' : 'Staff') }}
-                        </span>
-                        @if($staff->branch)
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">{{ $staff->branch->name }}</span>
-                        @endif
-                        <span class="text-[10px] {{ $staff->isReallyOnline() ? 'text-emerald-500' : '' }}" :class="$store.darkMode ? 'text-slate-500' : 'text-slate-400'">
-                            {{ $staff->getOnlineStatusText() }}
-                        </span>
-                    </div>
+                    <p class="text-[10px] truncate" :class="$store.darkMode ? 'text-slate-400' : 'text-slate-500'">
+                        <span class="{{ $staff->role === 'super_admin' ? 'text-red-500' : ($staff->role === 'admin' ? 'text-amber-600' : 'text-blue-500') }}">{{ $staff->role === 'super_admin' ? 'SA' : ($staff->role === 'admin' ? 'Admin' : 'Staff') }}</span>
+                        @if($staff->branch)<span class="mx-1">·</span>{{ $staff->branch->name }}@endif
+                        <span class="mx-1">·</span>
+                        <span class="{{ $staff->isReallyOnline() ? 'text-emerald-500' : '' }}">{{ $staff->getOnlineStatusText() }}</span>
+                    </p>
                 </div>
             </div>
             @empty

@@ -70,9 +70,6 @@ class ClearanceLetterController extends Controller
             }
         }
         
-        // Fallback: skip logo if too large (>100KB)
-        if (filesize($logoPath) > 100000) return null;
-        
         return 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
     }
 }

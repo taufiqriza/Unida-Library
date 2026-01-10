@@ -17,7 +17,7 @@ class ClearanceLetterController extends Controller
         $letter->load(['member', 'thesisSubmission', 'thesisSubmission.department', 'thesisSubmission.department.faculty', 'approver']);
         
         $logoPath = public_path('storage/logo-portal.png');
-        $logoBase64 = file_exists($logoPath) && filesize($logoPath) < 100000 
+        $logoBase64 = file_exists($logoPath) 
             ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath)) 
             : null;
         
