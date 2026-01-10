@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\PlagiarismCheck;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 
-class PlagiarismCertificateNotification extends Notification
+class PlagiarismCertificateNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public PlagiarismCheck $check) {}
 
     public function via($notifiable): array
@@ -15,16 +19,18 @@ class PlagiarismCertificateNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new \Illuminate\Mail\Mailable)
+            ->to($notifiable->email)
             ->subject("Sertifikat Bebas Plagiasi Terbit - Perpustakaan UNIDA")
-            ->greeting("Assalamu'alaikum {$notifiable->name},")
-            ->line("Sertifikat Bebas Plagiasi Anda telah **diterbitkan**.")
-            ->line("**Nomor Sertifikat:** {$this->check->certificate_number}")
-            ->line("**Judul Dokumen:** {$this->check->document_title}")
-            ->line("**Skor Similarity:** {$this->check->similarity_score}%")
-            ->action('Lihat Sertifikat', url("/member/plagiarism/{$this->check->id}/certificate"))
-            ->line('Terima kasih telah menggunakan layanan Perpustakaan UNIDA Gontor.');
+            ->view('emails.plagiarism-certificate-issued', [
+                'name' => $notifiable->name,
+                'documentTitle' => $this->check->document_title,
+                'certificateNumber' => $this->check->certificate_number,
+                'similarityScore' => $this->check->similarity_score,
+                'certificateUrl' => url("/member/plagiarism/{$this->check->id}/certificate"),
+                'subject' => "Sertifikat Bebas Plagiasi Terbit",
+            ]);
     }
 }

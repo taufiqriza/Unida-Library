@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\ClearanceLetter;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 
-class ClearanceLetterNotification extends Notification
+class ClearanceLetterNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public ClearanceLetter $letter) {}
 
     public function via($notifiable): array
@@ -15,15 +19,17 @@ class ClearanceLetterNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new \Illuminate\Mail\Mailable)
+            ->to($notifiable->email)
             ->subject("Surat Bebas Pustaka Terbit - Perpustakaan UNIDA")
-            ->greeting("Assalamu'alaikum {$notifiable->name},")
-            ->line("Surat Bebas Pustaka Anda telah **diterbitkan**.")
-            ->line("**Nomor Surat:** {$this->letter->letter_number}")
-            ->line("**Keperluan:** {$this->letter->purpose}")
-            ->action('Unduh Surat', url("/member/clearance-letter/{$this->letter->id}"))
-            ->line('Terima kasih telah menggunakan layanan Perpustakaan UNIDA Gontor.');
+            ->view('emails.clearance-letter-issued', [
+                'name' => $notifiable->name,
+                'letterNumber' => $this->letter->letter_number,
+                'purpose' => $this->letter->purpose,
+                'letterUrl' => url("/member/clearance-letter/{$this->letter->id}"),
+                'subject' => "Surat Bebas Pustaka Terbit",
+            ]);
     }
 }

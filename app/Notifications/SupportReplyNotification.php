@@ -2,11 +2,14 @@
 
 namespace App\Notifications;
 
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class SupportReplyNotification extends Notification
+class SupportReplyNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         public string $staffName,
         public string $messagePreview,
@@ -18,7 +21,7 @@ class SupportReplyNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
         $topicLabels = [
             'unggah' => 'Unggah Mandiri',
@@ -30,13 +33,16 @@ class SupportReplyNotification extends Notification
         
         $topicLabel = $topicLabels[$this->topic] ?? 'Support';
         
-        return (new MailMessage)
-            ->subject('Balasan dari Perpustakaan UNIDA Gontor')
-            ->greeting("Halo {$notifiable->name}!")
-            ->line("Staff kami ({$this->staffName}) telah membalas pertanyaan Anda terkait {$topicLabel}:")
-            ->line("\"{$this->messagePreview}\"")
-            ->action('Lihat Balasan', url('/'))
-            ->line('Silakan login ke website perpustakaan untuk melihat balasan lengkap.')
-            ->salutation('Salam, Perpustakaan UNIDA Gontor');
+        return (new \Illuminate\Mail\Mailable)
+            ->to($notifiable->email)
+            ->subject("Balasan Support: {$topicLabel} - Perpustakaan UNIDA")
+            ->view('emails.support-reply', [
+                'name' => $notifiable->name,
+                'staffName' => $this->staffName,
+                'messagePreview' => $this->messagePreview,
+                'topic' => $topicLabel,
+                'chatUrl' => url('/member/support'),
+                'subject' => "Balasan Support",
+            ]);
     }
 }

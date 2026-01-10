@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\ThesisSubmission;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Mail;
 
-class ThesisStatusNotification extends Notification
+class ThesisStatusNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(public ThesisSubmission $submission, public string $action) {}
 
     public function via($notifiable): array
@@ -15,7 +19,7 @@ class ThesisStatusNotification extends Notification
         return ['mail'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable)
     {
         $status = match($this->action) {
             'approved' => 'Disetujui',
@@ -24,26 +28,33 @@ class ThesisStatusNotification extends Notification
             default => $this->action,
         };
 
-        $message = (new MailMessage)
-            ->subject("Tugas Akhir: {$status} - Perpustakaan UNIDA")
-            ->greeting("Assalamu'alaikum {$notifiable->name},");
+        $template = match($this->action) {
+            'approved' => 'emails.thesis-approved',
+            'rejected' => 'emails.thesis-rejected',
+            'revision' => 'emails.thesis-revision',
+            default => 'emails.thesis-revision',
+        };
+
+        $data = [
+            'name' => $notifiable->name,
+            'title' => $this->submission->title,
+            'nim' => $notifiable->member_id ?? null,
+            'subject' => "Tugas Akhir: {$status}",
+        ];
 
         if ($this->action === 'approved') {
-            $message->line("Selamat! Tugas akhir Anda telah **disetujui**.")
-                ->line("**Judul:** {$this->submission->title}")
-                ->action('Lihat Detail', url('/member/submissions'));
+            $data['detailUrl'] = url('/member/submissions');
         } elseif ($this->action === 'rejected') {
-            $message->line("Mohon maaf, tugas akhir Anda **ditolak**.")
-                ->line("**Judul:** {$this->submission->title}")
-                ->line("**Alasan:** " . ($this->submission->rejection_reason ?: '-'))
-                ->action('Ajukan Ulang', url('/member/submit-thesis'));
+            $data['rejectionReason'] = $this->submission->rejection_reason ?: '-';
+            $data['submitUrl'] = url('/member/submit-thesis');
         } else {
-            $message->line("Tugas akhir Anda memerlukan **revisi**.")
-                ->line("**Judul:** {$this->submission->title}")
-                ->line("**Catatan:** " . ($this->submission->review_notes ?: '-'))
-                ->action('Edit Submission', url("/member/submit-thesis/{$this->submission->id}"));
+            $data['reviewNotes'] = $this->submission->review_notes ?: '-';
+            $data['editUrl'] = url("/member/submit-thesis/{$this->submission->id}");
         }
 
-        return $message->line('Terima kasih telah menggunakan layanan Perpustakaan UNIDA Gontor.');
+        return (new \Illuminate\Mail\Mailable)
+            ->to($notifiable->email)
+            ->subject("Tugas Akhir: {$status} - Perpustakaan UNIDA")
+            ->view($template, $data);
     }
 }
