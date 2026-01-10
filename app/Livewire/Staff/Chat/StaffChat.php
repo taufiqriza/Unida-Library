@@ -68,6 +68,10 @@ class StaffChat extends Component
     public $deletingChatId = null;
     public $deletingChatName = '';
 
+    // Read Receipts
+    public $showReadReceipts = false;
+    public $readReceiptsList = [];
+
     protected ChatService $chatService;
 
     public function boot(ChatService $chatService)
@@ -1146,6 +1150,19 @@ class StaffChat extends Component
         }
 
         $this->typingUsers = $typing;
+    }
+
+    public function showMessageReaders($messageId)
+    {
+        $message = collect($this->messages)->firstWhere('id', $messageId);
+        $this->readReceiptsList = $message['readers'] ?? [];
+        $this->showReadReceipts = true;
+    }
+
+    public function closeReadReceipts()
+    {
+        $this->showReadReceipts = false;
+        $this->readReceiptsList = [];
     }
 
     public function render()
