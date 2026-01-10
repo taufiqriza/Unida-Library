@@ -281,10 +281,31 @@ class ChatbotService
     {
         // Try AI response as fallback
         if ($this->aiService->isEnabled() && $room && strlen($originalMessage) >= 5) {
+            // Get recent conversation history
+            $history = [];
+            if ($room) {
+                $recentMessages = \App\Models\ChatMessage::where('chat_room_id', $room->id)
+                    ->whereIn('type', ['text', 'bot'])
+                    ->orderByDesc('created_at')
+                    ->take(6)
+                    ->get()
+                    ->reverse();
+                    
+                foreach ($recentMessages as $msg) {
+                    $history[] = [
+                        'is_member' => is_null($msg->sender_id) && $msg->type === 'text',
+                        'message' => $msg->message
+                    ];
+                }
+            }
+            
             $aiResponse = $this->aiService->generateResponse(
                 $originalMessage,
                 $room->topic ?? 'lainnya',
-                ['member_name' => $room->member?->name]
+                [
+                    'member_name' => $room->member?->name,
+                    'history' => $history
+                ]
             );
             
             if ($aiResponse) {

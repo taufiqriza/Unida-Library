@@ -22,7 +22,7 @@ class ChatAiService
     }
 
     /**
-     * Generate AI response for support chat
+     * Generate AI response for support chat with conversation context
      */
     public function generateResponse(string $question, string $topic, array $context = []): ?string
     {
@@ -30,34 +30,56 @@ class ChatAiService
             return null;
         }
 
+        // Don't cache if there's conversation history (context-dependent)
+        $hasHistory = !empty($context['history']);
         $cacheKey = "chat_ai:" . md5($question . $topic);
         
-        return Cache::remember($cacheKey, 300, function () use ($question, $topic, $context) {
-            try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . $this->apiKey,
-                    'Content-Type' => 'application/json',
-                ])->timeout(10)->post($this->baseUrl, [
-                    'model' => 'llama-3.1-8b-instant',
-                    'messages' => [
-                        ['role' => 'system', 'content' => $this->getSystemPrompt()],
-                        ['role' => 'user', 'content' => $this->buildPrompt($question, $topic, $context)]
-                    ],
-                    'max_tokens' => 400,
-                    'temperature' => 0.7,
-                ]);
+        if (!$hasHistory && Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
 
-                if ($response->successful()) {
-                    $content = $response->json()['choices'][0]['message']['content'] ?? '';
-                    return $this->formatResponse($content);
+        try {
+            $messages = [
+                ['role' => 'system', 'content' => $this->getSystemPrompt()]
+            ];
+            
+            // Add conversation history for context
+            if (!empty($context['history'])) {
+                foreach (array_slice($context['history'], -6) as $msg) { // Last 6 messages
+                    $role = $msg['is_member'] ? 'user' : 'assistant';
+                    $messages[] = ['role' => $role, 'content' => $msg['message']];
+                }
+            }
+            
+            // Add current question
+            $messages[] = ['role' => 'user', 'content' => $this->buildPrompt($question, $topic, $context)];
+            
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(10)->post($this->baseUrl, [
+                'model' => 'llama-3.1-8b-instant',
+                'messages' => $messages,
+                'max_tokens' => 400,
+                'temperature' => 0.7,
+            ]);
+
+            if ($response->successful()) {
+                $content = $response->json()['choices'][0]['message']['content'] ?? '';
+                $formatted = $this->formatResponse($content);
+                
+                if (!$hasHistory) {
+                    Cache::put($cacheKey, $formatted, 300);
                 }
                 
-                return null;
-            } catch (\Exception $e) {
-                Log::warning('ChatAI failed: ' . $e->getMessage());
-                return null;
+                return $formatted;
             }
-        });
+            
+            return null;
+        } catch (\Exception $e) {
+            Log::warning('ChatAI failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     private function getSystemPrompt(): string

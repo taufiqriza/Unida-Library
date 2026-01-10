@@ -197,8 +197,8 @@
             @if(!$connectedToStaff)
             {{-- Connect to Staff Button --}}
             <div class="px-3 pt-2">
-                <button type="button" wire:click="connectToStaff" class="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm transition">
-                    <i class="fas fa-headset"></i> Hubungi Pustakawan Langsung
+                <button type="button" wire:click="connectToStaff" class="w-full py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-700 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition">
+                    <i class="fas fa-headset text-[10px]"></i> Hubungi Admin
                 </button>
             </div>
             {{-- Quick Questions --}}
@@ -214,7 +214,7 @@
             <div class="px-3 pt-2">
                 <div class="py-2 px-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2 text-green-700 text-sm">
                     <i class="fas fa-check-circle"></i>
-                    <span>Terhubung dengan pustakawan</span>
+                    <span>Terhubung dengan admin</span>
                 </div>
             </div>
             @endif
