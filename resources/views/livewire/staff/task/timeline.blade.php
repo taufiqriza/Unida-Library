@@ -76,14 +76,23 @@
     </div>
 
     {{-- Compact Stats Cards --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
         <div class="stat-card bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
             <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
                 <i class="fas fa-tasks text-sm"></i>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold">{{ $tasks->count() }}</p>
-                <p class="text-[10px] text-violet-100 uppercase tracking-wide">Tugas</p>
+                <p class="text-2xl font-bold">{{ $stats['total_tasks'] }}</p>
+                <p class="text-[10px] text-violet-100 uppercase tracking-wide">Total</p>
+            </div>
+        </div>
+        <div class="stat-card bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
+            <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-user text-sm"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold">{{ $stats['my_tasks'] }}</p>
+                <p class="text-[10px] text-blue-100 uppercase tracking-wide">Saya</p>
             </div>
         </div>
         <div class="stat-card bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
@@ -97,29 +106,38 @@
         </div>
         <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
             <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center text-amber-500">
-                <i class="fas fa-clock text-sm"></i>
+                <i class="fas fa-hourglass-half text-sm"></i>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold text-gray-900">{{ $timelineDays }}</p>
-                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Hari</p>
+                <p class="text-2xl font-bold text-amber-600">{{ $stats['due_soon'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Segera</p>
             </div>
         </div>
-        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
+        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between {{ $stats['overdue'] > 0 ? 'ring-1 ring-red-200' : '' }}">
             <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center text-red-500">
                 <i class="fas fa-exclamation-triangle text-sm"></i>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold text-red-600">{{ $tasks->filter(fn($t) => $t->isOverdue())->count() }}</p>
+                <p class="text-2xl font-bold {{ $stats['overdue'] > 0 ? 'text-red-600' : 'text-gray-900' }}">{{ $stats['overdue'] }}</p>
                 <p class="text-[10px] text-gray-500 uppercase tracking-wide">Terlambat</p>
             </div>
         </div>
         <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
-            <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-500">
-                <i class="fas fa-calendar text-sm"></i>
+            <div class="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                <i class="fas fa-inbox text-sm"></i>
             </div>
             <div class="text-right">
-                <p class="text-lg font-bold text-gray-900">{{ $timelineStart->format('d') }}-{{ $timelineEnd->format('d M') }}</p>
-                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Periode</p>
+                <p class="text-2xl font-bold text-gray-600">{{ $stats['no_date'] }}</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Backlog</p>
+            </div>
+        </div>
+        <div class="stat-card bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl px-4 py-3 text-white flex items-center justify-between">
+            <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-sticky-note text-sm"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold">{{ $stats['my_notes'] }}</p>
+                <p class="text-[10px] text-amber-100 uppercase tracking-wide">Notes</p>
             </div>
         </div>
     </div>
@@ -305,6 +323,121 @@
         </div>
     </div>
 
+    {{-- Backlog & Notes Row --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {{-- Backlog (Tasks Without Dates) --}}
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                        <i class="fas fa-inbox text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Backlog</h3>
+                        <p class="text-xs text-gray-500">Tugas tanpa tanggal deadline</p>
+                    </div>
+                </div>
+                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-lg">{{ $tasksWithoutDates->count() }}</span>
+            </div>
+            <div class="p-4 max-h-[300px] overflow-y-auto">
+                @if($tasksWithoutDates->count() > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    @foreach($tasksWithoutDates as $task)
+                    <div wire:click="openTaskModal({{ $task->id }})" 
+                         class="p-3 border border-gray-100 rounded-xl hover:border-violet-200 hover:shadow-md cursor-pointer transition group">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-white shadow-sm {{
+                                match($task->priority) {
+                                    'urgent' => 'bg-gradient-to-br from-rose-500 to-red-600',
+                                    'high' => 'bg-gradient-to-br from-orange-500 to-amber-500',
+                                    'medium' => 'bg-gradient-to-br from-violet-500 to-purple-500',
+                                    default => 'bg-gradient-to-br from-blue-500 to-indigo-500'
+                                }
+                            }}">
+                                <i class="fas fa-tasks text-xs"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-semibold text-gray-900 text-sm truncate group-hover:text-violet-600 transition">{{ $task->title }}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="px-2 py-0.5 text-[10px] font-semibold rounded uppercase"
+                                          style="background: {{ $task->status?->color }}15; color: {{ $task->status?->color }}">
+                                        {{ $task->status?->name ?? 'New' }}
+                                    </span>
+                                    @if($task->assignee)
+                                    <span class="text-[10px] text-gray-400">{{ Str::limit($task->assignee->name, 10) }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <div class="text-center py-8">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                    </div>
+                    <p class="text-gray-500 text-sm">Semua tugas sudah memiliki deadline!</p>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Pinned Notes --}}
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-orange-50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center text-white shadow-sm">
+                        <i class="fas fa-sticky-note text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-900">Catatan Cepat</h3>
+                        <p class="text-xs text-gray-500">Notes terbaru</p>
+                    </div>
+                </div>
+                <a href="{{ route('staff.task.notes') }}" wire:navigate 
+                   class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-semibold rounded-lg transition">
+                    Lihat Semua
+                </a>
+            </div>
+            <div class="p-4 space-y-3 max-h-[300px] overflow-y-auto">
+                @forelse($pinnedNotes->merge($recentNotes)->unique('id')->take(5) as $note)
+                @php $noteColors = $note->getColorClasses(); @endphp
+                <div wire:click="openNoteModal({{ $note->id }})" 
+                     class="p-3 {{ $noteColors['bg'] }} {{ $noteColors['border'] }} border rounded-xl hover:shadow-md cursor-pointer transition group">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <h4 class="font-semibold text-gray-900 text-sm truncate flex-1 group-hover:text-violet-600">{{ $note->title }}</h4>
+                        @if($note->is_pinned)
+                        <i class="fas fa-thumbtack text-amber-500 text-xs"></i>
+                        @endif
+                    </div>
+                    @if($note->content)
+                    <p class="text-xs text-gray-500 line-clamp-2 mb-2">{{ Str::limit($note->content, 80) }}</p>
+                    @endif
+                    <div class="flex items-center justify-between text-[10px] text-gray-400">
+                        <span>{{ $note->updated_at->diffForHumans() }}</span>
+                        @if($note->is_public)
+                        <span class="px-1.5 py-0.5 bg-blue-100 text-blue-600 rounded text-[9px] font-semibold">Publik</span>
+                        @endif
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-6">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-sticky-note text-amber-500 text-xl"></i>
+                    </div>
+                    <p class="text-gray-500 text-sm mb-3">Belum ada catatan</p>
+                    <a href="{{ route('staff.task.notes') }}" wire:navigate 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition">
+                        <i class="fas fa-plus"></i>
+                        Buat Catatan
+                    </a>
+                </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
     {{-- Task Detail Modal (Teleport to body) --}}
     @if($showTaskModal && $selectedTask)
     @teleport('body')
@@ -346,6 +479,76 @@
                         <span class="font-medium ml-1">{{ $selectedTask->creator?->name ?? '-' }}</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    @endteleport
+    @endif
+
+    {{-- Note Preview Modal --}}
+    @if($showNoteModal && $selectedNote)
+    @teleport('body')
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" x-data x-init="document.body.style.overflow = 'hidden'" x-on:remove="document.body.style.overflow = ''">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeNoteModal"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            @php 
+                $noteColor = $selectedNote->getColorClasses();
+                $noteCat = $selectedNote->getCategoryInfo();
+            @endphp
+            
+            {{-- Header --}}
+            <div class="px-6 py-4 border-b border-gray-100 {{ $noteColor['bg'] }}">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 {{ $noteColor['bg'] }} {{ $noteColor['border'] }} border rounded-xl flex items-center justify-center">
+                            <i class="fas {{ $noteCat['icon'] }} {{ $noteColor['text'] }}"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">{{ $selectedNote->title }}</h3>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs {{ $noteColor['text'] }} font-medium">{{ $noteCat['label'] }}</span>
+                                @if($selectedNote->is_public)
+                                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[10px] rounded font-semibold">Publik</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <button wire:click="closeNoteModal" class="w-8 h-8 rounded-lg hover:bg-white/50 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            {{-- Content --}}
+            <div class="p-6">
+                @if($selectedNote->content)
+                <div class="prose prose-sm max-w-none">
+                    <p class="text-gray-700 whitespace-pre-wrap">{{ $selectedNote->content }}</p>
+                </div>
+                @else
+                <div class="text-center py-4 text-gray-400">
+                    <i class="fas fa-align-left text-2xl mb-2"></i>
+                    <p class="text-sm">Catatan ini tidak memiliki konten</p>
+                </div>
+                @endif
+            </div>
+            
+            {{-- Footer --}}
+            <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                    @if($selectedNote->user)
+                    <div class="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {{ strtoupper(substr($selectedNote->user->name, 0, 1)) }}
+                    </div>
+                    <span>{{ $selectedNote->user->name }}</span>
+                    <span class="text-gray-300">•</span>
+                    @endif
+                    <span class="text-gray-400">{{ $selectedNote->updated_at->format('d M Y, H:i') }}</span>
+                </div>
+                <a href="{{ route('staff.task.notes') }}" wire:navigate 
+                   class="px-3 py-1.5 bg-violet-100 hover:bg-violet-200 text-violet-700 text-xs font-semibold rounded-lg transition">
+                    Buka di Notes
+                </a>
             </div>
         </div>
     </div>
