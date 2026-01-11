@@ -229,85 +229,163 @@
     {{-- Modal (Teleport to body) --}}
     @if($showModal)
     @teleport('body')
-    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" x-data x-init="document.body.style.overflow = 'hidden'" x-on:remove="document.body.style.overflow = ''">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeModal"></div>
-        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            {{-- Modal Header --}}
-            <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-violet-50 to-purple-50 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
-                        <i class="fas {{ $editMode ? 'fa-pen' : 'fa-plus' }}"></i>
-                    </div>
-                    <h3 class="font-bold text-gray-900">{{ $editMode ? 'Edit Catatan' : 'Catatan Baru' }}</h3>
-                </div>
-                <button wire:click="closeModal" class="w-8 h-8 rounded-lg hover:bg-white/80 flex items-center justify-center text-gray-400 hover:text-gray-600 transition">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+         x-data="{ show: false }"
+         x-init="$nextTick(() => show = true); document.body.style.overflow = 'hidden'"
+         x-on:remove="document.body.style.overflow = ''">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/50 to-purple-900/40 backdrop-blur-md"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             wire:click="closeModal"></div>
+        
+        {{-- Modal Container --}}
+        <div class="relative w-full max-w-xl"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
             
-            {{-- Modal Body --}}
-            <div class="p-6 space-y-4">
-                {{-- Title --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Judul</label>
-                    <input type="text" wire:model="title" 
-                           class="w-full border-gray-200 rounded-xl focus:ring-violet-500 focus:border-violet-500"
-                           placeholder="Judul catatan...">
-                    @error('title') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                </div>
+            <div class="relative bg-white rounded-3xl shadow-2xl overflow-hidden ring-1 ring-black/5">
+                {{-- Decorative Background --}}
+                <div class="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
                 
-                {{-- Content --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Konten</label>
-                    <textarea wire:model="content" rows="5"
-                              class="w-full border-gray-200 rounded-xl focus:ring-violet-500 focus:border-violet-500"
-                              placeholder="Tulis catatan Anda..."></textarea>
-                </div>
-                
-                {{-- Category & Color --}}
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
-                        <select wire:model="category" class="w-full border-gray-200 rounded-xl focus:ring-violet-500 focus:border-violet-500">
-                            @foreach($categories as $key => $cat)
-                                <option value="{{ $key }}">{{ $cat['label'] }}</option>
-                            @endforeach
-                        </select>
+                {{-- Modal Header --}}
+                <div class="relative px-6 py-5 border-b border-gray-100/80 bg-gradient-to-r from-violet-50/80 via-purple-50/60 to-fuchsia-50/40">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <div class="w-12 h-12 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                                    <i class="fas {{ $editMode ? 'fa-pen-fancy' : 'fa-plus' }} text-lg"></i>
+                                </div>
+                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-lg shadow-sm flex items-center justify-center">
+                                    <i class="fas fa-sticky-note text-violet-500 text-[10px]"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900">{{ $editMode ? 'Edit Catatan' : 'Buat Catatan Baru' }}</h3>
+                                <p class="text-sm text-gray-500">{{ $editMode ? 'Perbarui catatan Anda' : 'Tambahkan catatan untuk tim' }}</p>
+                            </div>
+                        </div>
+                        <button wire:click="closeModal" 
+                                class="w-10 h-10 rounded-xl bg-white/80 hover:bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all hover:shadow-md hover:scale-105 active:scale-95">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Warna</label>
-                        <div class="flex gap-2">
-                            @foreach($colors as $key => $clr)
-                                <button type="button" wire:click="$set('color', '{{ $key }}')"
-                                        class="w-7 h-7 rounded-full {{ $clr['bg'] }} {{ $clr['border'] }} border-2 transition-transform {{ $color === $key ? 'ring-2 ring-offset-2 ring-violet-400 scale-110' : 'hover:scale-105' }}">
-                                </button>
-                            @endforeach
+                </div>
+                
+                {{-- Modal Body --}}
+                <div class="relative p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+                    {{-- Title Input --}}
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <i class="fas fa-heading text-violet-500 text-xs"></i>
+                            Judul Catatan
+                            <span class="text-red-400">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" wire:model="title" 
+                                   class="w-full px-4 py-3 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/10 focus:border-violet-400 focus:bg-white transition-all placeholder:text-gray-400"
+                                   placeholder="Masukkan judul catatan yang menarik...">
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">
+                                <i class="fas fa-pencil-alt text-sm"></i>
+                            </div>
+                        </div>
+                        @error('title') 
+                            <p class="text-red-500 text-xs flex items-center gap-1">
+                                <i class="fas fa-exclamation-circle"></i>{{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    
+                    {{-- Content Textarea --}}
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                            <i class="fas fa-align-left text-violet-500 text-xs"></i>
+                            Konten
+                        </label>
+                        <textarea wire:model="content" rows="4"
+                                  class="w-full px-4 py-3 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/10 focus:border-violet-400 focus:bg-white transition-all placeholder:text-gray-400 resize-none"
+                                  placeholder="Tulis isi catatan Anda di sini..."></textarea>
+                    </div>
+                    
+                    {{-- Category & Color in Cards --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        {{-- Category Select --}}
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                <i class="fas fa-folder text-violet-500 text-xs"></i>
+                                Kategori
+                            </label>
+                            <div class="relative">
+                                <select wire:model="category" 
+                                        class="w-full px-4 py-3 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-violet-500/10 focus:border-violet-400 focus:bg-white transition-all appearance-none cursor-pointer">
+                                    @foreach($categories as $key => $cat)
+                                        <option value="{{ $key }}">{{ $cat['label'] }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{-- Color Picker --}}
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                                <i class="fas fa-palette text-violet-500 text-xs"></i>
+                                Warna
+                            </label>
+                            <div class="flex items-center gap-2 p-3 bg-gray-50/50 rounded-xl border-2 border-gray-200">
+                                @foreach($colors as $key => $clr)
+                                    <button type="button" wire:click="$set('color', '{{ $key }}')"
+                                            class="relative w-8 h-8 rounded-full {{ $clr['bg'] }} border-2 {{ $color === $key ? $clr['border'] : 'border-transparent' }} transition-all duration-200 hover:scale-110 {{ $color === $key ? 'scale-110 shadow-lg' : '' }}">
+                                        @if($color === $key)
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <i class="fas fa-check {{ $clr['text'] }} text-xs"></i>
+                                            </div>
+                                        @endif
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {{-- Public Toggle Card --}}
+                    <div class="p-4 bg-gradient-to-r from-gray-50 via-violet-50/30 to-gray-50 rounded-2xl border border-gray-200/80">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl {{ $is_public ? 'bg-gradient-to-br from-blue-500 to-indigo-500' : 'bg-gray-200' }} flex items-center justify-center transition-all duration-300">
+                                    <i class="fas {{ $is_public ? 'fa-globe' : 'fa-lock' }} text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">{{ $is_public ? 'Catatan Publik' : 'Catatan Pribadi' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $is_public ? 'Semua anggota tim dapat melihat' : 'Hanya Anda yang dapat melihat' }}</p>
+                                </div>
+                            </div>
+                            <button type="button" wire:click="$toggle('is_public')" 
+                                    class="relative w-14 h-7 rounded-full transition-all duration-300 {{ $is_public ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg shadow-blue-500/30' : 'bg-gray-300' }}">
+                                <span class="absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 {{ $is_public ? 'left-[calc(100%-26px)]' : 'left-0.5' }}"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                {{-- Public Toggle --}}
-                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <button type="button" wire:click="$toggle('is_public')" 
-                            class="relative w-12 h-6 rounded-full transition-colors {{ $is_public ? 'bg-violet-500' : 'bg-gray-300' }}">
-                        <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform {{ $is_public ? 'translate-x-6' : '' }}"></span>
+                {{-- Modal Footer --}}
+                <div class="relative px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50/80 to-white flex items-center justify-between gap-4">
+                    <button wire:click="closeModal" 
+                            class="px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium rounded-xl hover:bg-gray-100 transition-all flex items-center gap-2">
+                        <i class="fas fa-arrow-left text-xs"></i>
+                        Batal
                     </button>
-                    <div>
-                        <p class="text-sm font-medium text-gray-700">Catatan Publik</p>
-                        <p class="text-xs text-gray-500">{{ $is_public ? 'Dapat dilihat semua anggota tim' : 'Hanya Anda yang dapat melihat' }}</p>
-                    </div>
+                    <button wire:click="save" 
+                            class="px-6 py-2.5 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-700 hover:via-purple-700 hover:to-fuchsia-700 text-white rounded-xl font-semibold shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]">
+                        <i class="fas {{ $editMode ? 'fa-save' : 'fa-plus-circle' }}"></i>
+                        {{ $editMode ? 'Simpan Perubahan' : 'Buat Catatan' }}
+                    </button>
                 </div>
-            </div>
-            
-            {{-- Modal Footer --}}
-            <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                <button wire:click="closeModal" class="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition">
-                    Batal
-                </button>
-                <button wire:click="save" 
-                        class="px-6 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-semibold hover:from-violet-700 hover:to-purple-700 shadow-lg shadow-purple-500/25 transition-all">
-                    {{ $editMode ? 'Simpan' : 'Buat' }}
-                </button>
             </div>
         </div>
     </div>
