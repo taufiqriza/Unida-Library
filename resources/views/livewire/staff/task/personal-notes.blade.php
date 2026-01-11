@@ -145,7 +145,8 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         @foreach($notes as $note)
             @php $colorClasses = $note->getColorClasses(); @endphp
-            <div class="note-card group relative {{ $colorClasses['bg'] }} {{ $colorClasses['border'] }} border rounded-2xl p-4">
+            <div wire:click="openPreviewModal({{ $note->id }})"
+                 class="note-card group relative {{ $colorClasses['bg'] }} {{ $colorClasses['border'] }} border rounded-2xl p-4 cursor-pointer">
                 {{-- Pin Badge --}}
                 @if($note->is_pinned)
                 <div class="absolute -top-2 -right-2 w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center shadow-lg">
@@ -172,16 +173,16 @@
                     
                     {{-- Actions (only for owner) --}}
                     @if($note->user_id === auth()->id())
-                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                        <button wire:click="togglePin({{ $note->id }})" 
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1" wire:click.stop>
+                        <button wire:click.stop="togglePin({{ $note->id }})" 
                                 class="w-7 h-7 rounded-lg hover:bg-white/80 flex items-center justify-center transition {{ $note->is_pinned ? 'text-amber-500' : 'text-gray-400' }}">
                             <i class="fas fa-thumbtack text-xs"></i>
                         </button>
-                        <button wire:click="openEditModal({{ $note->id }})" 
+                        <button wire:click.stop="openEditModal({{ $note->id }})" 
                                 class="w-7 h-7 rounded-lg hover:bg-white/80 flex items-center justify-center text-gray-400 hover:text-blue-500 transition">
                             <i class="fas fa-pen text-xs"></i>
                         </button>
-                        <button wire:click="delete({{ $note->id }})" 
+                        <button wire:click.stop="delete({{ $note->id }})" 
                                 wire:confirm="Yakin hapus catatan ini?"
                                 class="w-7 h-7 rounded-lg hover:bg-white/80 flex items-center justify-center text-gray-400 hover:text-red-500 transition">
                             <i class="fas fa-trash text-xs"></i>
@@ -385,6 +386,127 @@
                         <i class="fas {{ $editMode ? 'fa-save' : 'fa-plus-circle' }}"></i>
                         {{ $editMode ? 'Simpan Perubahan' : 'Buat Catatan' }}
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endteleport
+    @endif
+
+    {{-- Preview Modal --}}
+    @if($showPreviewModal && $selectedNote)
+    @teleport('body')
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+         x-data="{ show: false }"
+         x-init="$nextTick(() => show = true); document.body.style.overflow = 'hidden'"
+         x-on:remove="document.body.style.overflow = ''">
+        {{-- Backdrop --}}
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900/60 via-gray-900/50 to-purple-900/40 backdrop-blur-md"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             wire:click="closePreviewModal"></div>
+        
+        {{-- Modal Container --}}
+        <div class="relative w-full max-w-2xl"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+            
+            @php 
+                $noteColor = $selectedNote->getColorClasses();
+                $noteCat = $selectedNote->getCategoryInfo();
+            @endphp
+            
+            <div class="relative bg-white rounded-3xl shadow-2xl overflow-hidden ring-1 ring-black/5">
+                {{-- Decorative Header Background --}}
+                <div class="absolute top-0 left-0 right-0 h-32 {{ $noteColor['bg'] }} opacity-50"></div>
+                
+                {{-- Close Button --}}
+                <button wire:click="closePreviewModal" 
+                        class="absolute top-4 right-4 z-10 w-10 h-10 rounded-xl bg-white/90 hover:bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all hover:shadow-md hover:scale-105 active:scale-95">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                {{-- Header --}}
+                <div class="relative px-6 pt-6 pb-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 {{ $noteColor['bg'] }} {{ $noteColor['border'] }} border-2 rounded-2xl flex items-center justify-center shadow-lg">
+                            <i class="fas {{ $noteCat['icon'] }} {{ $noteColor['text'] }} text-xl"></i>
+                        </div>
+                        <div class="flex-1 pt-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 {{ $noteColor['bg'] }} {{ $noteColor['text'] }} text-xs font-semibold rounded-lg">
+                                    {{ $noteCat['label'] }}
+                                </span>
+                                @if($selectedNote->is_public)
+                                <span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs font-semibold rounded-lg flex items-center gap-1">
+                                    <i class="fas fa-globe text-[9px]"></i>Publik
+                                </span>
+                                @else
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-lg flex items-center gap-1">
+                                    <i class="fas fa-lock text-[9px]"></i>Pribadi
+                                </span>
+                                @endif
+                                @if($selectedNote->is_pinned)
+                                <span class="px-2 py-0.5 bg-amber-100 text-amber-600 text-xs font-semibold rounded-lg flex items-center gap-1">
+                                    <i class="fas fa-thumbtack text-[9px]"></i>Disematkan
+                                </span>
+                                @endif
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900 pr-12">{{ $selectedNote->title }}</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                {{-- Content --}}
+                <div class="px-6 pb-6">
+                    @if($selectedNote->content)
+                    <div class="prose prose-sm max-w-none bg-gray-50/50 rounded-2xl p-5 border border-gray-100">
+                        <div class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ $selectedNote->content }}</div>
+                    </div>
+                    @else
+                    <div class="text-center py-8 bg-gray-50/50 rounded-2xl border border-gray-100">
+                        <i class="fas fa-align-left text-gray-300 text-3xl mb-3"></i>
+                        <p class="text-gray-400">Catatan ini tidak memiliki konten</p>
+                    </div>
+                    @endif
+                </div>
+                
+                {{-- Footer --}}
+                <div class="px-6 py-4 border-t border-gray-100 bg-gradient-to-r from-gray-50/80 to-white">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            @if($selectedNote->user)
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                    {{ strtoupper(substr($selectedNote->user->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ $selectedNote->user->name }}</p>
+                                    <p class="text-xs text-gray-400">{{ $selectedNote->updated_at->format('d M Y, H:i') }}</p>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            @if($selectedNote->user_id === auth()->id())
+                            <button wire:click="editFromPreview" 
+                                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-all flex items-center gap-2">
+                                <i class="fas fa-pen text-xs"></i>
+                                Edit
+                            </button>
+                            @endif
+                            <button wire:click="closePreviewModal" 
+                                    class="px-5 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all flex items-center gap-2">
+                                <i class="fas fa-check"></i>
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

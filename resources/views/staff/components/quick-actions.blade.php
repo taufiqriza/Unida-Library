@@ -274,10 +274,10 @@
             </div>
         </div>
 
-        {{-- Katalog & Lainnya Section --}}
+        {{-- Katalog & Produktivitas Section --}}
         <div class="p-3">
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1">Katalog & Lainnya</p>
-            <div class="grid grid-cols-3 gap-2">
+            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-1">Katalog & Produktivitas</p>
+            <div class="grid grid-cols-4 gap-2">
                 <a href="{{ route('staff.biblio.index') }}" wire:navigate @click="open = false"
                    class="group flex flex-col items-center gap-2 p-3 rounded-xl bg-violet-50 hover:bg-violet-100 transition-all">
                     <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
@@ -292,12 +292,19 @@
                     </div>
                     <span class="text-[10px] font-semibold text-gray-600 text-center">Anggota</span>
                 </a>
+                <a href="{{ route('staff.task.notes') }}" wire:navigate @click="open = false"
+                   class="group flex flex-col items-center gap-2 p-3 rounded-xl bg-amber-50 hover:bg-amber-100 transition-all">
+                    <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <span class="text-[10px] font-semibold text-gray-600 text-center">Notes</span>
+                </a>
                 <a href="{{ route('staff.stock-opname.index') }}" wire:navigate @click="open = false"
                    class="group flex flex-col items-center gap-2 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all">
                     <div class="w-10 h-10 bg-gradient-to-br from-slate-500 to-gray-600 rounded-xl flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                         <i class="fas fa-clipboard-check"></i>
                     </div>
-                    <span class="text-[10px] font-semibold text-gray-600 text-center">Stock Opname</span>
+                    <span class="text-[10px] font-semibold text-gray-600 text-center">Stock</span>
                 </a>
             </div>
         </div>

@@ -98,6 +98,12 @@
             </div>
             @endif
             
+            <a href="{{ route('staff.task.notes') }}" wire:navigate 
+               class="px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-sm font-medium text-white hover:from-amber-600 hover:to-orange-600 transition flex items-center gap-2 shadow-sm">
+                <i class="fas fa-sticky-note text-xs"></i>
+                <span>Notes</span>
+            </a>
+            
             <button wire:click="loadData" class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
                 <i class="fas fa-sync-alt text-xs" wire:loading.class="fa-spin" wire:target="loadData"></i>
                 Refresh
@@ -201,30 +207,36 @@
         <div class="flex items-center justify-between mb-3">
             <h3 class="font-bold text-gray-900">Aksi Cepat</h3>
         </div>
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-5 gap-2">
             <a href="{{ route('staff.circulation.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
-                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
-                    <i class="fas fa-qrcode"></i>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-qrcode text-sm"></i>
                 </div>
-                <span class="text-[11px] font-medium text-gray-700 text-center">Scan</span>
+                <span class="text-[10px] font-medium text-gray-700 text-center">Scan</span>
             </a>
             <a href="{{ route('staff.attendance.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
-                <div class="w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white">
-                    <i class="fas fa-fingerprint"></i>
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-fingerprint text-sm"></i>
                 </div>
-                <span class="text-[11px] font-medium text-gray-700 text-center">Absen</span>
+                <span class="text-[10px] font-medium text-gray-700 text-center">Absen</span>
+            </a>
+            <a href="{{ route('staff.task.notes') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-sticky-note text-sm"></i>
+                </div>
+                <span class="text-[10px] font-medium text-gray-700 text-center">Notes</span>
             </a>
             <a href="{{ route('staff.member.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
-                <div class="w-11 h-11 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
-                    <i class="fas fa-users"></i>
+                <div class="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-users text-sm"></i>
                 </div>
-                <span class="text-[11px] font-medium text-gray-700 text-center">Anggota</span>
+                <span class="text-[10px] font-medium text-gray-700 text-center">Anggota</span>
             </a>
             <a href="{{ route('staff.biblio.index') }}" class="flex flex-col items-center gap-2 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition">
-                <div class="w-11 h-11 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white">
-                    <i class="fas fa-book"></i>
+                <div class="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center text-white">
+                    <i class="fas fa-book text-sm"></i>
                 </div>
-                <span class="text-[11px] font-medium text-gray-700 text-center">Katalog</span>
+                <span class="text-[10px] font-medium text-gray-700 text-center">Katalog</span>
             </a>
         </div>
     </div>

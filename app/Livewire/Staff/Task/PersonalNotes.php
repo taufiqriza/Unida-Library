@@ -12,6 +12,10 @@ class PersonalNotes extends Component
     public $editMode = false;
     public $noteId = null;
     
+    // Preview modal
+    public $showPreviewModal = false;
+    public $selectedNote = null;
+    
     // View mode: personal or public
     public $viewMode = 'personal';
     
@@ -114,6 +118,26 @@ class PersonalNotes extends Component
     {
         $this->showModal = false;
         $this->reset(['noteId', 'title', 'content', 'category', 'color', 'is_public']);
+    }
+
+    public function openPreviewModal($id)
+    {
+        $this->selectedNote = PersonalNote::with('user')->find($id);
+        $this->showPreviewModal = true;
+    }
+
+    public function closePreviewModal()
+    {
+        $this->showPreviewModal = false;
+        $this->selectedNote = null;
+    }
+
+    public function editFromPreview()
+    {
+        if ($this->selectedNote && $this->selectedNote->user_id === auth()->id()) {
+            $this->closePreviewModal();
+            $this->openEditModal($this->selectedNote->id);
+        }
     }
 
     public function save()
