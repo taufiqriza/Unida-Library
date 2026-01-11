@@ -476,7 +476,7 @@
                     </div>
                     <div>
                         <span class="text-gray-500">Reporter:</span>
-                        <span class="font-medium ml-1">{{ $selectedTask->creator?->name ?? '-' }}</span>
+                        <span class="font-medium ml-1">{{ $selectedTask->reporter?->name ?? '-' }}</span>
                     </div>
                 </div>
             </div>

@@ -34,7 +34,7 @@ class TaskTimeline extends Component
 
     public function openTaskModal($taskId)
     {
-        $this->selectedTask = Task::with(['assignee', 'creator', 'status', 'comments.user', 'checklists', 'activities.user'])->find($taskId);
+        $this->selectedTask = Task::with(['assignee', 'reporter', 'status', 'comments.user', 'checklists', 'activities.user'])->find($taskId);
         $this->showTaskModal = true;
     }
 
@@ -73,7 +73,7 @@ class TaskTimeline extends Component
         $timelineEnd = $timelineStart->copy()->addDays($timelineDays - 1);
         
         // Get ALL active tasks (not just those with dates)
-        $tasksQuery = Task::with(['assignee', 'status', 'creator', 'branch']);
+        $tasksQuery = Task::with(['assignee', 'status', 'reporter', 'branch']);
         
         // Filter by completion status
         if (!$this->showCompleted) {
