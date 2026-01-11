@@ -1,39 +1,39 @@
 @section('title', 'Jadwal Staff')
 
-<div class="space-y-4">
-    {{-- Header --}}
+<div class="space-y-5">
+    {{-- Header - Unified across all tabs --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">
-            <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                <i class="fas fa-calendar-alt text-2xl"></i>
+            <div class="w-14 h-14 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                <i class="fas fa-clipboard-list text-2xl"></i>
             </div>
             <div>
                 <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Tugas & Jadwal</h1>
                 <p class="text-sm text-gray-500 flex items-center gap-2">
                     <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                    Manajemen piket & penugasan
+                    Kolaborasi pekerjaan perpustakaan
                 </p>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            {{-- Unified 4-Tab Navigation --}}
+        <div class="flex items-center gap-3 flex-wrap">
+            {{-- Unified 4-Tab Navigation with wire:navigate --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
-                <a href="{{ route('staff.task.index') }}" 
+                <a href="{{ route('staff.task.index') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
                 </a>
-                <a href="{{ route('staff.task.timeline') }}" 
+                <a href="{{ route('staff.task.timeline') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-chart-gantt"></i>
                     <span class="hidden sm:inline">Timeline</span>
                 </a>
-                <span class="px-3 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm flex items-center gap-2">
+                <span class="px-3 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm flex items-center gap-2">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
                 </span>
-                <a href="{{ route('staff.task.notes') }}" 
+                <a href="{{ route('staff.task.notes') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-sticky-note"></i>
                     <span class="hidden sm:inline">Notes</span>
@@ -43,18 +43,18 @@
             {{-- View Toggle (Week/Month) --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
                 <button wire:click="$set('viewMode', 'week')" 
-                        class="px-3 py-1.5 text-sm font-medium rounded-lg transition {{ $viewMode === 'week' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                        class="px-3 py-1.5 text-sm font-medium rounded-lg transition {{ $viewMode === 'week' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-calendar-week mr-1"></i>Minggu
                 </button>
                 <button wire:click="$set('viewMode', 'month')" 
-                        class="px-3 py-1.5 text-sm font-medium rounded-lg transition {{ $viewMode === 'month' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                        class="px-3 py-1.5 text-sm font-medium rounded-lg transition {{ $viewMode === 'month' ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-calendar mr-1"></i>Bulan
                 </button>
             </div>
             
             @if($isAdmin)
             <button wire:click="openCreateModal()" 
-                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-xl shadow-lg shadow-emerald-500/25 transition text-sm">
+                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-medium rounded-xl shadow-lg shadow-purple-500/25 transition text-sm">
                 <i class="fas fa-plus"></i>
                 <span class="hidden sm:inline">Buat Jadwal</span>
             </button>
@@ -62,27 +62,27 @@
         </div>
     </div>
 
-    {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
+    {{-- Stats Cards - Unified 5-column grid --}}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="stat-card bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
             <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
                 <i class="fas fa-calendar-check text-sm"></i>
             </div>
             <div class="text-right">
                 <p class="text-2xl font-bold">{{ $stats['total_this_period'] }}</p>
-                <p class="text-[10px] text-emerald-100 uppercase tracking-wide">Periode Ini</p>
+                <p class="text-[10px] text-violet-100 uppercase tracking-wide">Periode</p>
             </div>
         </div>
-        <div class="bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
-            <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center text-blue-500">
+        <div class="stat-card bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
+            <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
                 <i class="fas fa-user text-sm"></i>
             </div>
             <div class="text-right">
-                <p class="text-2xl font-bold text-gray-900">{{ $stats['my_schedules'] }}</p>
-                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Jadwal Saya</p>
+                <p class="text-2xl font-bold">{{ $stats['my_schedules'] }}</p>
+                <p class="text-[10px] text-blue-100 uppercase tracking-wide">Saya</p>
             </div>
         </div>
-        <div class="bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
+        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
             <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center text-amber-500">
                 <i class="fas fa-clock text-sm"></i>
             </div>
@@ -91,13 +91,22 @@
                 <p class="text-[10px] text-gray-500 uppercase tracking-wide">Hari Ini</p>
             </div>
         </div>
-        <div class="bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
+        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
             <div class="w-9 h-9 bg-violet-100 rounded-lg flex items-center justify-center text-violet-500">
                 <i class="fas fa-exchange-alt text-sm"></i>
             </div>
             <div class="text-right">
                 <p class="text-2xl font-bold text-gray-900">{{ $stats['pending_swaps'] }}</p>
-                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tukar Jadwal</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Tukar</p>
+            </div>
+        </div>
+        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div class="w-9 h-9 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-500">
+                <i class="fas fa-check-circle text-sm"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-lg font-bold text-gray-900">{{ $currentMonth }}</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Bulan</p>
             </div>
         </div>
     </div>
@@ -285,7 +294,7 @@
 
     {{-- Create/Edit Modal - Teleported to body for proper z-index --}}
     <template x-teleport="body">
-        <div style="position: relative; z-index: 9999;">
+        <div style="position: relative; z-index: 99999;">
             @if($showModal)
             <div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
                  x-transition:enter="transition ease-out duration-300"

@@ -348,6 +348,7 @@ class StaffScheduleManager extends Component
             'locations' => StaffSchedule::getLocations(),
             'shifts' => StaffSchedule::getShifts(),
             'currentDate' => $currentDate,
+            'currentMonth' => $currentDate->locale('id')->isoFormat('MMM'),
             'startDate' => $startDate,
             'endDate' => $endDate,
             'isAdmin' => $isAdmin,

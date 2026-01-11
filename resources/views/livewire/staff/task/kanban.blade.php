@@ -79,22 +79,22 @@
         <div class="flex items-center gap-3">
             {{-- Unified 4-Tab Navigation --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
-                <a href="{{ route('staff.task.index') }}" 
+                <a href="{{ route('staff.task.index') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 {{ $viewMode === 'kanban' ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100' }}">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
                 </a>
-                <a href="{{ route('staff.task.timeline') }}" 
+                <a href="{{ route('staff.task.timeline') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-chart-gantt"></i>
                     <span class="hidden sm:inline">Timeline</span>
                 </a>
-                <a href="{{ route('staff.task.schedule') }}" 
+                <a href="{{ route('staff.task.schedule') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
                 </a>
-                <a href="{{ route('staff.task.notes') }}" 
+                <a href="{{ route('staff.task.notes') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-sticky-note"></i>
                     <span class="hidden sm:inline">Notes</span>
@@ -630,7 +630,7 @@
 
     {{-- Modals teleported to body for proper z-index --}}
     <template x-teleport="body">
-        <div style="position: relative; z-index: 9999;">
+        <div style="position: relative; z-index: 99999;">
             {{-- Task Detail Modal --}}
             @if($showTaskModal && $selectedTask)
             <div class="fixed inset-0 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"

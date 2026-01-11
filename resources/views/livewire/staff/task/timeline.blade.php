@@ -10,25 +10,25 @@
 @endpush
 
 <div class="space-y-5">
-    {{-- Header --}}
+    {{-- Header - Unified across all tabs --}}
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
-                <i class="fas fa-chart-gantt text-2xl"></i>
+                <i class="fas fa-clipboard-list text-2xl"></i>
             </div>
             <div>
                 <h1 class="text-xl lg:text-2xl font-bold text-gray-900">Tugas & Jadwal</h1>
                 <p class="text-sm text-gray-500 flex items-center gap-2">
-                    <span class="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></span>
-                    Tampilan Gantt Timeline
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    Kolaborasi pekerjaan perpustakaan
                 </p>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
-            {{-- Unified 4-Tab Navigation --}}
+        <div class="flex items-center gap-3 flex-wrap">
+            {{-- Unified 4-Tab Navigation with wire:navigate --}}
             <div class="bg-white rounded-xl p-1 border border-gray-200 flex shadow-sm">
-                <a href="{{ route('staff.task.index') }}" 
+                <a href="{{ route('staff.task.index') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-columns"></i>
                     <span class="hidden sm:inline">Kanban</span>
@@ -37,12 +37,12 @@
                     <i class="fas fa-chart-gantt"></i>
                     <span class="hidden sm:inline">Timeline</span>
                 </span>
-                <a href="{{ route('staff.task.schedule') }}" 
+                <a href="{{ route('staff.task.schedule') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-calendar-alt"></i>
                     <span class="hidden sm:inline">Jadwal</span>
                 </a>
-                <a href="{{ route('staff.task.notes') }}" 
+                <a href="{{ route('staff.task.notes') }}" wire:navigate
                    class="px-3 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 text-gray-600 hover:bg-gray-100">
                     <i class="fas fa-sticky-note"></i>
                     <span class="hidden sm:inline">Notes</span>
@@ -66,7 +66,7 @@
             </div>
             
             {{-- Branch Filter --}}
-            <select wire:model.live="filterBranch" class="text-sm border-gray-200 rounded-xl focus:ring-violet-500 focus:border-violet-500 shadow-sm">
+            <select wire:model.live="filterBranch" class="text-sm border-gray-200 rounded-xl focus:ring-violet-500 focus:border-violet-500 shadow-sm py-2">
                 <option value="">Semua Cabang</option>
                 @foreach($branches as $branch)
                     <option value="{{ $branch->id }}">{{ $branch->name }}</option>
@@ -75,8 +75,8 @@
         </div>
     </div>
 
-    {{-- Stats Cards --}}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    {{-- Compact Stats Cards --}}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <div class="stat-card bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl px-4 py-3 text-white flex items-center justify-between">
             <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center">
                 <i class="fas fa-tasks text-sm"></i>
@@ -102,6 +102,15 @@
             <div class="text-right">
                 <p class="text-2xl font-bold text-gray-900">{{ $timelineDays }}</p>
                 <p class="text-[10px] text-gray-500 uppercase tracking-wide">Hari</p>
+            </div>
+        </div>
+        <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
+            <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center text-red-500">
+                <i class="fas fa-exclamation-triangle text-sm"></i>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-red-600">{{ $tasks->filter(fn($t) => $t->isOverdue())->count() }}</p>
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide">Terlambat</p>
             </div>
         </div>
         <div class="stat-card bg-white rounded-xl px-4 py-3 border border-gray-100 shadow-sm flex items-center justify-between">
@@ -295,51 +304,51 @@
             </div>
         </div>
     </div>
-</div>
 
-{{-- Task Detail Modal (Teleport to body) --}}
-@if($showTaskModal && $selectedTask)
-@teleport('body')
-<div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" x-data x-init="document.body.style.overflow = 'hidden'" x-on:remove="document.body.style.overflow = ''">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeTaskModal"></div>
-    <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900">{{ $selectedTask->title }}</h3>
-                    <p class="text-sm text-gray-500">{{ $selectedTask->status?->name ?? 'No Status' }}</p>
+    {{-- Task Detail Modal (Teleport to body) --}}
+    @if($showTaskModal && $selectedTask)
+    @teleport('body')
+    <div class="fixed inset-0 z-[99999] flex items-center justify-center p-4" x-data x-init="document.body.style.overflow = 'hidden'" x-on:remove="document.body.style.overflow = ''">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" wire:click="closeTaskModal"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">{{ $selectedTask->title }}</h3>
+                        <p class="text-sm text-gray-500">{{ $selectedTask->status?->name ?? 'No Status' }}</p>
+                    </div>
+                    <button wire:click="closeTaskModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button wire:click="closeTaskModal" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            @if($selectedTask->description)
-            <div class="mb-4">
-                <p class="text-sm text-gray-600">{{ $selectedTask->description }}</p>
-            </div>
-            @endif
-            
-            <div class="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                    <span class="text-gray-500">Prioritas:</span>
-                    <span class="font-medium ml-1 capitalize">{{ $selectedTask->priority }}</span>
+                
+                @if($selectedTask->description)
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600">{{ $selectedTask->description }}</p>
                 </div>
-                <div>
-                    <span class="text-gray-500">Deadline:</span>
-                    <span class="font-medium ml-1">{{ $selectedTask->due_date?->format('d M Y') ?? '-' }}</span>
-                </div>
-                <div>
-                    <span class="text-gray-500">Assignee:</span>
-                    <span class="font-medium ml-1">{{ $selectedTask->assignee?->name ?? '-' }}</span>
-                </div>
-                <div>
-                    <span class="text-gray-500">Reporter:</span>
-                    <span class="font-medium ml-1">{{ $selectedTask->creator?->name ?? '-' }}</span>
+                @endif
+                
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-500">Prioritas:</span>
+                        <span class="font-medium ml-1 capitalize">{{ $selectedTask->priority }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Deadline:</span>
+                        <span class="font-medium ml-1">{{ $selectedTask->due_date?->format('d M Y') ?? '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Assignee:</span>
+                        <span class="font-medium ml-1">{{ $selectedTask->assignee?->name ?? '-' }}</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Reporter:</span>
+                        <span class="font-medium ml-1">{{ $selectedTask->creator?->name ?? '-' }}</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    @endteleport
+    @endif
 </div>
-@endteleport
-@endif
