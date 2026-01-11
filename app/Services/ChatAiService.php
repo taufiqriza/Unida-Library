@@ -13,7 +13,7 @@ class ChatAiService
 
     public function __construct()
     {
-        $this->apiKey = config('services.groq.api_key', '');
+        $this->apiKey = (string) (config('services.groq.api_key') ?? '');
     }
 
     public function isEnabled(): bool
